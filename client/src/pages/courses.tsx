@@ -2,21 +2,16 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { 
   ArrowLeft, 
-  Globe, 
   Monitor, 
   MessageCircle, 
-  Users, 
   Mountain,
   Laptop,
   Sparkles,
   GraduationCap,
   Baby,
   BookOpen,
-  Video,
-  Award,
   MapPin,
-  Clock,
-  Euro
+  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +25,17 @@ import categoryKids from "@/assets/images/category-kids.jpg";
 import categoryDigital from "@/assets/images/category-digital.jpg";
 import categoryGrowth from "@/assets/images/category-growth.jpg";
 
+import courseGroup from "@/assets/images/course-group.jpg";
+import courseIndividual from "@/assets/images/course-individual.jpg";
+import courseCertification from "@/assets/images/course-certification.jpg";
+import courseElearning from "@/assets/images/course-elearning.jpg";
+import courseConversation from "@/assets/images/course-conversation.jpg";
+import courseAdventure from "@/assets/images/course-adventure.jpg";
+import courseChildren from "@/assets/images/course-children.jpg";
+import courseTeens from "@/assets/images/course-teens.jpg";
+import courseExcel from "@/assets/images/course-excel.jpg";
+import courseAi from "@/assets/images/course-ai.jpg";
+
 const categoryImages: Record<string, string> = {
   presenza: categoryPresence,
   online: categoryOnline,
@@ -38,6 +44,28 @@ const categoryImages: Record<string, string> = {
   kids: categoryKids,
   digital: categoryDigital,
   growth: categoryGrowth,
+};
+
+const courseImages: Record<string, string> = {
+  "Corsi di Lingua di Gruppo": courseGroup,
+  "Corsi Individuali": courseIndividual,
+  "Preparazione Certificazioni": courseCertification,
+  "Self-Learning + Piattaforma": courseElearning,
+  "Blended Individuale": courseIndividual,
+  "Blended di Gruppo": courseGroup,
+  "Abbonamento Annuale": courseConversation,
+  "Conversazione Individuale": courseConversation,
+  "Learning Weekend": courseAdventure,
+  "Learning Week": courseAdventure,
+  "Kids' Courses": courseChildren,
+  "Summer City Camp": courseChildren,
+  "Vacanze Studio Estero": courseTeens,
+  "Office Senza Segreti": courseExcel,
+  "AI Senza Segreti": courseAi,
+  "Digital Skills Bootcamp": courseExcel,
+  "Comunicazione Efficace": courseGroup,
+  "Time Management": courseExcel,
+  "Mindfulness & Wellbeing": courseAdventure,
 };
 
 const courseCategories = [
@@ -334,21 +362,28 @@ export default function CoursesPage() {
                     viewport={{ once: true }}
                     transition={{ delay: courseIndex * 0.05 }}
                   >
-                    <Card className="h-full hover-elevate" data-testid={`card-course-${category.id}-${courseIndex}`}>
-                      <CardHeader>
+                    <Card className="h-full hover-elevate overflow-hidden" data-testid={`card-course-${category.id}-${courseIndex}`}>
+                      <div className="relative h-40 overflow-hidden">
+                        <img 
+                          src={courseImages[course.title] || categoryImages[category.id]} 
+                          alt={course.title}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+                        <div className="absolute bottom-3 left-3 right-3">
+                          <Badge className={`bg-gradient-to-r ${category.color} text-white border-0`}>
+                            {course.price}
+                          </Badge>
+                        </div>
+                      </div>
+                      <CardHeader className="pt-4">
                         <CardTitle className="text-lg">{course.title}</CardTitle>
                         <CardDescription>{course.description}</CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <div className="flex items-center gap-4 mb-4">
-                          <div className="flex items-center gap-1 text-primary font-semibold">
-                            <Euro className="w-4 h-4" />
-                            {course.price}
-                          </div>
-                          <div className="flex items-center gap-1 text-muted-foreground text-sm">
-                            <Clock className="w-4 h-4" />
-                            {course.duration}
-                          </div>
+                        <div className="flex items-center gap-1 text-muted-foreground text-sm mb-4">
+                          <Clock className="w-4 h-4" />
+                          {course.duration}
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {course.features.map((feature) => (
