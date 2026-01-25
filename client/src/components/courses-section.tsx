@@ -34,10 +34,11 @@ const courseImages: Record<string, string> = {
   "5": courseSpeaking,
   "6": courseEnglish,
   "7": courseDigital,
-  "8": courseSpeaking,
-  "9": coursePersonal,
+  "8": courseDigital,
+  "9": courseSpeaking,
   "10": coursePersonal,
   "11": coursePersonal,
+  "12": coursePersonal,
 };
 
 const iconMap: Record<string, any> = {
@@ -114,17 +115,26 @@ const courses: Course[] = [
   },
   {
     id: "7",
-    title: "AI e Office",
-    description: "Corsi di Intelligenza Artificiale e pacchetto Office per potenziare le tue competenze digitali. ChatGPT, Copilot, Word, Excel, PowerPoint.",
+    title: "Intelligenza Artificiale",
+    description: "Impara a usare ChatGPT, Copilot e altri strumenti AI per la produttività personale. Automazione, creatività e innovazione.",
     category: "digital",
-    duration: "1-3 mesi",
+    duration: "1-2 mesi",
     level: "all",
     icon: "sparkles",
     featured: true,
   },
-  // SKILLCRAFT COURSES
   {
     id: "8",
+    title: "Office & Produttività",
+    description: "Padroneggia Word, Excel, PowerPoint, Outlook e Teams. Dalle basi alle funzioni avanzate per massimizzare la tua efficienza.",
+    category: "digital",
+    duration: "1-3 mesi",
+    level: "all",
+    icon: "monitor",
+  },
+  // SKILLCRAFT COURSES
+  {
+    id: "9",
     title: "Digital Marketing",
     description: "Social media, SEO, content creation e personal branding. Impara a promuoverti online e costruire la tua presenza digitale.",
     category: "digital",
@@ -133,7 +143,7 @@ const courses: Course[] = [
     icon: "megaphone",
   },
   {
-    id: "9",
+    id: "10",
     title: "Competenze Trasversali",
     description: "Soft skills essenziali: comunicazione efficace, public speaking, gestione del tempo, problem solving e leadership personale.",
     category: "professional",
@@ -142,7 +152,7 @@ const courses: Course[] = [
     icon: "briefcase",
   },
   {
-    id: "10",
+    id: "11",
     title: "Crescita Personale",
     description: "Sviluppo personale e professionale: mindset, produttività, gestione dello stress e obiettivi. Coaching individuale disponibile.",
     category: "personal",
@@ -151,7 +161,7 @@ const courses: Course[] = [
     icon: "brain",
   },
   {
-    id: "11",
+    id: "12",
     title: "Sostenibilità",
     description: "Competenze per uno stile di vita sostenibile. Impatto ambientale, economia circolare e scelte consapevoli per il futuro.",
     category: "personal",
