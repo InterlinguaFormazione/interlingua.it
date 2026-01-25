@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, Users, Award, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import heroImage from "@/assets/images/hero-learning.jpg";
 
 const stats = [
   { icon: Users, value: "10,000+", label: "Studenti Formati" },
@@ -21,12 +20,16 @@ export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
       <div className="absolute inset-0">
-        <img 
-          src={heroImage} 
-          alt="Studenti che apprendono in un moderno centro di formazione" 
+        <video 
+          autoPlay 
+          muted 
+          loop 
+          playsInline
           className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/80 to-background" />
+        >
+          <source src="https://interlingua.it/wp-content/uploads/2022/05/corso-di-lingua-inglese.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background" />
       </div>
       
       <div className="absolute top-1/4 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
