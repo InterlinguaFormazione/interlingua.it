@@ -3,6 +3,7 @@ import { ArrowRight, Sparkles, Users, Award, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import heroImage from "@/assets/images/hero-learning.jpg";
+import heroVideo from "@/assets/videos/hero-video.mp4";
 
 const stats = [
   { icon: Users, value: "10,000+", label: "Studenti Formati" },
@@ -29,7 +30,7 @@ export function HeroSection() {
           className="w-full h-full object-cover"
           poster={heroImage}
         >
-          <source src="https://interlingua.it/wp-content/uploads/2022/05/corso-di-lingua-inglese.mp4" type="video/mp4" />
+          <source src={heroVideo} type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background" />
       </div>
