@@ -70,8 +70,8 @@ const courseImages: Record<string, string> = {
   "Abbonamento Annuale": courseConversation,
   "Prova Gratuita 1 Mese": courseConversation,
   "Conversazione Individuale": courseConversation,
-  "Learning Weekend": courseAdventure,
-  "Learning Week": courseAdventure,
+  "Full Immersion Workshop": courseAdventure,
+  "Spirit of Leadership": courseAdventure,
   "Kids' Courses": courseChildren,
   "Summer City Camp": courseChildren,
   "Summer Camp Esperienziale": courseAdventure,
@@ -212,61 +212,61 @@ const courseCategories = [
     id: "immersion",
     title: "Full Immersion",
     subtitle: "Esperienze trasformative",
-    description: "Learning weeks e weekends esperienziali con attività outdoor, team building e formazione linguistica intensiva.",
+    description: "Workshop superintensivi per avanzare di un intero livello QCER. Disponibili in versione indoor a Vicenza o outdoor sui colli Vicentini.",
     icon: Mountain,
     color: "from-green-500 to-green-600",
     courses: [
       {
-        title: "Learning Weekend",
-        description: "Weekend intensivo in lingua inglese con attività esperienziali e team building",
-        price: "Da €385",
-        duration: "2-3 giorni",
-        features: ["100% in inglese", "Outdoor activities", "Team building", "Coach madrelingua"]
-      },
-      {
-        title: "Learning Week",
-        description: "Settimana completa di immersione con sport, creatività e formazione linguistica",
+        title: "Full Immersion Workshop",
+        description: "Workshop indoor superintensivo a Vicenza centro. 4 formatori madrelingua specializzati. Avanza un intero livello QCER in una settimana",
         price: "Da €750",
         duration: "5-7 giorni",
-        features: ["Equitazione/Rafting", "Teatro/Creatività", "Personal development", "Certificato"]
+        features: ["4 coach madrelingua", "Vicenza UNESCO", "Soft Skills", "Certificato QCER"]
+      },
+      {
+        title: "Spirit of Leadership",
+        description: "Workshop esperienziale outdoor sui colli Vicentini con equitazione. Leadership, Team Working, Problem Solving in inglese",
+        price: "Da €385",
+        duration: "Weekend o settimana",
+        features: ["Equitazione", "Team building", "Colli Vicentini", "100% in inglese"]
       }
     ]
   },
   {
     id: "kids",
     title: "Bambini e Ragazzi",
-    subtitle: "Dai 5 ai 18 anni",
-    description: "Corsi dedicati ai giovani con metodologie ludiche e coinvolgenti. Summer camp e supporto scolastico.",
+    subtitle: "Dai 5 ai 16 anni",
+    description: "Corsi dedicati ai giovani con metodologie ludiche e coinvolgenti. Grammar Games, English Theatre, Team Building e molto altro.",
     icon: Baby,
     color: "from-pink-500 to-pink-600",
     courses: [
       {
         title: "Kids' Courses",
-        description: "Corsi di gruppo per bambini e ragazzi 5-18 anni. Grammar Games, English Theatre, Team Building",
-        price: "€280",
-        duration: "Trimestrale",
-        features: ["Max 5 partecipanti", "Docente madrelingua", "Attività ludiche", "Divisi per età"]
+        description: "Corsi di gruppo per bambini e ragazzi 5-16 anni a Vicenza e Thiene. 1 incontro/settimana di 1h15min con docente madrelingua",
+        price: "€370/quadrimestre",
+        duration: "20 ore (1 quadrimestre)",
+        features: ["Max 5 partecipanti", "Grammar Games, English Theatre", "Divisi per fascia d'età", "Materiale incluso"]
       },
       {
         title: "Summer City Camp",
-        description: "Settimane estive in inglese a Vicenza con attività creative, sportive e culturali. Centro storico con aria condizionata",
-        price: "Da €250/sett.",
+        description: "Settimane estive in inglese presso la sede di Vicenza. Lun-Ven 8:30-12:30 con 2 docenti madrelingua. 3 materie a scelta",
+        price: "€335/settimana",
         duration: "Giugno-Settembre",
-        features: ["Full immersion", "Attività varie", "Centro Vicenza", "Aria condizionata"]
+        features: ["Full immersion", "2 docenti madrelingua", "Centro Vicenza", "Attestato finale"]
       },
       {
         title: "Summer Camp Esperienziale",
-        description: "Learning weeks in montagna con sport (equitazione, rafting, hiking) e team building in inglese",
+        description: "Learning weeks in collina sui colli Vicentini con equitazione, hiking e team building. 100% in lingua inglese",
         price: "Da €550/sett.",
-        duration: "Giugno-Agosto",
-        features: ["Sport all'aperto", "Team building", "Coach madrelingua", "Natura"]
+        duration: "Giugno-Settembre",
+        features: ["Equitazione", "Team building", "Coach madrelingua", "Natura e sport"]
       },
       {
         title: "Corsi Online per Ragazzi",
-        description: "Lezioni individuali o di gruppo online per bambini e ragazzi con piattaforma AI interattiva",
+        description: "Lezioni individuali o di gruppo in aula virtuale Zoom, o blended con piattaforma AI interattiva per i più grandi",
         price: "Da €35/mese",
         duration: "Rinnovabile",
-        features: ["Piattaforma AI", "Docenti qualificati", "Orari flessibili", "Giochi didattici"]
+        features: ["Piattaforma AI", "Docenti qualificati", "Orari flessibili", "Perfetto per i piccoli"]
       },
       {
         title: "AI for Students",
@@ -277,10 +277,10 @@ const courseCategories = [
       },
       {
         title: "Vacanze Studio Estero",
-        description: "Soggiorni linguistici in UK, Irlanda, USA, Canada con famiglie selezionate o college",
+        description: "Soggiorni linguistici in UK, Irlanda, USA, Canada con famiglie selezionate o college. Network internazionale di scuole qualificate",
         price: "Su richiesta",
         duration: "2-4 settimane",
-        features: ["Network internazionale", "Assistenza h24", "Famiglie selezionate", "Certificazione"]
+        features: ["Network internazionale", "Consulenza personalizzata", "Famiglie selezionate", "Assistenza h24"]
       }
     ]
   },
