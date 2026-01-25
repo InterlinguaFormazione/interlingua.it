@@ -6,11 +6,18 @@ import aboutTeam from "@/assets/images/about-team.jpg";
 
 const locations = [
   {
-    name: "Sede Principale",
-    address: "Via della Formazione, 42",
-    city: "Milano, MI 20121",
-    phone: "+39 02 1234 5678",
-    email: "info@skillcraft-interlingua.it",
+    name: "Sede Vicenza",
+    address: "Viale della Scienza, 9",
+    city: "Vicenza, VI 36100",
+    phone: "+39 0444 321 654",
+    email: "info@interlingua.it",
+  },
+  {
+    name: "Sede Thiene",
+    address: "Via Trento, 22",
+    city: "Thiene, VI 36016",
+    phone: "+39 0445 380 580",
+    email: "thiene@interlingua.it",
   },
 ];
 
@@ -43,41 +50,41 @@ export function AboutSection() {
               Chi Siamo
             </Badge>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
-              Due Realtà, Una{" "}
+              Dal 1993, Leader nella{" "}
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Visione
+                Formazione Linguistica
               </span>
             </h2>
             <div className="space-y-4 text-muted-foreground">
               <p>
-                <strong className="text-foreground">SkillCraft-Interlingua</strong> nasce 
-                dall'unione di due eccellenze nel campo della formazione: 
-                Interlingua Formazione e SkillCraft.
+                <strong className="text-foreground">Interlingua Formazione</strong>, fondata nel 1993, 
+                è oggi un leader italiano nella formazione linguistica e nell'Executive Training 
+                in lingua inglese.
               </p>
               <p>
-                Da oltre 15 anni, <strong className="text-foreground">Interlingua</strong> è 
-                sinonimo di eccellenza nell'insegnamento delle lingue, con un metodo 
-                consolidato che ha formato migliaia di studenti.
+                Il nostro <strong className="text-foreground">Metodo Interlingua</strong> garantisce 
+                un approccio naturale, efficace e rapido all'apprendimento delle lingue straniere, 
+                con docenti madrelingua di alto livello.
               </p>
               <p>
-                <strong className="text-foreground">SkillCraft</strong> porta l'innovazione 
-                digitale e le competenze trasversali, creando percorsi formativi 
-                all'avanguardia per il mondo moderno.
+                Offriamo corsi di <strong className="text-foreground">inglese, francese, tedesco, 
+                spagnolo, italiano, cinese, russo e arabo</strong>, progettati per migliorare 
+                concretamente il livello linguistico e ottenere certificazioni internazionali QCER.
               </p>
               <p>
-                Insieme, offriamo un'esperienza formativa completa e personalizzata, 
-                pensata per chi vuole crescere professionalmente e personalmente.
+                Siamo <strong className="text-foreground">Ente di Formazione accreditato dalla 
+                Regione Veneto</strong>, con sedi a Vicenza e Thiene.
               </p>
             </div>
 
             <div className="mt-8 flex flex-wrap gap-4">
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10">
-                <span className="text-2xl font-bold text-primary">15+</span>
+                <span className="text-2xl font-bold text-primary">30+</span>
                 <span className="text-sm text-muted-foreground">Anni di Esperienza</span>
               </div>
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10">
-                <span className="text-2xl font-bold text-accent">5000+</span>
-                <span className="text-sm text-muted-foreground">Studenti Formati</span>
+                <span className="text-2xl font-bold text-accent">4.8</span>
+                <span className="text-sm text-muted-foreground">Stelle su Google</span>
               </div>
             </div>
           </motion.div>
@@ -87,9 +94,10 @@ export function AboutSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
+            className="space-y-6"
           >
             {locations.map((location, index) => (
-              <Card key={index} className="hover-elevate" data-testid="card-location">
+              <Card key={index} className="hover-elevate" data-testid={`card-location-${index}`}>
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4 mb-6">
                     <div className="p-3 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10">

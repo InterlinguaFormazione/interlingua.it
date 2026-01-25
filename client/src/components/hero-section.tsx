@@ -5,9 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import heroImage from "@/assets/images/hero-learning.jpg";
 
 const stats = [
-  { icon: Users, value: "5,000+", label: "Studenti Formati" },
-  { icon: BookOpen, value: "50+", label: "Corsi Disponibili" },
-  { icon: Award, value: "15+", label: "Anni di Esperienza" },
+  { icon: Users, value: "10,000+", label: "Studenti Formati" },
+  { icon: BookOpen, value: "8", label: "Lingue Insegnate" },
+  { icon: Award, value: "30+", label: "Anni di Esperienza" },
 ];
 
 export function HeroSection() {
@@ -41,7 +41,7 @@ export function HeroSection() {
           >
             <Badge variant="secondary" className="mb-6 px-4 py-2">
               <Sparkles className="w-4 h-4 mr-2" />
-              Il Futuro della Formazione
+              Dal 1993 Leader nella Formazione Linguistica
             </Badge>
           </motion.div>
 
@@ -51,10 +51,10 @@ export function HeroSection() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6"
           >
-            Trasforma le Tue{" "}
+            Impara le{" "}
             <span className="relative">
               <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                Competenze
+                Lingue
               </span>
               <svg
                 className="absolute -bottom-2 left-0 w-full"
@@ -76,6 +76,7 @@ export function HeroSection() {
                 </defs>
               </svg>
             </span>
+            {" "}con Noi
           </motion.h1>
 
           <motion.p
@@ -84,9 +85,9 @@ export function HeroSection() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto"
           >
-            Scopri un mondo di opportunità con i nostri corsi innovativi. 
-            Dalle lingue alle competenze digitali, ti aiutiamo a raggiungere 
-            i tuoi obiettivi con metodi all'avanguardia.
+            Il Metodo Interlingua garantisce un approccio naturale, efficace e rapido 
+            all'apprendimento delle lingue. Docenti madrelingua qualificati, 
+            corsi in presenza e online, certificazioni internazionali.
           </motion.p>
 
           <motion.div

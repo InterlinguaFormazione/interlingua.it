@@ -3,11 +3,11 @@ import { GraduationCap, Facebook, Instagram, Linkedin, Youtube, MapPin, Phone, M
 
 const footerLinks = {
   corsi: [
-    { label: "Inglese", href: "#courses" },
-    { label: "Tedesco", href: "#courses" },
-    { label: "Italiano per Stranieri", href: "#courses" },
-    { label: "Competenze Digitali", href: "#courses" },
-    { label: "Public Speaking", href: "#courses" },
+    { label: "Corsi in Presenza", href: "#courses" },
+    { label: "Corsi Online", href: "#courses" },
+    { label: "Full Immersion", href: "#courses" },
+    { label: "Certificazioni", href: "#courses" },
+    { label: "Speakers' Corner", href: "#courses" },
   ],
   azienda: [
     { label: "Chi Siamo", href: "#about" },
@@ -51,30 +51,30 @@ export function Footer() {
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-lg leading-tight tracking-tight">
-                  SkillCraft
+                  Interlingua
                 </span>
                 <span className="text-xs text-muted-foreground leading-tight -mt-0.5">
-                  Interlingua
+                  Formazione
                 </span>
               </div>
             </Link>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              Il centro di formazione all'avanguardia per la tua crescita personale e professionale. 
-              Corsi di lingua, competenze digitali e molto altro.
+              Dal 1993, leader italiano nella formazione linguistica e nell'Executive Training. 
+              Ente accreditato Regione Veneto. Corsi in presenza e online.
             </p>
             
             <div className="space-y-3 mb-6">
               <div className="flex items-center gap-3 text-sm">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span>Via della Formazione, 42 - Milano</span>
+                <span>Vicenza e Thiene (VI)</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <Phone className="h-4 w-4 text-muted-foreground" />
-                <span>+39 02 1234 5678</span>
+                <span>+39 0444 321 654</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                <span>info@skillcraft-interlingua.it</span>
+                <span>info@interlingua.it</span>
               </div>
             </div>
 
@@ -150,10 +150,10 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} SkillCraft-Interlingua. Tutti i diritti riservati.
+              © {new Date().getFullYear()} Interlingua Formazione. Tutti i diritti riservati.
             </p>
             <p className="text-sm text-muted-foreground">
-              P.IVA: IT12345678901
+              Ente accreditato Regione Veneto
             </p>
           </div>
         </div>
