@@ -6,7 +6,7 @@ import heroImage from "@/assets/images/hero-learning.jpg";
 
 const stats = [
   { icon: Users, value: "10,000+", label: "Studenti Formati" },
-  { icon: BookOpen, value: "8", label: "Lingue Insegnate" },
+  { icon: BookOpen, value: "12+", label: "Corsi Disponibili" },
   { icon: Award, value: "30+", label: "Anni di Esperienza" },
 ];
 
@@ -41,7 +41,7 @@ export function HeroSection() {
           >
             <Badge variant="secondary" className="mb-6 px-4 py-2">
               <Sparkles className="w-4 h-4 mr-2" />
-              Dal 1993 Leader nella Formazione Linguistica
+              Dal 1993 Leader nella Formazione
             </Badge>
           </motion.div>
 
@@ -51,10 +51,10 @@ export function HeroSection() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6"
           >
-            Impara le{" "}
+            Cresci con{" "}
             <span className="relative">
               <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                Lingue
+                Noi
               </span>
               <svg
                 className="absolute -bottom-2 left-0 w-full"
@@ -76,7 +76,6 @@ export function HeroSection() {
                 </defs>
               </svg>
             </span>
-            {" "}con Noi
           </motion.h1>
 
           <motion.p
