@@ -135,7 +135,7 @@ export default function ChiSiamoPage() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <section className="relative pt-20 md:pt-24 overflow-hidden">
+      <section className="relative pt-28 md:pt-32 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10" />
         <div className="absolute top-40 -left-40 w-80 h-80 bg-primary/20 rounded-full blur-3xl" />
         <div className="absolute bottom-20 -right-40 w-80 h-80 bg-accent/20 rounded-full blur-3xl" />

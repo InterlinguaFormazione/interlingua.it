@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Users, Building2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,6 +12,11 @@ const navLinks = [
   { href: "#testimonials", label: "Recensioni" },
   { href: "/chi-siamo", label: "Chi Siamo" },
   { href: "#contact", label: "Contatti" },
+];
+
+const audienceTabs = [
+  { id: "privati", label: "Privati", icon: Users, href: null },
+  { id: "aziende", label: "Aziende", icon: Building2, href: "https://skillcraft.it", external: true },
 ];
 
 export function Navigation() {
@@ -31,7 +36,40 @@ export function Navigation() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
+    <header className="fixed top-0 left-0 right-0 z-50">
+      <div className="bg-muted/80 backdrop-blur-sm border-b border-border/30">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-center gap-1 h-10">
+            {audienceTabs.map((tab) => (
+              tab.external ? (
+                <a
+                  key={tab.id}
+                  href={tab.href!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover-elevate"
+                  data-testid={`tab-${tab.id}`}
+                >
+                  <tab.icon className="w-4 h-4" />
+                  {tab.label}
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              ) : (
+                <button
+                  key={tab.id}
+                  className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-md"
+                  data-testid={`tab-${tab.id}`}
+                >
+                  <tab.icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              )
+            ))}
+          </div>
+        </div>
+      </div>
+      
+      <div className="glass border-b border-border/50">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           <Link href="/" className="flex items-center group" data-testid="link-home">
@@ -109,6 +147,7 @@ export function Navigation() {
           )}
         </AnimatePresence>
       </nav>
+      </div>
     </header>
   );
 }
