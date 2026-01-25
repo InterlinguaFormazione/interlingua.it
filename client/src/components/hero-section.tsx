@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, Users, Award, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import heroImage from "@/assets/images/hero-learning.jpg";
 
 const stats = [
   { icon: Users, value: "5,000+", label: "Studenti Formati" },
@@ -19,7 +20,14 @@ export function HeroSection() {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-      <div className="absolute inset-0 hero-gradient" />
+      <div className="absolute inset-0">
+        <img 
+          src={heroImage} 
+          alt="Studenti che apprendono in un moderno centro di formazione" 
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/80 to-background" />
+      </div>
       
       <div className="absolute top-1/4 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
       <div className="absolute bottom-1/4 right-10 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />

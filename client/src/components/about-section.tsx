@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { MapPin, Phone, Mail, Building2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import aboutTeam from "@/assets/images/about-team.jpg";
 
 const locations = [
   {
@@ -19,6 +20,18 @@ export function AboutSection() {
       <div className="absolute bottom-0 left-0 w-1/2 h-full bg-gradient-to-r from-accent/5 to-transparent" />
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="mb-12 relative rounded-2xl overflow-hidden">
+          <img 
+            src={aboutTeam} 
+            alt="Il nostro team di formatori" 
+            className="w-full h-64 md:h-80 object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+          <div className="absolute bottom-6 left-6 right-6">
+            <Badge variant="secondary" className="mb-2">Il Nostro Team</Badge>
+            <h3 className="text-2xl font-bold text-white drop-shadow-lg">Professionisti Dedicati alla Tua Crescita</h3>
+          </div>
+        </div>
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -20 }}

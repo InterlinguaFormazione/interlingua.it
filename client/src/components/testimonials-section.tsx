@@ -2,8 +2,20 @@ import { motion } from "framer-motion";
 import { Star, Quote } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Testimonial } from "@shared/schema";
+import testimonial1 from "@/assets/images/testimonial-1.jpg";
+import testimonial2 from "@/assets/images/testimonial-2.jpg";
+import testimonial3 from "@/assets/images/testimonial-3.jpg";
+
+const testimonialImages: Record<string, string> = {
+  "1": testimonial2,
+  "2": testimonial1,
+  "3": testimonial2,
+  "4": testimonial3,
+  "5": testimonial2,
+  "6": testimonial1,
+};
 
 const testimonials: Testimonial[] = [
   {
@@ -103,7 +115,12 @@ export function TestimonialsSection() {
                     </p>
 
                     <div className="flex items-center gap-3">
-                      <Avatar>
+                      <Avatar className="h-12 w-12 border-2 border-primary/20">
+                        <AvatarImage 
+                          src={testimonialImages[testimonial.id]} 
+                          alt={testimonial.name}
+                          className="object-cover"
+                        />
                         <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white">
                           {testimonial.name.split(" ").map(n => n[0]).join("")}
                         </AvatarFallback>

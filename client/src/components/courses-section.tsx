@@ -13,6 +13,21 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Course } from "@shared/schema";
+import courseEnglish from "@/assets/images/course-english.jpg";
+import courseGerman from "@/assets/images/course-german.jpg";
+import courseItalian from "@/assets/images/course-italian.jpg";
+import courseDigital from "@/assets/images/course-digital.jpg";
+import courseSpeaking from "@/assets/images/course-speaking.jpg";
+import coursePersonal from "@/assets/images/course-personal.jpg";
+
+const courseImages: Record<string, string> = {
+  "1": courseEnglish,
+  "2": courseGerman,
+  "3": courseItalian,
+  "4": courseDigital,
+  "5": courseSpeaking,
+  "6": coursePersonal,
+};
 
 const iconMap: Record<string, any> = {
   globe: Globe,
@@ -140,17 +155,25 @@ export function CoursesSection() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <Card 
-                  className="h-full hover-elevate group cursor-pointer relative overflow-visible"
+                  className="h-full hover-elevate group cursor-pointer relative overflow-hidden"
                   data-testid={`card-course-${course.id}`}
                 >
                   {course.featured && (
-                    <div className="absolute -top-3 -right-3 z-10">
+                    <div className="absolute top-3 right-3 z-20">
                       <Badge className="bg-gradient-to-r from-primary to-accent text-white border-0 shadow-lg">
                         Popolare
                       </Badge>
                     </div>
                   )}
-                  <CardHeader>
+                  <div className="relative h-40 overflow-hidden">
+                    <img 
+                      src={courseImages[course.id]} 
+                      alt={course.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
+                  </div>
+                  <CardHeader className="pt-4">
                     <div className="flex items-start justify-between gap-4 mb-2">
                       <div className="p-3 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 group-hover:from-primary/20 group-hover:to-accent/20 transition-colors">
                         <Icon className="h-6 w-6 text-primary" />
