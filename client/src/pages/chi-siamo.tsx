@@ -14,7 +14,13 @@ import {
   Building,
   MapPin,
   Phone,
-  Mail
+  Mail,
+  Star,
+  Sparkles,
+  Heart,
+  Globe,
+  Trophy,
+  Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -22,62 +28,106 @@ import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 
+import aboutTeamImage from "@/assets/images/about-team.jpg";
+import aboutTeachingImage from "@/assets/images/about-teaching.jpg";
+import aboutVicenzaImage from "@/assets/images/about-vicenza.jpg";
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 30 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6 }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
 const timelineEvents = [
-  { year: "1992", event: "Fondazione di Interlingua come agenzia di traduzioni e corsi aziendali" },
-  { year: "1993", event: "Apertura della prima sede operativa a Vicenza, in Viale Roma" },
-  { year: "1998", event: "Inaugurazione della seconda sede a Thiene" },
-  { year: "2000", event: "Introduzione del Sistema di Gestione della Qualità Interlingua" },
-  { year: "2001", event: "Trasferimento della sede operativa in Stradella dei Filippini, Vicenza" },
-  { year: "2003", event: "Primo ente di formazione linguistica accreditato in Veneto" },
-  { year: "2013", event: "Trasferimento della sede attuale in Viale Mazzini 27, Vicenza" },
+  { year: "1992", event: "Fondazione di Interlingua come agenzia di traduzioni e corsi aziendali", highlight: false },
+  { year: "1993", event: "Apertura della prima sede operativa a Vicenza", highlight: false },
+  { year: "1998", event: "Inaugurazione della seconda sede a Thiene", highlight: false },
+  { year: "2000", event: "Introduzione del Sistema di Gestione della Qualità", highlight: false },
+  { year: "2003", event: "Primo ente di formazione linguistica accreditato in Veneto", highlight: true },
+  { year: "2013", event: "Nuova sede in Viale Mazzini 27, Vicenza", highlight: false },
+  { year: "2024", event: "Lancio di SkillCraft-Interlingua con AI e competenze digitali", highlight: true },
+];
+
+const stats = [
+  { value: "30+", label: "Anni di Esperienza", icon: Trophy },
+  { value: "15.000+", label: "Studenti Formati", icon: Users },
+  { value: "500+", label: "Aziende Partner", icon: Building2 },
+  { value: "50+", label: "Docenti Madrelingua", icon: GraduationCap },
+];
+
+const values = [
+  { 
+    icon: Target, 
+    title: "Eccellenza", 
+    description: "Standard formativi elevati con docenti madrelingua qualificati e metodologie all'avanguardia",
+    color: "from-purple-500 to-purple-600"
+  },
+  { 
+    icon: Heart, 
+    title: "Passione", 
+    description: "Amore per l'insegnamento e dedizione al successo di ogni singolo studente",
+    color: "from-pink-500 to-pink-600"
+  },
+  { 
+    icon: Sparkles, 
+    title: "Innovazione", 
+    description: "Costante evoluzione metodologica integrando AI e tecnologie digitali",
+    color: "from-teal-500 to-teal-600"
+  },
+  { 
+    icon: Globe, 
+    title: "Internazionalità", 
+    description: "Network globale di docenti e partnership con istituzioni internazionali",
+    color: "from-blue-500 to-blue-600"
+  },
+];
+
+const methodologyPoints = [
+  { title: "CLIL", description: "Content and Language Integrated Learning per contenuti professionali" },
+  { title: "TBL", description: "Task-Based Learning con attività reali e materiali autentici" },
+  { title: "TPR", description: "Total Physical Response e approccio multisensoriale" },
+  { title: "Design Thinking", description: "Co-progettazione e problem solving creativo" },
 ];
 
 const clientCategories = [
   {
     title: "Imprese",
     icon: Building2,
-    description: "Collaboriamo con numerose aziende venete tra le più prestigiose",
-    sectors: ["Metalmeccanica", "Oreficeria", "Industria chimica", "Tessile e abbigliamento", "Industria alimentare"]
+    color: "from-blue-500 to-blue-600",
+    sectors: ["Metalmeccanica", "Oreficeria", "Industria chimica", "Tessile", "Alimentare"]
   },
   {
-    title: "Aziende di Servizi",
+    title: "Servizi",
     icon: Briefcase,
-    description: "Operiamo in ambiti ad alta specializzazione",
-    sectors: ["Turismo", "Trasporto commerciale e pubblico", "Energia elettrica e termica", "Aeronautica civile e militare", "Settore medico e sanitario"]
+    color: "from-green-500 to-green-600",
+    sectors: ["Turismo", "Trasporti", "Energia", "Aeronautica", "Sanità"]
   },
   {
-    title: "Studi Professionali",
+    title: "Professionisti",
     icon: GraduationCap,
-    description: "Team di docenti specializzati in diversi settori della consulenza",
-    sectors: ["Legale e notarile", "Proprietà intellettuale e brevetti", "Architettura e ingegneria civile", "Gestione e sviluppo delle Risorse Umane"]
+    color: "from-purple-500 to-purple-600",
+    sectors: ["Legale", "Brevetti", "Architettura", "Risorse Umane"]
   },
   {
-    title: "Istituti Scolastici",
+    title: "Scuole",
     icon: School,
-    description: "Progetti di lettorato linguistico e aggiornamento docenti",
-    sectors: ["Scuole di ogni ordine e grado", "Progetti educativi", "Formazione docenti"]
+    color: "from-orange-500 to-orange-600",
+    sectors: ["Lettorato", "Formazione docenti", "Progetti educativi"]
   },
   {
-    title: "Pubblica Amministrazione",
+    title: "PA",
     icon: Building,
-    description: "Collaboriamo con enti e amministrazioni locali",
-    sectors: ["Formazione professionale", "Aggiornamento personale", "Progetti formativi"]
-  }
-];
-
-const methodologyPoints = [
-  "CLIL (Content and Language Integrated Learning) per contenuti professionali",
-  "TBL (Task-Based Learning) con attività reali e materiali autentici",
-  "TPR (Total Physical Response) e approccio multisensoriale",
-  "Roleplay, focus group, case study e project work",
-  "Design thinking e co-progettazione",
-  "Simulazioni e analisi video"
-];
-
-const competencies = [
-  { category: "Soft Skills", items: ["Leadership", "Comunicazione efficace", "Public speaking", "Gestione del tempo"] },
-  { category: "Competenze Strategiche", items: ["Digital marketing", "Project management", "Tecniche di vendita", "Negoziazione"] },
-  { category: "Competenze Personali", items: ["Innovazione", "Team working", "Problem solving", "Pensiero critico"] }
+    color: "from-teal-500 to-teal-600",
+    sectors: ["Enti locali", "Aggiornamento", "Progetti formativi"]
+  },
 ];
 
 export default function ChiSiamoPage() {
@@ -85,267 +135,458 @@ export default function ChiSiamoPage() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <div className="pt-20 md:pt-24 bg-gradient-to-br from-primary/5 via-background to-accent/5">
-        <div className="container mx-auto px-4 py-12">
+      <section className="relative pt-20 md:pt-24 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-accent/10" />
+        <div className="absolute top-40 -left-40 w-80 h-80 bg-primary/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 -right-40 w-80 h-80 bg-accent/20 rounded-full blur-3xl" />
+        
+        <div className="container mx-auto px-4 py-16 md:py-24 relative">
           <Link href="/">
-            <Button variant="ghost" className="mb-6" data-testid="button-back-home">
+            <Button variant="ghost" className="mb-8" data-testid="button-back-home">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Torna alla Home
             </Button>
           </Link>
           
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-4xl"
-          >
-            <Badge className="mb-4">Dal 1993</Badge>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Chi Siamo
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl">
-              Interlingua Formazione: oltre 30 anni di eccellenza nella formazione linguistica e professionale in Veneto
-            </p>
-          </motion.div>
-        </div>
-      </div>
-
-      <main className="container mx-auto px-4 py-12">
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-16"
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Target className="w-6 h-6 text-primary" />
-            </div>
-            <h2 className="text-3xl font-bold">La Nostra Missione</h2>
-          </div>
-          
-          <div className="grid lg:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Il primo obiettivo di <strong className="text-foreground">Interlingua</strong> è lo <strong className="text-foreground">sviluppo effettivo, rapido e duraturo</strong> della competenza linguistica dei partecipanti, con il fine ultimo di raggiungere una <strong className="text-foreground">reale abilità comunicativa</strong> nei contesti autentici in cui ogni studente utilizza la lingua.
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
+                <Star className="w-3 h-3 mr-1" />
+                Dal 1993
+              </Badge>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+                La Tua Crescita è la{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+                  Nostra Missione
+                </span>
+              </h1>
+              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+                Oltre 30 anni di eccellenza nella formazione linguistica e professionale. 
+                Primo ente accreditato in Veneto, oggi leader nell'integrazione di lingue, 
+                AI e competenze digitali.
               </p>
-              
-              <p className="text-muted-foreground leading-relaxed">
-                Interlingua Formazione ha ideato una metodologia didattica unica, in costante evoluzione, che punta a un'acquisizione completa e funzionale delle competenze linguistiche. L'apprendimento è immediato e concreto, basato su situazioni comunicative autentiche ricreate in aula attraverso roleplay, focus group, case study e project work.
-              </p>
-            </div>
-            
-            <Card className="p-6">
-              <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-primary" />
-                Metodologia CLIL e Task-Based Learning
-              </h3>
-              <ul className="space-y-3">
-                {methodologyPoints.map((point, index) => (
-                  <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-muted-foreground">{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          </div>
-        </motion.section>
-
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-16"
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 rounded-lg bg-accent/10">
-              <GraduationCap className="w-6 h-6 text-accent" />
-            </div>
-            <h2 className="text-3xl font-bold">Competenze Trasversali</h2>
-          </div>
-          
-          <p className="text-muted-foreground mb-8 max-w-3xl">
-            Grazie al nostro approccio, ci siamo specializzati nella progettazione di percorsi non linguistici in lingua straniera, avvalendoci di trainer internazionali qualificati in diverse discipline.
-          </p>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            {competencies.map((comp, index) => (
-              <Card key={comp.category} className="p-6">
-                <h3 className="font-semibold text-lg mb-4">{comp.category}</h3>
-                <ul className="space-y-2">
-                  {comp.items.map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-muted-foreground">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            ))}
-          </div>
-        </motion.section>
-
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-16"
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Users className="w-6 h-6 text-primary" />
-            </div>
-            <h2 className="text-3xl font-bold">Il Nostro Team</h2>
-          </div>
-          
-          <div className="grid lg:grid-cols-2 gap-8">
-            <Card className="p-6">
-              <h3 className="font-semibold text-lg mb-4">Docenti Madrelingua</h3>
-              <p className="text-muted-foreground mb-4">
-                Tutti i docenti, formatori e coach di Interlingua sono madrelingua e in possesso di specializzazioni nell'insegnamento della propria lingua madre. Partecipano regolarmente a seminari di aggiornamento metodologico per mantenere elevati gli standard formativi.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary">Comunicazione efficace</Badge>
-                <Badge variant="secondary">Marketing</Badge>
-                <Badge variant="secondary">Tecniche di presentazione</Badge>
-                <Badge variant="secondary">Customer care</Badge>
-              </div>
-            </Card>
-            
-            <Card className="p-6">
-              <h3 className="font-semibold text-lg mb-4">Coordinamento Didattico</h3>
-              <p className="text-muted-foreground mb-4">
-                Il Coordinatore Didattico si occupa della progettazione e sviluppo del metodo Interlingua, dell'orientamento ai percorsi formativi, del bilancio delle competenze e del monitoraggio mensile della qualità formativa.
-              </p>
-              <p className="text-muted-foreground">
-                Le Assistenti di Coordinamento, presenti in ciascuna sede, curano il reclutamento dei docenti, l'organizzazione dei corsi e il monitoraggio costante di presenze, soddisfazione e progressi degli studenti.
-              </p>
-            </Card>
-          </div>
-        </motion.section>
-
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-16"
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 rounded-lg bg-accent/10">
-              <Award className="w-6 h-6 text-accent" />
-            </div>
-            <h2 className="text-3xl font-bold">La Nostra Storia</h2>
-          </div>
-          
-          <div className="relative">
-            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-border" />
-            
-            <div className="space-y-6">
-              {timelineEvents.map((event, index) => (
-                <motion.div
-                  key={event.year}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 * index }}
-                  className="relative pl-12"
-                >
-                  <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-primary/10 border-2 border-primary flex items-center justify-center">
-                    <span className="text-xs font-bold text-primary">{event.year.slice(-2)}</span>
-                  </div>
-                  <Card className="p-4">
-                    <div className="flex items-baseline gap-3">
-                      <span className="font-bold text-primary">{event.year}</span>
-                      <span className="text-muted-foreground">{event.event}</span>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-          
-          <Card className="mt-8 p-6 bg-primary/5 border-primary/20">
-            <h3 className="font-semibold text-lg mb-3">Ente di Formazione Accreditato</h3>
-            <p className="text-muted-foreground">
-              Dal 2003 Interlingua è inserita nell'elenco regionale degli Organismi di Formazione Accreditati dalla Regione Veneto, diventando il <strong className="text-foreground">primo ente di formazione linguistica accreditato in Veneto</strong>. L'accreditamento comporta verifiche rigorose e periodiche da parte degli enti pubblici, garantendo qualità, affidabilità e trasparenza dei percorsi formativi.
-            </p>
-          </Card>
-        </motion.section>
-
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mb-16"
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Building2 className="w-6 h-6 text-primary" />
-            </div>
-            <h2 className="text-3xl font-bold">I Nostri Clienti</h2>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {clientCategories.map((category, index) => (
-              <Card key={category.title} className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 rounded-lg bg-muted">
-                    <category.icon className="w-5 h-5 text-foreground" />
-                  </div>
-                  <h3 className="font-semibold">{category.title}</h3>
-                </div>
-                <p className="text-sm text-muted-foreground mb-4">{category.description}</p>
-                <ul className="space-y-1">
-                  {category.sectors.map((sector) => (
-                    <li key={sector} className="text-sm text-muted-foreground flex items-center gap-2">
-                      <CheckCircle className="w-3 h-3 text-primary" />
-                      {sector}
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            ))}
-          </div>
-        </motion.section>
-
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <Card className="p-8 bg-gradient-to-br from-primary/5 to-accent/5">
-            <div className="text-center max-w-2xl mx-auto">
-              <h2 className="text-2xl font-bold mb-4">Vuoi Saperne di Più?</h2>
-              <p className="text-muted-foreground mb-6">
-                Contattaci per scoprire come possiamo aiutarti a raggiungere i tuoi obiettivi formativi.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link href="/#contact">
-                  <Button size="lg" data-testid="button-contact-cta">
-                    <Mail className="w-4 h-4 mr-2" />
-                    Contattaci
-                  </Button>
-                </Link>
+              <div className="flex flex-wrap gap-4">
                 <Link href="/corsi">
-                  <Button variant="outline" size="lg" data-testid="button-courses-cta">
+                  <Button size="lg" data-testid="button-discover-courses">
                     Scopri i Corsi
                   </Button>
                 </Link>
+                <Link href="/#contact">
+                  <Button variant="outline" size="lg" data-testid="button-contact">
+                    Contattaci
+                  </Button>
+                </Link>
               </div>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="relative"
+            >
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                <img 
+                  src={aboutTeamImage} 
+                  alt="Il nostro team" 
+                  className="w-full h-[400px] object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6">
+                  <p className="text-white text-lg font-medium">
+                    Un team di esperti al tuo servizio
+                  </p>
+                  <p className="text-white/80 text-sm">
+                    Docenti madrelingua qualificati e appassionati
+                  </p>
+                </div>
+              </div>
+              <div className="absolute -bottom-6 -right-6 bg-primary text-primary-foreground rounded-xl p-4 shadow-lg">
+                <div className="text-3xl font-bold">30+</div>
+                <div className="text-sm opacity-90">Anni di esperienza</div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <motion.div
+            variants={staggerContainer}
+            initial="initial"
+            whileInView="animate"
+            viewport={{ once: true }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-6"
+          >
+            {stats.map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                variants={fadeInUp}
+                className="text-center"
+              >
+                <Card className="p-6 h-full hover-elevate transition-all duration-300">
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
+                    <stat.icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                    {stat.value}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {stat.label}
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Badge className="mb-4">I Nostri Valori</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Cosa Ci Rende Unici
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              I principi che guidano ogni nostro corso e ogni interazione con i nostri studenti
+            </p>
+          </motion.div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {values.map((value, index) => (
+              <motion.div
+                key={value.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="p-6 h-full group hover-elevate transition-all duration-300 relative overflow-hidden">
+                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${value.color}`} />
+                  <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-r ${value.color} mb-4 group-hover:scale-110 transition-transform`}>
+                    <value.icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3">{value.title}</h3>
+                  <p className="text-muted-foreground">{value.description}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <Badge className="mb-4">Il Nostro Metodo</Badge>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                Una Metodologia{" "}
+                <span className="text-primary">Innovativa</span>
+              </h2>
+              <p className="text-muted-foreground mb-8 leading-relaxed">
+                Abbiamo sviluppato una metodologia didattica unica che punta all'acquisizione 
+                completa e funzionale delle competenze. L'apprendimento è immediato e concreto, 
+                basato su situazioni comunicative autentiche.
+              </p>
               
-              <div className="mt-8 pt-8 border-t grid sm:grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                  <MapPin className="w-4 h-4" />
-                  <span>Viale Mazzini 27, Vicenza</span>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {methodologyPoints.map((point, index) => (
+                  <motion.div
+                    key={point.title}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Card className="p-4 h-full">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Zap className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold mb-1">{point.title}</h4>
+                          <p className="text-sm text-muted-foreground">{point.description}</p>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              <div className="rounded-2xl overflow-hidden shadow-xl">
+                <img 
+                  src={aboutTeachingImage} 
+                  alt="Metodologia didattica" 
+                  className="w-full h-[500px] object-cover"
+                />
+              </div>
+              <Card className="absolute -bottom-8 -left-8 p-6 shadow-xl max-w-xs">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
+                    <Award className="w-6 h-6 text-accent" />
+                  </div>
+                  <div>
+                    <div className="font-bold">Ente Accreditato</div>
+                    <div className="text-sm text-muted-foreground">Regione Veneto</div>
+                  </div>
                 </div>
-                <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                  <Phone className="w-4 h-4" />
-                  <span>+39 0444 321 654</span>
+                <p className="text-sm text-muted-foreground">
+                  Primo ente di formazione linguistica accreditato in Veneto dal 2003
+                </p>
+              </Card>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Badge className="mb-4">La Nostra Storia</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Un Percorso di Crescita
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Dal 1992 ad oggi, una storia di innovazione e dedizione alla formazione
+            </p>
+          </motion.div>
+          
+          <div className="relative max-w-4xl mx-auto">
+            <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-accent to-primary" />
+            
+            {timelineEvents.map((event, index) => (
+              <motion.div
+                key={event.year}
+                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className={`relative flex items-center mb-8 ${index % 2 === 0 ? 'justify-start' : 'justify-end'}`}
+              >
+                <div className={`w-5/12 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8 text-left order-1'}`}>
+                  <Card className={`p-5 ${event.highlight ? 'border-primary/50 bg-primary/5' : ''}`}>
+                    <div className={`text-2xl font-bold ${event.highlight ? 'text-primary' : ''} mb-2`}>
+                      {event.year}
+                    </div>
+                    <p className="text-muted-foreground">{event.event}</p>
+                    {event.highlight && (
+                      <Badge className="mt-3" variant="secondary">
+                        <Star className="w-3 h-3 mr-1" />
+                        Milestone
+                      </Badge>
+                    )}
+                  </Card>
+                </div>
+                
+                <div className="absolute left-1/2 transform -translate-x-1/2 z-10">
+                  <div className={`w-4 h-4 rounded-full border-4 ${event.highlight ? 'bg-primary border-primary' : 'bg-background border-muted-foreground/30'}`} />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="order-2 lg:order-1"
+            >
+              <div className="rounded-2xl overflow-hidden shadow-xl">
+                <img 
+                  src={aboutVicenzaImage} 
+                  alt="Vicenza, sede Interlingua" 
+                  className="w-full h-[400px] object-cover"
+                />
+              </div>
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="order-1 lg:order-2"
+            >
+              <Badge className="mb-4">Le Nostre Sedi</Badge>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                Nel Cuore del{" "}
+                <span className="text-primary">Veneto</span>
+              </h2>
+              <p className="text-muted-foreground mb-8 leading-relaxed">
+                Due sedi strategiche per essere sempre vicini ai nostri studenti, 
+                con la possibilità di frequentare anche online da qualsiasi luogo.
+              </p>
+              
+              <div className="space-y-4">
+                <Card className="p-5">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-lg mb-1">Vicenza - Centro Storico</h4>
+                      <p className="text-muted-foreground">Viale Mazzini 27, nel cuore della città del Palladio</p>
+                    </div>
+                  </div>
+                </Card>
+                
+                <Card className="p-5">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-6 h-6 text-accent" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-lg mb-1">Thiene</h4>
+                      <p className="text-muted-foreground">Sede operativa dal 1998, punto di riferimento per l'Alto Vicentino</p>
+                    </div>
+                  </div>
+                </Card>
+                
+                <Card className="p-5 border-dashed">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
+                      <Globe className="w-6 h-6 text-foreground" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-lg mb-1">Online - Ovunque Tu Sia</h4>
+                      <p className="text-muted-foreground">Piattaforma e-learning e lezioni live via Zoom</p>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <Badge className="mb-4">I Nostri Clienti</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Chi Si Affida a Noi
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Collaboriamo con le realtà più prestigiose del territorio veneto e non solo
+            </p>
+          </motion.div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {clientCategories.map((category, index) => (
+              <motion.div
+                key={category.title}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="p-5 h-full text-center group hover-elevate transition-all duration-300">
+                  <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-r ${category.color} mb-4 group-hover:scale-110 transition-transform`}>
+                    <category.icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="font-bold mb-3">{category.title}</h3>
+                  <div className="space-y-1">
+                    {category.sectors.slice(0, 3).map((sector) => (
+                      <div key={sector} className="text-xs text-muted-foreground">
+                        {sector}
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <Card className="p-8 md:p-12 bg-gradient-to-br from-primary/10 via-background to-accent/10 border-0 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
+              
+              <div className="relative text-center max-w-2xl mx-auto">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
+                  <Mail className="w-8 h-8 text-primary" />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                  Inizia il Tuo Percorso
+                </h2>
+                <p className="text-muted-foreground mb-8 text-lg">
+                  Contattaci per scoprire come possiamo aiutarti a raggiungere i tuoi obiettivi 
+                  formativi e professionali.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <Link href="/#contact">
+                    <Button size="lg" className="min-w-[200px]" data-testid="button-contact-cta">
+                      <Mail className="w-4 h-4 mr-2" />
+                      Contattaci Ora
+                    </Button>
+                  </Link>
+                  <Link href="/corsi">
+                    <Button variant="outline" size="lg" className="min-w-[200px]" data-testid="button-courses-cta">
+                      Esplora i Corsi
+                    </Button>
+                  </Link>
+                </div>
+                
+                <div className="mt-10 pt-8 border-t border-border/50 grid sm:grid-cols-2 gap-6">
+                  <div className="flex items-center justify-center gap-3">
+                    <Phone className="w-5 h-5 text-primary" />
+                    <span className="font-medium">+39 0444 321 654</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-3">
+                    <Mail className="w-5 h-5 text-primary" />
+                    <span className="font-medium">info@interlingua.it</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Card>
-        </motion.section>
-      </main>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
 
       <Footer />
     </div>
