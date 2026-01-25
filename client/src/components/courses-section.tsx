@@ -32,11 +32,11 @@ const courseImages: Record<string, string> = {
   "3": courseGerman,
   "4": courseItalian,
   "5": courseSpeaking,
-  "6": courseDigital,
-  "7": courseSpeaking,
-  "8": coursePersonal,
+  "6": courseEnglish,
+  "7": courseDigital,
+  "8": courseSpeaking,
   "9": coursePersonal,
-  "10": courseEnglish,
+  "10": coursePersonal,
   "11": coursePersonal,
 };
 
@@ -105,6 +105,15 @@ const courses: Course[] = [
   },
   {
     id: "6",
+    title: "Language Coaching",
+    description: "Percorsi personalizzati 1-to-1 con coach madrelingua. Sviluppa fluency, confidence e competenze comunicative su misura.",
+    category: "languages",
+    duration: "Personalizzato",
+    level: "all",
+    icon: "mic",
+  },
+  {
+    id: "7",
     title: "AI e Office",
     description: "Corsi di Intelligenza Artificiale e pacchetto Office per potenziare le tue competenze digitali. ChatGPT, Copilot, Word, Excel, PowerPoint.",
     category: "digital",
@@ -115,7 +124,7 @@ const courses: Course[] = [
   },
   // SKILLCRAFT COURSES
   {
-    id: "7",
+    id: "8",
     title: "Digital Marketing",
     description: "Social media, SEO, content creation e personal branding. Impara a promuoverti online e costruire la tua presenza digitale.",
     category: "digital",
@@ -124,7 +133,7 @@ const courses: Course[] = [
     icon: "megaphone",
   },
   {
-    id: "8",
+    id: "9",
     title: "Competenze Trasversali",
     description: "Soft skills essenziali: comunicazione efficace, public speaking, gestione del tempo, problem solving e leadership personale.",
     category: "professional",
@@ -133,22 +142,13 @@ const courses: Course[] = [
     icon: "briefcase",
   },
   {
-    id: "9",
+    id: "10",
     title: "Crescita Personale",
     description: "Sviluppo personale e professionale: mindset, produttività, gestione dello stress e obiettivi. Coaching individuale disponibile.",
     category: "personal",
     duration: "Flessibile",
     level: "all",
     icon: "brain",
-  },
-  {
-    id: "10",
-    title: "Language Coaching",
-    description: "Percorsi personalizzati 1-to-1 con coach madrelingua. Sviluppa fluency, confidence e competenze comunicative su misura.",
-    category: "languages",
-    duration: "Personalizzato",
-    level: "all",
-    icon: "mic",
   },
   {
     id: "11",
