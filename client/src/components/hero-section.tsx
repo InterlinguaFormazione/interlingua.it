@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, Users, Award, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import heroImage from "@/assets/images/hero-learning.jpg";
+import heroFallback from "@/assets/images/hero-fallback.jpg";
 import heroVideo from "@/assets/videos/hero-video.mp4";
 
 const stats = [
@@ -28,7 +28,7 @@ export function HeroSection() {
           loop 
           playsInline
           className="w-full h-full object-cover"
-          poster={heroImage}
+          poster={heroFallback}
         >
           <source src={heroVideo} type="video/mp4" />
         </video>
