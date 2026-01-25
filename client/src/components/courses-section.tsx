@@ -160,12 +160,12 @@ const courses: Course[] = [
   },
   {
     id: "12",
-    title: "Sicurezza Digitale",
-    description: "Proteggi la tua privacy online, gestisci password, riconosci truffe e phishing. Competenze essenziali per navigare in sicurezza.",
-    category: "digital",
-    duration: "1 mese",
+    title: "Corsi Online E-Learning",
+    description: "Studia quando vuoi con accesso 24/7. Piattaforma interattiva con video, esercizi e tutor madrelingua. Inglese, tedesco, francese, spagnolo.",
+    category: "languages",
+    duration: "Flessibile",
     level: "all",
-    icon: "code",
+    icon: "monitor",
   },
 ];
 
