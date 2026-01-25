@@ -4,9 +4,10 @@ import { GraduationCap, Facebook, Instagram, Linkedin, Youtube, MapPin, Phone, M
 const footerLinks = {
   corsi: [
     { label: "Corsi di Lingue", href: "#courses" },
-    { label: "Full Immersion", href: "#courses" },
-    { label: "Certificazioni", href: "#courses" },
     { label: "Intelligenza Artificiale", href: "#courses" },
+    { label: "Office & Produttività", href: "#courses" },
+    { label: "Digital Marketing", href: "#courses" },
+    { label: "Soft Skills", href: "#courses" },
     { label: "Crescita Personale", href: "#courses" },
   ],
   azienda: [

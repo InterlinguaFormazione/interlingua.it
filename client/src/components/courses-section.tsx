@@ -7,7 +7,13 @@ import {
   Clock, 
   Users,
   ArrowRight,
-  Languages
+  Languages,
+  Monitor,
+  Megaphone,
+  Leaf,
+  Mic,
+  Award,
+  Sparkles
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,8 +31,14 @@ const courseImages: Record<string, string> = {
   "2": courseGerman,
   "3": courseItalian,
   "4": courseDigital,
-  "5": courseSpeaking,
-  "6": coursePersonal,
+  "5": courseDigital,
+  "6": courseSpeaking,
+  "7": courseSpeaking,
+  "8": coursePersonal,
+  "9": courseEnglish,
+  "10": coursePersonal,
+  "11": courseGerman,
+  "12": courseDigital,
 };
 
 const iconMap: Record<string, any> = {
@@ -35,6 +47,12 @@ const iconMap: Record<string, any> = {
   briefcase: Briefcase,
   brain: Brain,
   languages: Languages,
+  monitor: Monitor,
+  megaphone: Megaphone,
+  leaf: Leaf,
+  mic: Mic,
+  award: Award,
+  sparkles: Sparkles,
 };
 
 const courses: Course[] = [
@@ -65,7 +83,7 @@ const courses: Course[] = [
     category: "languages",
     duration: "Personalizzato",
     level: "all",
-    icon: "globe",
+    icon: "award",
   },
   {
     id: "4",
@@ -74,11 +92,29 @@ const courses: Course[] = [
     category: "digital",
     duration: "1-2 mesi",
     level: "all",
-    icon: "code",
+    icon: "sparkles",
     featured: true,
   },
   {
     id: "5",
+    title: "Office & Produttività",
+    description: "Padroneggia Word, Excel, PowerPoint, Outlook e Teams. Dalle basi alle funzioni avanzate per massimizzare la tua efficienza.",
+    category: "digital",
+    duration: "1-3 mesi",
+    level: "all",
+    icon: "monitor",
+  },
+  {
+    id: "6",
+    title: "Digital Marketing",
+    description: "Social media, SEO, content creation e personal branding. Impara a promuoverti online e costruire la tua presenza digitale.",
+    category: "digital",
+    duration: "2-3 mesi",
+    level: "all",
+    icon: "megaphone",
+  },
+  {
+    id: "7",
     title: "Competenze Trasversali",
     description: "Soft skills essenziali: comunicazione efficace, public speaking, gestione del tempo, problem solving e leadership personale.",
     category: "professional",
@@ -87,13 +123,49 @@ const courses: Course[] = [
     icon: "briefcase",
   },
   {
-    id: "6",
+    id: "8",
     title: "Crescita Personale",
     description: "Sviluppo personale e professionale: mindset, produttività, gestione dello stress e obiettivi. Coaching individuale disponibile.",
     category: "personal",
     duration: "Flessibile",
     level: "all",
     icon: "brain",
+  },
+  {
+    id: "9",
+    title: "Language Coaching",
+    description: "Percorsi personalizzati 1-to-1 con coach madrelingua. Sviluppa fluency, confidence e competenze comunicative su misura.",
+    category: "languages",
+    duration: "Personalizzato",
+    level: "all",
+    icon: "mic",
+  },
+  {
+    id: "10",
+    title: "Sostenibilità",
+    description: "Competenze per uno stile di vita sostenibile. Impatto ambientale, economia circolare e scelte consapevoli per il futuro.",
+    category: "personal",
+    duration: "1-2 mesi",
+    level: "all",
+    icon: "leaf",
+  },
+  {
+    id: "11",
+    title: "Speakers' Corner",
+    description: "Pratica l'inglese tutto l'anno con tutor madrelingua qualificati. Lezioni settimanali di conversazione via Zoom a prezzo accessibile.",
+    category: "languages",
+    duration: "12 mesi",
+    level: "intermediate",
+    icon: "globe",
+  },
+  {
+    id: "12",
+    title: "Digitalizzazione 4.0",
+    description: "Fondamenti digitali per il mondo moderno: cloud, collaborazione online, sicurezza informatica e strumenti di produttività.",
+    category: "digital",
+    duration: "1-2 mesi",
+    level: "all",
+    icon: "code",
   },
 ];
 
