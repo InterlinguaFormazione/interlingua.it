@@ -22,6 +22,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+import categoryPresence from "@/assets/images/category-presence.jpg";
+import categoryOnline from "@/assets/images/category-online.jpg";
+import categorySpeakers from "@/assets/images/category-speakers.jpg";
+import categoryImmersion from "@/assets/images/category-immersion.jpg";
+import categoryKids from "@/assets/images/category-kids.jpg";
+import categoryDigital from "@/assets/images/category-digital.jpg";
+import categoryGrowth from "@/assets/images/category-growth.jpg";
+
+const categoryImages: Record<string, string> = {
+  presenza: categoryPresence,
+  online: categoryOnline,
+  speakers: categorySpeakers,
+  immersion: categoryImmersion,
+  kids: categoryKids,
+  digital: categoryDigital,
+  growth: categoryGrowth,
+};
+
 const courseCategories = [
   {
     id: "presenza",
@@ -278,17 +296,32 @@ export default function CoursesPage() {
               transition={{ delay: categoryIndex * 0.1 }}
               id={category.id}
             >
-              <div className="flex items-center gap-4 mb-8">
-                <div className={`p-3 rounded-xl bg-gradient-to-br ${category.color} text-white`}>
-                  <category.icon className="w-6 h-6" />
+              <div className="relative rounded-2xl overflow-hidden mb-8">
+                <div className="absolute inset-0">
+                  <img 
+                    src={categoryImages[category.id]} 
+                    alt={category.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/40" />
                 </div>
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-bold">{category.title}</h2>
-                  <p className="text-muted-foreground">{category.subtitle}</p>
+                <div className="relative p-8 md:p-12">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className={`p-3 rounded-xl bg-gradient-to-br ${category.color} text-white shadow-lg`}>
+                      <category.icon className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl md:text-3xl font-bold">{category.title}</h2>
+                      <p className="text-muted-foreground">{category.subtitle}</p>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground max-w-2xl">
+                    {category.description}
+                  </p>
                 </div>
               </div>
-              
-              <p className="text-muted-foreground mb-6 max-w-3xl">
+
+              <p className="text-muted-foreground mb-6 max-w-3xl hidden">
                 {category.description}
               </p>
 
