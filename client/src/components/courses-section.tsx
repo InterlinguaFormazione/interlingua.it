@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "wouter";
 import { 
   Globe, 
   Code, 
@@ -296,15 +297,24 @@ export function CoursesSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="text-center mt-12"
+          className="text-center mt-12 flex flex-col sm:flex-row gap-4 justify-center"
         >
+          <Link href="/corsi">
+            <Button 
+              size="lg" 
+              data-testid="button-all-courses"
+            >
+              Vedi Tutti i Corsi
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
           <Button 
             size="lg" 
+            variant="outline"
             onClick={handleScrollToContact}
-            data-testid="button-all-courses"
+            data-testid="button-request-info"
           >
             Richiedi Informazioni
-            <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </motion.div>
       </div>

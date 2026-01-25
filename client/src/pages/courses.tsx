@@ -1,0 +1,367 @@
+import { motion } from "framer-motion";
+import { Link } from "wouter";
+import { 
+  ArrowLeft, 
+  Globe, 
+  Monitor, 
+  MessageCircle, 
+  Users, 
+  Mountain,
+  Laptop,
+  Sparkles,
+  GraduationCap,
+  Baby,
+  BookOpen,
+  Video,
+  Award,
+  MapPin,
+  Clock,
+  Euro
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+const courseCategories = [
+  {
+    id: "presenza",
+    title: "Formazione in Presenza",
+    subtitle: "Corsi a Vicenza e Thiene",
+    description: "Lezioni con docenti madrelingua qualificati nelle nostre sedi. Metodologia C.L.I.L. e approccio esperienziale.",
+    icon: MapPin,
+    color: "from-purple-500 to-purple-600",
+    courses: [
+      {
+        title: "Corsi di Lingua di Gruppo",
+        description: "Inglese, francese, tedesco, spagnolo, russo. 12 settimane, 1 lezione/settimana + piattaforma e-learning 24/7",
+        price: "€340",
+        duration: "12 settimane",
+        features: ["Docente madrelingua", "Max 8 partecipanti", "Certificato finale", "Bonus Cultura 18app"]
+      },
+      {
+        title: "Corsi Individuali",
+        description: "Percorso personalizzato one-to-one con massima flessibilità di orari e contenuti",
+        price: "Su richiesta",
+        duration: "Personalizzata",
+        features: ["100% personalizzato", "Orari flessibili", "Obiettivi specifici", "Preparazione esami"]
+      },
+      {
+        title: "Preparazione Certificazioni",
+        description: "Cambridge, IELTS, TOEFL, DELF, DELE, Goethe e altre certificazioni internazionali",
+        price: "€400",
+        duration: "8-12 settimane",
+        features: ["Simulazioni d'esame", "Materiale ufficiale", "Feedback dettagliato", "Alta percentuale successo"]
+      }
+    ]
+  },
+  {
+    id: "online",
+    title: "E-Learning Online",
+    subtitle: "Impara ovunque tu sia",
+    description: "Piattaforma blended con tutor madrelingua e community internazionale di 4 milioni di studenti.",
+    icon: Monitor,
+    color: "from-teal-500 to-teal-600",
+    courses: [
+      {
+        title: "Self-Learning + Piattaforma",
+        description: "Accesso 24/7 alla piattaforma con AI, riconoscimento vocale e contenuti interattivi",
+        price: "Da €25/mese",
+        duration: "Rinnovabile",
+        features: ["Accesso 24/7", "Community 4M studenti", "AI integrata", "7 lingue disponibili"]
+      },
+      {
+        title: "Blended Individuale",
+        description: "Piattaforma e-learning + 2-4 lezioni individuali al mese con tutor madrelingua",
+        price: "Da €65/mese",
+        duration: "Rinnovabile",
+        features: ["Lezioni live Zoom", "Tutor dedicato", "Flessibilità totale", "Feedback personalizzato"]
+      },
+      {
+        title: "Blended di Gruppo",
+        description: "Piattaforma e-learning + 1 lezione di gruppo a settimana in aula virtuale",
+        price: "€45/mese",
+        duration: "Rinnovabile",
+        features: ["Lezioni serali", "Piccoli gruppi", "Interazione sociale", "Costo contenuto"]
+      }
+    ]
+  },
+  {
+    id: "speakers",
+    title: "Speakers' Corner",
+    subtitle: "Pratica la conversazione",
+    description: "Incontri settimanali di conversazione in inglese con docenti madrelingua. Frequenza libera, temi sempre nuovi.",
+    icon: MessageCircle,
+    color: "from-orange-500 to-orange-600",
+    courses: [
+      {
+        title: "Abbonamento Annuale",
+        description: "Accesso illimitato agli incontri settimanali di conversazione. Ogni venerdì alle 18:30",
+        price: "€200/anno",
+        duration: "12 mesi",
+        features: ["Frequenza libera", "Temi settimanali", "Livello B1+", "Community attiva"]
+      },
+      {
+        title: "Conversazione Individuale",
+        description: "Carnet di 5 lezioni individuali con il docente che preferisci. Prenotazione via app",
+        price: "€95",
+        duration: "5 lezioni",
+        features: ["Orario flessibile", "Scelta docente", "Focus personale", "Prenotazione app"]
+      }
+    ]
+  },
+  {
+    id: "immersion",
+    title: "Full Immersion",
+    subtitle: "Esperienze trasformative",
+    description: "Learning weeks e weekends esperienziali con attività outdoor, team building e formazione linguistica intensiva.",
+    icon: Mountain,
+    color: "from-green-500 to-green-600",
+    courses: [
+      {
+        title: "Learning Weekend",
+        description: "Weekend intensivo in lingua inglese con attività esperienziali e team building",
+        price: "Da €385",
+        duration: "2-3 giorni",
+        features: ["100% in inglese", "Outdoor activities", "Team building", "Coach madrelingua"]
+      },
+      {
+        title: "Learning Week",
+        description: "Settimana completa di immersione con sport, creatività e formazione linguistica",
+        price: "Da €750",
+        duration: "5-7 giorni",
+        features: ["Equitazione/Rafting", "Teatro/Creatività", "Personal development", "Certificato"]
+      }
+    ]
+  },
+  {
+    id: "kids",
+    title: "Bambini e Ragazzi",
+    subtitle: "Dai 5 ai 18 anni",
+    description: "Corsi dedicati ai giovani con metodologie ludiche e coinvolgenti. Summer camp e supporto scolastico.",
+    icon: Baby,
+    color: "from-pink-500 to-pink-600",
+    courses: [
+      {
+        title: "Kids' Courses",
+        description: "Corsi di gruppo per bambini e ragazzi 5-18 anni. Grammar Games, English Theatre, Team Building",
+        price: "€280",
+        duration: "Trimestrale",
+        features: ["Max 5 partecipanti", "Docente madrelingua", "Attività ludiche", "Divisi per età"]
+      },
+      {
+        title: "Summer City Camp",
+        description: "Settimane estive in inglese a Vicenza con attività creative, sportive e culturali",
+        price: "Da €250/settimana",
+        duration: "Giugno-Settembre",
+        features: ["Full immersion", "Attività varie", "Centro Vicenza", "Aria condizionata"]
+      },
+      {
+        title: "Vacanze Studio Estero",
+        description: "Soggiorni linguistici in UK, Irlanda, USA, Canada con famiglie o college",
+        price: "Su richiesta",
+        duration: "2-4 settimane",
+        features: ["Network internazionale", "Assistenza h24", "Famiglie selezionate", "Certificazione"]
+      }
+    ]
+  },
+  {
+    id: "digital",
+    title: "Competenze Digitali",
+    subtitle: "SkillCraft Academy",
+    description: "Corsi pratici su Office, Excel avanzato, AI e strumenti digitali per lavoro e studio.",
+    icon: Laptop,
+    color: "from-blue-500 to-blue-600",
+    courses: [
+      {
+        title: "Office Senza Segreti",
+        description: "Excel, Word, PowerPoint e Copilot. Impara a gestire dati, report e presentazioni professionali",
+        price: "€340",
+        duration: "8 settimane",
+        features: ["Excel avanzato", "Copilot AI", "Esercitazioni pratiche", "Certificato"]
+      },
+      {
+        title: "AI Senza Segreti",
+        description: "Intelligenza Artificiale per lavoro e studio. ChatGPT, Copilot, strumenti creativi e produttività",
+        price: "€340",
+        duration: "8 settimane",
+        features: ["Strumenti AI pratici", "Prompt engineering", "Automazione", "Casi d'uso reali"]
+      },
+      {
+        title: "Digital Skills Bootcamp",
+        description: "Percorso intensivo su competenze digitali essenziali per il mondo del lavoro moderno",
+        price: "€450",
+        duration: "6 settimane",
+        features: ["Cloud & collaboration", "Data analysis", "Digital marketing basics", "Project work"]
+      }
+    ]
+  },
+  {
+    id: "growth",
+    title: "Crescita Personale",
+    subtitle: "SkillCraft Development",
+    description: "Soft skills, comunicazione efficace, leadership e benessere personale per la tua crescita.",
+    icon: Sparkles,
+    color: "from-violet-500 to-violet-600",
+    courses: [
+      {
+        title: "Comunicazione Efficace",
+        description: "Public speaking, ascolto attivo, comunicazione assertiva e gestione dei conflitti",
+        price: "€380",
+        duration: "8 settimane",
+        features: ["Esercizi pratici", "Video feedback", "Role playing", "Coaching individuale"]
+      },
+      {
+        title: "Time Management",
+        description: "Tecniche di gestione del tempo, priorità, focus e produttività personale",
+        price: "€280",
+        duration: "4 settimane",
+        features: ["Metodo GTD", "Strumenti digitali", "Abitudini efficaci", "Follow-up mensile"]
+      },
+      {
+        title: "Mindfulness & Wellbeing",
+        description: "Gestione dello stress, equilibrio vita-lavoro, mindfulness applicata alla quotidianità",
+        price: "€320",
+        duration: "6 settimane",
+        features: ["Pratiche guidate", "App dedicate", "Gruppo supporto", "Materiali audio"]
+      }
+    ]
+  }
+];
+
+export default function CoursesPage() {
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href="/">
+            <Button variant="ghost" className="gap-2" data-testid="button-back-home">
+              <ArrowLeft className="w-4 h-4" />
+              Torna alla Home
+            </Button>
+          </Link>
+          <Badge variant="secondary" className="hidden sm:flex">
+            <GraduationCap className="w-4 h-4 mr-2" />
+            Oltre 20 Corsi Disponibili
+          </Badge>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-16"
+        >
+          <Badge variant="outline" className="mb-4">
+            <BookOpen className="w-4 h-4 mr-2" />
+            Catalogo Completo
+          </Badge>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            I Nostri{" "}
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              Corsi
+            </span>
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Lingue straniere, competenze digitali, AI e crescita personale. 
+            Scegli il percorso più adatto a te tra le nostre 7 aree formative.
+          </p>
+        </motion.div>
+
+        <div className="space-y-16">
+          {courseCategories.map((category, categoryIndex) => (
+            <motion.section
+              key={category.id}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: categoryIndex * 0.1 }}
+              id={category.id}
+            >
+              <div className="flex items-center gap-4 mb-8">
+                <div className={`p-3 rounded-xl bg-gradient-to-br ${category.color} text-white`}>
+                  <category.icon className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-bold">{category.title}</h2>
+                  <p className="text-muted-foreground">{category.subtitle}</p>
+                </div>
+              </div>
+              
+              <p className="text-muted-foreground mb-6 max-w-3xl">
+                {category.description}
+              </p>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {category.courses.map((course, courseIndex) => (
+                  <motion.div
+                    key={course.title}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: courseIndex * 0.05 }}
+                  >
+                    <Card className="h-full hover-elevate" data-testid={`card-course-${category.id}-${courseIndex}`}>
+                      <CardHeader>
+                        <CardTitle className="text-lg">{course.title}</CardTitle>
+                        <CardDescription>{course.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="flex items-center gap-1 text-primary font-semibold">
+                            <Euro className="w-4 h-4" />
+                            {course.price}
+                          </div>
+                          <div className="flex items-center gap-1 text-muted-foreground text-sm">
+                            <Clock className="w-4 h-4" />
+                            {course.duration}
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {course.features.map((feature) => (
+                            <Badge key={feature} variant="secondary" className="text-xs">
+                              {feature}
+                            </Badge>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+          ))}
+        </div>
+
+        <motion.section
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-20 text-center"
+        >
+          <Card className="p-8 md:p-12 bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              Non sai quale corso scegliere?
+            </h2>
+            <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+              Prenota una consulenza gratuita con i nostri esperti. Ti aiuteremo a trovare 
+              il percorso formativo più adatto ai tuoi obiettivi.
+            </p>
+            <Link href="/#contact">
+              <Button size="lg" data-testid="button-contact-cta">
+                Richiedi Consulenza Gratuita
+              </Button>
+            </Link>
+          </Card>
+        </motion.section>
+      </main>
+
+      <footer className="border-t py-8 mt-12">
+        <div className="container mx-auto px-4 text-center text-muted-foreground">
+          <p>SkillCraft-Interlingua - Dal 1993 Leader nella Formazione</p>
+          <p className="text-sm mt-2">Vicenza | Thiene | Online</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
