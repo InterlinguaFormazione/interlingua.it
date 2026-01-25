@@ -12,7 +12,9 @@ import {
   BookOpen,
   MapPin,
   Clock,
-  ChevronRight
+  ChevronRight,
+  ExternalLink,
+  ShoppingCart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -100,7 +102,8 @@ const courseCategories = [
         description: "Inglese, francese, tedesco, spagnolo, russo. 12 settimane, 1 lezione/settimana + piattaforma e-learning 24/7",
         price: "€340",
         duration: "12 settimane",
-        features: ["Docente madrelingua", "Livelli QCER", "Certificato finale", "Carta Cultura"]
+        features: ["Docente madrelingua", "Livelli QCER", "Certificato finale", "Carta Cultura"],
+        purchaseUrl: "https://interlingua.it/prodotto/collettivi-intensivi-presenza/"
       },
       {
         title: "Corsi Individuali",
@@ -145,14 +148,16 @@ const courseCategories = [
         description: "Accesso 24/7 alla piattaforma con AI, riconoscimento vocale e contenuti interattivi",
         price: "Da €25/mese",
         duration: "Rinnovabile",
-        features: ["Accesso 24/7", "Community 4M studenti", "AI integrata", "7 lingue disponibili"]
+        features: ["Accesso 24/7", "Community 4M studenti", "AI integrata", "7 lingue disponibili"],
+        purchaseUrl: "https://interlingua.it/prodotto/corsi-su-piattaforma-online-della-durata-di-un-mese-di-lingua-inglese-francese-tedesca-spagnola-russa/"
       },
       {
         title: "Blended Individuale",
         description: "Piattaforma e-learning + 2-4 lezioni individuali al mese con tutor madrelingua via Zoom",
         price: "Da €65/mese",
         duration: "Rinnovabile",
-        features: ["Lezioni live Zoom", "Tutor dedicato", "Flessibilità totale", "Carta Cultura"]
+        features: ["Lezioni live Zoom", "Tutor dedicato", "Flessibilità totale", "Carta Cultura"],
+        purchaseUrl: "https://interlingua.it/prodotto/corsi-su-piattaforma-online-della-durata-di-un-mese-di-lingua-inglese-francese-tedesca-spagnola-russa/"
       },
       {
         title: "Blended di Gruppo",
@@ -190,21 +195,24 @@ const courseCategories = [
         description: "Accesso illimitato agli incontri settimanali di conversazione. Ogni venerdì alle 18:30 su Zoom",
         price: "€200/anno",
         duration: "12 mesi",
-        features: ["Frequenza libera", "Temi settimanali", "Livello B1+", "Metodologia CLIL"]
+        features: ["Frequenza libera", "Temi settimanali", "Livello B1+", "Metodologia CLIL"],
+        purchaseUrl: "https://interlingua.it/prodotto/cam-class-speakers-corner-abbonamento-annuale/"
       },
       {
         title: "Prova Gratuita 1 Mese",
         description: "Prova lo Speakers' Corner gratuitamente per un mese. Nessun impegno, cancella quando vuoi",
         price: "Gratis",
         duration: "1 mese",
-        features: ["Senza impegno", "Accesso completo", "Prenota online", "Cancellazione libera"]
+        features: ["Senza impegno", "Accesso completo", "Prenota online", "Cancellazione libera"],
+        purchaseUrl: "https://interlingua.it/speakers-corner-trial-page/"
       },
       {
         title: "Conversazione Individuale",
         description: "Carnet di 5 lezioni individuali con il docente che preferisci. Prenotazione via app",
         price: "€95",
         duration: "5 lezioni",
-        features: ["Orario flessibile", "Scelta docente", "Zoom live", "Prenotazione app"]
+        features: ["Orario flessibile", "Scelta docente", "Zoom live", "Prenotazione app"],
+        purchaseUrl: "https://interlingua.it/prodotto/cam-class-conversazione-lingua-5-lezioni/"
       }
     ]
   },
@@ -245,28 +253,32 @@ const courseCategories = [
         description: "Corsi di gruppo per bambini e ragazzi 5-16 anni a Vicenza e Thiene. 1 incontro/settimana di 1h15min con docente madrelingua",
         price: "€370/quadrimestre",
         duration: "20 ore (1 quadrimestre)",
-        features: ["Max 5 partecipanti", "Grammar Games, English Theatre", "Divisi per fascia d'età", "Materiale incluso"]
+        features: ["Max 5 partecipanti", "Grammar Games, English Theatre", "Divisi per fascia d'età", "Materiale incluso"],
+        purchaseUrl: "https://interlingua.it/kids-courses/"
       },
       {
         title: "Summer City Camp",
         description: "Settimane estive in inglese presso la sede di Vicenza. Lun-Ven 8:30-12:30 con 2 docenti madrelingua. 3 materie a scelta",
         price: "€335/settimana",
         duration: "Giugno-Settembre",
-        features: ["Full immersion", "2 docenti madrelingua", "Centro Vicenza", "Attestato finale"]
+        features: ["Full immersion", "2 docenti madrelingua", "Centro Vicenza", "Attestato finale"],
+        purchaseUrl: "https://interlingua.it/summercamp/"
       },
       {
         title: "Summer Camp Esperienziale",
         description: "Learning weeks in collina sui colli Vicentini con equitazione, hiking e team building. 100% in lingua inglese",
         price: "Da €550/sett.",
         duration: "Giugno-Settembre",
-        features: ["Equitazione", "Team building", "Coach madrelingua", "Natura e sport"]
+        features: ["Equitazione", "Team building", "Coach madrelingua", "Natura e sport"],
+        purchaseUrl: "https://interlingua.it/summercamp/"
       },
       {
         title: "Corsi Online per Ragazzi",
         description: "Lezioni individuali o di gruppo in aula virtuale Zoom, o blended con piattaforma AI interattiva per i più grandi",
         price: "Da €35/mese",
         duration: "Rinnovabile",
-        features: ["Piattaforma AI", "Docenti qualificati", "Orari flessibili", "Perfetto per i piccoli"]
+        features: ["Piattaforma AI", "Docenti qualificati", "Orari flessibili", "Perfetto per i piccoli"],
+        purchaseUrl: "https://interlingua.it/corsi-e-learning-online/#kids"
       },
       {
         title: "AI for Students",
@@ -297,7 +309,8 @@ const courseCategories = [
         description: "Excel, Word, PowerPoint e Copilot. Impara a gestire dati, report e presentazioni professionali",
         price: "€340",
         duration: "8 settimane",
-        features: ["Excel avanzato", "Copilot AI", "Esercitazioni pratiche", "Certificato"]
+        features: ["Excel avanzato", "Copilot AI", "Esercitazioni pratiche", "Certificato"],
+        purchaseUrl: "https://interlingua.it/prodotto/office-senza-segreti-excel-word-powerpoint-e-copilot/"
       },
       {
         title: "AI Senza Segreti",
@@ -472,13 +485,22 @@ export default function CoursesPage() {
                           )}
                         </div>
                       </CardContent>
-                      <CardFooter className="pt-0">
+                      <CardFooter className="pt-0 flex flex-col gap-2">
                         <Link href={`/corsi/${slugify(course.title)}`} className="w-full">
                           <Button variant="outline" className="w-full" data-testid={`button-info-${slugify(course.title)}`}>
                             Maggiori Informazioni
                             <ChevronRight className="w-4 h-4 ml-2" />
                           </Button>
                         </Link>
+                        {course.purchaseUrl && (
+                          <a href={course.purchaseUrl} target="_blank" rel="noopener noreferrer" className="w-full">
+                            <Button className="w-full gap-2" data-testid={`button-buy-${slugify(course.title)}`}>
+                              <ShoppingCart className="w-4 h-4" />
+                              Acquista Online
+                              <ExternalLink className="w-3 h-3" />
+                            </Button>
+                          </a>
+                        )}
                       </CardFooter>
                     </Card>
                   </motion.div>

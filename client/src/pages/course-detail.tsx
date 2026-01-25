@@ -17,7 +17,9 @@ import {
   Calendar,
   Users,
   Award,
-  BookOpen
+  BookOpen,
+  ExternalLink,
+  ShoppingCart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -107,6 +109,7 @@ interface CourseData {
   requirements: string[];
   targetAudience: string;
   methodology: string;
+  purchaseUrl?: string;
 }
 
 const allCourses: CourseData[] = [
@@ -124,7 +127,8 @@ const allCourses: CourseData[] = [
     includes: ["12 lezioni in presenza da 90 minuti", "Accesso piattaforma e-learning 24/7", "Materiale didattico digitale", "Test di livello iniziale", "Certificato di frequenza", "Community online di studenti"],
     requirements: ["Nessun requisito particolare", "Test di livello per inserimento corretto"],
     targetAudience: "Adulti e giovani adulti che desiderano imparare o migliorare una lingua straniera in un ambiente stimolante e interattivo.",
-    methodology: "Metodologia C.L.I.L. (Content and Language Integrated Learning) con approccio comunicativo e task-based learning."
+    methodology: "Metodologia C.L.I.L. (Content and Language Integrated Learning) con approccio comunicativo e task-based learning.",
+    purchaseUrl: "https://interlingua.it/prodotto/collettivi-intensivi-presenza/"
   },
   {
     id: "corsi-individuali",
@@ -204,7 +208,8 @@ const allCourses: CourseData[] = [
     includes: ["Accesso illimitato alla piattaforma", "Corsi per 7 lingue diverse", "Riconoscimento vocale AI", "Esercizi interattivi", "Tracking dei progressi", "Community internazionale"],
     requirements: ["Connessione internet", "Dispositivo (PC, tablet o smartphone)"],
     targetAudience: "Chiunque voglia imparare una lingua in modo flessibile e autonomo.",
-    methodology: "Apprendimento adattivo con AI e contenuti multimediali interattivi."
+    methodology: "Apprendimento adattivo con AI e contenuti multimediali interattivi.",
+    purchaseUrl: "https://interlingua.it/prodotto/corsi-su-piattaforma-online-della-durata-di-un-mese-di-lingua-inglese-francese-tedesca-spagnola-russa/"
   },
   {
     id: "blended-individuale",
@@ -220,7 +225,8 @@ const allCourses: CourseData[] = [
     includes: ["Accesso piattaforma 24/7", "2-4 lezioni individuali/mese via Zoom", "Tutor madrelingua dedicato", "Prenotazione flessibile via app", "Feedback personalizzato", "Materiali extra"],
     requirements: ["Connessione internet stabile", "Webcam e microfono"],
     targetAudience: "Chi desidera flessibilità ma anche interazione diretta con un docente.",
-    methodology: "Combinazione di studio autonomo e coaching personalizzato."
+    methodology: "Combinazione di studio autonomo e coaching personalizzato.",
+    purchaseUrl: "https://interlingua.it/prodotto/corsi-su-piattaforma-online-della-durata-di-un-mese-di-lingua-inglese-francese-tedesca-spagnola-russa/"
   },
   {
     id: "blended-di-gruppo",
@@ -284,7 +290,8 @@ const allCourses: CourseData[] = [
     includes: ["Accesso illimitato per 12 mesi", "Incontri ogni venerdì alle 18:30", "Temi sempre nuovi", "Docenti madrelingua diversi", "Materiali di supporto", "Community attiva"],
     requirements: ["Livello minimo B1 di inglese"],
     targetAudience: "Chi vuole mantenere attivo il proprio inglese con pratica regolare.",
-    methodology: "Conversazione libera guidata con metodologia CLIL su temi attuali."
+    methodology: "Conversazione libera guidata con metodologia CLIL su temi attuali.",
+    purchaseUrl: "https://interlingua.it/prodotto/cam-class-speakers-corner-abbonamento-annuale/"
   },
   {
     id: "prova-gratuita-1-mese",
@@ -300,7 +307,8 @@ const allCourses: CourseData[] = [
     includes: ["4 incontri gratuiti", "Accesso completo alla community", "Nessun vincolo", "Cancellazione automatica", "Possibilità di upgrade"],
     requirements: ["Livello minimo B1 di inglese", "Registrazione online"],
     targetAudience: "Chi vuole provare lo Speakers' Corner senza impegno.",
-    methodology: "Stessa metodologia dell'abbonamento annuale."
+    methodology: "Stessa metodologia dell'abbonamento annuale.",
+    purchaseUrl: "https://interlingua.it/speakers-corner-trial-page/"
   },
   {
     id: "conversazione-individuale",
@@ -316,7 +324,8 @@ const allCourses: CourseData[] = [
     includes: ["5 lezioni individuali da 30 minuti", "Scelta del docente preferito", "Prenotazione flessibile via app", "Lezioni via Zoom", "Argomenti a scelta", "Validità 6 mesi"],
     requirements: ["Download app per prenotazione"],
     targetAudience: "Chi vuole praticare la conversazione con massima flessibilità.",
-    methodology: "Conversazione libera guidata su temi scelti dallo studente."
+    methodology: "Conversazione libera guidata su temi scelti dallo studente.",
+    purchaseUrl: "https://interlingua.it/prodotto/cam-class-conversazione-lingua-5-lezioni/"
   },
   {
     id: "full-immersion-workshop",
@@ -364,7 +373,8 @@ const allCourses: CourseData[] = [
     includes: ["20 ore di lezione (1 quadrimestre)", "1 incontro/settimana di 1h15min", "Massimo 3-5 partecipanti", "Docente madrelingua qualificato", "Materiale didattico incluso", "Sedi Vicenza o Thiene", "Attestato finale"],
     requirements: ["Età 5-16 anni", "Divisi per fascia d'età e livello"],
     targetAudience: "Bambini e ragazzi dai 5 ai 16 anni.",
-    methodology: "Approccio ludico con Grammar Games, English Theatre, Team Building e preparazione certificazioni."
+    methodology: "Approccio ludico con Grammar Games, English Theatre, Team Building e preparazione certificazioni.",
+    purchaseUrl: "https://interlingua.it/kids-courses/"
   },
   {
     id: "summer-city-camp",
@@ -380,7 +390,8 @@ const allCourses: CourseData[] = [
     includes: ["20 ore/settimana (Lun-Ven 8:30-12:30)", "2 docenti madrelingua qualificati", "3 materie a scelta", "Materiale didattico incluso", "Sede Vicenza centro storico", "Gruppi divisi per età", "Attestato finale"],
     requirements: ["Età 5-16 anni"],
     targetAudience: "Bambini e ragazzi che vogliono passare un'estate divertente imparando l'inglese.",
-    methodology: "Immersione ludica con Grammar Games, English Theatre, Team Building e docenti madrelingua."
+    methodology: "Immersione ludica con Grammar Games, English Theatre, Team Building e docenti madrelingua.",
+    purchaseUrl: "https://interlingua.it/summercamp/"
   },
   {
     id: "summer-camp-esperienziale",
@@ -396,7 +407,8 @@ const allCourses: CourseData[] = [
     includes: ["Soggiorno centro equestre colli Vicentini", "Tutti i pasti", "Equitazione e hiking", "Team building", "Coach madrelingua", "100% in inglese", "Assicurazione inclusa"],
     requirements: ["Età 10-17 anni", "Nessuna esperienza equestre richiesta"],
     targetAudience: "Ragazzi avventurosi che amano la natura e lo sport.",
-    methodology: "Outdoor education con immersione linguistica totale sui colli Vicentini."
+    methodology: "Outdoor education con immersione linguistica totale sui colli Vicentini.",
+    purchaseUrl: "https://interlingua.it/summercamp/"
   },
   {
     id: "corsi-online-per-ragazzi",
@@ -412,7 +424,8 @@ const allCourses: CourseData[] = [
     includes: ["Lezioni online live", "Accesso piattaforma AI interattiva", "Giochi didattici", "Tracking progressi per genitori", "Materiali digitali", "Certificato"],
     requirements: ["Età 6-17 anni", "Connessione internet", "Supervisione genitori per i più piccoli"],
     targetAudience: "Bambini e ragazzi che preferiscono o necessitano di formazione online.",
-    methodology: "Apprendimento ludico digitale con AI e docenti specializzati."
+    methodology: "Apprendimento ludico digitale con AI e docenti specializzati.",
+    purchaseUrl: "https://interlingua.it/corsi-e-learning-online/#kids"
   },
   {
     id: "ai-for-students",
@@ -460,7 +473,8 @@ const allCourses: CourseData[] = [
     includes: ["8 lezioni pratiche in presenza", "Esercitazioni su casi reali", "Focus su Excel avanzato", "Introduzione a Copilot AI", "Materiali e template", "Certificato di competenza"],
     requirements: ["Conoscenza base del PC", "Accesso a Microsoft Office"],
     targetAudience: "Professionisti, studenti e chiunque voglia migliorare le proprie competenze Office.",
-    methodology: "Apprendimento pratico con esercitazioni su casi reali."
+    methodology: "Apprendimento pratico con esercitazioni su casi reali.",
+    purchaseUrl: "https://interlingua.it/prodotto/office-senza-segreti-excel-word-powerpoint-e-copilot/"
   },
   {
     id: "ai-senza-segreti",
@@ -707,8 +721,22 @@ export default function CourseDetailPage() {
                 </div>
 
                 <div className="space-y-3">
+                  {course.purchaseUrl && (
+                    <a 
+                      href={course.purchaseUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" size="lg" data-testid="button-purchase-course">
+                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        Acquista Online
+                        <ExternalLink className="w-3 h-3 ml-2" />
+                      </Button>
+                    </a>
+                  )}
                   <Link href="/#contact">
-                    <Button className="w-full" size="lg" data-testid="button-request-info">
+                    <Button className="w-full" variant={course.purchaseUrl ? "outline" : "default"} size="lg" data-testid="button-request-info">
                       <Mail className="w-4 h-4 mr-2" />
                       Richiedi Informazioni
                     </Button>
