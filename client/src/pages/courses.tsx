@@ -11,12 +11,12 @@ import {
   Baby,
   BookOpen,
   MapPin,
-  Clock
+  Clock,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
 import categoryPresence from "@/assets/images/category-presence.jpg";
 import categoryOnline from "@/assets/images/category-online.jpg";
 import categorySpeakers from "@/assets/images/category-speakers.jpg";
@@ -45,6 +45,16 @@ const categoryImages: Record<string, string> = {
   digital: categoryDigital,
   growth: categoryGrowth,
 };
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/['']/g, '')
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/--+/g, '-')
+    .trim();
+}
 
 const courseImages: Record<string, string> = {
   "Corsi di Lingua di Gruppo": courseGroup,
@@ -426,7 +436,7 @@ export default function CoursesPage() {
                     viewport={{ once: true }}
                     transition={{ delay: courseIndex * 0.05 }}
                   >
-                    <Card className="h-full hover-elevate overflow-hidden" data-testid={`card-course-${category.id}-${courseIndex}`}>
+                    <Card className="h-full hover-elevate overflow-hidden flex flex-col" data-testid={`card-course-${category.id}-${courseIndex}`}>
                       <div className="relative h-40 overflow-hidden">
                         <img 
                           src={courseImages[course.title] || categoryImages[category.id]} 
@@ -442,21 +452,34 @@ export default function CoursesPage() {
                       </div>
                       <CardHeader className="pt-4">
                         <CardTitle className="text-lg">{course.title}</CardTitle>
-                        <CardDescription>{course.description}</CardDescription>
+                        <CardDescription className="line-clamp-2">{course.description}</CardDescription>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="flex-1">
                         <div className="flex items-center gap-1 text-muted-foreground text-sm mb-4">
                           <Clock className="w-4 h-4" />
                           {course.duration}
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {course.features.map((feature) => (
+                          {course.features.slice(0, 3).map((feature) => (
                             <Badge key={feature} variant="secondary" className="text-xs">
                               {feature}
                             </Badge>
                           ))}
+                          {course.features.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{course.features.length - 3}
+                            </Badge>
+                          )}
                         </div>
                       </CardContent>
+                      <CardFooter className="pt-0">
+                        <Link href={`/corsi/${slugify(course.title)}`} className="w-full">
+                          <Button variant="outline" className="w-full" data-testid={`button-info-${slugify(course.title)}`}>
+                            Maggiori Informazioni
+                            <ChevronRight className="w-4 h-4 ml-2" />
+                          </Button>
+                        </Link>
+                      </CardFooter>
                     </Card>
                   </motion.div>
                 ))}
