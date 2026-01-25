@@ -50,15 +50,23 @@ const courseImages: Record<string, string> = {
   "Corsi di Lingua di Gruppo": courseGroup,
   "Corsi Individuali": courseIndividual,
   "Preparazione Certificazioni": courseCertification,
+  "English Debate Lab": courseConversation,
+  "Supporto Scolastico": courseTeens,
   "Self-Learning + Piattaforma": courseElearning,
   "Blended Individuale": courseIndividual,
   "Blended di Gruppo": courseGroup,
+  "Corso in Mini-Gruppi": courseGroup,
+  "Preparazione Certificazioni Online": courseCertification,
   "Abbonamento Annuale": courseConversation,
+  "Prova Gratuita 1 Mese": courseConversation,
   "Conversazione Individuale": courseConversation,
   "Learning Weekend": courseAdventure,
   "Learning Week": courseAdventure,
   "Kids' Courses": courseChildren,
   "Summer City Camp": courseChildren,
+  "Summer Camp Esperienziale": courseAdventure,
+  "Corsi Online per Ragazzi": courseElearning,
+  "AI for Students": courseAi,
   "Vacanze Studio Estero": courseTeens,
   "Office Senza Segreti": courseExcel,
   "AI Senza Segreti": courseAi,
@@ -82,7 +90,7 @@ const courseCategories = [
         description: "Inglese, francese, tedesco, spagnolo, russo. 12 settimane, 1 lezione/settimana + piattaforma e-learning 24/7",
         price: "€340",
         duration: "12 settimane",
-        features: ["Docente madrelingua", "Max 8 partecipanti", "Certificato finale", "Bonus Cultura 18app"]
+        features: ["Docente madrelingua", "Livelli QCER", "Certificato finale", "Carta Cultura"]
       },
       {
         title: "Corsi Individuali",
@@ -96,7 +104,21 @@ const courseCategories = [
         description: "Cambridge, IELTS, TOEFL, DELF, DELE, Goethe e altre certificazioni internazionali",
         price: "€400",
         duration: "8-12 settimane",
-        features: ["Simulazioni d'esame", "Materiale ufficiale", "Feedback dettagliato", "Alta percentuale successo"]
+        features: ["Simulazioni d'esame", "Materiale ufficiale", "Feedback dettagliato", "Alta % successo"]
+      },
+      {
+        title: "English Debate Lab",
+        description: "Laboratorio di dibattito in inglese per sviluppare capacità argomentative e pensiero critico",
+        price: "€320",
+        duration: "8 settimane",
+        features: ["Public speaking", "Pensiero critico", "Argomentazione", "Docente madrelingua"]
+      },
+      {
+        title: "Supporto Scolastico",
+        description: "Ripetizioni e supporto personalizzato per studenti di scuole medie e superiori",
+        price: "Su richiesta",
+        duration: "Personalizzata",
+        features: ["Tutte le materie", "Preparazione verifiche", "Metodo di studio", "Docenti qualificati"]
       }
     ]
   },
@@ -117,10 +139,10 @@ const courseCategories = [
       },
       {
         title: "Blended Individuale",
-        description: "Piattaforma e-learning + 2-4 lezioni individuali al mese con tutor madrelingua",
+        description: "Piattaforma e-learning + 2-4 lezioni individuali al mese con tutor madrelingua via Zoom",
         price: "Da €65/mese",
         duration: "Rinnovabile",
-        features: ["Lezioni live Zoom", "Tutor dedicato", "Flessibilità totale", "Feedback personalizzato"]
+        features: ["Lezioni live Zoom", "Tutor dedicato", "Flessibilità totale", "Carta Cultura"]
       },
       {
         title: "Blended di Gruppo",
@@ -128,6 +150,20 @@ const courseCategories = [
         price: "€45/mese",
         duration: "Rinnovabile",
         features: ["Lezioni serali", "Piccoli gruppi", "Interazione sociale", "Costo contenuto"]
+      },
+      {
+        title: "Corso in Mini-Gruppi",
+        description: "Lezioni online in piccoli gruppi con docente madrelingua. Massima interazione garantita",
+        price: "€55/mese",
+        duration: "Rinnovabile",
+        features: ["Max 6 studenti", "Docente madrelingua", "Orari serali", "Zoom live"]
+      },
+      {
+        title: "Preparazione Certificazioni Online",
+        description: "Preparazione a distanza per Cambridge, IELTS, DELF, DELE con simulazioni e feedback",
+        price: "€380",
+        duration: "8-12 settimane",
+        features: ["Simulazioni online", "Materiale digitale", "Tutor dedicato", "Esami mock"]
       }
     ]
   },
@@ -141,17 +177,24 @@ const courseCategories = [
     courses: [
       {
         title: "Abbonamento Annuale",
-        description: "Accesso illimitato agli incontri settimanali di conversazione. Ogni venerdì alle 18:30",
+        description: "Accesso illimitato agli incontri settimanali di conversazione. Ogni venerdì alle 18:30 su Zoom",
         price: "€200/anno",
         duration: "12 mesi",
-        features: ["Frequenza libera", "Temi settimanali", "Livello B1+", "Community attiva"]
+        features: ["Frequenza libera", "Temi settimanali", "Livello B1+", "Metodologia CLIL"]
+      },
+      {
+        title: "Prova Gratuita 1 Mese",
+        description: "Prova lo Speakers' Corner gratuitamente per un mese. Nessun impegno, cancella quando vuoi",
+        price: "Gratis",
+        duration: "1 mese",
+        features: ["Senza impegno", "Accesso completo", "Prenota online", "Cancellazione libera"]
       },
       {
         title: "Conversazione Individuale",
         description: "Carnet di 5 lezioni individuali con il docente che preferisci. Prenotazione via app",
         price: "€95",
         duration: "5 lezioni",
-        features: ["Orario flessibile", "Scelta docente", "Focus personale", "Prenotazione app"]
+        features: ["Orario flessibile", "Scelta docente", "Zoom live", "Prenotazione app"]
       }
     ]
   },
@@ -196,14 +239,35 @@ const courseCategories = [
       },
       {
         title: "Summer City Camp",
-        description: "Settimane estive in inglese a Vicenza con attività creative, sportive e culturali",
-        price: "Da €250/settimana",
+        description: "Settimane estive in inglese a Vicenza con attività creative, sportive e culturali. Centro storico con aria condizionata",
+        price: "Da €250/sett.",
         duration: "Giugno-Settembre",
         features: ["Full immersion", "Attività varie", "Centro Vicenza", "Aria condizionata"]
       },
       {
+        title: "Summer Camp Esperienziale",
+        description: "Learning weeks in montagna con sport (equitazione, rafting, hiking) e team building in inglese",
+        price: "Da €550/sett.",
+        duration: "Giugno-Agosto",
+        features: ["Sport all'aperto", "Team building", "Coach madrelingua", "Natura"]
+      },
+      {
+        title: "Corsi Online per Ragazzi",
+        description: "Lezioni individuali o di gruppo online per bambini e ragazzi con piattaforma AI interattiva",
+        price: "Da €35/mese",
+        duration: "Rinnovabile",
+        features: ["Piattaforma AI", "Docenti qualificati", "Orari flessibili", "Giochi didattici"]
+      },
+      {
+        title: "AI for Students",
+        description: "Corso per ragazzi sull'uso consapevole dell'AI per studio e creatività. ChatGPT, Copilot e strumenti creativi",
+        price: "€280",
+        duration: "6 settimane",
+        features: ["AI per lo studio", "Uso responsabile", "Progetti creativi", "Certificato"]
+      },
+      {
         title: "Vacanze Studio Estero",
-        description: "Soggiorni linguistici in UK, Irlanda, USA, Canada con famiglie o college",
+        description: "Soggiorni linguistici in UK, Irlanda, USA, Canada con famiglie selezionate o college",
         price: "Su richiesta",
         duration: "2-4 settimane",
         features: ["Network internazionale", "Assistenza h24", "Famiglie selezionate", "Certificazione"]
