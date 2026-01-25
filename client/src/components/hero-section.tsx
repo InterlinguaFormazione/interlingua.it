@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Sparkles, Users, Award, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import heroImage from "@/assets/images/hero-learning.jpg";
 
 const stats = [
   { icon: Users, value: "10,000+", label: "Studenti Formati" },
@@ -26,6 +27,7 @@ export function HeroSection() {
           loop 
           playsInline
           className="w-full h-full object-cover"
+          poster={heroImage}
         >
           <source src="https://interlingua.it/wp-content/uploads/2022/05/corso-di-lingua-inglese.mp4" type="video/mp4" />
         </video>
