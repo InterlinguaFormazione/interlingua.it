@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { Facebook, Instagram, Linkedin, Youtube, MapPin, Phone, Mail } from "lucide-react";
 import logoImage from "@assets/SKILLCRAFT-INTERLINGUA_1769354785857.png";
 
@@ -12,8 +12,8 @@ const footerLinks = {
     { label: "Crescita Personale", href: "#courses" },
   ],
   azienda: [
-    { label: "Chi Siamo", href: "#about" },
-    { label: "Il Nostro Team", href: "#about" },
+    { label: "Chi Siamo", href: "/chi-siamo" },
+    { label: "Il Nostro Team", href: "/chi-siamo" },
     { label: "Testimonianze", href: "#testimonials" },
     { label: "Lavora con Noi", href: "#contact" },
   ],
@@ -33,12 +33,17 @@ const socialLinks = [
 ];
 
 export function Footer() {
+  const [, setLocation] = useLocation();
+  
   const handleNavClick = (href: string) => {
     if (href.startsWith("#")) {
       const element = document.querySelector(href);
       if (element) {
         element.scrollIntoView({ behavior: "smooth" });
       }
+    } else if (href.startsWith("/")) {
+      setLocation(href);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 

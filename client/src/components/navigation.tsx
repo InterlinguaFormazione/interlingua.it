@@ -10,7 +10,7 @@ const navLinks = [
   { href: "/corsi", label: "Corsi" },
   { href: "#features", label: "Perché Noi" },
   { href: "#testimonials", label: "Recensioni" },
-  { href: "#about", label: "Chi Siamo" },
+  { href: "/chi-siamo", label: "Chi Siamo" },
   { href: "#contact", label: "Contatti" },
 ];
 
