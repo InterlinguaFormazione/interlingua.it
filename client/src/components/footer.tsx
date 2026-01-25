@@ -1,5 +1,6 @@
 import { Link } from "wouter";
-import { GraduationCap, Facebook, Instagram, Linkedin, Youtube, MapPin, Phone, Mail } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Youtube, MapPin, Phone, Mail } from "lucide-react";
+import logoImage from "@assets/SKILLCRAFT-INTERLINGUA_1769354785857.png";
 
 const footerLinks = {
   corsi: [
@@ -46,18 +47,12 @@ export function Footer() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-6" data-testid="link-footer-home">
-              <div className="bg-gradient-to-r from-primary to-accent p-2 rounded-lg">
-                <GraduationCap className="h-6 w-6 text-white" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-lg leading-tight tracking-tight">
-                  SkillCraft
-                </span>
-                <span className="text-xs text-muted-foreground leading-tight -mt-0.5">
-                  Interlingua
-                </span>
-              </div>
+            <Link href="/" className="inline-block mb-6" data-testid="link-footer-home">
+              <img 
+                src={logoImage} 
+                alt="SkillCraft Interlingua" 
+                className="h-12 w-auto"
+              />
             </Link>
             <p className="text-muted-foreground mb-6 max-w-sm">
               Dal 1993, formazione linguistica e competenze professionali. 

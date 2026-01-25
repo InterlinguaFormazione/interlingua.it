@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, GraduationCap } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { motion, AnimatePresence } from "framer-motion";
+import logoImage from "@assets/SKILLCRAFT-INTERLINGUA_1769354785857.png";
 
 const navLinks = [
   { href: "#courses", label: "Corsi" },
@@ -33,21 +34,12 @@ export function Navigation() {
     <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
-          <Link href="/" className="flex items-center gap-2 group" data-testid="link-home">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-lg blur-sm opacity-50 group-hover:opacity-75 transition-opacity" />
-              <div className="relative bg-gradient-to-r from-primary to-accent p-2 rounded-lg">
-                <GraduationCap className="h-6 w-6 text-white" />
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-lg leading-tight tracking-tight">
-                SkillCraft
-              </span>
-              <span className="text-xs text-muted-foreground leading-tight -mt-0.5">
-                Interlingua
-              </span>
-            </div>
+          <Link href="/" className="flex items-center group" data-testid="link-home">
+            <img 
+              src={logoImage} 
+              alt="SkillCraft Interlingua" 
+              className="h-10 md:h-12 w-auto"
+            />
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
