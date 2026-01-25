@@ -3,11 +3,11 @@ import { GraduationCap, Facebook, Instagram, Linkedin, Youtube, MapPin, Phone, M
 
 const footerLinks = {
   corsi: [
-    { label: "Corsi in Presenza", href: "#courses" },
-    { label: "Corsi Online", href: "#courses" },
+    { label: "Corsi di Lingue", href: "#courses" },
     { label: "Full Immersion", href: "#courses" },
     { label: "Certificazioni", href: "#courses" },
-    { label: "Speakers' Corner", href: "#courses" },
+    { label: "Intelligenza Artificiale", href: "#courses" },
+    { label: "Crescita Personale", href: "#courses" },
   ],
   azienda: [
     { label: "Chi Siamo", href: "#about" },
@@ -51,16 +51,16 @@ export function Footer() {
               </div>
               <div className="flex flex-col">
                 <span className="font-bold text-lg leading-tight tracking-tight">
-                  Interlingua
+                  SkillCraft
                 </span>
                 <span className="text-xs text-muted-foreground leading-tight -mt-0.5">
-                  Formazione
+                  Interlingua
                 </span>
               </div>
             </Link>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              Dal 1993, leader italiano nella formazione linguistica e nell'Executive Training. 
-              Ente accreditato Regione Veneto. Corsi in presenza e online.
+              Dal 1993, formazione linguistica e competenze professionali. 
+              Lingue, AI, soft skills, crescita personale. Ente accreditato Regione Veneto.
             </p>
             
             <div className="space-y-3 mb-6">
@@ -150,7 +150,7 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Interlingua Formazione. Tutti i diritti riservati.
+              © {new Date().getFullYear()} SkillCraft-Interlingua. Tutti i diritti riservati.
             </p>
             <p className="text-sm text-muted-foreground">
               Ente accreditato Regione Veneto

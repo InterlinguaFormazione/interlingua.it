@@ -42,10 +42,10 @@ export function Navigation() {
             </div>
             <div className="flex flex-col">
               <span className="font-bold text-lg leading-tight tracking-tight">
-                Interlingua
+                SkillCraft
               </span>
               <span className="text-xs text-muted-foreground leading-tight -mt-0.5">
-                Formazione
+                Interlingua
               </span>
             </div>
           </Link>

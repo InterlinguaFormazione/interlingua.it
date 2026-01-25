@@ -85,9 +85,9 @@ export function HeroSection() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg sm:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto"
           >
-            Il Metodo Interlingua garantisce un approccio naturale, efficace e rapido 
-            all'apprendimento delle lingue. Docenti madrelingua qualificati, 
-            corsi in presenza e online, certificazioni internazionali.
+            Corsi di lingue con docenti madrelingua, competenze digitali, 
+            intelligenza artificiale, soft skills e crescita personale. 
+            Il tuo percorso formativo su misura, in presenza o online.
           </motion.p>
 
           <motion.div

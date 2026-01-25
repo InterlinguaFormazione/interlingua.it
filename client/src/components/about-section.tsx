@@ -50,30 +50,30 @@ export function AboutSection() {
               Chi Siamo
             </Badge>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
-              Dal 1993, Leader nella{" "}
+              Due Eccellenze,{" "}
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Formazione Linguistica
+                Un'Unica Missione
               </span>
             </h2>
             <div className="space-y-4 text-muted-foreground">
               <p>
-                <strong className="text-foreground">Interlingua Formazione</strong>, fondata nel 1993, 
-                è oggi un leader italiano nella formazione linguistica e nell'Executive Training 
-                in lingua inglese.
+                <strong className="text-foreground">SkillCraft-Interlingua</strong> unisce l'eccellenza 
+                di Interlingua nella formazione linguistica con le competenze innovative di SkillCraft 
+                in ambito digitale e professionale.
               </p>
               <p>
-                Il nostro <strong className="text-foreground">Metodo Interlingua</strong> garantisce 
-                un approccio naturale, efficace e rapido all'apprendimento delle lingue straniere, 
-                con docenti madrelingua di alto livello.
+                Dal 1993, <strong className="text-foreground">Interlingua</strong> è sinonimo di 
+                qualità nell'insegnamento delle lingue con il suo metodo naturale ed efficace, 
+                docenti madrelingua e certificazioni internazionali QCER.
               </p>
               <p>
-                Offriamo corsi di <strong className="text-foreground">inglese, francese, tedesco, 
-                spagnolo, italiano, cinese, russo e arabo</strong>, progettati per migliorare 
-                concretamente il livello linguistico e ottenere certificazioni internazionali QCER.
+                <strong className="text-foreground">SkillCraft</strong> porta competenze all'avanguardia: 
+                intelligenza artificiale, soft skills, crescita personale e competenze digitali 
+                per il mondo moderno.
               </p>
               <p>
-                Siamo <strong className="text-foreground">Ente di Formazione accreditato dalla 
-                Regione Veneto</strong>, con sedi a Vicenza e Thiene.
+                Siamo <strong className="text-foreground">Ente accreditato Regione Veneto</strong>, 
+                con sedi a Vicenza e Thiene. Corsi in presenza e online per privati.
               </p>
             </div>
 
