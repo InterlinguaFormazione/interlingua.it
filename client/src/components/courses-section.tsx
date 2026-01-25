@@ -160,10 +160,10 @@ const courses: Course[] = [
   },
   {
     id: "12",
-    title: "Digitalizzazione 4.0",
-    description: "Fondamenti digitali per il mondo moderno: cloud, collaborazione online, sicurezza informatica e strumenti di produttività.",
+    title: "Sicurezza Digitale",
+    description: "Proteggi la tua privacy online, gestisci password, riconosci truffe e phishing. Competenze essenziali per navigare in sicurezza.",
     category: "digital",
-    duration: "1-2 mesi",
+    duration: "1 mese",
     level: "all",
     icon: "code",
   },
