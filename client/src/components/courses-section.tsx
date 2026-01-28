@@ -36,7 +36,7 @@ const categories = [
   },
   {
     id: "online",
-    title: "E-Learning Online",
+    title: "Formazione Online",
     description: "Piattaforma 24/7 con AI e riconoscimento vocale. Corsi blended con tutor madrelingua via Zoom. Studia quando e dove vuoi.",
     icon: Monitor,
     image: categoryOnline,
