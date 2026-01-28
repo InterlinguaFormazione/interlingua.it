@@ -7,7 +7,7 @@ module.exports = {
   apps: [
     {
       name: 'skillcraft-interlingua',
-      script: 'dist/index.js',
+      script: 'dist/index.cjs',
       cwd: '/var/www/SkillCraft-Interlingua',
       instances: 'max',
       exec_mode: 'cluster',
