@@ -72,7 +72,6 @@ export function FeaturesSection() {
   return (
     <section id="features" className="py-24 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent" />
-      
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <motion.div
@@ -90,11 +89,7 @@ export function FeaturesSection() {
                 Missione
               </span>
             </h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              Con oltre 15 anni di esperienza nella formazione, 
-              abbiamo sviluppato un metodo unico che combina 
-              tradizione e innovazione per risultati concreti.
-            </p>
+            <p className="text-lg text-muted-foreground mb-8">Con oltre 30 anni di esperienza nella formazione, abbiamo sviluppato un metodo unico che combina tradizione e innovazione per risultati concreti.</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {benefits.map((benefit, index) => (
