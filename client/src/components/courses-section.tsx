@@ -5,7 +5,7 @@ import {
   Monitor,
   MessageCircle,
   Mountain,
-  Baby,
+  Mic,
   Briefcase,
   ArrowRight,
   Users,
@@ -20,8 +20,8 @@ import categoryPresence from "@/assets/images/category-presence.jpg";
 import categoryOnline from "@/assets/images/category-online.jpg";
 import categorySpeakers from "@/assets/images/category-speakers.jpg";
 import categoryImmersion from "@/assets/images/category-immersion.jpg";
-import categoryKids from "@/assets/images/category-kids.jpg";
 import categoryDigital from "@/assets/images/category-digital.jpg";
+import courseIndividual from "@/assets/images/course-individual.jpg";
 
 const categories = [
   {
@@ -33,6 +33,15 @@ const categories = [
     color: "from-purple-500 to-purple-600",
     courseCount: 4,
     featured: true,
+  },
+  {
+    id: "coaching",
+    title: "Language Coaching",
+    description: "Percorsi personalizzati 1-to-1 con coach madrelingua. Sviluppa fluency, confidence e competenze comunicative su misura per i tuoi obiettivi.",
+    icon: Mic,
+    image: courseIndividual,
+    color: "from-indigo-500 to-indigo-600",
+    courseCount: 3,
   },
   {
     id: "online",
@@ -61,15 +70,6 @@ const categories = [
     color: "from-green-500 to-green-600",
     courseCount: 2,
     featured: true,
-  },
-  {
-    id: "kids",
-    title: "Bambini & Ragazzi",
-    description: "Corsi per bambini 5-16 anni, Summer Camp in città o in natura, vacanze studio all'estero. Docenti specializzati nell'insegnamento ai giovani.",
-    icon: Baby,
-    image: categoryKids,
-    color: "from-pink-500 to-pink-600",
-    courseCount: 6,
   },
   {
     id: "professional",
