@@ -104,9 +104,7 @@ export function CoursesSection() {
               Percorso
             </span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Esplora le nostre 6 aree formative e trova il corso perfetto per i tuoi obiettivi
-          </p>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">Esplora le nostre aree formative e trova il corso perfetto per i tuoi obiettivi</p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
