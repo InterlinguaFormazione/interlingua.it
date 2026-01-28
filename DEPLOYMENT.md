@@ -5,7 +5,7 @@
 | Setting | Value |
 |---------|-------|
 | App Name | skillcraft-interlingua |
-| Domain | skillcraft-interlingua.interlingua.it |
+| Domain | skillcraft.interlingua.it |
 | Port | 5005 |
 | VPS IP | 72.62.36.128 |
 | Directory | /var/www/SkillCraft-Interlingua |
@@ -92,7 +92,7 @@ systemctl reload nginx
 ### Step 9: Get SSL Certificate
 
 ```bash
-certbot --nginx -d skillcraft-interlingua.interlingua.it
+certbot --nginx -d skillcraft.interlingua.it
 ```
 
 ### Step 10: Create PM2 Log Directory
@@ -115,7 +115,7 @@ pm2 status
 curl http://localhost:5005
 ```
 
-Visit: https://skillcraft-interlingua.interlingua.it
+Visit: https://skillcraft.interlingua.it
 
 ---
 
