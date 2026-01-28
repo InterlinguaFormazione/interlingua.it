@@ -1,63 +1,52 @@
 /**
  * PM2 Ecosystem Configuration
- * English Workout - SkillCraft Interlingua
+ * SkillCraft-Interlingua
  */
 
 module.exports = {
   apps: [
     {
-      name: 'english-workout',
+      name: 'skillcraft-interlingua',
       script: 'dist/index.js',
-      cwd: '/var/www/english-workout',
+      cwd: '/var/www/SkillCraft-Interlingua',
       instances: 'max',
       exec_mode: 'cluster',
       autorestart: true,
       watch: false,
       max_memory_restart: '500M',
       
-      // Environment variables for production
       env_production: {
         NODE_ENV: 'production',
-        PORT: 5000,
+        PORT: 5005,
       },
       
-      // Environment variables for development
       env_development: {
         NODE_ENV: 'development',
-        PORT: 5000,
+        PORT: 5005,
       },
 
-      // Logging
-      error_file: '/var/log/pm2/english-workout-error.log',
-      out_file: '/var/log/pm2/english-workout-out.log',
-      log_file: '/var/log/pm2/english-workout-combined.log',
+      error_file: '/var/log/pm2/skillcraft-interlingua-error.log',
+      out_file: '/var/log/pm2/skillcraft-interlingua-out.log',
+      log_file: '/var/log/pm2/skillcraft-interlingua-combined.log',
       time: true,
       
-      // Restart delay
       restart_delay: 4000,
-      
-      // Graceful shutdown
       kill_timeout: 5000,
       wait_ready: true,
       listen_timeout: 10000,
-
-      // Health monitoring
       exp_backoff_restart_delay: 100,
       max_restarts: 10,
     }
   ],
 
-  // Deployment configuration (optional - for pm2 deploy)
   deploy: {
     production: {
-      user: 'deploy',
-      host: 'your-vps-ip',
+      user: 'root',
+      host: '72.62.36.128',
       ref: 'origin/main',
-      repo: 'git@github.com:your-username/english-workout.git',
-      path: '/var/www/english-workout',
-      'pre-deploy-local': '',
+      repo: 'git@github.com:InterlinguaFormazione/SkillCraft-Interlingua.git',
+      path: '/var/www/SkillCraft-Interlingua',
       'post-deploy': 'npm install && npm run build && pm2 reload ecosystem.config.cjs --env production',
-      'pre-setup': '',
     }
   }
 };
