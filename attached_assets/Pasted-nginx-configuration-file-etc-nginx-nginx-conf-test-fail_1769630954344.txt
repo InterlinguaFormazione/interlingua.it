@@ -1,0 +1,28 @@
+nginx: configuration file /etc/nginx/nginx.conf test failed
+
+The nginx plugin is not working; there may be problems with your existing configuration.
+The error was: MisconfigurationError('Error while running nginx -c /etc/nginx/nginx.conf -t.\n\n2026/01/28 20:06:49 [emerg] 721887#721887: open() "/etc/nginx/sites-enabled/skillcraft-interlingua.conf" failed (2: No such file or directory) in /etc/nginx/nginx.conf:60\nnginx: configuration file /etc/nginx/nginx.conf test failed\n')
+root@srv1133915:/var/www/SkillCraft-Interlingua# # 1. Rimuovi il symlink rotto
+sudo rm -f /etc/nginx/sites-enabled/skillcraft-interlingua.conf
+
+# 2. Crea il file nginx direttamente
+sudo nano /etc/nginx/sites-available/skillcraft-interlingua.conf
+root@srv1133915:/var/www/SkillCraft-Interlingua# # 3. Crea il symlink
+sudo ln -sf /etc/nginx/sites-available/skillcraft-interlingua.conf /etc/nginx/sites-enabled/
+
+# 4. Testa e ricarica
+sudo nginx -t && sudo systemctl reload nginx
+
+# 5. SSL
+sudo certbot --nginx -d skillcraft-interlingua.interlingua.it
+2026/01/28 20:09:06 [emerg] 721979#721979: no "ssl_certificate" is defined for the "listen ... ssl" directive in /etc/nginx/sites-enabled/skillcraft-interlingua.conf:11
+nginx: configuration file /etc/nginx/nginx.conf test failed
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Error while running nginx -c /etc/nginx/nginx.conf -t.
+
+2026/01/28 20:09:06 [emerg] 721983#721983: no "ssl_certificate" is defined for the "listen ... ssl" directive in /etc/nginx/sites-enabled/skillcraft-interlingua.conf:11
+nginx: configuration file /etc/nginx/nginx.conf test failed
+
+The nginx plugin is not working; there may be problems with your existing configuration.
+The error was: MisconfigurationError('Error while running nginx -c /etc/nginx/nginx.conf -t.\n\n2026/01/28 20:09:06 [emerg] 721983#721983: no "ssl_certificate" is defined for the "listen ... ssl" directive in /etc/nginx/sites-enabled/skillcraft-interlingua.conf:11\nnginx: configuration file /etc/nginx/nginx.conf test failed\n')
+root@srv1133915:/var/www/SkillCraft-Interlingua#
