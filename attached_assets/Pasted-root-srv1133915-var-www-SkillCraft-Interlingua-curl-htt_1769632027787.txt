@@ -1,0 +1,100 @@
+root@srv1133915:/var/www/SkillCraft-Interlingua# curl http://localhost:5005
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+
+    <!-- SEO Meta Tags -->
+    <title>SkillCraft-Interlingua | Corsi Lingue, AI, Soft Skills | Vicenza Dal 1993</title>
+    <meta name="description" content="SkillCraft-Interlingua: corsi di lingue, AI, MS Office, digital marketing, soft skills e crescita personale. Vicenza e Thiene, in presenza o online. Dal 1993." />
+    <meta name="keywords" content="corsi di lingua vicenza, corsi inglese thiene, corsi AI, intelligenza artificiale, corsi MS Office, Excel, Word, digital marketing, soft skills, crescita personale, certificazioni IELTS, Cambridge, full immersion" />
+    <meta name="author" content="SkillCraft-Interlingua" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://skillcraft-interlingua.it" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://skillcraft-interlingua.it" />
+    <meta property="og:title" content="SkillCraft-Interlingua | Lingue, AI e Crescita Personale" />
+    <meta property="og:description" content="Dal 1993 formazione linguistica e competenze professionali. Lingue, AI, soft skills, crescita personale. Vicenza e Thiene." />
+    <meta property="og:locale" content="it_IT" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SkillCraft-Interlingua | Formazione Vicenza" />
+    <meta name="twitter:description" content="Corsi di lingue, AI, soft skills e crescita personale. Docenti madrelingua, certificazioni internazionali. Dal 1993." />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "EducationalOrganization",
+      "name": "SkillCraft-Interlingua",
+      "description": "Dal 1993 formazione linguistica, intelligenza artificiale, soft skills e crescita personale per privati",
+      "url": "https://skillcraft-interlingua.it",
+      "foundingDate": "1993",
+      "areaServed": "IT",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Vicenza",
+        "addressRegion": "VI",
+        "addressCountry": "IT"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "102"
+      },
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Corsi di Formazione",
+        "itemListElement": [
+          {
+            "@type": "Course",
+            "name": "Corsi di Lingue",
+            "description": "Inglese, tedesco, francese, spagnolo, russo con docenti madrelingua"
+          },
+          {
+            "@type": "Course",
+            "name": "Intelligenza Artificiale",
+            "description": "Corsi AI per produttività personale: ChatGPT, Copilot, automazione"
+          },
+          {
+            "@type": "Course",
+            "name": "Office e Produttività",
+            "description": "Word, Excel, PowerPoint, Outlook, Teams dalle basi alle funzioni avanzate"
+          },
+          {
+            "@type": "Course",
+            "name": "Digital Marketing",
+            "description": "Social media, SEO, content creation e personal branding"
+          },
+          {
+            "@type": "Course",
+            "name": "Soft Skills",
+            "description": "Comunicazione, public speaking, gestione del tempo, leadership"
+          },
+          {
+            "@type": "Course",
+            "name": "Crescita Personale",
+            "description": "Mindset, produttività, gestione dello stress, coaching individuale"
+          }
+        ]
+      }
+    }
+    </script>
+    <script type="module" crossorigin src="/assets/index-B9G-z8ih.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CCl1jukp.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+root@srv1133915:/var/www/SkillCraft-Interlingua#
