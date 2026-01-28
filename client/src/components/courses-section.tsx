@@ -2,198 +2,88 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { 
   Globe, 
-  Code, 
-  Briefcase, 
-  Brain, 
-  Clock, 
-  Users,
-  ArrowRight,
-  Languages,
   Monitor,
-  Megaphone,
-  Leaf,
-  Mic,
-  Award,
+  MessageCircle,
+  Mountain,
+  Baby,
+  Briefcase,
+  ArrowRight,
+  Users,
+  BookOpen,
   Sparkles
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Course } from "@shared/schema";
-import courseEnglish from "@/assets/images/course-english.jpg";
-import courseGerman from "@/assets/images/course-german.jpg";
-import courseItalian from "@/assets/images/course-italian.jpg";
-import courseDigital from "@/assets/images/course-digital.jpg";
-import courseSpeaking from "@/assets/images/course-speaking.jpg";
-import coursePersonal from "@/assets/images/course-personal.jpg";
 
-const courseImages: Record<string, string> = {
-  "1": courseEnglish,
-  "2": courseDigital,
-  "3": courseGerman,
-  "4": courseItalian,
-  "5": courseSpeaking,
-  "6": courseEnglish,
-  "7": courseDigital,
-  "8": courseDigital,
-  "9": courseSpeaking,
-  "10": coursePersonal,
-  "11": coursePersonal,
-  "12": coursePersonal,
-};
+import categoryPresence from "@/assets/images/category-presence.jpg";
+import categoryOnline from "@/assets/images/category-online.jpg";
+import categorySpeakers from "@/assets/images/category-speakers.jpg";
+import categoryImmersion from "@/assets/images/category-immersion.jpg";
+import categoryKids from "@/assets/images/category-kids.jpg";
+import categoryDigital from "@/assets/images/category-digital.jpg";
 
-const iconMap: Record<string, any> = {
-  globe: Globe,
-  code: Code,
-  briefcase: Briefcase,
-  brain: Brain,
-  languages: Languages,
-  monitor: Monitor,
-  megaphone: Megaphone,
-  leaf: Leaf,
-  mic: Mic,
-  award: Award,
-  sparkles: Sparkles,
-};
-
-const courses: Course[] = [
-  // INTERLINGUA COURSES
+const categories = [
   {
-    id: "1",
-    title: "Corsi di Lingue",
-    description: "Inglese, francese, tedesco, spagnolo, russo e altre lingue. In presenza a Vicenza e Thiene o online. Docenti madrelingua qualificati.",
-    category: "languages",
-    duration: "3-12 mesi",
-    level: "all",
-    icon: "globe",
+    id: "lingua",
+    title: "Corsi di Lingua",
+    description: "Inglese, francese, tedesco, spagnolo e russo. Corsi di gruppo, individuali e preparazione certificazioni in presenza a Vicenza e Thiene.",
+    icon: Globe,
+    image: categoryPresence,
+    color: "from-purple-500 to-purple-600",
+    courseCount: 4,
     featured: true,
   },
   {
-    id: "2",
-    title: "Corsi Online E-Learning",
-    description: "Studia quando vuoi con accesso 24/7. Piattaforma interattiva con video, esercizi e tutor madrelingua. Inglese, tedesco, francese, spagnolo.",
-    category: "languages",
-    duration: "Flessibile",
-    level: "all",
-    icon: "monitor",
+    id: "online",
+    title: "E-Learning Online",
+    description: "Piattaforma 24/7 con AI e riconoscimento vocale. Corsi blended con tutor madrelingua via Zoom. Studia quando e dove vuoi.",
+    icon: Monitor,
+    image: categoryOnline,
+    color: "from-teal-500 to-teal-600",
+    courseCount: 3,
   },
   {
-    id: "3",
-    title: "Full Immersion Workshop",
-    description: "5 giorni intensivi per dare una svolta al tuo inglese. Coach madrelingua, pratica orale, simulazioni reali. Supera un livello QCER in una settimana!",
-    category: "languages",
-    duration: "5 giorni",
-    level: "all",
-    icon: "languages",
-    featured: true,
-  },
-  {
-    id: "4",
-    title: "Certificazioni Internazionali",
-    description: "Preparati per IELTS, TOEFL, Cambridge, DELF, DELE, Goethe. Lezioni live + e-learning + simulazioni d'esame. Valido per MIUR.",
-    category: "languages",
-    duration: "Personalizzato",
-    level: "all",
-    icon: "award",
-  },
-  {
-    id: "5",
+    id: "speakers",
     title: "Speakers' Corner",
-    description: "Pratica l'inglese tutto l'anno con tutor madrelingua qualificati. Lezioni settimanali di conversazione via Zoom a prezzo accessibile.",
-    category: "languages",
-    duration: "12 mesi",
-    level: "intermediate",
-    icon: "globe",
+    description: "Pratica la conversazione in inglese ogni venerdì con docenti madrelingua. Abbonamento annuale, prova gratuita o lezioni individuali.",
+    icon: MessageCircle,
+    image: categorySpeakers,
+    color: "from-orange-500 to-orange-600",
+    courseCount: 3,
   },
   {
-    id: "6",
-    title: "Language Coaching",
-    description: "Percorsi personalizzati 1-to-1 con coach madrelingua. Sviluppa fluency, confidence e competenze comunicative su misura.",
-    category: "languages",
-    duration: "Personalizzato",
-    level: "all",
-    icon: "mic",
-  },
-  {
-    id: "7",
-    title: "Intelligenza Artificiale",
-    description: "Impara a usare ChatGPT, Copilot e altri strumenti AI per la produttività personale. Automazione, creatività e innovazione.",
-    category: "digital",
-    duration: "1-2 mesi",
-    level: "all",
-    icon: "sparkles",
+    id: "immersion",
+    title: "Full Immersion",
+    description: "Workshop intensivi a Vicenza e esperienze outdoor sui colli Vicentini con equitazione. Avanza un livello QCER in una settimana.",
+    icon: Mountain,
+    image: categoryImmersion,
+    color: "from-green-500 to-green-600",
+    courseCount: 2,
     featured: true,
   },
   {
-    id: "8",
-    title: "Office & Produttività",
-    description: "Padroneggia Word, Excel, PowerPoint, Outlook e Teams. Dalle basi alle funzioni avanzate per massimizzare la tua efficienza.",
-    category: "digital",
-    duration: "1-3 mesi",
-    level: "all",
-    icon: "monitor",
-  },
-  // SKILLCRAFT COURSES
-  {
-    id: "9",
-    title: "Digital Marketing",
-    description: "Social media, SEO, content creation e personal branding. Impara a promuoverti online e costruire la tua presenza digitale.",
-    category: "digital",
-    duration: "2-3 mesi",
-    level: "all",
-    icon: "megaphone",
+    id: "kids",
+    title: "Bambini & Ragazzi",
+    description: "Corsi per bambini 5-16 anni, Summer Camp in città o in natura, vacanze studio all'estero. Docenti specializzati nell'insegnamento ai giovani.",
+    icon: Baby,
+    image: categoryKids,
+    color: "from-pink-500 to-pink-600",
+    courseCount: 6,
   },
   {
-    id: "10",
-    title: "Competenze Trasversali",
-    description: "Soft skills essenziali: comunicazione efficace, public speaking, gestione del tempo, problem solving e leadership personale.",
-    category: "professional",
-    duration: "2-3 mesi",
-    level: "all",
-    icon: "briefcase",
-  },
-  {
-    id: "11",
-    title: "Crescita Personale",
-    description: "Sviluppo personale e professionale: mindset, produttività, gestione dello stress e obiettivi. Coaching individuale disponibile.",
-    category: "personal",
-    duration: "Flessibile",
-    level: "all",
-    icon: "brain",
-  },
-  {
-    id: "12",
-    title: "Sostenibilità",
-    description: "Competenze per uno stile di vita sostenibile. Impatto ambientale, economia circolare e scelte consapevoli per il futuro.",
-    category: "personal",
-    duration: "1-2 mesi",
-    level: "all",
-    icon: "leaf",
+    id: "professional",
+    title: "Competenze Professionali",
+    description: "Office, AI, digital skills e crescita personale. Comunicazione efficace, leadership e time management per il tuo sviluppo.",
+    icon: Briefcase,
+    image: categoryDigital,
+    color: "from-blue-500 to-blue-600",
+    courseCount: 5,
+    featured: true,
   },
 ];
 
-const categoryLabels: Record<string, string> = {
-  languages: "Lingue",
-  digital: "Digitale",
-  professional: "Professionale",
-  personal: "Personale",
-};
-
-const levelLabels: Record<string, string> = {
-  beginner: "Principiante",
-  intermediate: "Intermedio",
-  advanced: "Avanzato",
-  all: "Tutti i livelli",
-};
-
 export function CoursesSection() {
-  const handleScrollToContact = () => {
-    const element = document.querySelector("#contact");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   return (
     <section id="courses" className="py-24 bg-muted/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -205,6 +95,7 @@ export function CoursesSection() {
           className="text-center mb-16"
         >
           <Badge variant="secondary" className="mb-4">
+            <Sparkles className="w-3 h-3 mr-1" />
             I Nostri Corsi
           </Badge>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
@@ -214,79 +105,74 @@ export function CoursesSection() {
             </span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Offriamo una vasta gamma di corsi pensati per le tue esigenze. 
-            Scopri quello più adatto a te.
+            Esplora le nostre 6 aree formative e trova il corso perfetto per i tuoi obiettivi
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((course, index) => {
-            const Icon = iconMap[course.icon] || Globe;
+          {categories.map((category, index) => {
+            const Icon = category.icon;
             return (
               <motion.div
-                key={course.id}
-                initial={{ opacity: 0, y: 20 }}
+                key={category.id}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Card 
-                  className="h-full hover-elevate group cursor-pointer relative overflow-hidden"
-                  data-testid={`card-course-${course.id}`}
-                >
-                  {course.featured && (
-                    <div className="absolute top-3 right-3 z-20">
-                      <Badge className="bg-gradient-to-r from-primary to-accent text-white border-0 shadow-lg">
-                        Popolare
-                      </Badge>
-                    </div>
-                  )}
-                  <div className="relative h-40 overflow-hidden">
-                    <img 
-                      src={courseImages[course.id]} 
-                      alt={course.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent" />
-                  </div>
-                  <CardHeader className="pt-4">
-                    <div className="flex items-start justify-between gap-4 mb-2">
-                      <div className="p-3 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 group-hover:from-primary/20 group-hover:to-accent/20 transition-colors">
-                        <Icon className="h-6 w-6 text-primary" />
+                <Link href="/corsi">
+                  <Card 
+                    className="h-full hover-elevate group cursor-pointer relative overflow-hidden"
+                    data-testid={`card-category-${category.id}`}
+                  >
+                    {category.featured && (
+                      <div className="absolute top-4 right-4 z-20">
+                        <Badge className="bg-gradient-to-r from-primary to-accent text-white border-0 shadow-lg">
+                          Popolare
+                        </Badge>
                       </div>
-                      <Badge variant="outline" className="text-xs">
-                        {categoryLabels[course.category]}
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                      {course.title}
-                    </CardTitle>
-                    <CardDescription className="text-base">
-                      {course.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="h-4 w-4" />
-                        <span>{course.duration}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Users className="h-4 w-4" />
-                        <span>{levelLabels[course.level]}</span>
+                    )}
+                    
+                    <div className="relative h-48 overflow-hidden">
+                      <img 
+                        src={category.image} 
+                        alt={category.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-card via-card/60 to-transparent" />
+                      
+                      <div className={`absolute bottom-4 left-4 p-3 rounded-xl bg-gradient-to-r ${category.color} shadow-lg group-hover:scale-110 transition-transform`}>
+                        <Icon className="h-6 w-6 text-white" />
                       </div>
                     </div>
-                    <Button 
-                      variant="ghost" 
-                      className="w-full justify-between group/btn"
-                      onClick={handleScrollToContact}
-                      data-testid={`button-course-info-${course.id}`}
-                    >
-                      Scopri di più
-                      <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
-                    </Button>
-                  </CardContent>
-                </Card>
+                    
+                    <CardContent className="pt-4">
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <h3 className="text-xl font-bold group-hover:text-primary transition-colors">
+                          {category.title}
+                        </h3>
+                        <Badge variant="secondary" className="text-xs shrink-0">
+                          {category.courseCount} corsi
+                        </Badge>
+                      </div>
+                      
+                      <p className="text-muted-foreground mb-4 line-clamp-3">
+                        {category.description}
+                      </p>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                          <Users className="h-4 w-4" />
+                          <span>Tutti i livelli</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-primary font-medium text-sm group-hover:gap-2 transition-all">
+                          Esplora
+                          <ArrowRight className="h-4 w-4" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               </motion.div>
             );
           })}
@@ -297,25 +183,35 @@ export function CoursesSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="text-center mt-12 flex flex-col sm:flex-row gap-4 justify-center"
+          className="text-center mt-12"
         >
-          <Link href="/corsi">
+          <div className="inline-flex flex-col sm:flex-row gap-4 items-center">
+            <Link href="/corsi">
+              <Button 
+                size="lg" 
+                data-testid="button-all-courses"
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
+                Vedi Tutti i Corsi
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
             <Button 
               size="lg" 
-              data-testid="button-all-courses"
+              variant="outline"
+              onClick={() => {
+                const element = document.querySelector("#contact");
+                if (element) element.scrollIntoView({ behavior: "smooth" });
+              }}
+              data-testid="button-request-info"
             >
-              Vedi Tutti i Corsi
-              <ArrowRight className="ml-2 h-5 w-5" />
+              Richiedi Informazioni
             </Button>
-          </Link>
-          <Button 
-            size="lg" 
-            variant="outline"
-            onClick={handleScrollToContact}
-            data-testid="button-request-info"
-          >
-            Richiedi Informazioni
-          </Button>
+          </div>
+          
+          <p className="mt-6 text-sm text-muted-foreground">
+            Oltre 20 corsi disponibili tra lingue, competenze digitali e crescita personale
+          </p>
         </motion.div>
       </div>
     </section>
