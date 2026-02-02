@@ -11,6 +11,11 @@ const locations = [
     city: "36100 Vicenza (VI)",
     phone: "+39 0444 321601",
     email: "info@interlingua.it",
+    hours: [
+      { days: "Lun - Gio", time: "8:30-12:30 / 15:30-20:00" },
+      { days: "Venerdì", time: "8:30-12:30 / 15:30-19:00" },
+      { days: "Sab - Dom", time: "Chiuso" },
+    ],
   },
   {
     name: "Sede Thiene",
@@ -18,6 +23,10 @@ const locations = [
     city: "36016 Thiene (VI)",
     phone: "+39 0445 382744",
     email: "thiene@interlingua.it",
+    hours: [
+      { days: "Lun - Ven", time: "14:00 - 20:00" },
+      { days: "Sab - Dom", time: "Chiuso" },
+    ],
   },
 ];
 
@@ -142,14 +151,14 @@ export function AboutSection() {
                   </div>
 
                   <div className="mt-6 pt-6 border-t">
-                    <h4 className="font-medium mb-3">Orari di Apertura</h4>
+                    <h4 className="font-medium mb-3">Orari Segreteria</h4>
                     <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="text-muted-foreground">Lun - Ven</div>
-                      <div>09:00 - 20:00</div>
-                      <div className="text-muted-foreground">Sabato</div>
-                      <div>Chiuso</div>
-                      <div className="text-muted-foreground">Domenica</div>
-                      <div>Chiuso</div>
+                      {location.hours.map((h, i) => (
+                        <div key={i} className="contents">
+                          <div className="text-muted-foreground">{h.days}</div>
+                          <div>{h.time}</div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </CardContent>
