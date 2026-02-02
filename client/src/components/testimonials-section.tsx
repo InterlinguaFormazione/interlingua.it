@@ -257,7 +257,11 @@ export function TestimonialsSection() {
           <a href={GOOGLE_WRITE_REVIEW_URL} target="_blank" rel="noopener noreferrer">
             <Button size="lg" data-testid="button-write-review">
               Lascia una Recensione
-              <Star className="ml-2 h-4 w-4" />
+              <div className="flex ml-2 gap-0.5">
+                {[1,2,3,4,5].map(i => (
+                  <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
             </Button>
           </a>
           <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer">
