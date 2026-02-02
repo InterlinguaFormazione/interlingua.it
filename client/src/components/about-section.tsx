@@ -147,7 +147,7 @@ export function AboutSection() {
                       <div className="text-muted-foreground">Lun - Ven</div>
                       <div>09:00 - 20:00</div>
                       <div className="text-muted-foreground">Sabato</div>
-                      <div>09:00 - 13:00</div>
+                      <div>Chiuso</div>
                       <div className="text-muted-foreground">Domenica</div>
                       <div>Chiuso</div>
                     </div>
