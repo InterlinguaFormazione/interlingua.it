@@ -23,11 +23,11 @@ const locations = [
 
 export function AboutSection() {
   return (
-    <section id="about" className="py-24 relative overflow-hidden">
+    <section id="about" className="py-16 relative overflow-hidden">
       <div className="absolute bottom-0 left-0 w-1/2 h-full bg-gradient-to-r from-accent/5 to-transparent" />
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="mb-12 relative rounded-2xl overflow-hidden">
+        <div className="mb-8 relative rounded-2xl overflow-hidden">
           <img 
             src={aboutTeam} 
             alt="Il nostro team di formatori" 
@@ -39,7 +39,7 @@ export function AboutSection() {
             <h3 className="text-2xl font-bold text-white drop-shadow-lg">Professionisti Dedicati alla Tua Crescita</h3>
           </div>
         </div>
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-10 items-center">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}

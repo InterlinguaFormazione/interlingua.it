@@ -85,14 +85,14 @@ export function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-24 bg-muted/30">
+    <section id="contact" className="py-16 bg-muted/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="text-center mb-10"
         >
           <Badge variant="secondary" className="mb-4">
             Contattaci
@@ -189,6 +189,7 @@ export function ContactSection() {
                                   type="tel" 
                                   placeholder="+39 123 456 7890" 
                                   {...field}
+                                  value={field.value ?? ""}
                                   data-testid="input-contact-phone"
                                 />
                               </FormControl>
@@ -203,7 +204,7 @@ export function ContactSection() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Corso di Interesse</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined}>
                                 <FormControl>
                                   <SelectTrigger data-testid="select-course-interest">
                                     <SelectValue placeholder="Seleziona un corso" />
