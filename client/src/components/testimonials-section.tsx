@@ -54,6 +54,45 @@ const fallbackReviews: GoogleReview[] = [
     avatar: null,
     relativeTime: "",
   },
+  {
+    id: "4",
+    name: "Alessio Gallone",
+    role: "Google Review",
+    content: "Esperienza molto positiva. Docenti preparati e ambiente stimolante per l'apprendimento.",
+    rating: 5,
+    avatar: null,
+    relativeTime: "",
+  },
+  {
+    id: "5",
+    name: "Lucia Triolo",
+    role: "Google Review",
+    content: "Ottima esperienza formativa. Professionalità e competenza contraddistinguono tutto il team di Interlingua.",
+    rating: 5,
+    avatar: null,
+    relativeTime: "",
+  },
+  {
+    id: "6",
+    name: "Will Barnes",
+    role: "Google Review",
+    content: "Great language school with professional and friendly teachers. Highly recommended for anyone wanting to learn Italian or improve their English skills.",
+    rating: 5,
+    avatar: null,
+    relativeTime: "",
+  },
+];
+
+const additionalReviews: GoogleReview[] = [
+  {
+    id: "extra-1",
+    name: "Lucia Triolo",
+    role: "Google Review",
+    content: "Ottima esperienza formativa. Professionalità e competenza contraddistinguono tutto il team di Interlingua.",
+    rating: 5,
+    avatar: null,
+    relativeTime: "7 mesi fa",
+  },
 ];
 
 export function TestimonialsSection() {
@@ -63,7 +102,10 @@ export function TestimonialsSection() {
     staleTime: 24 * 60 * 60 * 1000,
   });
 
-  const reviews = data?.reviews || fallbackReviews;
+  const apiReviews = data?.reviews || [];
+  const reviews = apiReviews.length > 0 
+    ? [...apiReviews, ...additionalReviews].slice(0, Math.max(6, apiReviews.length + 1))
+    : fallbackReviews;
   const rating = data?.rating || 4.8;
   const totalReviews = data?.totalReviews || 102;
   const displayedReviews = showAll ? reviews : reviews.slice(0, 6);
