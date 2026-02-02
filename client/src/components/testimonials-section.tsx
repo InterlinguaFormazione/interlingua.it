@@ -1,9 +1,12 @@
 import { motion } from "framer-motion";
-import { Star, Quote } from "lucide-react";
+import { Star, Quote, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Testimonial } from "@shared/schema";
+
+const GOOGLE_REVIEWS_URL = "https://search.google.com/local/reviews?placeid=ChIJDWsIWn0xf0cR9w29gPorTls";
 import testimonial1 from "@/assets/images/testimonial-1.jpg";
 import testimonial2 from "@/assets/images/testimonial-2.jpg";
 import testimonial3 from "@/assets/images/testimonial-3.jpg";
@@ -82,9 +85,18 @@ export function TestimonialsSection() {
               Studenti
             </span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
             Le storie di successo dei nostri studenti sono la nostra più grande soddisfazione.
           </p>
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-card border">
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Star key={i} className={`h-4 w-4 ${i <= 4 ? 'fill-yellow-400 text-yellow-400' : 'fill-yellow-400/80 text-yellow-400/80'}`} />
+              ))}
+            </div>
+            <span className="font-bold">4.8</span>
+            <span className="text-muted-foreground text-sm">su Google (102 recensioni)</span>
+          </div>
         </motion.div>
 
         <div className="relative">
@@ -136,6 +148,21 @@ export function TestimonialsSection() {
             ))}
           </div>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="text-center mt-8"
+        >
+          <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer">
+            <Button variant="outline" size="lg" data-testid="button-google-reviews">
+              Vedi Tutte le Recensioni su Google
+              <ExternalLink className="ml-2 h-4 w-4" />
+            </Button>
+          </a>
+        </motion.div>
       </div>
     </section>
   );
