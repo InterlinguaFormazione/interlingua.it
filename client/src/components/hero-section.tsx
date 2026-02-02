@@ -4,6 +4,7 @@ import { ArrowRight, Sparkles, Users, Award, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import heroFallback from "@/assets/images/hero-fallback.jpg";
+import heroVideo from "@/assets/videos/hero-video.mp4";
 
 const stats = [
   { icon: Users, value: "10,000+", label: "Studenti Formati" },
@@ -22,11 +23,16 @@ export function HeroSection() {
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center pt-28 md:pt-32 overflow-hidden">
       <div className="absolute inset-0">
-        <img 
-          src={heroFallback}
-          alt="Hero background"
+        <video 
+          autoPlay 
+          muted 
+          loop 
+          playsInline
           className="w-full h-full object-cover"
-        />
+          poster={heroFallback}
+        >
+          <source src={heroVideo} type="video/mp4" />
+        </video>
         <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/70 to-background" />
       </div>
       
