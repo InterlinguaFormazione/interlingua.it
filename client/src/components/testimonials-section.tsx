@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useQuery } from "@tanstack/react-query";
 
 const GOOGLE_REVIEWS_URL = "https://search.google.com/local/reviews?placeid=ChIJDWsIWn0xf0cR9w29gPorTls";
+const GOOGLE_WRITE_REVIEW_URL = "https://search.google.com/local/writereview?placeid=ChIJDWsIWn0xf0cR9w29gPorTls";
 
 interface GoogleReview {
   id: string;
@@ -247,11 +248,17 @@ export function TestimonialsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="text-center mt-8"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8"
         >
+          <a href={GOOGLE_WRITE_REVIEW_URL} target="_blank" rel="noopener noreferrer">
+            <Button size="lg" data-testid="button-write-review">
+              Lascia una Recensione
+              <Star className="ml-2 h-4 w-4" />
+            </Button>
+          </a>
           <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer">
             <Button variant="outline" size="lg" data-testid="button-google-reviews">
-              Vedi Tutte le Recensioni su Google
+              Vedi Tutte le Recensioni
               <ExternalLink className="ml-2 h-4 w-4" />
             </Button>
           </a>
