@@ -165,18 +165,17 @@ export function TestimonialsSection() {
               <div className="flex items-center gap-2">
                 <span className="font-bold text-lg">{rating.toFixed(1)}</span>
                 <div className="flex items-center gap-0.5">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <Star 
-                      key={i} 
-                      className={`h-4 w-4 ${
-                        i <= Math.floor(rating) 
-                          ? 'fill-yellow-400 text-yellow-400' 
-                          : i <= rating 
-                            ? 'fill-yellow-400/50 text-yellow-400/50'
-                            : 'fill-gray-300 text-gray-300'
-                      }`} 
-                    />
-                  ))}
+                  {[1, 2, 3, 4, 5].map((i) => {
+                    const fillPercent = Math.min(1, Math.max(0, rating - (i - 1)));
+                    return (
+                      <div key={i} className="relative h-4 w-4">
+                        <Star className="h-4 w-4 fill-gray-300 text-gray-300 absolute" />
+                        <div className="overflow-hidden absolute" style={{ width: `${fillPercent * 100}%` }}>
+                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
               <span className="text-muted-foreground text-xs">Basato su {totalReviews} recensioni</span>
