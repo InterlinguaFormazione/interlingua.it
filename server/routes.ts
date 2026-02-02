@@ -4,6 +4,10 @@ import { storage } from "./storage";
 import { insertContactSchema, insertNewsletterSchema } from "@shared/schema";
 import { z } from "zod";
 
+const GOOGLE_PLACE_ID = "ChIJDWsIWn0xf0cR9w29gPorTls";
+let reviewsCache: { data: any; timestamp: number } | null = null;
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
@@ -91,6 +95,62 @@ export async function registerRoutes(
       res.json(subscriptions);
     } catch (error) {
       console.error("Error fetching newsletter subscriptions:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Internal server error" 
+      });
+    }
+  });
+
+  app.get("/api/reviews", async (_req, res) => {
+    try {
+      // Check cache first
+      if (reviewsCache && Date.now() - reviewsCache.timestamp < CACHE_DURATION) {
+        return res.json(reviewsCache.data);
+      }
+
+      const apiKey = process.env.GOOGLE_API_KEY;
+      if (!apiKey) {
+        return res.status(500).json({ 
+          success: false, 
+          message: "Google API key not configured" 
+        });
+      }
+
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${GOOGLE_PLACE_ID}&fields=reviews,rating,user_ratings_total&language=it&key=${apiKey}`
+      );
+
+      const data = await response.json();
+
+      if (data.status !== "OK") {
+        console.error("Google Places API error:", data.status, data.error_message);
+        return res.status(500).json({ 
+          success: false, 
+          message: "Failed to fetch reviews from Google" 
+        });
+      }
+
+      const result = {
+        rating: data.result?.rating || 4.8,
+        totalReviews: data.result?.user_ratings_total || 0,
+        reviews: (data.result?.reviews || []).map((review: any) => ({
+          id: review.time?.toString() || Math.random().toString(),
+          name: review.author_name || "Anonimo",
+          role: "Google Review",
+          content: review.text || "",
+          rating: review.rating || 5,
+          avatar: review.profile_photo_url || null,
+          relativeTime: review.relative_time_description || "",
+        })),
+      };
+
+      // Update cache
+      reviewsCache = { data: result, timestamp: Date.now() };
+
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching Google reviews:", error);
       res.status(500).json({ 
         success: false, 
         message: "Internal server error" 
