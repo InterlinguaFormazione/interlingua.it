@@ -1,6 +1,5 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Star, Quote, ExternalLink, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { motion } from "framer-motion";
+import { Star, Quote, ExternalLink, Loader2 } from "lucide-react";
 import { SiGoogle } from "react-icons/si";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -96,20 +95,14 @@ const additionalReviews: GoogleReview[] = [
 ];
 
 export function TestimonialsSection() {
-  const [showAll, setShowAll] = useState(false);
   const { data, isLoading } = useQuery<ReviewsData>({
     queryKey: ["/api/reviews"],
     staleTime: 24 * 60 * 60 * 1000,
   });
 
-  const apiReviews = data?.reviews || [];
-  const reviews = apiReviews.length > 0 
-    ? [...apiReviews, ...additionalReviews].slice(0, Math.max(6, apiReviews.length + 1))
-    : fallbackReviews;
+  const reviews = data?.reviews || fallbackReviews.slice(0, 5);
   const rating = data?.rating || 4.8;
   const totalReviews = data?.totalReviews || 102;
-  const displayedReviews = showAll ? reviews : reviews.slice(0, 6);
-  const hasMoreReviews = reviews.length > 6;
 
   return (
     <section id="testimonials" className="py-16 bg-muted/30 overflow-hidden">
@@ -170,82 +163,111 @@ export function TestimonialsSection() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <AnimatePresence mode="popLayout">
-                  {displayedReviews.map((review, index) => (
-                  <motion.div
-                    key={review.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                    layout
-                  >
-                    <Card 
-                      className="h-full hover-elevate relative"
-                      data-testid={`testimonial-${review.id}`}
+              <div className="flex flex-col gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {reviews.slice(0, 3).map((review, index) => (
+                    <motion.div
+                      key={review.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.3, delay: index * 0.05 }}
                     >
-                      <CardContent className="pt-6">
-                        <Quote className="h-8 w-8 text-primary/20 absolute top-4 right-4" />
-                        
-                        <div className="flex items-center gap-1 mb-4">
-                          {Array.from({ length: review.rating }).map((_, i) => (
-                            <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          ))}
-                        </div>
-
-                        <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-4">
-                          "{review.content}"
-                        </p>
-
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-12 w-12 border-2 border-primary/20">
-                            {review.avatar && (
-                              <AvatarImage 
-                                src={review.avatar} 
-                                alt={review.name}
-                                className="object-cover"
-                              />
-                            )}
-                            <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white">
-                              {review.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-semibold text-sm">{review.name}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {review.relativeTime || review.role}
-                            </p>
+                      <Card 
+                        className="h-full hover-elevate relative"
+                        data-testid={`testimonial-${review.id}`}
+                      >
+                        <CardContent className="pt-6">
+                          <Quote className="h-8 w-8 text-primary/20 absolute top-4 right-4" />
+                          
+                          <div className="flex items-center gap-1 mb-4">
+                            {Array.from({ length: review.rating }).map((_, i) => (
+                              <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            ))}
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-            
-            {hasMoreReviews && (
-              <div className="text-center mt-6">
-                <Button 
-                  variant="ghost" 
-                  onClick={() => setShowAll(!showAll)}
-                  data-testid="button-toggle-reviews"
-                >
-                  {showAll ? (
-                    <>
-                      Mostra Meno
-                      <ChevronUp className="ml-2 h-4 w-4" />
-                    </>
-                  ) : (
-                    <>
-                      Mostra Altre {reviews.length - 6} Recensioni
-                      <ChevronDown className="ml-2 h-4 w-4" />
-                    </>
-                  )}
-                </Button>
+
+                          <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-4">
+                            "{review.content}"
+                          </p>
+
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-12 w-12 border-2 border-primary/20">
+                              {review.avatar && (
+                                <AvatarImage 
+                                  src={review.avatar} 
+                                  alt={review.name}
+                                  className="object-cover"
+                                />
+                              )}
+                              <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white">
+                                {review.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-semibold text-sm">{review.name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {review.relativeTime || review.role}
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                  {reviews.slice(3, 5).map((review, index) => (
+                    <motion.div
+                      key={review.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.3, delay: (index + 3) * 0.05 }}
+                    >
+                      <Card 
+                        className="h-full hover-elevate relative"
+                        data-testid={`testimonial-${review.id}`}
+                      >
+                        <CardContent className="pt-6">
+                          <Quote className="h-8 w-8 text-primary/20 absolute top-4 right-4" />
+                          
+                          <div className="flex items-center gap-1 mb-4">
+                            {Array.from({ length: review.rating }).map((_, i) => (
+                              <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                            ))}
+                          </div>
+
+                          <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-4">
+                            "{review.content}"
+                          </p>
+
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-12 w-12 border-2 border-primary/20">
+                              {review.avatar && (
+                                <AvatarImage 
+                                  src={review.avatar} 
+                                  alt={review.name}
+                                  className="object-cover"
+                                />
+                              )}
+                              <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white">
+                                {review.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-semibold text-sm">{review.name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {review.relativeTime || review.role}
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
-            )}
             </>
           )}
         </div>
