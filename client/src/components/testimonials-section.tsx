@@ -1,4 +1,5 @@
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Star, Quote, ExternalLink, Loader2 } from "lucide-react";
 import { SiGoogle } from "react-icons/si";
 import { Card, CardContent } from "@/components/ui/card";
@@ -95,14 +96,36 @@ const additionalReviews: GoogleReview[] = [
 ];
 
 export function TestimonialsSection() {
+  const [startIndex, setStartIndex] = useState(0);
   const { data, isLoading } = useQuery<ReviewsData>({
     queryKey: ["/api/reviews"],
     staleTime: 24 * 60 * 60 * 1000,
   });
 
-  const reviews = data?.reviews || fallbackReviews.slice(0, 5);
+  const allReviews = data?.reviews || fallbackReviews.slice(0, 5);
   const rating = data?.rating || 4.8;
   const totalReviews = data?.totalReviews || 102;
+
+  useEffect(() => {
+    if (allReviews.length <= 3) return;
+    
+    const interval = setInterval(() => {
+      setStartIndex((prev) => (prev + 1) % allReviews.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [allReviews.length]);
+
+  const getVisibleReviews = () => {
+    const visible = [];
+    for (let i = 0; i < 3; i++) {
+      const index = (startIndex + i) % allReviews.length;
+      visible.push(allReviews[index]);
+    }
+    return visible;
+  };
+
+  const visibleReviews = getVisibleReviews();
 
   return (
     <section id="testimonials" className="py-16 bg-muted/30 overflow-hidden">
@@ -162,113 +185,60 @@ export function TestimonialsSection() {
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
-            <>
-              <div className="flex flex-col gap-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {reviews.slice(0, 3).map((review, index) => (
-                    <motion.div
-                      key={review.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <AnimatePresence mode="popLayout">
+                {visibleReviews.map((review, index) => (
+                  <motion.div
+                    key={review.id}
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -50 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    layout
+                  >
+                    <Card 
+                      className="h-full hover-elevate relative"
+                      data-testid={`testimonial-${review.id}`}
                     >
-                      <Card 
-                        className="h-full hover-elevate relative"
-                        data-testid={`testimonial-${review.id}`}
-                      >
-                        <CardContent className="pt-6">
-                          <Quote className="h-8 w-8 text-primary/20 absolute top-4 right-4" />
-                          
-                          <div className="flex items-center gap-1 mb-4">
-                            {Array.from({ length: review.rating }).map((_, i) => (
-                              <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            ))}
-                          </div>
+                      <CardContent className="pt-6">
+                        <Quote className="h-8 w-8 text-primary/20 absolute top-4 right-4" />
+                        
+                        <div className="flex items-center gap-1 mb-4">
+                          {Array.from({ length: review.rating }).map((_, i) => (
+                            <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          ))}
+                        </div>
 
-                          <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-4">
-                            "{review.content}"
-                          </p>
+                        <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-4">
+                          "{review.content}"
+                        </p>
 
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-12 w-12 border-2 border-primary/20">
-                              {review.avatar && (
-                                <AvatarImage 
-                                  src={review.avatar} 
-                                  alt={review.name}
-                                  className="object-cover"
-                                />
-                              )}
-                              <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white">
-                                {review.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-semibold text-sm">{review.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {review.relativeTime || review.role}
-                              </p>
-                            </div>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-12 w-12 border-2 border-primary/20">
+                            {review.avatar && (
+                              <AvatarImage 
+                                src={review.avatar} 
+                                alt={review.name}
+                                className="object-cover"
+                              />
+                            )}
+                            <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white">
+                              {review.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-semibold text-sm">{review.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {review.relativeTime || review.role}
+                            </p>
                           </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                  {reviews.slice(3, 5).map((review, index) => (
-                    <motion.div
-                      key={review.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.3, delay: (index + 3) * 0.05 }}
-                    >
-                      <Card 
-                        className="h-full hover-elevate relative"
-                        data-testid={`testimonial-${review.id}`}
-                      >
-                        <CardContent className="pt-6">
-                          <Quote className="h-8 w-8 text-primary/20 absolute top-4 right-4" />
-                          
-                          <div className="flex items-center gap-1 mb-4">
-                            {Array.from({ length: review.rating }).map((_, i) => (
-                              <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                            ))}
-                          </div>
-
-                          <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-4">
-                            "{review.content}"
-                          </p>
-
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-12 w-12 border-2 border-primary/20">
-                              {review.avatar && (
-                                <AvatarImage 
-                                  src={review.avatar} 
-                                  alt={review.name}
-                                  className="object-cover"
-                                />
-                              )}
-                              <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white">
-                                {review.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-semibold text-sm">{review.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {review.relativeTime || review.role}
-                              </p>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
           )}
         </div>
 
