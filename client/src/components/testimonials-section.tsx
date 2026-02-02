@@ -154,21 +154,17 @@ export function TestimonialsSection() {
             href={GOOGLE_REVIEWS_URL} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-4 px-6 py-4 rounded-xl bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 shadow-lg hover-elevate"
+            className="inline-flex items-center gap-3 px-5 py-3 rounded-lg bg-card border hover-elevate"
           >
-            <div className="flex flex-col items-center">
-              <SiGoogle className="h-8 w-8" style={{ color: '#4285F4' }} />
-              <span className="text-[10px] font-medium text-gray-500 mt-1">Google</span>
-            </div>
-            <div className="h-12 w-px bg-gray-200 dark:bg-gray-700" />
+            <SiGoogle className="h-6 w-6 text-[#4285F4]" />
             <div className="flex flex-col items-start">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-2xl text-gray-900 dark:text-white">{rating.toFixed(1)}</span>
+                <span className="font-bold text-lg">{rating.toFixed(1)}</span>
                 <div className="flex items-center gap-0.5">
                   {[1, 2, 3, 4, 5].map((i) => (
                     <Star 
                       key={i} 
-                      className={`h-5 w-5 ${
+                      className={`h-4 w-4 ${
                         i <= Math.floor(rating) 
                           ? 'fill-yellow-400 text-yellow-400' 
                           : i <= rating 
@@ -179,7 +175,7 @@ export function TestimonialsSection() {
                   ))}
                 </div>
               </div>
-              <span className="text-gray-500 text-sm font-medium">Basato su {totalReviews} recensioni</span>
+              <span className="text-muted-foreground text-xs">Basato su {totalReviews} recensioni</span>
             </div>
           </a>
         </motion.div>
