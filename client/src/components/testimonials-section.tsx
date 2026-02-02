@@ -156,16 +156,9 @@ export function TestimonialsSection() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-4 px-6 py-4 rounded-xl bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 shadow-lg hover-elevate"
           >
-            <div className="flex flex-col items-center gap-1">
-              <SiGoogle className="h-10 w-10" style={{ color: '#4285F4' }} />
-              <span className="text-xs font-semibold tracking-tight">
-                <span style={{ color: '#4285F4' }}>G</span>
-                <span style={{ color: '#EA4335' }}>o</span>
-                <span style={{ color: '#FBBC05' }}>o</span>
-                <span style={{ color: '#4285F4' }}>g</span>
-                <span style={{ color: '#34A853' }}>l</span>
-                <span style={{ color: '#EA4335' }}>e</span>
-              </span>
+            <div className="flex flex-col items-center">
+              <SiGoogle className="h-8 w-8" style={{ color: '#4285F4' }} />
+              <span className="text-[10px] font-medium text-gray-500 mt-1">Google</span>
             </div>
             <div className="h-12 w-px bg-gray-200 dark:bg-gray-700" />
             <div className="flex flex-col items-start">
