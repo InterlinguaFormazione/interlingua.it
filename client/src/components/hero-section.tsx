@@ -76,9 +76,9 @@ export function HeroSection() {
                 />
                 <defs>
                   <linearGradient id="gradient" x1="0" y1="0" x2="300" y2="0">
-                    <stop offset="0%" stopColor="hsl(262, 83%, 58%)" />
-                    <stop offset="50%" stopColor="hsl(172, 66%, 50%)" />
-                    <stop offset="100%" stopColor="hsl(262, 83%, 58%)" />
+                    <stop offset="0%" stopColor="hsl(222, 67%, 40%)" />
+                    <stop offset="50%" stopColor="hsl(20, 91%, 53%)" />
+                    <stop offset="100%" stopColor="hsl(222, 67%, 40%)" />
                   </linearGradient>
                 </defs>
               </svg>
