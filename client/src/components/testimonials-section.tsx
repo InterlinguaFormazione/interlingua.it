@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Star, Quote, ExternalLink, Loader2 } from "lucide-react";
 import { SiGoogle } from "react-icons/si";
 import { Card, CardContent } from "@/components/ui/card";
@@ -97,36 +96,14 @@ const additionalReviews: GoogleReview[] = [
 ];
 
 export function TestimonialsSection() {
-  const [startIndex, setStartIndex] = useState(0);
   const { data, isLoading } = useQuery<ReviewsData>({
     queryKey: ["/api/reviews"],
     staleTime: 24 * 60 * 60 * 1000,
   });
 
-  const allReviews = data?.reviews || fallbackReviews.slice(0, 5);
+  const reviews = data?.reviews || fallbackReviews.slice(0, 5);
   const rating = data?.rating || 4.8;
   const totalReviews = data?.totalReviews || 102;
-
-  useEffect(() => {
-    if (allReviews.length <= 3) return;
-    
-    const interval = setInterval(() => {
-      setStartIndex((prev) => (prev + 1) % allReviews.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [allReviews.length]);
-
-  const getVisibleReviews = () => {
-    const visible = [];
-    for (let i = 0; i < 3; i++) {
-      const index = (startIndex + i) % allReviews.length;
-      visible.push(allReviews[index]);
-    }
-    return visible;
-  };
-
-  const visibleReviews = getVisibleReviews();
 
   return (
     <section id="testimonials" className="py-16 bg-muted/30 overflow-hidden">
@@ -187,16 +164,14 @@ export function TestimonialsSection() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <AnimatePresence mode="popLayout">
-                {visibleReviews.map((review, index) => (
-                  <motion.div
-                    key={review.id}
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -50 }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                    layout
-                  >
+              {reviews.slice(0, 3).map((review, index) => (
+                <motion.div
+                  key={review.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
                     <Card 
                       className="h-full hover-elevate relative"
                       data-testid={`testimonial-${review.id}`}
@@ -238,7 +213,6 @@ export function TestimonialsSection() {
                     </Card>
                   </motion.div>
                 ))}
-              </AnimatePresence>
             </div>
           )}
         </div>
