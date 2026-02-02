@@ -25,9 +25,9 @@ type ContactFormData = InsertContact;
 const contactOptions = [
   {
     icon: MessageSquare,
-    title: "Chat con Noi",
-    description: "Risposta immediata",
-    action: "Scrivi ora",
+    title: "Scrivici",
+    description: "info@interlingua.it",
+    action: "Invia email",
   },
   {
     icon: Calendar,
@@ -37,9 +37,9 @@ const contactOptions = [
   },
   {
     icon: Headphones,
-    title: "Supporto Telefonico",
+    title: "Chiamaci",
     description: "Lun-Ven 9:00-18:00",
-    action: "+39 02 1234 5678",
+    action: "+39 0444 321601",
   },
 ];
 

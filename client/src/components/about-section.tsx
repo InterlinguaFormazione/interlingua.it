@@ -7,16 +7,16 @@ import aboutTeam from "@/assets/images/about-team.jpg";
 const locations = [
   {
     name: "Sede Vicenza",
-    address: "Viale della Scienza, 9",
-    city: "Vicenza, VI 36100",
-    phone: "+39 0444 321 654",
+    address: "Viale Mazzini, 27",
+    city: "36100 Vicenza (VI)",
+    phone: "+39 0444 321601",
     email: "info@interlingua.it",
   },
   {
     name: "Sede Thiene",
-    address: "Via Trento, 22",
-    city: "Thiene, VI 36016",
-    phone: "+39 0445 380 580",
+    address: "Corso Garibaldi, 174",
+    city: "36016 Thiene (VI)",
+    phone: "+39 0445 382744",
     email: "thiene@interlingua.it",
   },
 ];
