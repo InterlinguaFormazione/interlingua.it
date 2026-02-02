@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Quote, ExternalLink, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { SiGoogle } from "react-icons/si";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -65,8 +66,8 @@ export function TestimonialsSection() {
   const reviews = data?.reviews || fallbackReviews;
   const rating = data?.rating || 4.8;
   const totalReviews = data?.totalReviews || 102;
-  const displayedReviews = showAll ? reviews : reviews.slice(0, 3);
-  const hasMoreReviews = reviews.length > 3;
+  const displayedReviews = showAll ? reviews : reviews.slice(0, 6);
+  const hasMoreReviews = reviews.length > 6;
 
   return (
     <section id="testimonials" className="py-16 bg-muted/30 overflow-hidden">
@@ -90,24 +91,34 @@ export function TestimonialsSection() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
             Le storie di successo dei nostri studenti sono la nostra più grande soddisfazione.
           </p>
-          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-card border">
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Star 
-                  key={i} 
-                  className={`h-4 w-4 ${
-                    i <= Math.floor(rating) 
-                      ? 'fill-yellow-400 text-yellow-400' 
-                      : i <= rating 
-                        ? 'fill-yellow-400/50 text-yellow-400/50'
-                        : 'fill-gray-300 text-gray-300'
-                  }`} 
-                />
-              ))}
+          <a 
+            href={GOOGLE_REVIEWS_URL} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-5 py-3 rounded-lg bg-card border hover-elevate"
+          >
+            <SiGoogle className="h-6 w-6 text-[#4285F4]" />
+            <div className="flex flex-col items-start">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-lg">{rating.toFixed(1)}</span>
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <Star 
+                      key={i} 
+                      className={`h-4 w-4 ${
+                        i <= Math.floor(rating) 
+                          ? 'fill-yellow-400 text-yellow-400' 
+                          : i <= rating 
+                            ? 'fill-yellow-400/50 text-yellow-400/50'
+                            : 'fill-gray-300 text-gray-300'
+                      }`} 
+                    />
+                  ))}
+                </div>
+              </div>
+              <span className="text-muted-foreground text-xs">Basato su {totalReviews} recensioni</span>
             </div>
-            <span className="font-bold">{rating.toFixed(1)}</span>
-            <span className="text-muted-foreground text-sm">su Google ({totalReviews} recensioni)</span>
-          </div>
+          </a>
         </motion.div>
 
         <div className="relative">
@@ -186,7 +197,7 @@ export function TestimonialsSection() {
                     </>
                   ) : (
                     <>
-                      Mostra Altre {reviews.length - 3} Recensioni
+                      Mostra Altre {reviews.length - 6} Recensioni
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </>
                   )}
