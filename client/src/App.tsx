@@ -26,6 +26,7 @@ import CookiePolicyPage from "@/pages/cookie-policy";
 import PrivacyPolicyPage from "@/pages/privacy-policy";
 import FullImmersionPage from "@/pages/full-immersion";
 import FormazioneInPresenzaPage from "@/pages/formazione-in-presenza";
+import CorsiELearningPage from "@/pages/corsi-e-learning";
 import NotFound from "@/pages/not-found";
 
 function ScrollToTop() {
@@ -51,6 +52,7 @@ function Router() {
       <Route path="/speakers-corner/admin" component={SpeakersCornerAdmin} />
       <Route path="/full-immersion" component={FullImmersionPage} />
       <Route path="/formazione-in-presenza" component={FormazioneInPresenzaPage} />
+      <Route path="/corsi-e-learning" component={CorsiELearningPage} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={BlogPostPage} />
