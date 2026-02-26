@@ -22,47 +22,49 @@ import {
   Mail,
   Zap,
   Globe,
+  Heart,
+  Coffee,
 } from "lucide-react";
 import fullImmersionImage from "@assets/Full-Immersion-Workshop-di-Lingua-Inglese_1772143747179.jpg";
 
 const benefits = [
   {
     icon: TrendingUp,
-    title: "Guadagna un Livello QCER",
-    description: "Avanza di un livello in una sola settimana grazie alla pratica intensiva e costante.",
-    gradient: "from-green-500/10 to-emerald-500/10",
-    iconColor: "text-green-600",
+    title: "Un Livello in Una Settimana",
+    description: "Non mesi. Non anni. Una settimana. Avanza di un intero livello QCER grazie a un'immersione così intensa che il tuo cervello non avrà altra scelta che pensare in inglese.",
+    gradient: "from-primary/10 to-blue-500/10",
+    iconColor: "text-primary",
   },
   {
     icon: Globe,
-    title: "100% in Inglese",
-    description: "Immersione totale nella lingua per massimizzare l'apprendimento naturale.",
-    gradient: "from-blue-500/10 to-cyan-500/10",
-    iconColor: "text-blue-600",
+    title: "Zero Italiano. Solo Inglese.",
+    description: "Dal buongiorno al caffè di metà mattina, ogni parola è in inglese. Niente traduzioni, niente scorciatoie. È così che il tuo cervello smette di tradurre e inizia a pensare in inglese.",
+    gradient: "from-amber-500/10 to-orange-500/10",
+    iconColor: "text-amber-600",
   },
   {
     icon: Users,
-    title: "Piccoli Gruppi",
-    description: "Classi ridotte per garantire attenzione personalizzata e massima interazione.",
-    gradient: "from-purple-500/10 to-violet-500/10",
-    iconColor: "text-purple-600",
+    title: "Piccoli Gruppi, Grandi Risultati",
+    description: "Massimo 12 persone. CEO, studenti, professionisti, viaggiatori: tutti accomunati dalla voglia di fare il salto di qualità. Qui non ci si nasconde dietro al compagno di banco.",
+    gradient: "from-emerald-500/10 to-teal-500/10",
+    iconColor: "text-emerald-600",
   },
   {
     icon: Award,
-    title: "Docenti Madrelingua",
-    description: "Staff qualificato con anni di esperienza nell'insegnamento full immersion.",
-    gradient: "from-amber-500/10 to-orange-500/10",
-    iconColor: "text-amber-600",
+    title: "Docenti che Fanno la Differenza",
+    description: "Madrelingua con anni di esperienza nel full immersion. Non insegnanti qualunque: professionisti che sanno trasformare una settimana in un'esperienza che ricorderai per sempre.",
+    gradient: "from-rose-500/10 to-pink-500/10",
+    iconColor: "text-rose-600",
   },
 ];
 
 const programFeatures = [
-  "Moduli intensivi progettati per massimizzare i risultati",
-  "Perfetto equilibrio tra impegno, studio e risultati",
-  "Progetti pratici e attività collaborative",
-  "Simulazioni di situazioni reali e professionali",
-  "Materiali didattici inclusi",
-  "Attestato di partecipazione con livello raggiunto",
+  "Moduli progettati per massimizzare ogni singola ora",
+  "Perfetto equilibrio tra impegno, pratica e risultati",
+  "Progetti reali e simulazioni professionali",
+  "Attività collaborative che ti fanno dimenticare di stare studiando",
+  "Tutti i materiali didattici inclusi",
+  "Attestato di partecipazione con livello QCER raggiunto",
 ];
 
 const testimonials = [
@@ -95,18 +97,18 @@ const testimonials = [
 const formats = [
   {
     title: "Full Immersion Workshop",
-    subtitle: "Una settimana intensiva",
-    description: "5 giorni di immersione totale nella lingua inglese a Vicenza. L'alternativa conveniente ed efficace ai soggiorni studio all'estero.",
-    features: ["5 giorni intensivi (lun-ven)", "6 ore al giorno di lezione", "Tutti i livelli", "In sede a Vicenza"],
-    color: "from-green-500 to-green-600",
+    subtitle: "Una settimana che vale un anno",
+    description: "5 giorni di immersione totale nella lingua inglese nella nostra sede di Vicenza. Niente valigie per Londra, niente jet lag: gli stessi risultati di un soggiorno all'estero, ma a due passi da casa. E con docenti migliori.",
+    features: ["5 giorni intensivi (lun-ven)", "6 ore al giorno di pratica attiva", "Dal livello A2 al C1", "In sede a Vicenza"],
+    color: "from-primary to-blue-600",
     icon: BookOpen,
   },
   {
     title: "Experiential Weekend",
-    subtitle: "Weekend esperienziali",
-    description: "Weekend outdoor sui Colli Berici con attività esperienziali come equitazione, leadership e team building, tutto in lingua inglese.",
-    features: ["2 giorni (sab-dom)", "Attività outdoor", "Leadership & team building", "Colli Berici, Vicenza"],
-    color: "from-emerald-500 to-teal-600",
+    subtitle: "Dove l'inglese incontra l'avventura",
+    description: "Un weekend sui Colli Berici che non dimenticherai. Equitazione, leadership, team building, il tutto rigorosamente in inglese. Tornerai a casa con un inglese migliore, nuove amicizie e la voglia di rifarlo subito.",
+    features: ["2 giorni immersivi (sab-dom)", "Attività outdoor ed equitazione", "Leadership & team building", "Colli Berici, provincia di Vicenza"],
+    color: "from-amber-500 to-orange-600",
     icon: Mountain,
   },
 ];
@@ -116,8 +118,8 @@ export default function FullImmersionPage() {
     <div className="min-h-screen">
       <Navigation />
       <main>
-        <section className="relative pt-36 pb-20 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-600 via-green-500 to-emerald-600" />
+        <section className="relative pt-36 pb-24 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-blue-600" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent_50%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(255,255,255,0.05),transparent_50%)]" />
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -128,18 +130,36 @@ export default function FullImmersionPage() {
                   Full Immersion Workshop
                 </Badge>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight" data-testid="text-fi-title">
-                  Impara l'Inglese nel Modo più Efficace
+                  Una Settimana.<br />Un Livello in Più.
                 </h1>
-                <p className="text-xl text-white/85 mb-4 leading-relaxed max-w-xl">
-                  L'alternativa conveniente ed efficace ai soggiorni studio all'estero.
+                <p className="text-xl text-white/90 mb-4 leading-relaxed max-w-xl">
+                  Immagina di svegliarti lunedì mattina con il tuo inglese di sempre, e di tornare a casa venerdì sera pensando in inglese senza nemmeno accorgertene.
                 </p>
                 <p className="text-lg text-white/75 mb-8 leading-relaxed max-w-xl">
-                  Guadagna un livello QCER in una sola settimana con i nostri workshop intensivi a Vicenza.
+                  Non è magia. Sono 5 giorni di immersione totale con docenti madrelingua che sanno esattamente come sbloccare il tuo potenziale. Niente grammatica noiosa, niente esercizi ripetitivi: solo pratica reale, conversazioni vere e la scoperta che sì, il tuo inglese era già lì dentro. Aveva solo bisogno di uscire.
                 </p>
+
+                <div className="flex flex-wrap gap-6 mb-10">
+                  <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl border border-white/15">
+                    <Calendar className="w-5 h-5 text-white/90" />
+                    <div>
+                      <p className="text-xs text-white/60 font-medium uppercase tracking-wider">Durata</p>
+                      <p className="font-semibold text-white">5 giorni intensivi</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-4 py-3 rounded-xl border border-white/15">
+                    <MapPin className="w-5 h-5 text-white/90" />
+                    <div>
+                      <p className="text-xs text-white/60 font-medium uppercase tracking-wider">Dove</p>
+                      <p className="font-semibold text-white">Vicenza</p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="flex flex-wrap gap-4">
                   <Button
                     size="lg"
-                    className="h-14 px-8 text-base rounded-xl bg-white text-green-700 hover:bg-white/90 shadow-xl"
+                    className="h-14 px-8 text-base rounded-xl bg-white text-primary hover:bg-white/90 shadow-xl"
                     onClick={() => {
                       const el = document.querySelector("#contact-section");
                       if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -147,7 +167,7 @@ export default function FullImmersionPage() {
                     data-testid="button-fi-cta"
                   >
                     <Sparkles className="w-5 h-5 mr-2" />
-                    Richiedi Informazioni
+                    Voglio Partecipare
                   </Button>
                   <Button
                     size="lg"
@@ -166,6 +186,7 @@ export default function FullImmersionPage() {
               </div>
               <div className="relative lg:pl-8">
                 <div className="relative">
+                  <div className="absolute -inset-4 bg-gradient-to-tr from-primary/20 via-primary/5 to-blue-400/20 rounded-3xl blur-2xl" />
                   <img
                     src={fullImmersionImage}
                     alt="Full Immersion Workshop di lingua inglese"
@@ -176,8 +197,8 @@ export default function FullImmersionPage() {
                   />
                   <div className="absolute -bottom-6 -left-6 bg-card rounded-2xl shadow-xl border border-border/50 p-4 backdrop-blur-sm">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
-                        <TrendingUp className="w-6 h-6 text-green-500" />
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <TrendingUp className="w-6 h-6 text-primary" />
                       </div>
                       <div>
                         <p className="text-sm font-bold text-foreground">+1 Livello QCER</p>
@@ -188,11 +209,11 @@ export default function FullImmersionPage() {
                   <div className="absolute -top-4 -right-4 bg-card rounded-2xl shadow-xl border border-border/50 p-4 backdrop-blur-sm">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center">
-                        <MapPin className="w-6 h-6 text-amber-500" />
+                        <Heart className="w-6 h-6 text-amber-500" />
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-foreground">Vicenza</p>
-                        <p className="text-xs text-muted-foreground">In sede e outdoor</p>
+                        <p className="text-sm font-bold text-foreground">98%</p>
+                        <p className="text-xs text-muted-foreground">Lo rifarebbero</p>
                       </div>
                     </div>
                   </div>
@@ -205,23 +226,23 @@ export default function FullImmersionPage() {
         <section className="py-24 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-muted/50 to-muted/20" />
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <div className="text-center mb-16">
+            <div className="text-center mb-6">
               <Badge variant="secondary" className="mb-4 px-4 py-1.5">
                 <Zap className="w-3 h-3 mr-1" />
-                I Vantaggi
+                Perché Funziona
               </Badge>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-benefits-title">
-                Perché Scegliere il Full Immersion?
+                Non un Corso. Un'Esperienza che Ti Trasforma.
               </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Un metodo collaudato che unisce intensità, qualità e risultati concreti.
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-4">
+                C'è un motivo per cui chi partecipa torna a casa con gli occhi che brillano. Il Full Immersion non è il solito corso di inglese con la lavagna e i compiti a casa. È una settimana in cui il tuo inglese fa un salto che normalmente richiederebbe mesi, in un ambiente così stimolante che le giornate volano.
               </p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
               {benefits.map((benefit, index) => (
                 <Card
                   key={index}
-                  className="group relative overflow-hidden border-border/50 hover:border-green-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/5 hover:-translate-y-1"
+                  className="group relative overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1"
                   data-testid={`card-fi-benefit-${index}`}
                 >
                   <CardContent className="pt-8 pb-6 text-center relative">
@@ -240,25 +261,70 @@ export default function FullImmersionPage() {
           </div>
         </section>
 
-        <section id="formats-section" className="py-24">
+        <section className="py-24">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-6">
+                <Badge variant="secondary" className="mb-4 px-4 py-1.5">
+                  <Coffee className="w-3 h-3 mr-1" />
+                  Una Giornata Tipo
+                </Badge>
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-day-title">
+                  Come Si Vive il Full Immersion
+                </h2>
+              </div>
+              <p className="text-lg text-muted-foreground text-center max-w-3xl mx-auto mb-12">
+                Arrivi la mattina, ti accoglie il profumo del caffè e un "Good morning!" dal tuo docente. Da quel momento, il tuo cervello entra in modalità inglese. Le ore volano tra presentazioni, dibattiti, role-play e progetti di gruppo. Ti ritrovi a ridere, discutere, negoziare, tutto in inglese, e la cosa più bella è che non ti sembra nemmeno di studiare.
+              </p>
+              <div className="grid md:grid-cols-2 gap-6">
+                {[
+                  { time: "9:00 - 10:30", title: "Warm-up & Discussion", desc: "Si parte con energia: discussioni su temi attuali, brainstorming e attività che ti svegliano il cervello (e l'inglese).", icon: Sparkles },
+                  { time: "10:30 - 11:00", title: "Coffee Break", desc: "Sì, anche la pausa caffè è in inglese. Ed è qui che succede la magia: parli perché vuoi, non perché devi.", icon: Coffee },
+                  { time: "11:00 - 13:00", title: "Workshop Intensivo", desc: "Il cuore della giornata: presentazioni, simulazioni professionali, negoziazioni. Metti in pratica tutto subito.", icon: Target },
+                  { time: "14:00 - 16:00", title: "Progetto di Gruppo", desc: "Lavori con il tuo team su un progetto reale. Alla fine della settimana lo presenterai. In inglese, ovviamente.", icon: Users },
+                ].map((slot, index) => (
+                  <div
+                    key={index}
+                    className="group relative flex gap-5 p-6 rounded-2xl border border-border/50 bg-card hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
+                    data-testid={`slot-fi-${index}`}
+                  >
+                    <div className="flex-shrink-0">
+                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center text-primary-foreground shadow-md shadow-primary/25">
+                        <slot.icon className="w-6 h-6" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs text-primary font-bold uppercase tracking-wider mb-1">{slot.time}</p>
+                      <h3 className="font-bold text-foreground text-lg mb-1">{slot.title}</h3>
+                      <p className="text-muted-foreground leading-relaxed text-sm">{slot.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="formats-section" className="py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-muted/50 to-muted/20" />
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div className="text-center mb-16">
               <Badge variant="secondary" className="mb-4 px-4 py-1.5">
                 <Calendar className="w-3 h-3 mr-1" />
-                I Nostri Formati
+                Due Modi per Immergersi
               </Badge>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-formats-title">
-                Scegli il Formato Ideale per Te
+                Scegli la Tua Avventura
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Due esperienze immersive progettate per diverse esigenze e obiettivi.
+                Due formati, un solo obiettivo: farti vivere l'inglese come non l'hai mai vissuto.
               </p>
             </div>
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {formats.map((format, index) => (
                 <Card
                   key={index}
-                  className="overflow-hidden border-border/50 hover:border-green-500/30 transition-all duration-300 hover:shadow-xl"
+                  className="overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-xl"
                   data-testid={`card-fi-format-${index}`}
                 >
                   <div className={`h-2 bg-gradient-to-r ${format.color}`} />
@@ -276,7 +342,7 @@ export default function FullImmersionPage() {
                     <div className="space-y-3">
                       {format.features.map((feature, i) => (
                         <div key={i} className="flex items-center gap-3">
-                          <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                          <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
                           <span className="text-sm text-foreground">{feature}</span>
                         </div>
                       ))}
@@ -288,48 +354,50 @@ export default function FullImmersionPage() {
           </div>
         </section>
 
-        <section className="py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-transparent" />
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <section className="py-24">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-16">
                 <Badge variant="secondary" className="mb-4 px-4 py-1.5">
                   <Target className="w-3 h-3 mr-1" />
-                  Il Programma
+                  Tutto Incluso
                 </Badge>
                 <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-program-title">
-                  Cosa Include il Workshop
+                  Cosa Porti a Casa
                 </h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Oltre a un inglese che finalmente funziona nella vita reale.
+                </p>
               </div>
-              <Card className="overflow-hidden border-green-500/20 shadow-xl shadow-green-500/5" data-testid="card-fi-program">
-                <div className="bg-gradient-to-r from-green-500/10 via-green-500/5 to-transparent p-1">
+              <Card className="overflow-hidden border-primary/20 shadow-xl shadow-primary/5" data-testid="card-fi-program">
+                <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-1">
                   <CardContent className="p-8 md:p-10 bg-card rounded-lg">
                     <div className="grid sm:grid-cols-2 gap-4">
                       {programFeatures.map((feature, index) => (
-                        <div key={index} className="flex items-center gap-3 p-3 rounded-xl bg-green-500/5 border border-green-500/10">
-                          <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                        <div key={index} className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
+                          <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
                           <span className="text-sm font-medium text-foreground">{feature}</span>
                         </div>
                       ))}
                     </div>
                     <div className="mt-8 grid grid-cols-3 gap-6 pt-6 border-t border-border/50">
                       <div className="text-center">
-                        <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mx-auto mb-2">
-                          <Clock className="w-6 h-6 text-green-600" />
+                        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-2">
+                          <Clock className="w-6 h-6 text-primary" />
                         </div>
                         <p className="text-2xl font-bold text-foreground">30+</p>
-                        <p className="text-xs text-muted-foreground">Ore di lezione</p>
+                        <p className="text-xs text-muted-foreground">Ore di pratica</p>
                       </div>
                       <div className="text-center">
-                        <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mx-auto mb-2">
-                          <Users className="w-6 h-6 text-green-600" />
+                        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-2">
+                          <Users className="w-6 h-6 text-primary" />
                         </div>
                         <p className="text-2xl font-bold text-foreground">Max 12</p>
                         <p className="text-xs text-muted-foreground">Partecipanti</p>
                       </div>
                       <div className="text-center">
-                        <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center mx-auto mb-2">
-                          <Award className="w-6 h-6 text-green-600" />
+                        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-2">
+                          <Award className="w-6 h-6 text-primary" />
                         </div>
                         <p className="text-2xl font-bold text-foreground">+1</p>
                         <p className="text-xs text-muted-foreground">Livello QCER</p>
@@ -342,35 +410,36 @@ export default function FullImmersionPage() {
           </div>
         </section>
 
-        <section className="py-24">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-transparent" />
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div className="text-center mb-16">
               <Badge variant="secondary" className="mb-4 px-4 py-1.5">
                 <Star className="w-3 h-3 mr-1" />
-                Testimonianze
+                Parola di Chi C'era
               </Badge>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-testimonials-title">
-                Cosa Dice Chi Ha Partecipato
+                Non Crederci Sulla Parola. Credi a Loro.
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Le esperienze reali dei nostri partecipanti.
+                Sono tornati a casa con un inglese migliore e la voglia di rifarlo. Ecco cosa dicono.
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {testimonials.map((testimonial, index) => (
                 <Card
                   key={index}
-                  className="border-border/50 hover:border-green-500/20 transition-all duration-300 hover:shadow-lg"
+                  className="border-border/50 hover:border-primary/20 transition-all duration-300 hover:shadow-lg"
                   data-testid={`card-fi-testimonial-${index}`}
                 >
                   <CardContent className="p-6">
-                    <Quote className="w-8 h-8 text-green-500/30 mb-3" />
+                    <Quote className="w-8 h-8 text-primary/20 mb-3" />
                     <p className="text-sm text-muted-foreground leading-relaxed mb-4 italic">
                       "{testimonial.text}"
                     </p>
                     <div className="flex items-center gap-3 pt-3 border-t border-border/50">
-                      <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center">
-                        <span className="text-xs font-bold text-green-600">{testimonial.author[0]}</span>
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="text-xs font-bold text-primary">{testimonial.author[0]}</span>
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-foreground">{testimonial.author}</p>
@@ -389,25 +458,28 @@ export default function FullImmersionPage() {
         </section>
 
         <section id="contact-section" className="py-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-600 via-green-500 to-emerald-600" />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-blue-600" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(255,255,255,0.05),transparent_50%)]" />
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
             <div className="max-w-3xl mx-auto">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8">
                 <Sparkles className="w-4 h-4 text-white/90" />
-                <span className="text-sm font-semibold text-white/90">Prossime Date</span>
+                <span className="text-sm font-semibold text-white/90">Posti Limitati</span>
               </div>
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white" data-testid="text-fi-cta-title">
-                Vuoi Partecipare al Prossimo Workshop?
+                La Prossima Settimana Che Cambierà il Tuo Inglese
               </h2>
-              <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
-                Contattaci per scoprire le prossime date disponibili e riservare il tuo posto.
+              <p className="text-xl text-white/80 mb-4 max-w-2xl mx-auto leading-relaxed">
+                I gruppi sono piccoli. I posti si esauriscono. Se stai leggendo fin qui, qualcosa ti dice che è il momento giusto.
+              </p>
+              <p className="text-lg text-white/65 mb-10 max-w-2xl mx-auto leading-relaxed">
+                Contattaci per scoprire le prossime date e riservare il tuo posto. Una chiacchierata al telefono o un'email: è tutto quello che serve per iniziare.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Button
                   size="lg"
-                  className="h-14 px-8 text-base rounded-xl bg-white text-green-700 hover:bg-white/90 shadow-xl"
+                  className="h-14 px-8 text-base rounded-xl bg-white text-primary hover:bg-white/90 shadow-xl"
                   asChild
                   data-testid="button-fi-call"
                 >
