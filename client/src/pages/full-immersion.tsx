@@ -31,28 +31,28 @@ const benefits = [
   {
     icon: TrendingUp,
     title: "Un Livello in Una Settimana",
-    description: "Non mesi. Non anni. Una settimana. Avanza di un intero livello QCER grazie a un'immersione così intensa che il tuo cervello non avrà altra scelta che pensare in inglese.",
+    description: "Forse non te ne accorgi subito, ma già dal secondo giorno qualcosa dentro di te inizia a cambiare. Le parole arrivano più facilmente, le frasi si formano da sole. E quando venerdì ti rendi conto di aver fatto un salto di un intero livello QCER, capisci che il cambiamento era già iniziato prima ancora che potessi notarlo.",
     gradient: "from-primary/10 to-blue-500/10",
     iconColor: "text-primary",
   },
   {
     icon: Globe,
-    title: "Zero Italiano. Solo Inglese.",
-    description: "Dal buongiorno al caffè di metà mattina, ogni parola è in inglese. Niente traduzioni, niente scorciatoie. È così che il tuo cervello smette di tradurre e inizia a pensare in inglese.",
+    title: "Solo Inglese. Naturalmente.",
+    description: "C'è quel momento, forse al secondo caffè, forse durante una risata, in cui ti accorgi che stai pensando in inglese. Non stai più traducendo. Il tuo cervello ha semplicemente scelto la via più naturale, e tu puoi goderti la sensazione di esprimerti con una fluidità che non sapevi di avere.",
     gradient: "from-amber-500/10 to-orange-500/10",
     iconColor: "text-amber-600",
   },
   {
     icon: Users,
-    title: "Piccoli Gruppi, Grandi Risultati",
-    description: "Massimo 12 persone. CEO, studenti, professionisti, viaggiatori: tutti accomunati dalla voglia di fare il salto di qualità. Qui non ci si nasconde dietro al compagno di banco.",
+    title: "Persone Come Te",
+    description: "Quando sei circondato da persone che condividono la tua stessa curiosità e la tua stessa voglia di crescere, succede qualcosa di speciale. In gruppi di massimo 12, ognuno trova il proprio spazio per esprimersi, e tu scopri che gli altri sono la risorsa più preziosa per il tuo apprendimento.",
     gradient: "from-emerald-500/10 to-teal-500/10",
     iconColor: "text-emerald-600",
   },
   {
     icon: Award,
-    title: "Docenti che Fanno la Differenza",
-    description: "Madrelingua con anni di esperienza nel full immersion. Non insegnanti qualunque: professionisti che sanno trasformare una settimana in un'esperienza che ricorderai per sempre.",
+    title: "Guide che Ispirano",
+    description: "Ci sono insegnanti che spiegano, e poi ci sono quelli che ti fanno sentire capace. I nostri docenti madrelingua hanno quel dono raro di creare uno spazio in cui ti senti libero di provare, di sbagliare, di scoprire che sai molto più di quanto pensavi.",
     gradient: "from-rose-500/10 to-pink-500/10",
     iconColor: "text-rose-600",
   },
@@ -97,16 +97,16 @@ const testimonials = [
 const formats = [
   {
     title: "Full Immersion Workshop",
-    subtitle: "Una settimana che vale un anno",
-    description: "5 giorni di immersione totale nella lingua inglese nella nostra sede di Vicenza. Niente valigie per Londra, niente jet lag: gli stessi risultati di un soggiorno all'estero, ma a due passi da casa. E con docenti migliori.",
+    subtitle: "Cinque giorni che portano lontano",
+    description: "Alcune persone vanno a Londra per migliorare l'inglese. Altre scelgono di venire a Vicenza, dove tutto è progettato perché il cambiamento accada nel modo più profondo e naturale possibile. E spesso, chi sceglie questa strada, si sorprende di quanto lontano arriva restando vicino a casa.",
     features: ["5 giorni intensivi (lun-ven)", "6 ore al giorno di pratica attiva", "Dal livello A2 al C1", "In sede a Vicenza"],
     color: "from-primary to-blue-600",
     icon: BookOpen,
   },
   {
     title: "Experiential Weekend",
-    subtitle: "Dove l'inglese incontra l'avventura",
-    description: "Un weekend sui Colli Berici che non dimenticherai. Equitazione, leadership, team building, il tutto rigorosamente in inglese. Tornerai a casa con un inglese migliore, nuove amicizie e la voglia di rifarlo subito.",
+    subtitle: "Quando il corpo impara insieme alla mente",
+    description: "Ci sono esperienze che ti cambiano senza che tu te ne renda conto. Un weekend sui Colli Berici, tra cavalli, natura e sfide di leadership, tutto in inglese. Quando torni a casa, porti con te qualcosa di più di un inglese migliore: porti una nuova consapevolezza di quello che sei capace di fare.",
     features: ["2 giorni immersivi (sab-dom)", "Attività outdoor ed equitazione", "Leadership & team building", "Colli Berici, provincia di Vicenza"],
     color: "from-amber-500 to-orange-600",
     icon: Mountain,
@@ -130,13 +130,13 @@ export default function FullImmersionPage() {
                   Full Immersion Workshop
                 </Badge>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight" data-testid="text-fi-title">
-                  Una Settimana.<br />Un Livello in Più.
+                  E Se Bastasse<br />Una Settimana?
                 </h1>
                 <p className="text-xl text-white/90 mb-4 leading-relaxed max-w-xl">
-                  Immagina di svegliarti lunedì mattina con il tuo inglese di sempre, e di tornare a casa venerdì sera pensando in inglese senza nemmeno accorgertene.
+                  Sai già che il tuo inglese potrebbe essere migliore. Forse lo senti quando cerchi una parola che è lì, sulla punta della lingua, ma non esce. O quando capisci tutto, ma rispondere ti sembra un'altra cosa. Quella sensazione ti sta dicendo qualcosa.
                 </p>
                 <p className="text-lg text-white/75 mb-8 leading-relaxed max-w-xl">
-                  Non è magia. Sono 5 giorni di immersione totale con docenti madrelingua che sanno esattamente come sbloccare il tuo potenziale. Niente grammatica noiosa, niente esercizi ripetitivi: solo pratica reale, conversazioni vere e la scoperta che sì, il tuo inglese era già lì dentro. Aveva solo bisogno di uscire.
+                  In cinque giorni di immersione totale, succede qualcosa che mesi di studio tradizionale non riescono a darti: il tuo inglese smette di essere qualcosa che sai e diventa qualcosa che sei. I nostri docenti madrelingua sanno esattamente come guidarti in quel passaggio, nel modo più naturale possibile.
                 </p>
 
                 <div className="flex flex-wrap gap-6 mb-10">
@@ -232,10 +232,10 @@ export default function FullImmersionPage() {
                 Perché Funziona
               </Badge>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-benefits-title">
-                Non un Corso. Un'Esperienza che Ti Trasforma.
+                Quello Che Succede Dentro di Te
               </h2>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-4">
-                C'è un motivo per cui chi partecipa torna a casa con gli occhi che brillano. Il Full Immersion non è il solito corso di inglese con la lavagna e i compiti a casa. È una settimana in cui il tuo inglese fa un salto che normalmente richiederebbe mesi, in un ambiente così stimolante che le giornate volano.
+                Alcune cose si capiscono solo vivendole. Chi ha partecipato racconta sempre dello stesso momento: quel punto in cui smetti di pensare all'inglese come a qualcosa di difficile e inizi semplicemente a usarlo. Come se una porta che era sempre stata lì si fosse finalmente aperta.
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
@@ -270,18 +270,18 @@ export default function FullImmersionPage() {
                   Una Giornata Tipo
                 </Badge>
                 <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-day-title">
-                  Come Si Vive il Full Immersion
+                  Lasciati Portare dalla Giornata
                 </h2>
               </div>
               <p className="text-lg text-muted-foreground text-center max-w-3xl mx-auto mb-12">
-                Arrivi la mattina, ti accoglie il profumo del caffè e un "Good morning!" dal tuo docente. Da quel momento, il tuo cervello entra in modalità inglese. Le ore volano tra presentazioni, dibattiti, role-play e progetti di gruppo. Ti ritrovi a ridere, discutere, negoziare, tutto in inglese, e la cosa più bella è che non ti sembra nemmeno di studiare.
+                Non sai ancora esattamente cosa accadrà, ma puoi già immaginarlo. Arrivi la mattina, e qualcosa nell'aria ti dice che questa non sarà una giornata qualunque. Ogni momento è pensato per farti dimenticare che stai imparando, e lasciarti semplicemente vivere l'inglese come se fosse sempre stato parte di te.
               </p>
               <div className="grid md:grid-cols-2 gap-6">
                 {[
-                  { time: "9:00 - 10:30", title: "Warm-up & Discussion", desc: "Si parte con energia: discussioni su temi attuali, brainstorming e attività che ti svegliano il cervello (e l'inglese).", icon: Sparkles },
-                  { time: "10:30 - 11:00", title: "Coffee Break", desc: "Sì, anche la pausa caffè è in inglese. Ed è qui che succede la magia: parli perché vuoi, non perché devi.", icon: Coffee },
-                  { time: "11:00 - 13:00", title: "Workshop Intensivo", desc: "Il cuore della giornata: presentazioni, simulazioni professionali, negoziazioni. Metti in pratica tutto subito.", icon: Target },
-                  { time: "14:00 - 16:00", title: "Progetto di Gruppo", desc: "Lavori con il tuo team su un progetto reale. Alla fine della settimana lo presenterai. In inglese, ovviamente.", icon: Users },
+                  { time: "9:00 - 10:30", title: "Warm-up & Discussion", desc: "Ti ritrovi a discutere di qualcosa che ti appassiona, e senza accorgertene stai già parlando con una scioltezza che ieri non avevi. Le parole iniziano a venire da sole.", icon: Sparkles },
+                  { time: "10:30 - 11:00", title: "Coffee Break", desc: "È durante il caffè che succedono le cose più interessanti. Quando parli perché vuoi, non perché devi, scopri qualcosa di nuovo su te stesso e sul tuo inglese.", icon: Coffee },
+                  { time: "11:00 - 13:00", title: "Workshop Intensivo", desc: "Presentazioni, negoziazioni, simulazioni. Ogni attività ti fa sentire un po' più sicuro di prima, e quel senso di sicurezza resta con te anche dopo.", icon: Target },
+                  { time: "14:00 - 16:00", title: "Progetto di Gruppo", desc: "Lavori con persone che, come te, hanno scelto di fare questo passo. E mentre costruite qualcosa insieme, vi accorgete che l'inglese è diventato semplicemente il vostro modo di comunicare.", icon: Users },
                 ].map((slot, index) => (
                   <div
                     key={index}
