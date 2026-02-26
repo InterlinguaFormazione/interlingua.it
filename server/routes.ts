@@ -9,6 +9,34 @@ import { forwardToCRM } from "./crm";
 import { generateBlogPost } from "./blog-generator";
 import { chatWithAI } from "./ai-chat";
 import cron from "node-cron";
+import crypto from "crypto";
+
+const adminSessions = new Map<string, { createdAt: number }>();
+const ADMIN_SESSION_DURATION = 4 * 60 * 60 * 1000;
+
+function generateAdminToken(): string {
+  return crypto.randomBytes(32).toString("hex");
+}
+
+function isValidAdminSession(token: string | undefined): boolean {
+  if (!token) return false;
+  const session = adminSessions.get(token);
+  if (!session) return false;
+  if (Date.now() - session.createdAt > ADMIN_SESSION_DURATION) {
+    adminSessions.delete(token);
+    return false;
+  }
+  return true;
+}
+
+function requireAdmin(req: any, res: any, next: any) {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.replace("Bearer ", "");
+  if (!isValidAdminSession(token)) {
+    return res.status(401).json({ success: false, message: "Non autorizzato" });
+  }
+  next();
+}
 
 const MIN_SUBMIT_TIME_MS = 3000;
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
@@ -56,7 +84,66 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  
+
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const { password } = req.body;
+      const adminPassword = process.env.ADMIN_PASSWORD;
+      if (!adminPassword) {
+        return res.status(500).json({ success: false, message: "Admin password not configured" });
+      }
+      if (password !== adminPassword) {
+        return res.status(401).json({ success: false, message: "Password non corretta" });
+      }
+      const token = generateAdminToken();
+      adminSessions.set(token, { createdAt: Date.now() });
+      res.json({ success: true, token });
+    } catch (error) {
+      console.error("Admin login error:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/admin/contacts", requireAdmin, async (_req, res) => {
+    try {
+      const submissions = await storage.getContactSubmissions();
+      res.json(submissions);
+    } catch (error) {
+      console.error("Error fetching contact submissions:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/admin/newsletter", requireAdmin, async (_req, res) => {
+    try {
+      const subscriptions = await storage.getNewsletterSubscriptions();
+      res.json(subscriptions);
+    } catch (error) {
+      console.error("Error fetching newsletter subscriptions:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/admin/blog", requireAdmin, async (_req, res) => {
+    try {
+      const posts = await storage.getBlogPosts();
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching blog posts:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/blog/generate", requireAdmin, async (_req, res) => {
+    try {
+      await generateBlogPost();
+      res.json({ success: true, message: "Blog post generation triggered" });
+    } catch (error) {
+      console.error("Blog generation error:", error);
+      res.status(500).json({ success: false, message: "Generation failed" });
+    }
+  });
+
   app.post("/api/contact", async (req, res) => {
     try {
       const botCheck = checkBotProtection(req.body);

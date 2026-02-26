@@ -36,6 +36,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/bando-detail.tsx` - Individual bando/funded course detail page
 - `src/pages/speakers-corner.tsx` - Speaker's Corner landing page with login
 - `src/pages/speakers-corner-dashboard.tsx` - Subscriber dashboard for booking sessions
+- `src/pages/admin.tsx` - General admin panel (contacts, newsletter, blog, links to Speaker's Corner admin)
 - `src/pages/speakers-corner-admin.tsx` - Admin panel for managing subscribers, sessions, email settings
 - `src/pages/blog.tsx` - Blog listing page
 - `src/pages/blog-post.tsx` - Blog post detail page
@@ -92,6 +93,13 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `POST /api/blog/generate` - Trigger blog post generation
 - `POST /api/chat` - AI chat endpoint
 
+### Admin API (protected with server-side token auth)
+- `POST /api/admin/login` - Admin login (returns session token)
+- `GET /api/admin/contacts` - Get all contact submissions
+- `GET /api/admin/newsletter` - Get all newsletter subscriptions
+- `GET /api/admin/blog` - Get all blog posts
+- `POST /api/admin/blog/generate` - Trigger blog post generation
+
 ### Speaker's Corner Subscriber API
 - `POST /api/speakers-corner/login` - Subscriber login (email + password)
 - `GET /api/speakers-corner/sessions` - Get upcoming sessions with participant counts
@@ -125,6 +133,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `AWS_REGION` - AWS SES region (default: eu-south-1)
 - `CRM_WEBHOOK_API_KEY` - CRM webhook key (sk-webhook-...)
 - `CRM_BASE_URL` - CRM base URL (default: https://crm.skillcraft.it)
+- `ADMIN_PASSWORD` - Password for the general admin panel (/admin)
 
 ## Contact Email
 - **Default email**: `infocorsi@skillcraft.interlingua.it` (used everywhere on site)
@@ -140,7 +149,8 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `/bandi/:id` - Individual bando/funded course detail page
 - `/speakers-corner` - Speaker's Corner info page with subscriber login
 - `/speakers-corner/dashboard` - Subscriber dashboard (view/book sessions)
-- `/speakers-corner/admin` - Admin panel (manage subscribers, sessions, email settings)
+- `/admin` - General admin panel (contacts, newsletter, blog management)
+- `/speakers-corner/admin` - Speaker's Corner admin (manage subscribers, sessions, email settings)
 - `/blog` - Blog listing
 - `/blog/:slug` - Blog post detail
 - `/cookie-policy` - Cookie policy (GDPR)

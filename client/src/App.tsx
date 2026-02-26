@@ -17,6 +17,7 @@ import BandoDetailPage from "@/pages/bando-detail";
 import SpeakersCornerPage from "@/pages/speakers-corner";
 import SpeakersCornerDashboard from "@/pages/speakers-corner-dashboard";
 import SpeakersCornerAdmin from "@/pages/speakers-corner-admin";
+import AdminPage from "@/pages/admin";
 import BlogPage from "@/pages/blog";
 import BlogPostPage from "@/pages/blog-post";
 import CookiePolicyPage from "@/pages/cookie-policy";
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/speakers-corner" component={SpeakersCornerPage} />
       <Route path="/speakers-corner/dashboard" component={SpeakersCornerDashboard} />
       <Route path="/speakers-corner/admin" component={SpeakersCornerAdmin} />
+      <Route path="/admin" component={AdminPage} />
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={BlogPostPage} />
       <Route path="/cookie-policy" component={CookiePolicyPage} />
