@@ -1,0 +1,51 @@
+/var/log/skillcraft/out.log last 50 lines:
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Amministrazione & Business
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Business Coaching
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Competenze Trasversali
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Crescita Personale & Professionale
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Digital Marketing
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Digitalizzazione e Tecnologie 4.0
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Innovazione & Operations
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Intelligenza Artificiale e Innovazione Digitale
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Internazionalizzazione e Business Development
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Language Coaching
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Lingue Straniere
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Management & Leadership
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Marketing, Vendite & Clienti
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Office & Produttività
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Sostenibilità e Trasformazione Green
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: company - SkillCraft 1993: Fondazione
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: company - SkillCraft 2000: Espansione digitale
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: company - SkillCraft 2010: Accreditamento regionale
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: company - SkillCraft 2020: SkillCraft
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: company - SkillCraft 2024: Oggi
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: company - Valore SkillCraft: Eccellenza
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: company - Valore SkillCraft: Personalizzazione
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: company - Valore SkillCraft: Innovazione
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: company - Valore SkillCraft: Risultati
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Experiential Workshops in English
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Full Immersion Workshop di Lingua Inglese
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: service - Skillcraft Experience
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: testimonial - Testimonianza Workshop - Giampietro
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: testimonial - Testimonianza Workshop - Vanessa Martini
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: testimonial - Testimonianza Workshop - Claudia Poletti
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: testimonial - Testimonianza Workshop - Elena
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: company - Contatti SkillCraft
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: company - Statistiche SkillCraft
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: company - SkillCraft Formazione Completa
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: company - Missione e Storia SkillCraft
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: page - SkillCraft Open Lab - 26 Settembre 2025
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: page - Esperto SkillCraft: Stephanie Vella
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: page - Esperto SkillCraft: Maurizia Moltoni Sartori
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: page - Esperto SkillCraft: Alberto Arsie
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: page - Esperto SkillCraft: Laura Bau
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: page - Esperto SkillCraft: Ampelia Berto
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: page - Esperto SkillCraft: Valentino Spolaore
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: page - Docente SkillCraft Open Lab: Andrea
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: page - Docente SkillCraft Open Lab: Ampelia
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: page - Docente SkillCraft Open Lab: Maurizia
+44|skillcr | 2026-02-25 21:17:29 +00:00: 📚 Knowledge updated: page - Docente SkillCraft Open Lab: Will
+44|skillcr | 2026-02-25 21:17:29 +00:00: ✅ Successfully seeded 84/84 content sections
+44|skillcr | 2026-02-25 21:17:29 +00:00: ✅ Structured content fallback seeded 84 items: Successfully seeded 84/84 content sections
+44|skillcr | 2026-02-25 21:17:31 +00:00: 🔄 Processing embeddings for 114 items...
+44|skillcr | 2026-02-25 21:17:53 +00:00: 9:17:53 PM [express] [Offer Reminders] Reminder emails are disabled

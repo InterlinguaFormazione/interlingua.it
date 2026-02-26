@@ -1,15 +1,16 @@
 import { Link, useLocation } from "wouter";
-import { Facebook, Instagram, Linkedin, Youtube, MapPin, Phone, Mail } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Youtube, MapPin, Phone, Mail, ArrowUp, Cookie } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import logoImage from "@assets/SKILLCRAFT-INTERLINGUA_1769354785857.png";
 
 const footerLinks = {
   corsi: [
-    { label: "Corsi di Lingue", href: "#courses" },
-    { label: "Intelligenza Artificiale", href: "#courses" },
-    { label: "Office & Produttività", href: "#courses" },
-    { label: "Digital Marketing", href: "#courses" },
-    { label: "Soft Skills", href: "#courses" },
-    { label: "Crescita Personale", href: "#courses" },
+    { label: "AI & Competenze Digitali", href: "#courses" },
+    { label: "Competenze Trasversali", href: "#courses" },
+    { label: "Management & Organizzazione", href: "#courses" },
+    { label: "Formazione Esperienziale", href: "#courses" },
+    { label: "Business & Strategia", href: "#courses" },
+    { label: "Lingue e Interculturalità", href: "#courses" },
   ],
   azienda: [
     { label: "Chi Siamo", href: "/chi-siamo" },
@@ -19,9 +20,10 @@ const footerLinks = {
   ],
   supporto: [
     { label: "Contatti", href: "#contact" },
-    { label: "FAQ", href: "#" },
-    { label: "Privacy Policy", href: "#" },
-    { label: "Termini e Condizioni", href: "#" },
+    { label: "FAQ", href: "#faq" },
+    { label: "Blog", href: "/blog" },
+    { label: "Cookie Policy", href: "/cookie-policy" },
+    { label: "Privacy Policy", href: "/privacy-policy" },
   ],
 };
 
@@ -47,9 +49,14 @@ export function Footer() {
     }
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <footer className="bg-card border-t">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="h-1 w-full bg-gradient-to-r from-primary via-accent to-primary" />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
           <div className="lg:col-span-2">
             <Link href="/" className="inline-block mb-6" data-testid="link-footer-home">
@@ -60,8 +67,8 @@ export function Footer() {
               />
             </Link>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              Dal 1993, formazione linguistica e competenze professionali. 
-              Lingue, AI, soft skills, crescita personale. Ente accreditato Regione Veneto.
+              Dal 1993, formazione professionale a 360 gradi. 
+              Intelligenza artificiale, competenze digitali, soft skills, management e lingue. Ente accreditato Regione Veneto.
             </p>
             
             <div className="space-y-3 mb-6">
@@ -75,23 +82,28 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                <span>info@interlingua.it</span>
+                <span>infocorsi@skillcraft.interlingua.it</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               {socialLinks.map((social) => (
-                <a
+                <Button
                   key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-lg hover-elevate text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label={social.label}
-                  data-testid={`link-social-${social.label.toLowerCase()}`}
+                  variant="ghost"
+                  size="icon"
+                  asChild
                 >
-                  <social.icon className="h-5 w-5" />
-                </a>
+                  <a
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={social.label}
+                    data-testid={`link-social-${social.label.toLowerCase()}`}
+                  >
+                    <social.icon className="h-5 w-5" />
+                  </a>
+                </Button>
               ))}
             </div>
           </div>
@@ -153,9 +165,29 @@ export function Footer() {
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} SkillCraft-Interlingua. Tutti i diritti riservati.
             </p>
-            <p className="text-sm text-muted-foreground">
-              Ente accreditato Regione Veneto
-            </p>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => {
+                  window.dispatchEvent(new Event("open-cookie-settings"));
+                }}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
+                data-testid="button-cookie-preferences"
+              >
+                <Cookie className="h-3.5 w-3.5" />
+                Preferenze Cookie
+              </button>
+              <p className="text-sm text-muted-foreground">
+                Ente accreditato Regione Veneto
+              </p>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={scrollToTop}
+                data-testid="button-back-to-top"
+              >
+                <ArrowUp className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>

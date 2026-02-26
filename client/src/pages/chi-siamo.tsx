@@ -66,8 +66,8 @@ const stats = [
 const values = [
   { 
     icon: Target, 
-    title: "Eccellenza", 
-    description: "Standard formativi elevati con docenti madrelingua qualificati e metodologie all'avanguardia",
+    title: "Qualità", 
+    description: "Standard formativi elevati con docenti qualificati e metodologie all'avanguardia",
     color: "from-purple-500 to-purple-600"
   },
   { 
@@ -165,7 +165,7 @@ export default function ChiSiamoPage() {
                 </span>
               </h1>
               <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                Oltre 30 anni di eccellenza nella formazione linguistica e professionale. 
+                Oltre 30 anni di esperienza nella formazione professionale. 
                 Primo ente accreditato in Veneto, oggi leader nell'integrazione di lingue, 
                 AI e competenze digitali.
               </p>
@@ -491,6 +491,71 @@ export default function ChiSiamoPage() {
         </div>
       </section>
 
+      <section className="py-20 bg-muted/30" id="team">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <Badge className="mb-4">Il Nostro Team</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Le Persone Dietro <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">SkillCraft</span>
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Un team di professionisti appassionati con esperienza internazionale nella formazione
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                name: "Dott.ssa Silvia Rossi",
+                role: "Direttrice Generale",
+                bio: "Oltre 25 anni nella formazione aziendale. Specializzata in strategia formativa e sviluppo organizzativo.",
+                color: "from-purple-500 to-purple-600"
+              },
+              {
+                name: "Prof. Marco Bianchi",
+                role: "Responsabile Area AI & Digitale",
+                bio: "Esperto di intelligenza artificiale applicata. Docente certificato su ChatGPT, Copilot e automazione.",
+                color: "from-blue-500 to-blue-600"
+              },
+              {
+                name: "Dott.ssa Elena Moretti",
+                role: "Coordinatrice Soft Skills",
+                bio: "Psicologa del lavoro con specializzazione in comunicazione efficace e leadership coaching.",
+                color: "from-teal-500 to-teal-600"
+              },
+              {
+                name: "James Mitchell",
+                role: "Head Teacher - Languages",
+                bio: "Madrelingua inglese con certificazione CELTA. 15 anni di esperienza nell'insegnamento interculturale.",
+                color: "from-orange-500 to-orange-600"
+              },
+            ].map((member, index) => (
+              <motion.div
+                key={member.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="p-6 h-full text-center hover-elevate" data-testid={`card-team-${index}`}>
+                  <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${member.color} mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold`}>
+                    {member.name.split(" ").slice(-1)[0][0]}
+                  </div>
+                  <h3 className="font-bold text-lg mb-1">{member.name}</h3>
+                  <Badge variant="secondary" className="mb-3">{member.role}</Badge>
+                  <p className="text-sm text-muted-foreground">{member.bio}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="py-20">
         <div className="container mx-auto px-4">
           <motion.div
@@ -579,7 +644,7 @@ export default function ChiSiamoPage() {
                   </div>
                   <div className="flex items-center justify-center gap-3">
                     <Mail className="w-5 h-5 text-primary" />
-                    <span className="font-medium">info@interlingua.it</span>
+                    <span className="font-medium">infocorsi@skillcraft.interlingua.it</span>
                   </div>
                 </div>
               </div>

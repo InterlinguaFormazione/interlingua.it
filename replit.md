@@ -1,11 +1,24 @@
 # SkillCraft-Interlingua Website
 
 ## Overview
-A modern, visually stunning website for SkillCraft-Interlingua, a training center offering language courses and professional development for private (non-business) users. The site combines offerings from Interlingua Formazione and SkillCraft into one cohesive platform.
+A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive professional training center for private (non-business) users. The site positions SkillCraft-Interlingua as a 360-degree training provider covering AI, digital skills, soft skills, management, experiential learning, and languages (de-emphasized). Languages are intentionally listed last as they are being phased out as the primary focus. AI and digital skills are the primary focus — explicitly mention ChatGPT, Copilot, automation.
+
+## Deployment
+- **Target**: User's own VPS at `skillcraft.interlingua.it`
+- **CI/CD**: GitHub Actions (`.github/workflows/deploy.yml`) — auto-deploys on push to `main`
+- **GitHub Secrets needed**: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`, `VPS_PORT` (optional)
+- **VPS Stack**: Node.js 20 + PM2 + Nginx reverse proxy + Certbot SSL
+- **VPS directory**: `/var/www/SkillCraft-Interlingua`
+- **PM2 process name**: `skillcraft-interlingua`
+- **Production command**: `node dist/index.cjs` (serves frontend + backend on port 5000)
+- **Full deployment guide**: `DEPLOY-VPS.md`
 
 ## Tech Stack
 - **Frontend**: React with TypeScript, Vite, TailwindCSS, Shadcn/ui components
-- **Backend**: Express.js with PostgreSQL (Drizzle ORM)
+- **Backend**: Express.js
+- **Database**: PostgreSQL (Drizzle ORM)
+- **Email**: AWS SES (gracefully disabled if credentials not set)
+- **CRM Integration**: Webhook to `crm.skillcraft.it` (via `server/crm.ts`)
 - **State Management**: TanStack React Query
 - **Animations**: Framer Motion
 - **Routing**: Wouter
@@ -16,46 +29,68 @@ A modern, visually stunning website for SkillCraft-Interlingua, a training cente
 
 ### Frontend (`client/`)
 - `src/pages/home.tsx` - Main landing page with all sections
+- `src/pages/course-detail.tsx` - Individual course detail pages (20 courses)
+- `src/pages/courses.tsx` - All courses listing
+- `src/pages/chi-siamo.tsx` - About us page
+- `src/pages/bandi-e-corsi.tsx` - Funded courses and tenders listing
+- `src/pages/bando-detail.tsx` - Individual bando/funded course detail page
 - `src/pages/speakers-corner.tsx` - Speaker's Corner landing page with login
 - `src/pages/speakers-corner-dashboard.tsx` - Subscriber dashboard for booking sessions
 - `src/pages/speakers-corner-admin.tsx` - Admin panel for managing subscribers, sessions, email settings
+- `src/pages/blog.tsx` - Blog listing page
+- `src/pages/blog-post.tsx` - Blog post detail page
+- `src/pages/cookie-policy.tsx` - GDPR cookie policy
+- `src/pages/privacy-policy.tsx` - GDPR privacy policy
 - `src/components/` - Reusable UI components
   - `navigation.tsx` - Fixed header with mobile menu
   - `hero-section.tsx` - Hero with animated stats
   - `courses-section.tsx` - Course cards grid
   - `features-section.tsx` - Benefits and features
-  - `testimonials-section.tsx` - Student reviews
-  - `about-section.tsx` - Company information
-  - `contact-section.tsx` - Contact form
-  - `newsletter-section.tsx` - Newsletter signup
+  - `testimonials-section.tsx` - Student reviews (Google Reviews API)
+  - `about-section.tsx` - Company information (Vicenza + Thiene locations)
+  - `contact-section.tsx` - Contact form with honeypot bot protection
+  - `newsletter-section.tsx` - Newsletter signup with honeypot bot protection
+  - `cookie-banner.tsx` - GDPR cookie consent banner with granular controls
+  - `ai-chat-widget.tsx` - Floating AI chat assistant (OpenAI GPT-4o-mini)
   - `footer.tsx` - Site footer
   - `theme-provider.tsx` - Dark/light mode support
   - `theme-toggle.tsx` - Theme switcher button
 
 ### Backend (`server/`)
 - `db.ts` - PostgreSQL database connection (drizzle-orm/node-postgres)
-- `routes.ts` - API endpoints for contact form, newsletter, Speaker's Corner
-- `storage.ts` - Storage interface (in-memory for legacy, PostgreSQL for Speaker's Corner)
+- `routes.ts` - API endpoints with bot protection (honeypot, timestamp check, rate limiting)
+- `storage.ts` - PostgreSQL database storage (Drizzle ORM)
+- `ai-chat.ts` - AI chat endpoint (OpenAI GPT-4o-mini with full site context)
+- `email.ts` - AWS SES email notifications (contact + newsletter confirmation)
+- `crm.ts` - CRM webhook integration (forwards contact submissions)
+- `blog-generator.ts` - Automated blog generation
 
 ### Shared (`shared/`)
-- `schema.ts` - TypeScript interfaces, Drizzle tables, and Zod schemas
+- `schema.ts` - Drizzle schema + Zod validation schemas
 
 ## Database Tables
 - `users` - Basic user accounts
 - `contact_submissions` - Contact form submissions
 - `newsletter_subscriptions` - Newsletter subscribers
+- `cookie_consents` - GDPR cookie consent records
+- `blog_posts` - AI-generated blog posts
 - `sc_subscribers` - Speaker's Corner subscribers (name, email, hashed password, subscription dates)
 - `sc_sessions` - Weekly Friday sessions (date, time, topic, max participants, status)
 - `sc_bookings` - Session bookings (subscriber + session link)
 - `sc_email_settings` - Email notification settings (suspend/resume for holidays)
 
 ## API Endpoints
-- `POST /api/contact` - Submit contact form
+- `POST /api/contact` - Submit contact form (saves to DB + emails + CRM)
 - `GET /api/contact` - Get all contact submissions
-- `POST /api/newsletter` - Subscribe to newsletter
+- `POST /api/newsletter` - Subscribe to newsletter (saves to DB + confirmation email)
 - `GET /api/newsletter` - Get all newsletter subscriptions
 - `GET /api/courses` - Get available courses
-- `GET /api/reviews` - Get Google reviews (cached)
+- `POST /api/cookie-consent` - Log cookie consent (GDPR proof-of-consent)
+- `GET /api/reviews` - Google Reviews (cached 24h)
+- `GET /api/blog` - Get published blog posts
+- `GET /api/blog/:slug` - Get blog post by slug
+- `POST /api/blog/generate` - Trigger blog post generation
+- `POST /api/chat` - AI chat endpoint
 
 ### Speaker's Corner Subscriber API
 - `POST /api/speakers-corner/login` - Subscriber login (email + password)
@@ -75,6 +110,27 @@ A modern, visually stunning website for SkillCraft-Interlingua, a training cente
 - `PATCH /api/admin/speakers-corner/email-settings` - Update email settings
 - `POST /api/admin/speakers-corner/generate-sessions` - Auto-generate Friday sessions
 
+## Bot Protection
+- **Honeypot fields**: Hidden fields in both forms — bots fill them, humans don't
+- **Timestamp check**: Submissions under 3 seconds rejected (too fast = bot)
+- **Rate limiting**: Max 5 submissions per IP per 15 minutes
+- Blocked bots get fake 200 responses (so they don't know they were caught)
+
+## Environment Variables / Secrets
+- `DATABASE_URL` - PostgreSQL connection string
+- `SESSION_SECRET` - Express session secret
+- `GOOGLE_API_KEY` - Google Places API (for reviews)
+- `AWS_ACCESS_KEY_ID` - AWS SES
+- `AWS_SECRET_ACCESS_KEY` - AWS SES
+- `AWS_REGION` - AWS SES region (default: eu-south-1)
+- `CRM_WEBHOOK_API_KEY` - CRM webhook key (sk-webhook-...)
+- `CRM_BASE_URL` - CRM base URL (default: https://crm.skillcraft.it)
+
+## Contact Email
+- **Default email**: `infocorsi@skillcraft.interlingua.it` (used everywhere on site)
+- **Privacy email**: `privacy@interlingua.it` (privacy policy only)
+- **Email sender**: `noreply@skillcraft.interlingua.it`
+
 ## Pages
 - `/` - Home page with hero, courses, features, testimonials, about, contact, newsletter
 - `/corsi` - Course catalog
@@ -85,6 +141,10 @@ A modern, visually stunning website for SkillCraft-Interlingua, a training cente
 - `/speakers-corner` - Speaker's Corner info page with subscriber login
 - `/speakers-corner/dashboard` - Subscriber dashboard (view/book sessions)
 - `/speakers-corner/admin` - Admin panel (manage subscribers, sessions, email settings)
+- `/blog` - Blog listing
+- `/blog/:slug` - Blog post detail
+- `/cookie-policy` - Cookie policy (GDPR)
+- `/privacy-policy` - Privacy policy (GDPR)
 
 ## Bandi e Corsi Finanziati
 - Data source: `client/src/data/bandi-data.ts`
@@ -98,6 +158,24 @@ A modern, visually stunning website for SkillCraft-Interlingua, a training cente
 - Tuesday weekly email invitations to active subscribers (email service integration pending)
 - Email suspension feature for holiday periods
 
+## Key Design Decisions
+- Languages are de-emphasized (listed last, being phased out)
+- AI teaching is very prominent (ChatGPT, Copilot, automation explicitly mentioned)
+- Word "eccellenze" is NOT used (overused by competitors)
+- Cookie consent uses custom event ("open-cookie-settings") for reopening
+- Email service gracefully degrades if AWS SES credentials not configured
+- Newsletter handles race condition on unique email constraint
+- CRM forwarding gracefully skips when API key not configured
+
+## GDPR Compliance
+- Cookie consent banner with granular category controls (necessary, analytics, marketing)
+- Cookie consent logged to database with proof-of-consent (sessionId, IP, userAgent, preferences)
+- Cookie policy page with specific cookie tables, third-party disclosures, legal bases
+- Privacy policy covering all data processing, GDPR rights, Garante Privacy contact
+- 12-month consent retention
+
 ## Running the Project
-The project runs with `npm run dev` which starts both the Express backend and Vite frontend on port 5000.
-Use `npm run db:push` to sync database schema changes.
+- **Dev**: `npm run dev` (Express backend + Vite frontend on port 5000)
+- **Build**: `npm run build` (outputs `dist/index.cjs` + `dist/public/`)
+- **Production**: `npm start` or `node dist/index.cjs`
+- **DB sync**: `npm run db:push` to sync database schema changes

@@ -51,6 +51,49 @@ export const insertNewsletterSchema = createInsertSchema(newsletterSubscriptions
 export type InsertNewsletter = z.infer<typeof insertNewsletterSchema>;
 export type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;
 
+export const cookieConsents = pgTable("cookie_consents", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: text("session_id").notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  necessary: boolean("necessary").default(true),
+  analytics: boolean("analytics").default(false),
+  marketing: boolean("marketing").default(false),
+  preferences: boolean("preferences").default(false),
+  consentAction: text("consent_action").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertCookieConsentSchema = createInsertSchema(cookieConsents).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertCookieConsent = z.infer<typeof insertCookieConsentSchema>;
+export type CookieConsent = typeof cookieConsents.$inferSelect;
+
+export const blogPosts = pgTable("blog_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  excerpt: text("excerpt").notNull(),
+  content: text("content").notNull(),
+  category: text("category").notNull(),
+  imageUrl: text("image_url"),
+  sourceUrl: text("source_url"),
+  sourceTitle: text("source_title"),
+  published: boolean("published").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
+export type BlogPost = typeof blogPosts.$inferSelect;
+
 export const scSubscribers = pgTable("sc_subscribers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   name: text("name").notNull(),

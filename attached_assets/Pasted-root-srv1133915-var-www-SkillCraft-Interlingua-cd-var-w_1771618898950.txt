@@ -1,0 +1,31 @@
+root@srv1133915:/var/www/SkillCraft-Interlingua# cd /var/www/SkillCraft-Interlingua
+cat > ecosystem.config.cjs << 'EOF'
+module.exports = {
+  apps: [{
+    name: "skillcraft-interlingua",
+    script: "dist/index.cjs",
+    env: {
+      DATABASE_URL: "postgresql://skillcraft-interlingua_user:Sk6llCraft_DB_2025_Pro@localhost:5432/skillcraft_interlingua",
+      PORT: "5005",
+      NODE_ENV: "production"
+    }
+  }]
+};
+EOF
+pm2 start ecosystem.config.cjs
+pm2 save
+[PM2][WARN] Applications skillcraft-interlingua not running, starting...
+[PM2] App [skillcraft-interlingua] launched (1 instances)
+┌────┬───────────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name                      │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼───────────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 18 │ english-test              │ default     │ 1.0.0   │ fork    │ 1079164  │ 2D     │ 12   │ online    │ 0%       │ 176.6mb  │ root     │ disabled │
+│ 3  │ english-workout           │ default     │ 1.0.0   │ fork    │ 966705   │ 9D     │ 96   │ online    │ 0%       │ 157.5mb  │ root     │ disabled │
+│ 8  │ quality-skillcraft        │ default     │ 1.0.0   │ fork    │ 867502   │ 14D    │ 3    │ online    │ 0%       │ 131.2mb  │ root     │ disabled │
+│ 34 │ skillcraft                │ default     │ 1.0.0   │ fork    │ 1115984  │ 2h     │ 16   │ online    │ 0%       │ 234.8mb  │ root     │ disabled │
+│ 42 │ skillcraft-crm            │ default     │ 1.0.0   │ fork    │ 1113371  │ 4h     │ 3    │ online    │ 0%       │ 91.0mb   │ root     │ disabled │
+│ 43 │ skillcraft-interlingua    │ default     │ 1.0.0   │ fork    │ 1118563  │ 0s     │ 0    │ online    │ 0%       │ 17.6mb   │ root     │ disabled │
+└────┴───────────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+[PM2] Saving current process list...
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+root@srv1133915:/var/www/SkillCraft-Interlingua#

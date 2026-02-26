@@ -4,6 +4,10 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CookieBanner } from "@/components/cookie-banner";
+import { WhatsAppButton } from "@/components/whatsapp-button";
+import { MobileCTA } from "@/components/mobile-cta";
+import { AIChatWidget } from "@/components/ai-chat-widget";
 import Home from "@/pages/home";
 import CoursesPage from "@/pages/courses";
 import CourseDetailPage from "@/pages/course-detail";
@@ -13,6 +17,10 @@ import BandoDetailPage from "@/pages/bando-detail";
 import SpeakersCornerPage from "@/pages/speakers-corner";
 import SpeakersCornerDashboard from "@/pages/speakers-corner-dashboard";
 import SpeakersCornerAdmin from "@/pages/speakers-corner-admin";
+import BlogPage from "@/pages/blog";
+import BlogPostPage from "@/pages/blog-post";
+import CookiePolicyPage from "@/pages/cookie-policy";
+import PrivacyPolicyPage from "@/pages/privacy-policy";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -27,6 +35,10 @@ function Router() {
       <Route path="/speakers-corner" component={SpeakersCornerPage} />
       <Route path="/speakers-corner/dashboard" component={SpeakersCornerDashboard} />
       <Route path="/speakers-corner/admin" component={SpeakersCornerAdmin} />
+      <Route path="/blog" component={BlogPage} />
+      <Route path="/blog/:slug" component={BlogPostPage} />
+      <Route path="/cookie-policy" component={CookiePolicyPage} />
+      <Route path="/privacy-policy" component={PrivacyPolicyPage} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -38,6 +50,10 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Router />
+          <CookieBanner />
+          <WhatsAppButton />
+          <MobileCTA />
+          <AIChatWidget />
           <Toaster />
         </TooltipProvider>
       </QueryClientProvider>

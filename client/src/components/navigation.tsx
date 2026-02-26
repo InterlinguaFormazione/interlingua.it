@@ -13,6 +13,7 @@ const navLinks = [
   { href: "#features", label: "Perché Noi" },
   { href: "#testimonials", label: "Recensioni" },
   { href: "/chi-siamo", label: "Chi Siamo" },
+  { href: "/blog", label: "Blog" },
   { href: "#contact", label: "Contatti" },
 ];
 
@@ -41,32 +42,34 @@ export function Navigation() {
     <header className="fixed top-0 left-0 right-0 z-50">
       <div className="bg-muted/80 backdrop-blur-sm border-b border-border/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center gap-1 h-10">
-            {audienceTabs.map((tab) => (
-              tab.external ? (
-                <a
-                  key={tab.id}
-                  href={tab.href!}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-md hover-elevate"
-                  data-testid={`tab-${tab.id}`}
-                >
-                  <tab.icon className="w-4 h-4" />
-                  {tab.label}
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              ) : (
-                <button
-                  key={tab.id}
-                  className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-md"
-                  data-testid={`tab-${tab.id}`}
-                >
-                  <tab.icon className="w-4 h-4" />
-                  {tab.label}
-                </button>
-              )
-            ))}
+          <div className="flex items-center justify-center h-10">
+            <div className="inline-flex items-center rounded-full bg-muted/50 p-1">
+              {audienceTabs.map((tab) => (
+                tab.external ? (
+                  <a
+                    key={tab.id}
+                    href={tab.href!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-36 py-1.5 text-sm font-medium text-accent-foreground bg-accent/80 hover:bg-accent transition-all rounded-full"
+                    data-testid={`tab-${tab.id}`}
+                  >
+                    <tab.icon className="w-4 h-4" />
+                    {tab.label}
+                    <ExternalLink className="w-3 h-3 opacity-50" />
+                  </a>
+                ) : (
+                  <button
+                    key={tab.id}
+                    className="flex items-center justify-center gap-2 w-36 py-1.5 text-sm font-semibold bg-primary text-primary-foreground rounded-full shadow-sm"
+                    data-testid={`tab-${tab.id}`}
+                  >
+                    <tab.icon className="w-4 h-4" />
+                    {tab.label}
+                  </button>
+                )
+              ))}
+            </div>
           </div>
         </div>
       </div>

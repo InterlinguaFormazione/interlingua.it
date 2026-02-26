@@ -118,43 +118,35 @@ export function CoursesSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Link href="/corsi">
+                <Link href={`/corsi#${category.id}`}>
                   <Card 
                     className="h-full hover-elevate group cursor-pointer relative overflow-hidden"
                     data-testid={`card-category-${category.id}`}
                   >
-                    {category.featured && (
-                      <div className="absolute top-4 right-4 z-20">
-                        <Badge className="bg-gradient-to-r from-primary to-accent text-white border-0 shadow-lg">
-                          Popolare
-                        </Badge>
-                      </div>
-                    )}
-                    
                     <div className="relative h-48 overflow-hidden">
                       <img 
                         src={category.image} 
                         alt={category.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-card via-card/60 to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
                       
-                      <div className={`absolute bottom-4 left-4 p-3 rounded-xl bg-gradient-to-r ${category.color} shadow-lg group-hover:scale-110 transition-transform`}>
-                        <Icon className="h-6 w-6 text-white" />
+                      <div className={`absolute bottom-3 left-3 p-2 rounded-lg bg-gradient-to-r ${category.color} shadow-lg`}>
+                        <Icon className="h-5 w-5 text-white" />
                       </div>
                     </div>
                     
                     <CardContent className="pt-4">
-                      <div className="flex items-start justify-between gap-2 mb-3">
-                        <h3 className="text-xl font-bold group-hover:text-primary transition-colors">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <h3 className="text-lg font-bold group-hover:text-primary transition-colors">
                           {category.title}
                         </h3>
                         <Badge variant="secondary" className="text-xs shrink-0">
-                          {category.courseCount} corsi
+                          {category.courseCount} {category.courseCount === 1 ? "corso" : "corsi"}
                         </Badge>
                       </div>
                       
-                      <p className="text-muted-foreground mb-4 line-clamp-3">
+                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                         {category.description}
                       </p>
                       
@@ -163,7 +155,7 @@ export function CoursesSection() {
                           <Users className="h-4 w-4" />
                           <span>Tutti i livelli</span>
                         </div>
-                        <div className="flex items-center gap-1 text-primary font-medium text-sm group-hover:gap-2 transition-all">
+                        <div className="flex items-center gap-1 text-primary font-medium text-sm">
                           Esplora
                           <ArrowRight className="h-4 w-4" />
                         </div>

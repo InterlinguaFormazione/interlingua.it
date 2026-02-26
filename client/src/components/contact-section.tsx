@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Send, Loader2, CheckCircle2, MessageSquare, Calendar, Headphones } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -26,7 +26,7 @@ const contactOptions = [
   {
     icon: MessageSquare,
     title: "Scrivici",
-    description: "info@interlingua.it",
+    description: "infocorsi@skillcraft.interlingua.it",
     action: "Invia email",
   },
   {
@@ -45,6 +45,8 @@ const contactOptions = [
 
 export function ContactSection() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
+  const formLoadTime = useRef(Date.now());
   const { toast } = useToast();
 
   const form = useForm<ContactFormData>({
@@ -60,7 +62,11 @@ export function ContactSection() {
 
   const mutation = useMutation({
     mutationFn: async (data: ContactFormData) => {
-      const response = await apiRequest("POST", "/api/contact", data);
+      const response = await apiRequest("POST", "/api/contact", {
+        ...data,
+        _hp: honeypot,
+        _ts: formLoadTime.current,
+      });
       return response.json();
     },
     onSuccess: () => {
@@ -85,7 +91,7 @@ export function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-16 bg-muted/30">
+    <section id="contact" className="py-24 bg-muted/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -94,6 +100,7 @@ export function ContactSection() {
           transition={{ duration: 0.5 }}
           className="text-center mb-10"
         >
+          <div className="h-1 w-16 rounded-full bg-gradient-to-r from-primary to-accent mx-auto mb-4" />
           <Badge variant="secondary" className="mb-4">
             Contattaci
           </Badge>
@@ -116,7 +123,7 @@ export function ContactSection() {
             transition={{ duration: 0.5 }}
             className="lg:col-span-3"
           >
-            <Card className="h-full">
+            <Card className="h-full shadow-lg">
               <CardContent className="p-6 sm:p-8">
                 {isSubmitted ? (
                   <motion.div
@@ -138,6 +145,17 @@ export function ContactSection() {
                 ) : (
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                      <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true" tabIndex={-1}>
+                        <label htmlFor="website_url">Website</label>
+                        <input
+                          type="text"
+                          id="website_url"
+                          name="website_url"
+                          value={honeypot}
+                          onChange={(e) => setHoneypot(e.target.value)}
+                          autoComplete="off"
+                        />
+                      </div>
                       <div className="grid sm:grid-cols-2 gap-6">
                         <FormField
                           control={form.control}
@@ -211,13 +229,13 @@ export function ContactSection() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="inglese">Inglese</SelectItem>
-                                  <SelectItem value="tedesco">Tedesco</SelectItem>
-                                  <SelectItem value="italiano">Italiano per Stranieri</SelectItem>
-                                  <SelectItem value="digital">Competenze Digitali</SelectItem>
-                                  <SelectItem value="speaking">Public Speaking</SelectItem>
-                                  <SelectItem value="personal">Sviluppo Personale</SelectItem>
-                                  <SelectItem value="altro">Altro</SelectItem>
+                                  <SelectItem value="AI & Competenze Digitali">AI & Competenze Digitali</SelectItem>
+                                  <SelectItem value="Management & Organizzazione">Management & Organizzazione</SelectItem>
+                                  <SelectItem value="Competenze Trasversali">Competenze Trasversali</SelectItem>
+                                  <SelectItem value="Business & Strategia">Business & Strategia</SelectItem>
+                                  <SelectItem value="Formazione Esperienziale">Formazione Esperienziale</SelectItem>
+                                  <SelectItem value="Lingue e Interculturalità">Lingue e Interculturalità</SelectItem>
+                                  <SelectItem value="Altro">Altro</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -285,7 +303,7 @@ export function ContactSection() {
                 data-testid={`card-contact-option-${index}`}
               >
                 <CardContent className="p-6 flex items-center gap-4">
-                  <div className="p-3 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10">
+                  <div className="p-3 rounded-xl bg-gradient-to-br from-primary/15 to-accent/15 border border-primary/10">
                     <option.icon className="h-6 w-6 text-primary" />
                   </div>
                   <div className="flex-1">
@@ -297,8 +315,10 @@ export function ContactSection() {
               </Card>
             ))}
 
-            <Card className="bg-gradient-to-br from-primary to-accent text-white border-0">
-              <CardContent className="p-6">
+            <Card className="bg-gradient-to-br from-primary via-primary/90 to-accent text-white border-0 relative">
+              <div className="absolute inset-0 rounded-md bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-60" />
+              <div className="absolute inset-0 rounded-md bg-gradient-to-tr from-white/0 via-white/10 to-white/0" />
+              <CardContent className="p-6 relative z-10">
                 <h3 className="text-xl font-bold mb-2">Test di Livello Gratuito</h3>
                 <p className="text-white/80 mb-4">
                   Scopri il tuo livello attuale con un test gratuito e ricevi consigli personalizzati.

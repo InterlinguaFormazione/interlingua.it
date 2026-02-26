@@ -5,6 +5,10 @@ import {
   type InsertContact,
   type NewsletterSubscription,
   type InsertNewsletter,
+  type CookieConsent,
+  type InsertCookieConsent,
+  type BlogPost,
+  type InsertBlogPost,
   type ScSubscriber,
   type InsertScSubscriber,
   type ScSession,
@@ -12,12 +16,16 @@ import {
   type ScBooking,
   type InsertScBooking,
   type ScEmailSettings,
+  users,
+  contactSubmissions,
+  newsletterSubscriptions,
+  cookieConsents,
+  blogPosts,
   scSubscribers,
   scSessions,
   scBookings,
   scEmailSettings,
 } from "@shared/schema";
-import { randomUUID } from "crypto";
 import { db } from "./db";
 import { eq, and, gte, desc } from "drizzle-orm";
 
@@ -32,6 +40,14 @@ export interface IStorage {
   createNewsletterSubscription(newsletter: InsertNewsletter): Promise<NewsletterSubscription>;
   getNewsletterSubscriptionByEmail(email: string): Promise<NewsletterSubscription | undefined>;
   getNewsletterSubscriptions(): Promise<NewsletterSubscription[]>;
+
+  createCookieConsent(consent: InsertCookieConsent): Promise<CookieConsent>;
+  getCookieConsents(): Promise<CookieConsent[]>;
+
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  getBlogPosts(): Promise<BlogPost[]>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  getLatestBlogPost(): Promise<BlogPost | undefined>;
 
   createScSubscriber(subscriber: InsertScSubscriber): Promise<ScSubscriber>;
   getScSubscriberByEmail(email: string): Promise<ScSubscriber | undefined>;
@@ -56,80 +72,71 @@ export interface IStorage {
   updateScEmailSettings(suspended: boolean, reason?: string): Promise<ScEmailSettings>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-  private contactSubmissions: Map<string, ContactSubmission>;
-  private newsletterSubscriptions: Map<string, NewsletterSubscription>;
-
-  constructor() {
-    this.users = new Map();
-    this.contactSubmissions = new Map();
-    this.newsletterSubscriptions = new Map();
-  }
-
+export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async createContactSubmission(contact: InsertContact): Promise<ContactSubmission> {
-    const id = randomUUID();
-    const submission: ContactSubmission = {
-      ...contact,
-      id,
-      phone: contact.phone || null,
-      courseInterest: contact.courseInterest || null,
-      createdAt: new Date(),
-    };
-    this.contactSubmissions.set(id, submission);
+    const [submission] = await db.insert(contactSubmissions).values(contact).returning();
     return submission;
   }
 
   async getContactSubmissions(): Promise<ContactSubmission[]> {
-    return Array.from(this.contactSubmissions.values()).sort(
-      (a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)
-    );
+    return db.select().from(contactSubmissions).orderBy(desc(contactSubmissions.createdAt));
   }
 
   async createNewsletterSubscription(newsletter: InsertNewsletter): Promise<NewsletterSubscription> {
-    const existing = await this.getNewsletterSubscriptionByEmail(newsletter.email);
-    if (existing) {
-      return existing;
-    }
-    
-    const id = randomUUID();
-    const subscription: NewsletterSubscription = {
-      ...newsletter,
-      id,
-      subscribed: true,
-      createdAt: new Date(),
-    };
-    this.newsletterSubscriptions.set(id, subscription);
+    const [subscription] = await db.insert(newsletterSubscriptions).values(newsletter).returning();
     return subscription;
   }
 
   async getNewsletterSubscriptionByEmail(email: string): Promise<NewsletterSubscription | undefined> {
-    return Array.from(this.newsletterSubscriptions.values()).find(
-      (sub) => sub.email === email
-    );
+    const [subscription] = await db.select().from(newsletterSubscriptions).where(eq(newsletterSubscriptions.email, email));
+    return subscription;
   }
 
   async getNewsletterSubscriptions(): Promise<NewsletterSubscription[]> {
-    return Array.from(this.newsletterSubscriptions.values()).sort(
-      (a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0)
-    );
+    return db.select().from(newsletterSubscriptions).orderBy(desc(newsletterSubscriptions.createdAt));
+  }
+
+  async createCookieConsent(consent: InsertCookieConsent): Promise<CookieConsent> {
+    const [record] = await db.insert(cookieConsents).values(consent).returning();
+    return record;
+  }
+
+  async getCookieConsents(): Promise<CookieConsent[]> {
+    return db.select().from(cookieConsents).orderBy(desc(cookieConsents.createdAt));
+  }
+
+  async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+    const [blogPost] = await db.insert(blogPosts).values(post).returning();
+    return blogPost;
+  }
+
+  async getBlogPosts(): Promise<BlogPost[]> {
+    return db.select().from(blogPosts).where(eq(blogPosts.published, true)).orderBy(desc(blogPosts.createdAt));
+  }
+
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug));
+    return post;
+  }
+
+  async getLatestBlogPost(): Promise<BlogPost | undefined> {
+    const [post] = await db.select().from(blogPosts).orderBy(desc(blogPosts.createdAt)).limit(1);
+    return post;
   }
 
   async createScSubscriber(subscriber: InsertScSubscriber): Promise<ScSubscriber> {
@@ -245,4 +252,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

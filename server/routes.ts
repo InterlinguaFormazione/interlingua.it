@@ -1,9 +1,52 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactSchema, insertNewsletterSchema } from "@shared/schema";
+import { insertContactSchema, insertNewsletterSchema, insertCookieConsentSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation } from "./email";
+import { forwardToCRM } from "./crm";
+import { generateBlogPost } from "./blog-generator";
+import { chatWithAI } from "./ai-chat";
+import cron from "node-cron";
+
+const MIN_SUBMIT_TIME_MS = 3000;
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+const MAX_SUBMISSIONS_PER_WINDOW = 5;
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function getClientIp(req: Request): string {
+  return (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown";
+}
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  entry.count++;
+  return entry.count > MAX_SUBMISSIONS_PER_WINDOW;
+}
+
+function checkBotProtection(body: any): { blocked: boolean; reason?: string } {
+  if (body._hp && body._hp.length > 0) {
+    return { blocked: true, reason: "honeypot" };
+  }
+  if (body._ts) {
+    const elapsed = Date.now() - Number(body._ts);
+    if (elapsed < MIN_SUBMIT_TIME_MS) {
+      return { blocked: true, reason: "too_fast" };
+    }
+  }
+  return { blocked: false };
+}
+
+function stripBotFields(body: any) {
+  const { _hp, _ts, ...clean } = body;
+  return clean;
+}
 
 const GOOGLE_PLACE_ID = "ChIJDWsIWn0xf0cR9w29gPorTls";
 let reviewsCache: { data: any; timestamp: number } | null = null;
@@ -16,8 +59,58 @@ export async function registerRoutes(
   
   app.post("/api/contact", async (req, res) => {
     try {
-      const validatedData = insertContactSchema.parse(req.body);
+      const botCheck = checkBotProtection(req.body);
+      if (botCheck.blocked) {
+        console.log(`Bot blocked on /api/contact: ${botCheck.reason} from ${getClientIp(req)}`);
+        res.status(200).json({ success: true, message: "Contact submission received", id: "ok" });
+        return;
+      }
+
+      const clientIp = getClientIp(req);
+      if (isRateLimited(clientIp)) {
+        console.log(`Rate limited on /api/contact: ${clientIp}`);
+        res.status(429).json({ success: false, message: "Troppe richieste. Riprova tra qualche minuto." });
+        return;
+      }
+
+      const cleanBody = stripBotFields(req.body);
+      const validatedData = insertContactSchema.parse(cleanBody);
       const submission = await storage.createContactSubmission(validatedData);
+      
+      try {
+        await sendContactNotification({
+          name: validatedData.name,
+          email: validatedData.email,
+          phone: validatedData.phone,
+          courseInterest: validatedData.courseInterest,
+          message: validatedData.message,
+        });
+      } catch (emailError) {
+        console.error("Failed to send contact notification email:", emailError);
+      }
+
+      try {
+        await sendContactConfirmation({
+          name: validatedData.name,
+          email: validatedData.email,
+          courseInterest: validatedData.courseInterest,
+        });
+      } catch (emailError) {
+        console.error("Failed to send contact confirmation email:", emailError);
+      }
+
+      try {
+        await forwardToCRM({
+          name: validatedData.name,
+          email: validatedData.email,
+          phone: validatedData.phone,
+          courseInterest: validatedData.courseInterest,
+          message: validatedData.message,
+        });
+      } catch (crmError) {
+        console.error("Failed to forward to CRM:", crmError);
+      }
+
       res.status(201).json({ 
         success: true, 
         message: "Contact submission received",
@@ -55,7 +148,22 @@ export async function registerRoutes(
 
   app.post("/api/newsletter", async (req, res) => {
     try {
-      const validatedData = insertNewsletterSchema.parse(req.body);
+      const botCheck = checkBotProtection(req.body);
+      if (botCheck.blocked) {
+        console.log(`Bot blocked on /api/newsletter: ${botCheck.reason} from ${getClientIp(req)}`);
+        res.status(200).json({ success: true, message: "Successfully subscribed to newsletter", id: "ok" });
+        return;
+      }
+
+      const clientIp = getClientIp(req);
+      if (isRateLimited(clientIp)) {
+        console.log(`Rate limited on /api/newsletter: ${clientIp}`);
+        res.status(429).json({ success: false, message: "Troppe richieste. Riprova tra qualche minuto." });
+        return;
+      }
+
+      const cleanBody = stripBotFields(req.body);
+      const validatedData = insertNewsletterSchema.parse(cleanBody);
       
       const existing = await storage.getNewsletterSubscriptionByEmail(validatedData.email);
       if (existing) {
@@ -67,7 +175,28 @@ export async function registerRoutes(
         return;
       }
       
-      const subscription = await storage.createNewsletterSubscription(validatedData);
+      let subscription;
+      try {
+        subscription = await storage.createNewsletterSubscription(validatedData);
+      } catch (dbError: any) {
+        if (dbError?.code === "23505") {
+          const existingAgain = await storage.getNewsletterSubscriptionByEmail(validatedData.email);
+          res.status(200).json({ 
+            success: true, 
+            message: "Already subscribed",
+            id: existingAgain?.id 
+          });
+          return;
+        }
+        throw dbError;
+      }
+      
+      try {
+        await sendNewsletterConfirmation(validatedData.email);
+      } catch (emailError) {
+        console.error("Failed to send newsletter confirmation email:", emailError);
+      }
+
       res.status(201).json({ 
         success: true, 
         message: "Successfully subscribed to newsletter",
@@ -154,6 +283,124 @@ export async function registerRoutes(
         success: false, 
         message: "Internal server error" 
       });
+    }
+  });
+
+  app.post("/api/cookie-consent", async (req, res) => {
+    try {
+      const consentData = {
+        ...req.body,
+        ipAddress: req.ip || req.headers["x-forwarded-for"] || "unknown",
+        userAgent: req.headers["user-agent"] || "unknown",
+      };
+      const validatedData = insertCookieConsentSchema.parse(consentData);
+      const record = await storage.createCookieConsent(validatedData);
+      res.status(201).json({ 
+        success: true, 
+        message: "Cookie consent recorded",
+        id: record.id 
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ 
+          success: false, 
+          message: "Invalid consent data", 
+          errors: error.errors 
+        });
+      } else {
+        console.error("Cookie consent error:", error);
+        res.status(500).json({ 
+          success: false, 
+          message: "Internal server error" 
+        });
+      }
+    }
+  });
+
+  app.get("/api/cookie-consent", async (_req, res) => {
+    try {
+      const consents = await storage.getCookieConsents();
+      res.json(consents);
+    } catch (error) {
+      console.error("Error fetching cookie consents:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Internal server error" 
+      });
+    }
+  });
+
+  app.get("/api/blog", async (_req, res) => {
+    try {
+      const posts = await storage.getBlogPosts();
+      res.json(posts);
+    } catch (error) {
+      console.error("Error fetching blog posts:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/blog/:slug", async (req, res) => {
+    try {
+      const post = await storage.getBlogPostBySlug(req.params.slug);
+      if (!post) {
+        return res.status(404).json({ success: false, message: "Post not found" });
+      }
+      res.json(post);
+    } catch (error) {
+      console.error("Error fetching blog post:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/blog/generate", async (_req, res) => {
+    try {
+      await generateBlogPost();
+      res.json({ success: true, message: "Blog post generation triggered" });
+    } catch (error) {
+      console.error("Blog generation error:", error);
+      res.status(500).json({ success: false, message: "Generation failed" });
+    }
+  });
+
+  cron.schedule("0 7 * * *", async () => {
+    console.log("Running daily blog generation...");
+    await generateBlogPost();
+  });
+
+  const chatRateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+  app.post("/api/chat", async (req, res) => {
+    try {
+      const clientIp = getClientIp(req);
+      const now = Date.now();
+      const chatEntry = chatRateLimitMap.get(clientIp);
+      if (chatEntry && now < chatEntry.resetAt && chatEntry.count > 20) {
+        res.status(429).json({ success: false, message: "Troppe richieste. Riprova tra qualche minuto." });
+        return;
+      }
+      if (!chatEntry || now > chatEntry.resetAt) {
+        chatRateLimitMap.set(clientIp, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+      } else {
+        chatEntry.count++;
+      }
+
+      const { messages } = req.body;
+      if (!Array.isArray(messages) || messages.length === 0) {
+        res.status(400).json({ success: false, message: "Messages array required" });
+        return;
+      }
+
+      const sanitizedMessages = messages.slice(-10).map((m: any) => ({
+        role: m.role === "assistant" ? "assistant" as const : "user" as const,
+        content: String(m.content).slice(0, 1000),
+      }));
+
+      const reply = await chatWithAI(sanitizedMessages);
+      res.json({ success: true, reply });
+    } catch (error) {
+      console.error("Chat error:", error);
+      res.status(500).json({ success: false, message: "Errore nel servizio di chat" });
     }
   });
 

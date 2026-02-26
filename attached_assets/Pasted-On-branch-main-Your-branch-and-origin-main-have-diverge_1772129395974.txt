@@ -1,0 +1,103 @@
+On branch main
+Your branch and 'origin/main' have diverged,
+and have 4 and 85 different commits each, respectively.
+  (use "git pull" if you want to integrate the remote branch with yours)
+
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+  (use "git merge --abort" to abort the merge)
+
+Changes to be committed:
+    new file:   .github/workflows/deploy.yml
+    new file:   DEPLOY-VPS.md
+    new file:   attached_assets/INTEGRAZIONE-SITO-WEB_1771613919176.md
+    new file:   attached_assets/Interlingua-skillcraft-favicon_1771281404748.png
+    new file:   attached_assets/Pasted--root-pm2-logs-skillcraft-interlingua-error-log-last-30_1771618827477.txt
+    new file:   attached_assets/Pasted--var-log-skillcraft-out-log-last-50-lines-44-skillcr-20_1772054298276.txt
+    new file:   attached_assets/Pasted-root-srv1133915-var-www-SkillCraft-Interlingua-cd-var-w_1771618898950.txt
+    new file:   attached_assets/competenze-trasversali_1771623339669.webp
+    new file:   attached_assets/intelligenza-artificiale_1771623256532.webp
+    new file:   attached_assets/internazionalizzazione-business-development_1771623434911.webp
+    new file:   attached_assets/lingue-straniere_1771623311454.webp
+    new file:   attached_assets/management-leadership_1771623365629.webp
+    new file:   attached_assets/marketing-vendite-clienti_1771623200419.webp
+    new file:   attached_assets/rollup2025_63_1771269113424.pdf
+    modified:   client/index.html
+    modified:   client/public/favicon.png
+    new file:   client/public/images/team/elena-thiene.webp
+    new file:   client/public/images/team/giulia-corporate.webp
+    new file:   client/public/images/team/giulia-vicenza.webp
+    new file:   client/public/images/team/michela-corporate.webp
+    new file:   client/src/assets/images/category-business.jpg
+    new file:   client/src/assets/images/category-digital-skills.jpg
+    new file:   client/src/assets/images/category-experiential.jpg
+    new file:   client/src/assets/images/category-languages.jpg
+    new file:   client/src/assets/images/category-management.jpg
+    new file:   client/src/assets/images/category-personal.jpg
+    new file:   client/src/assets/images/category-soft-skills.jpg
+    modified:   client/src/components/about-section.tsx
+    new file:   client/src/components/ai-chat-widget.tsx
+    new file:   client/src/components/comparison-section.tsx
+    modified:   client/src/components/contact-section.tsx
+    new file:   client/src/components/cookie-banner.tsx
+    modified:   client/src/components/courses-section.tsx
+    new file:   client/src/components/faq-section.tsx
+    modified:   client/src/components/features-section.tsx
+    modified:   client/src/components/footer.tsx
+    modified:   client/src/components/hero-section.tsx
+    new file:   client/src/components/mobile-cta.tsx
+    modified:   client/src/components/navigation.tsx
+    modified:   client/src/components/newsletter-section.tsx
+    new file:   client/src/components/stats-section.tsx
+    modified:   client/src/components/testimonials-section.tsx
+    deleted:    client/src/components/ui/alert-dialog.tsx
+    deleted:    client/src/components/ui/aspect-ratio.tsx
+    deleted:    client/src/components/ui/breadcrumb.tsx
+    deleted:    client/src/components/ui/calendar.tsx
+    deleted:    client/src/components/ui/carousel.tsx
+    deleted:    client/src/components/ui/chart.tsx
+    deleted:    client/src/components/ui/checkbox.tsx
+    deleted:    client/src/components/ui/collapsible.tsx
+    deleted:    client/src/components/ui/command.tsx
+    deleted:    client/src/components/ui/context-menu.tsx
+    deleted:    client/src/components/ui/drawer.tsx
+    deleted:    client/src/components/ui/hover-card.tsx
+    deleted:    client/src/components/ui/input-otp.tsx
+    deleted:    client/src/components/ui/menubar.tsx
+    deleted:    client/src/components/ui/navigation-menu.tsx
+    deleted:    client/src/components/ui/pagination.tsx
+    deleted:    client/src/components/ui/progress.tsx
+    deleted:    client/src/components/ui/radio-group.tsx
+    deleted:    client/src/components/ui/resizable.tsx
+    deleted:    client/src/components/ui/scroll-area.tsx
+    deleted:    client/src/components/ui/sidebar.tsx
+    deleted:    client/src/components/ui/slider.tsx
+    deleted:    client/src/components/ui/table.tsx
+    deleted:    client/src/components/ui/tabs.tsx
+    deleted:    client/src/components/ui/toggle-group.tsx
+    new file:   client/src/components/whatsapp-button.tsx
+    modified:   client/src/index.css
+    new file:   client/src/pages/blog-post.tsx
+    new file:   client/src/pages/blog.tsx
+    modified:   client/src/pages/chi-siamo.tsx
+    new file:   client/src/pages/cookie-policy.tsx
+    modified:   client/src/pages/course-detail.tsx
+    modified:   client/src/pages/courses.tsx
+    modified:   client/src/pages/home.tsx
+    new file:   client/src/pages/privacy-policy.tsx
+    new file:   server/ai-chat.ts
+    new file:   server/blog-generator.ts
+    new file:   server/crm.ts
+    new file:   server/email.ts
+    modified:   server/index.ts
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+    both modified:   client/src/App.tsx
+    both modified:   package-lock.json
+    both modified:   package.json
+    both modified:   replit.md
+    both added:      server/db.ts
+    both modified:   server/routes.ts
+    both modified:   server/storage.ts
+    both modified:   shared/schema.ts

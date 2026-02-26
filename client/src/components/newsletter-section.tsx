@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Mail, Loader2, CheckCircle2, ArrowRight } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -19,6 +19,8 @@ type NewsletterFormData = InsertNewsletter;
 
 export function NewsletterSection() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
+  const formLoadTime = useRef(Date.now());
   const { toast } = useToast();
 
   const form = useForm<NewsletterFormData>({
@@ -30,7 +32,11 @@ export function NewsletterSection() {
 
   const mutation = useMutation({
     mutationFn: async (data: NewsletterFormData) => {
-      const response = await apiRequest("POST", "/api/newsletter", data);
+      const response = await apiRequest("POST", "/api/newsletter", {
+        ...data,
+        _hp: honeypot,
+        _ts: formLoadTime.current,
+      });
       return response.json();
     },
     onSuccess: () => {
@@ -55,9 +61,10 @@ export function NewsletterSection() {
   };
 
   return (
-    <section className="py-12 relative overflow-hidden">
+    <section className="py-16 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary to-accent opacity-90" />
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIxIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
+      <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 animate-[shimmer_3s_ease-in-out_infinite]" style={{ backgroundSize: "200% 100%" }} />
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
@@ -88,48 +95,62 @@ export function NewsletterSection() {
               <span className="text-white font-medium">Grazie per l'iscrizione!</span>
             </motion.div>
           ) : (
-            <Form {...form}>
-              <form 
-                onSubmit={form.handleSubmit(onSubmit)} 
-                className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
-              >
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="La tua email"
-                          className="h-12 bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:bg-white/20"
-                          {...field}
-                          data-testid="input-newsletter-email"
-                        />
-                      </FormControl>
-                      <FormMessage className="text-white/80" />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  size="lg"
-                  variant="secondary"
-                  className="h-12 bg-primary-foreground text-primary"
-                  disabled={mutation.isPending}
-                  data-testid="button-newsletter-submit"
+            <>
+              <Form {...form}>
+                <form 
+                  onSubmit={form.handleSubmit(onSubmit)} 
+                  className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto"
                 >
-                  {mutation.isPending ? (
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                  ) : (
-                    <>
-                      Iscriviti
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </>
-                  )}
-                </Button>
-              </form>
-            </Form>
+                  <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true" tabIndex={-1}>
+                    <label htmlFor="company_name">Company</label>
+                    <input
+                      type="text"
+                      id="company_name"
+                      name="company_name"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                      autoComplete="off"
+                    />
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="La tua email"
+                            className="h-14 text-base rounded-xl bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:bg-white/20"
+                            {...field}
+                            data-testid="input-newsletter-email"
+                          />
+                        </FormControl>
+                        <FormMessage className="text-white/80" />
+                      </FormItem>
+                    )}
+                  />
+                  <Button
+                    type="submit"
+                    size="lg"
+                    variant="secondary"
+                    className="h-14 text-base rounded-xl bg-primary-foreground text-primary"
+                    disabled={mutation.isPending}
+                    data-testid="button-newsletter-submit"
+                  >
+                    {mutation.isPending ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <>
+                        Iscriviti
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </Form>
+              <p className="mt-4 text-sm text-white/60">Nessuno spam, solo contenuti utili</p>
+            </>
           )}
         </motion.div>
       </div>
