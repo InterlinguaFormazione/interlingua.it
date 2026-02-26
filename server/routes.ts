@@ -8,6 +8,7 @@ import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirm
 import { forwardToCRM } from "./crm";
 import { generateBlogPost } from "./blog-generator";
 import { chatWithAI } from "./ai-chat";
+import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalOrder } from "./paypal";
 import cron from "node-cron";
 import crypto from "crypto";
 
@@ -982,6 +983,85 @@ export async function registerRoutes(
       res.json({ success: true, created: created.length, sessions: created });
     } catch (error) {
       console.error("Error generating SC sessions:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.get("/paypal/setup", async (req, res) => {
+    await loadPaypalDefault(req, res);
+  });
+
+  app.post("/paypal/order", async (req, res) => {
+    await createPaypalOrder(req, res);
+  });
+
+  app.post("/paypal/order/:orderID/capture", async (req, res) => {
+    await capturePaypalOrder(req, res);
+  });
+
+  app.post("/api/speakers-corner/purchase", async (req, res) => {
+    try {
+      const { paypalOrderId, name, email, password } = req.body;
+      if (!paypalOrderId || !name || !email || !password) {
+        return res.status(400).json({ success: false, message: "Dati mancanti" });
+      }
+
+      const existing = await storage.getScSubscriberByEmail(email);
+      if (existing) {
+        return res.status(400).json({ success: false, message: "Esiste già un account con questa email. Accedi dalla pagina Speaker's Corner." });
+      }
+
+      const existingPayment = await storage.getScPaymentByOrderId(paypalOrderId);
+      if (existingPayment) {
+        return res.status(400).json({ success: false, message: "Questo pagamento è già stato elaborato." });
+      }
+
+      const verification = await verifyPaypalOrder(paypalOrderId);
+      if (!verification.verified) {
+        console.error("PayPal order verification failed:", verification);
+        return res.status(400).json({ 
+          success: false, 
+          message: "Pagamento non verificato. Contatta l'assistenza se il problema persiste." 
+        });
+      }
+
+      const today = new Date();
+      const endDate = new Date(today);
+      endDate.setFullYear(endDate.getFullYear() + 1);
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const subscriber = await storage.createScSubscriber({
+        name,
+        email,
+        password: hashedPassword,
+        subscriptionStart: today.toISOString().split('T')[0],
+        subscriptionEnd: endDate.toISOString().split('T')[0],
+        active: true,
+      });
+
+      await storage.createScPayment({
+        subscriberId: subscriber.id,
+        paypalOrderId,
+        amount: verification.amount || "200.00",
+        currency: verification.currency || "EUR",
+        status: "completed",
+        payerEmail: verification.payerEmail || email,
+      });
+
+      const { password: _, ...safeSubscriber } = subscriber;
+      res.json({ success: true, subscriber: safeSubscriber });
+    } catch (error) {
+      console.error("Error processing SC purchase:", error);
+      res.status(500).json({ success: false, message: "Errore durante l'elaborazione dell'acquisto" });
+    }
+  });
+
+  app.get("/api/admin/speakers-corner/payments", requireAuth, async (req, res) => {
+    try {
+      const payments = await storage.getScPayments();
+      res.json(payments);
+    } catch (error) {
+      console.error("Error fetching SC payments:", error);
       res.status(500).json({ success: false, message: "Errore del server" });
     }
   });

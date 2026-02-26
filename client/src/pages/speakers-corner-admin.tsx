@@ -26,6 +26,7 @@ import {
   Play,
   RefreshCw,
   Pencil,
+  CreditCard,
 } from "lucide-react";
 
 interface AdminSubscriber {
@@ -53,6 +54,17 @@ interface EmailSettings {
   emailsSuspended: boolean;
   suspensionReason: string | null;
   updatedAt: string;
+}
+
+interface AdminPayment {
+  id: string;
+  subscriberId: string;
+  paypalOrderId: string;
+  amount: string;
+  currency: string;
+  status: string;
+  payerEmail: string | null;
+  createdAt: string;
 }
 
 export default function SpeakersCornerAdmin() {
@@ -87,6 +99,10 @@ export default function SpeakersCornerAdmin() {
 
   const { data: emailSettings } = useQuery<EmailSettings>({
     queryKey: ["/api/admin/speakers-corner/email-settings"],
+  });
+
+  const { data: payments = [], isLoading: paymentsLoading } = useQuery<AdminPayment[]>({
+    queryKey: ["/api/admin/speakers-corner/payments"],
   });
 
   const createSubscriberMutation = useMutation({
@@ -284,7 +300,7 @@ export default function SpeakersCornerAdmin() {
           </div>
 
           <Tabs defaultValue="subscribers" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="subscribers" data-testid="tab-subscribers">
                 <Users className="w-4 h-4 mr-2" />
                 Iscritti
@@ -296,6 +312,10 @@ export default function SpeakersCornerAdmin() {
               <TabsTrigger value="email" data-testid="tab-email">
                 <Mail className="w-4 h-4 mr-2" />
                 Email
+              </TabsTrigger>
+              <TabsTrigger value="payments" data-testid="tab-payments">
+                <CreditCard className="w-4 h-4 mr-2" />
+                Pagamenti
               </TabsTrigger>
             </TabsList>
 
@@ -809,6 +829,67 @@ export default function SpeakersCornerAdmin() {
                       </ul>
                     </CardContent>
                   </Card>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="payments">
+              <Card>
+                <CardHeader>
+                  <div>
+                    <CardTitle>Storico Pagamenti</CardTitle>
+                    <CardDescription>Pagamenti ricevuti tramite PayPal per gli abbonamenti Speaker's Corner</CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {paymentsLoading ? (
+                    <div className="space-y-3">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="h-16 bg-muted rounded animate-pulse" />
+                      ))}
+                    </div>
+                  ) : payments.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <CreditCard className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>Nessun pagamento registrato</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {payments.map((payment) => (
+                        <div
+                          key={payment.id}
+                          className="flex items-center justify-between p-4 rounded-lg border bg-card"
+                          data-testid={`row-payment-${payment.id}`}
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                              <CreditCard className="w-5 h-5 text-green-600" />
+                            </div>
+                            <div>
+                              <p className="font-medium text-foreground">{payment.payerEmail || "N/A"}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Ordine: {payment.paypalOrderId}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="text-right">
+                              <p className="font-semibold text-foreground">€{payment.amount}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {new Date(payment.createdAt).toLocaleDateString("it-IT")}
+                              </p>
+                            </div>
+                            <Badge
+                              variant={payment.status === "completed" ? "secondary" : "destructive"}
+                              className={payment.status === "completed" ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : ""}
+                            >
+                              {payment.status === "completed" ? "Completato" : payment.status}
+                            </Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>

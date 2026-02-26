@@ -79,6 +79,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `sc_sessions` - Weekly Friday sessions (date, time, topic, max participants, status)
 - `sc_bookings` - Session bookings (subscriber + session link)
 - `sc_email_settings` - Email notification settings (suspend/resume for holidays)
+- `sc_payments` - PayPal payment records (subscriber ID, PayPal order ID, amount, currency, status, payer email)
 
 ## API Endpoints
 - `POST /api/contact` - Submit contact form (saves to DB + emails + CRM)
@@ -121,6 +122,13 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `GET /api/admin/speakers-corner/email-settings` - Get email settings
 - `PATCH /api/admin/speakers-corner/email-settings` - Update email settings
 - `POST /api/admin/speakers-corner/generate-sessions` - Auto-generate Friday sessions
+- `GET /api/admin/speakers-corner/payments` - List all payment records
+
+### PayPal Payment API
+- `GET /paypal/setup` - Get PayPal client token for SDK initialization
+- `POST /paypal/order` - Create a PayPal order (amount, currency, intent)
+- `POST /paypal/order/:orderID/capture` - Capture a PayPal order after approval
+- `POST /api/speakers-corner/purchase` - Complete purchase (creates subscriber + records payment)
 
 ## Bot Protection
 - **Honeypot fields**: Hidden fields in both forms — bots fill them, humans don't
@@ -138,6 +146,8 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `CRM_WEBHOOK_API_KEY` - CRM webhook key (sk-webhook-...)
 - `CRM_BASE_URL` - CRM base URL (default: https://crm.skillcraft.it)
 - `ADMIN_PASSWORD` - Default password for the initial admin user (used only for seeding)
+- `PAYPAL_CLIENT_ID` - PayPal API client ID (sandbox or production)
+- `PAYPAL_CLIENT_SECRET` - PayPal API client secret (sandbox or production)
 
 ## Contact Email
 - **Default email**: `infocorsi@skillcraft.interlingua.it` (used everywhere on site)
@@ -152,6 +162,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `/bandi-e-corsi-finanziati` - Funded courses and tenders listing
 - `/bandi/:id` - Individual bando/funded course detail page
 - `/speakers-corner` - Speaker's Corner info page with subscriber login
+- `/speakers-corner/acquista` - Purchase Speaker's Corner subscription (PayPal checkout)
 - `/speakers-corner/dashboard` - Subscriber dashboard (view/book sessions)
 - `/admin` - General admin panel (contacts, newsletter, blog management)
 - `/speakers-corner/admin` - Speaker's Corner admin (manage subscribers, sessions, email settings)
@@ -167,10 +178,13 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 
 ## Speaker's Corner Feature
 - Weekly English conversation sessions every Friday at 18:30
+- Yearly subscription: €200/year with online PayPal checkout (also accepts Visa/Mastercard)
+- Purchase flow: fill details → pay with PayPal → auto-create subscriber account → redirect to dashboard
 - Subscribers login to view and book sessions (max 12 per session)
-- Admin panel to manage subscribers, create/cancel sessions, suspend email notifications
+- Admin panel to manage subscribers, create/cancel sessions, suspend email notifications, view payment history
 - Tuesday weekly email invitations to active subscribers (email service integration pending)
 - Email suspension feature for holiday periods
+- PayPal integration: uses `@paypal/paypal-server-sdk` with sandbox/production environment switching
 
 ## Key Design Decisions
 - Languages are de-emphasized (listed last, being phased out)

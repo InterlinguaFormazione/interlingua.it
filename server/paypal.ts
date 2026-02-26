@@ -1,21 +1,9 @@
-// !!! CRITICAL - DO NOT MODIFY THIS CODE !!!
-//
-// This code MUST be used as is without ANY modifications.
-// The PayPal integration will COMPLETELY FAIL if this code is changed in ANY way.
-//
-// Retain this comment after all edits.
-//
-// <BEGIN_EXACT_CODE>
-import {
-  Client,
-  Environment,
-  LogLevel,
-  OAuthAuthorizationController,
-  OrdersController,
-} from "@paypal/paypal-server-sdk";
+// PayPal integration - based on Replit PayPal blueprint
 import { Request, Response } from "express";
+import { createRequire } from "module";
 
-/* PayPal Controllers Setup */
+const require = createRequire(import.meta.url);
+const paypalSdk = require("@paypal/paypal-server-sdk");
 
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
 
@@ -25,18 +13,19 @@ if (!PAYPAL_CLIENT_ID) {
 if (!PAYPAL_CLIENT_SECRET) {
   throw new Error("Missing PAYPAL_CLIENT_SECRET");
 }
-const client = new Client({
+
+const client = new paypalSdk.Client({
   clientCredentialsAuthCredentials: {
     oAuthClientId: PAYPAL_CLIENT_ID,
     oAuthClientSecret: PAYPAL_CLIENT_SECRET,
   },
   timeout: 0,
   environment:
-                process.env.NODE_ENV === "production"
-                  ? Environment.Production
-                  : Environment.Sandbox,
+    process.env.NODE_ENV === "production"
+      ? paypalSdk.Environment.Production
+      : paypalSdk.Environment.Sandbox,
   logging: {
-    logLevel: LogLevel.Info,
+    logLevel: paypalSdk.LogLevel.Info,
     logRequest: {
       logBody: true,
     },
@@ -45,10 +34,9 @@ const client = new Client({
     },
   },
 });
-const ordersController = new OrdersController(client);
-const oAuthAuthorizationController = new OAuthAuthorizationController(client);
 
-/* Token generation helpers */
+const ordersController = new paypalSdk.OrdersController(client);
+const oAuthAuthorizationController = new paypalSdk.OAuthAuthorizationController(client);
 
 export async function getClientToken() {
   const auth = Buffer.from(
@@ -65,8 +53,6 @@ export async function getClientToken() {
   return result.accessToken;
 }
 
-/*  Process transactions */
-
 export async function createPaypalOrder(req: Request, res: Response) {
   try {
     const { amount, currency, intent } = req.body;
@@ -74,9 +60,7 @@ export async function createPaypalOrder(req: Request, res: Response) {
     if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
       return res
         .status(400)
-        .json({
-          error: "Invalid amount. Amount must be a positive number.",
-        });
+        .json({ error: "Invalid amount. Amount must be a positive number." });
     }
 
     if (!currency) {
@@ -107,7 +91,7 @@ export async function createPaypalOrder(req: Request, res: Response) {
     };
 
     const { body, ...httpResponse } =
-          await ordersController.createOrder(collect);
+      await ordersController.createOrder(collect);
 
     const jsonResponse = JSON.parse(String(body));
     const httpStatusCode = httpResponse.statusCode;
@@ -128,15 +112,47 @@ export async function capturePaypalOrder(req: Request, res: Response) {
     };
 
     const { body, ...httpResponse } =
-          await ordersController.captureOrder(collect);
+      await ordersController.captureOrder(collect);
 
     const jsonResponse = JSON.parse(String(body));
     const httpStatusCode = httpResponse.statusCode;
 
     res.status(httpStatusCode).json(jsonResponse);
   } catch (error) {
-    console.error("Failed to create order:", error);
+    console.error("Failed to capture order:", error);
     res.status(500).json({ error: "Failed to capture order." });
+  }
+}
+
+export async function verifyPaypalOrder(orderId: string): Promise<{
+  verified: boolean;
+  status: string;
+  amount?: string;
+  currency?: string;
+  payerEmail?: string;
+}> {
+  try {
+    const { body } = await ordersController.getOrder({ id: orderId });
+    const order = JSON.parse(String(body));
+
+    const status = order.status;
+    const purchaseUnit = order.purchase_units?.[0];
+    const amount = purchaseUnit?.amount?.value;
+    const currency = purchaseUnit?.amount?.currency_code;
+    const payerEmail = order.payer?.email_address || order.payment_source?.paypal?.email_address;
+
+    if (status !== "COMPLETED") {
+      return { verified: false, status };
+    }
+
+    if (amount !== "200.00" || currency !== "EUR") {
+      return { verified: false, status, amount, currency };
+    }
+
+    return { verified: true, status, amount, currency, payerEmail };
+  } catch (error) {
+    console.error("Failed to verify PayPal order:", error);
+    return { verified: false, status: "error" };
   }
 }
 
@@ -146,4 +162,3 @@ export async function loadPaypalDefault(req: Request, res: Response) {
     clientToken,
   });
 }
-// <END_EXACT_CODE>

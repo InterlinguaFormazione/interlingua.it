@@ -16,6 +16,8 @@ import {
   type ScBooking,
   type InsertScBooking,
   type ScEmailSettings,
+  type ScPayment,
+  type InsertScPayment,
   users,
   contactSubmissions,
   newsletterSubscriptions,
@@ -25,6 +27,7 @@ import {
   scSessions,
   scBookings,
   scEmailSettings,
+  scPayments,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, desc } from "drizzle-orm";
@@ -74,6 +77,11 @@ export interface IStorage {
 
   getScEmailSettings(): Promise<ScEmailSettings>;
   updateScEmailSettings(suspended: boolean, reason?: string): Promise<ScEmailSettings>;
+
+  createScPayment(payment: InsertScPayment): Promise<ScPayment>;
+  getScPayments(): Promise<ScPayment[]>;
+  getScPaymentByOrderId(paypalOrderId: string): Promise<ScPayment | undefined>;
+  updateScPaymentStatus(id: string, status: string): Promise<ScPayment | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -270,6 +278,25 @@ export class DatabaseStorage implements IStorage {
       suspensionReason: reason || null,
       updatedAt: new Date(),
     }).where(eq(scEmailSettings.id, settings.id)).returning();
+    return result;
+  }
+
+  async createScPayment(payment: InsertScPayment): Promise<ScPayment> {
+    const [result] = await db.insert(scPayments).values(payment).returning();
+    return result;
+  }
+
+  async getScPayments(): Promise<ScPayment[]> {
+    return db.select().from(scPayments).orderBy(desc(scPayments.createdAt));
+  }
+
+  async getScPaymentByOrderId(paypalOrderId: string): Promise<ScPayment | undefined> {
+    const [result] = await db.select().from(scPayments).where(eq(scPayments.paypalOrderId, paypalOrderId));
+    return result;
+  }
+
+  async updateScPaymentStatus(id: string, status: string): Promise<ScPayment | undefined> {
+    const [result] = await db.update(scPayments).set({ status }).where(eq(scPayments.id, id)).returning();
     return result;
   }
 }

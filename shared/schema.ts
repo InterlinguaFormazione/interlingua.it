@@ -162,6 +162,25 @@ export const scEmailSettings = pgTable("sc_email_settings", {
 
 export type ScEmailSettings = typeof scEmailSettings.$inferSelect;
 
+export const scPayments = pgTable("sc_payments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  subscriberId: varchar("subscriber_id").notNull(),
+  paypalOrderId: text("paypal_order_id").notNull(),
+  amount: text("amount").notNull(),
+  currency: text("currency").notNull().default("EUR"),
+  status: text("status").notNull().default("pending"),
+  payerEmail: text("payer_email"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertScPaymentSchema = createInsertSchema(scPayments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertScPayment = z.infer<typeof insertScPaymentSchema>;
+export type ScPayment = typeof scPayments.$inferSelect;
+
 export interface Course {
   id: string;
   title: string;

@@ -21,7 +21,8 @@ import {
   MessageCircle,
   Globe,
   Award,
-  ArrowRight
+  ArrowRight,
+  CreditCard,
 } from "lucide-react";
 const speakersCornerImage = "/images/speakers-corner.png";
 
@@ -126,12 +127,20 @@ export default function SpeakersCornerPage() {
                     <span>Max 12 persone</span>
                   </div>
                 </div>
+                <div className="mb-6">
+                  <span className="text-3xl font-bold text-foreground" data-testid="text-sc-price">€200</span>
+                  <span className="text-muted-foreground">/anno</span>
+                </div>
                 <div className="flex flex-wrap gap-3">
-                  <Button size="lg" onClick={() => document.getElementById('login-section')?.scrollIntoView({ behavior: 'smooth' })} data-testid="button-sc-login-scroll">
+                  <Button size="lg" onClick={() => setLocation("/speakers-corner/acquista")} data-testid="button-sc-purchase">
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Acquista Abbonamento
+                  </Button>
+                  <Button size="lg" variant="outline" onClick={() => document.getElementById('login-section')?.scrollIntoView({ behavior: 'smooth' })} data-testid="button-sc-login-scroll">
                     Accedi al tuo account
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
-                  <Button size="lg" variant="outline" onClick={() => document.getElementById('info-section')?.scrollIntoView({ behavior: 'smooth' })} data-testid="button-sc-info-scroll">
+                  <Button size="lg" variant="ghost" onClick={() => document.getElementById('info-section')?.scrollIntoView({ behavior: 'smooth' })} data-testid="button-sc-info-scroll">
                     Scopri di più
                   </Button>
                 </div>
