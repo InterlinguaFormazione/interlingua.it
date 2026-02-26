@@ -28,6 +28,7 @@ import {
   Users,
   UserPlus,
   Trash2,
+  Pencil,
 } from "lucide-react";
 
 interface AdminUser {
@@ -90,6 +91,9 @@ export default function AdminPage() {
 
   const [newUser, setNewUser] = useState({ username: "", password: "", name: "", email: "", role: "staff" });
   const [userDialogOpen, setUserDialogOpen] = useState(false);
+  const [editUser, setEditUser] = useState<AdminUser | null>(null);
+  const [editUserData, setEditUserData] = useState({ name: "", email: "", role: "", password: "" });
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const authenticated = !!token;
   const isAdmin = currentUser?.role === "admin";
@@ -199,6 +203,34 @@ export default function AdminPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       toast({ title: "Aggiornato", description: "Stato utente aggiornato." });
+    },
+  });
+
+  const updateUserMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Record<string, any> }) => {
+      const payload: Record<string, any> = {};
+      if (data.name) payload.name = data.name;
+      if (data.email !== undefined) payload.email = data.email;
+      if (data.role) payload.role = data.role;
+      if (data.password) payload.password = data.password;
+      const res = await adminFetch(`/api/admin/users/${id}`, token!, {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body.message || "Errore nell'aggiornamento");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: "Utente aggiornato", description: "Le modifiche sono state salvate." });
+      setEditDialogOpen(false);
+      setEditUser(null);
+    },
+    onError: (error: Error) => {
+      toast({ title: "Errore", description: error.message, variant: "destructive" });
     },
   });
 
@@ -752,6 +784,23 @@ export default function AdminPage() {
                                 disabled={user.id === currentUser?.id}
                                 data-testid={`switch-user-${user.id}`}
                               />
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setEditUser(user);
+                                  setEditUserData({
+                                    name: user.name,
+                                    email: user.email || "",
+                                    role: user.role,
+                                    password: "",
+                                  });
+                                  setEditDialogOpen(true);
+                                }}
+                                data-testid={`button-edit-user-${user.id}`}
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </Button>
                               {user.id !== currentUser?.id && (
                                 <Button
                                   variant="ghost"
@@ -773,6 +822,78 @@ export default function AdminPage() {
                     )}
                   </CardContent>
                 </Card>
+
+                <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Modifica Utente — @{editUser?.username}</DialogTitle>
+                    </DialogHeader>
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (editUser) {
+                          updateUserMutation.mutate({ id: editUser.id, data: editUserData });
+                        }
+                      }}
+                      className="space-y-4"
+                    >
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-user-name">Nome e Cognome</Label>
+                        <Input
+                          id="edit-user-name"
+                          value={editUserData.name}
+                          onChange={(e) => setEditUserData({ ...editUserData, name: e.target.value })}
+                          required
+                          data-testid="input-edit-user-name"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-user-email">Email</Label>
+                        <Input
+                          id="edit-user-email"
+                          type="email"
+                          value={editUserData.email}
+                          onChange={(e) => setEditUserData({ ...editUserData, email: e.target.value })}
+                          data-testid="input-edit-user-email"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-user-role">Ruolo</Label>
+                        <Select
+                          value={editUserData.role}
+                          onValueChange={(value) => setEditUserData({ ...editUserData, role: value })}
+                        >
+                          <SelectTrigger data-testid="select-edit-user-role">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="staff">Staff</SelectItem>
+                            <SelectItem value="admin">Amministratore</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-user-password">Nuova Password (lascia vuoto per non cambiarla)</Label>
+                        <Input
+                          id="edit-user-password"
+                          type="password"
+                          value={editUserData.password}
+                          onChange={(e) => setEditUserData({ ...editUserData, password: e.target.value })}
+                          placeholder="Lascia vuoto per non modificare"
+                          data-testid="input-edit-user-password"
+                        />
+                      </div>
+                      <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={updateUserMutation.isPending}
+                        data-testid="button-save-user"
+                      >
+                        {updateUserMutation.isPending ? "Salvataggio..." : "Salva Modifiche"}
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </TabsContent>
             )}
           </Tabs>
