@@ -205,7 +205,7 @@ export default function SpeakersCornerPage() {
                     className="relative rounded-3xl w-full max-w-lg mx-auto shadow-2xl shadow-primary/10 border border-white/20"
                     data-testid="img-sc-hero"
                   />
-                  <div className="absolute -bottom-6 -left-6 bg-card rounded-2xl shadow-xl border border-border/50 p-4 backdrop-blur-sm">
+                  <div className="absolute -bottom-12 -left-6 bg-card rounded-2xl shadow-xl border border-border/50 p-4 backdrop-blur-sm">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
                         <Mic className="w-6 h-6 text-green-500" />
