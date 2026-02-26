@@ -216,7 +216,7 @@ export default function SpeakersCornerPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="absolute -top-4 -right-4 bg-card rounded-2xl shadow-xl border border-border/50 p-4 backdrop-blur-sm">
+                  <div className="absolute -top-8 -right-4 bg-card rounded-2xl shadow-xl border border-border/50 p-4 backdrop-blur-sm">
                     <div className="flex items-center gap-2">
                       <div className="flex -space-x-2">
                         <div className="w-8 h-8 rounded-full bg-primary/20 border-2 border-card flex items-center justify-center text-xs font-bold text-primary">A</div>
