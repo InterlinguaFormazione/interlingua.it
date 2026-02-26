@@ -30,7 +30,7 @@ import {
   scPayments,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gte, desc } from "drizzle-orm";
+import { eq, and, gte, lte, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -214,10 +214,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUpcomingScSessions(): Promise<ScSession[]> {
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const toLocalDate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const today = toLocalDate(now);
+    const dayOfWeek = now.getDay();
+    const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+    const endOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilSunday);
+    const endOfWeekStr = toLocalDate(endOfWeek);
     return db.select().from(scSessions).where(
       and(
         gte(scSessions.sessionDate, today),
+        lte(scSessions.sessionDate, endOfWeekStr),
         eq(scSessions.status, "active")
       )
     ).orderBy(scSessions.sessionDate);

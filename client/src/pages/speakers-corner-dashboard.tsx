@@ -254,9 +254,10 @@ export default function SpeakersCornerDashboard() {
           </div>
 
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-foreground mb-6" data-testid="text-sessions-title">
-              Sessioni Disponibili
+            <h2 className="text-2xl font-bold text-foreground mb-2" data-testid="text-sessions-title">
+              Sessioni di Questa Settimana
             </h2>
+            <p className="text-sm text-muted-foreground mb-6">Puoi prenotare solo le sessioni della settimana corrente.</p>
             {sessionsLoading ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[1, 2, 3].map((i) => (
