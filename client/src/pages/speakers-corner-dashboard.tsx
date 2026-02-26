@@ -318,11 +318,17 @@ export default function SpeakersCornerDashboard() {
                           </p>
                         )}
 
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                          <Users className="w-4 h-4" />
-                          <span>
-                            {session.currentParticipants}/{session.maxParticipants || 12} posti occupati
-                          </span>
+                        <div className="flex items-center gap-2 text-sm mb-4">
+                          {booked ? (
+                            <Badge variant="default" className="bg-green-600">
+                              <CheckCircle className="w-3 h-3 mr-1" />
+                              Prenotato
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary">
+                              Non prenotato
+                            </Badge>
+                          )}
                         </div>
 
                         {booked ? (
