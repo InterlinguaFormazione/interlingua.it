@@ -134,7 +134,7 @@ export default function SpeakersCornerPage() {
     <div className="min-h-screen">
       <Navigation />
       <main>
-        <section className="relative pt-28 pb-24 overflow-hidden">
+        <section className="relative pt-36 pb-24 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-primary/3 to-transparent" />
           <div className="absolute top-20 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl -z-10" />
           <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-accent/5 rounded-full blur-3xl -z-10" />
