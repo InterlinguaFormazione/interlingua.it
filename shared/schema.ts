@@ -111,6 +111,7 @@ export const scSubscribers = pgTable("sc_subscribers", {
   cap: text("cap"),
   citta: text("citta"),
   provincia: text("provincia"),
+  paese: text("paese"),
   ragioneSociale: text("ragione_sociale"),
   partitaIva: text("partita_iva"),
   codiceSdi: text("codice_sdi"),

@@ -51,6 +51,7 @@ export default function SpeakersCornerPurchase() {
   const [cap, setCap] = useState("");
   const [citta, setCitta] = useState("");
   const [provincia, setProvincia] = useState("");
+  const [paese, setPaese] = useState("Italia");
   const [ragioneSociale, setRagioneSociale] = useState("");
   const [partitaIva, setPartitaIva] = useState("");
   const [codiceSdi, setCodiceSdi] = useState("");
@@ -109,7 +110,7 @@ export default function SpeakersCornerPurchase() {
 
   const handleBillingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!codiceFiscale || !indirizzo || !cap || !citta || !provincia) {
+    if (!codiceFiscale || !indirizzo || !cap || !citta || !provincia || !paese) {
       toast({ title: "Campi obbligatori", description: "Compila tutti i campi di fatturazione obbligatori.", variant: "destructive" });
       return;
     }
@@ -212,6 +213,7 @@ export default function SpeakersCornerPurchase() {
                   cap,
                   citta,
                   provincia,
+                  paese,
                   ragioneSociale,
                   partitaIva,
                   codiceSdi,
@@ -585,6 +587,17 @@ export default function SpeakersCornerPurchase() {
                               data-testid="input-purchase-provincia"
                             />
                           </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="purchase-paese">Paese *</Label>
+                          <Input
+                            id="purchase-paese"
+                            value={paese}
+                            onChange={(e) => setPaese(e.target.value)}
+                            placeholder="Italia"
+                            required
+                            data-testid="input-purchase-paese"
+                          />
                         </div>
 
                         {(tipoFatturazione === "professionista" || tipoFatturazione === "azienda") && (

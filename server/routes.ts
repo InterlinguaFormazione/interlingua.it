@@ -873,7 +873,7 @@ export async function registerRoutes(
 
   app.patch("/api/admin/speakers-corner/subscribers/:id", async (req, res) => {
     try {
-      const { nome, cognome, email, subscriptionStart, subscriptionEnd, active, password, tipoFatturazione, codiceFiscale, indirizzo, cap, citta, provincia, ragioneSociale, partitaIva, codiceSdi, pec } = req.body;
+      const { nome, cognome, email, subscriptionStart, subscriptionEnd, active, password, tipoFatturazione, codiceFiscale, indirizzo, cap, citta, provincia, paese, ragioneSociale, partitaIva, codiceSdi, pec } = req.body;
       const updateData: any = {};
       if (nome !== undefined) updateData.nome = nome;
       if (cognome !== undefined) updateData.cognome = cognome;
@@ -893,6 +893,7 @@ export async function registerRoutes(
       if (cap !== undefined) updateData.cap = cap || null;
       if (citta !== undefined) updateData.citta = citta || null;
       if (provincia !== undefined) updateData.provincia = provincia || null;
+      if (paese !== undefined) updateData.paese = paese || null;
       if (ragioneSociale !== undefined) updateData.ragioneSociale = ragioneSociale || null;
       if (partitaIva !== undefined) updateData.partitaIva = partitaIva || null;
       if (codiceSdi !== undefined) updateData.codiceSdi = codiceSdi || null;
@@ -1030,7 +1031,7 @@ export async function registerRoutes(
 
   app.post("/api/speakers-corner/purchase", async (req, res) => {
     try {
-      const { paypalOrderId, nome, cognome, email, password, tipoFatturazione, codiceFiscale, indirizzo, cap, citta, provincia, ragioneSociale, partitaIva, codiceSdi, pec } = req.body;
+      const { paypalOrderId, nome, cognome, email, password, tipoFatturazione, codiceFiscale, indirizzo, cap, citta, provincia, paese, ragioneSociale, partitaIva, codiceSdi, pec } = req.body;
       if (!paypalOrderId || !nome || !cognome || !email || !password || !codiceFiscale || !indirizzo || !cap || !citta || !provincia) {
         return res.status(400).json({ success: false, message: "Dati mancanti. Compila tutti i campi obbligatori." });
       }
@@ -1073,6 +1074,7 @@ export async function registerRoutes(
         cap: cap || null,
         citta: citta || null,
         provincia: provincia || null,
+        paese: paese || null,
         ragioneSociale: ragioneSociale || null,
         partitaIva: partitaIva || null,
         codiceSdi: codiceSdi || null,
