@@ -26,6 +26,10 @@ import {
   Coffee,
   GraduationCap,
   UserCheck,
+  Languages,
+  Mic2,
+  Briefcase,
+  Brain,
 } from "lucide-react";
 import fullImmersionImage from "@assets/Full-Immersion-Workshop-di-Lingua-Inglese_1772143747179.jpg";
 
@@ -60,12 +64,37 @@ const benefits = [
   },
 ];
 
-const programFeatures = [
-  "Programma interdisciplinare con metodologia CLIL",
-  "Grammatica attiva e linguaggio tecnico personalizzato",
-  "Soft skills, small talk e ascolto attivo (Ear Training)",
-  "Game-based learning e attività esperienziali",
-  "Elevator Pitch finale davanti ai colleghi",
+const programTopics = [
+  {
+    title: "Language Studies",
+    description: "Un approccio attivo alla lingua e alla grammatica, orientato all'uso reale dell'inglese. Grazie al Task-Based Learning, ogni lezione è personalizzata e interattiva, centrata sui bisogni concreti degli studenti — dalla scrittura di email alla gestione di dialoghi quotidiani o professionali.",
+    icon: Languages,
+    gradient: "from-primary to-blue-600",
+  },
+  {
+    title: "Small Talk & Ear Training",
+    description: "Sessioni dinamiche dedicate alla conversazione, alla comprensione orale e alla pronuncia. Attraverso roleplay, giochi d'aula, tecniche di mirroring e imitation learning, si lavora su scioltezza e spontaneità, superando inibizioni e blocchi linguistici.",
+    icon: Mic2,
+    gradient: "from-amber-500 to-orange-600",
+  },
+  {
+    title: "Specialist & Executive Language",
+    description: "Per chi vuole approfondire il linguaggio specifico del proprio contesto: business, tecnico, accademico o personale. I contenuti sono adattati al profilo dei partecipanti, con esercitazioni pratiche, sviluppo di progetti e simulazioni reali, attraverso Experiential Learning e Design Thinking.",
+    icon: Briefcase,
+    gradient: "from-emerald-500 to-teal-600",
+  },
+  {
+    title: "Specialist & Executive Mindset",
+    description: "Un modulo trasversale e motivazionale focalizzato sulla comunicazione efficace, sull'intelligenza emotiva e sulla crescita personale. Qui si potenziano soft skills come public speaking, team-working, leadership e creatività, attraverso metodologie esperienziali e game-based learning.",
+    icon: Brain,
+    gradient: "from-violet-500 to-purple-600",
+  },
+];
+
+const programHighlights = [
+  "4 sessioni da 90 minuti al giorno, 5 giorni consecutivi",
+  "4 docenti madrelingua, ciascuno esperto nel proprio topic",
+  "Almeno 30 ore frontali totali",
   "Certificato a fine corso con livello QCER raggiunto",
   "Programma di consolidamento di 3 mesi post-corso",
   "Accesso a corso online e Speaker's Corner inclusi",
@@ -400,24 +429,52 @@ export default function FullImmersionPage() {
 
         <section className="py-24">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-16">
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-6">
                 <Badge variant="secondary" className="mb-4 px-4 py-1.5">
                   <Target className="w-3 h-3 mr-1" />
-                  Risultati Garantiti
+                  Programma Customizzato
                 </Badge>
                 <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-program-title">
                   Programma Interdisciplinare
                 </h2>
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Metodologia immersiva ed esperienziale. Ogni modulo è progettato per un sostanziale miglioramento della competenza linguistica, con un programma di consolidamento che continua anche dopo il corso.
+                <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-4">
+                  La Learning Week offre un'esperienza intensiva, coinvolgente e trasformativa, adatta a professionisti, studenti e a chiunque desideri migliorare le proprie competenze comunicative in inglese in modo pratico e concreto.
+                </p>
+                <p className="text-base text-muted-foreground max-w-3xl mx-auto">
+                  Cinque giornate consecutive, dal lunedi al venerdi, articolate in quattro sessioni da 90 minuti al giorno, per un totale di almeno 30 ore, guidate da quattro docenti madrelingua, ciascuno esperto nel proprio topic.
                 </p>
               </div>
+
+              <div className="grid md:grid-cols-2 gap-6 mt-12 mb-12">
+                {programTopics.map((topic, index) => (
+                  <Card
+                    key={index}
+                    className="group overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                    data-testid={`card-fi-topic-${index}`}
+                  >
+                    <div className={`h-1.5 bg-gradient-to-r ${topic.gradient}`} />
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${topic.gradient} flex items-center justify-center shadow-md flex-shrink-0`}>
+                          <topic.icon className="w-6 h-6 text-white" />
+                        </div>
+                        <h3 className="text-lg font-bold text-foreground">{topic.title}</h3>
+                      </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{topic.description}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
               <Card className="overflow-hidden border-primary/20 shadow-xl shadow-primary/5" data-testid="card-fi-program">
                 <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-1">
                   <CardContent className="p-8 md:p-10 bg-card rounded-lg">
+                    <p className="text-sm text-muted-foreground leading-relaxed text-center mb-8 max-w-2xl mx-auto">
+                      Questo approccio rende ogni partecipante protagonista attivo del proprio apprendimento, permettendo di costruire competenze linguistiche solide e durature, che vadano ben oltre la teoria.
+                    </p>
                     <div className="grid sm:grid-cols-2 gap-4">
-                      {programFeatures.map((feature, index) => (
+                      {programHighlights.map((feature, index) => (
                         <div key={index} className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
                           <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
                           <span className="text-sm font-medium text-foreground">{feature}</span>
@@ -436,7 +493,7 @@ export default function FullImmersionPage() {
                         <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-2">
                           <Users className="w-6 h-6 text-primary" />
                         </div>
-                        <p className="text-2xl font-bold text-foreground">1–8</p>
+                        <p className="text-2xl font-bold text-foreground">1-8</p>
                         <p className="text-xs text-muted-foreground">Partecipanti</p>
                       </div>
                       <div className="text-center">
