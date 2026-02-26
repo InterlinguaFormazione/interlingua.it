@@ -19,6 +19,7 @@ function createSESClient(): SESClient | null {
 const ses = createSESClient();
 
 const FROM_EMAIL = "noreply@skillcraft.interlingua.it";
+const SC_FROM_EMAIL = "speakers_corner@interlingua.it";
 const NOTIFICATION_EMAIL = "infocorsi@skillcraft.interlingua.it";
 
 export async function sendContactNotification(data: {
@@ -286,7 +287,7 @@ Per qualsiasi domanda contattaci a: infocorsi@skillcraft.interlingua.it
   }
 
   const command = new SendEmailCommand({
-    Source: FROM_EMAIL,
+    Source: SC_FROM_EMAIL,
     Destination: {
       ToAddresses: [data.email],
     },
@@ -366,7 +367,7 @@ Per qualsiasi domanda contattaci a: infocorsi@skillcraft.interlingua.it
   }
 
   const command = new SendEmailCommand({
-    Source: FROM_EMAIL,
+    Source: SC_FROM_EMAIL,
     Destination: {
       ToAddresses: [data.email],
     },
