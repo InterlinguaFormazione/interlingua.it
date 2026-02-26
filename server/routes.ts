@@ -873,7 +873,7 @@ export async function registerRoutes(
 
   app.patch("/api/admin/speakers-corner/subscribers/:id", async (req, res) => {
     try {
-      const { nome, cognome, email, subscriptionStart, subscriptionEnd, active, password, codiceFiscale, indirizzo, cap, citta, provincia, ragioneSociale, partitaIva, codiceSdi, pec } = req.body;
+      const { nome, cognome, email, subscriptionStart, subscriptionEnd, active, password, tipoFatturazione, codiceFiscale, indirizzo, cap, citta, provincia, ragioneSociale, partitaIva, codiceSdi, pec } = req.body;
       const updateData: any = {};
       if (nome !== undefined) updateData.nome = nome;
       if (cognome !== undefined) updateData.cognome = cognome;
@@ -887,6 +887,7 @@ export async function registerRoutes(
         }
         updateData.password = await bcrypt.hash(password, 10);
       }
+      if (tipoFatturazione !== undefined) updateData.tipoFatturazione = tipoFatturazione || null;
       if (codiceFiscale !== undefined) updateData.codiceFiscale = codiceFiscale || null;
       if (indirizzo !== undefined) updateData.indirizzo = indirizzo || null;
       if (cap !== undefined) updateData.cap = cap || null;
@@ -1029,7 +1030,7 @@ export async function registerRoutes(
 
   app.post("/api/speakers-corner/purchase", async (req, res) => {
     try {
-      const { paypalOrderId, nome, cognome, email, password, codiceFiscale, indirizzo, cap, citta, provincia, ragioneSociale, partitaIva, codiceSdi, pec } = req.body;
+      const { paypalOrderId, nome, cognome, email, password, tipoFatturazione, codiceFiscale, indirizzo, cap, citta, provincia, ragioneSociale, partitaIva, codiceSdi, pec } = req.body;
       if (!paypalOrderId || !nome || !cognome || !email || !password || !codiceFiscale || !indirizzo || !cap || !citta || !provincia) {
         return res.status(400).json({ success: false, message: "Dati mancanti. Compila tutti i campi obbligatori." });
       }
@@ -1066,6 +1067,7 @@ export async function registerRoutes(
         cognome,
         email,
         password: hashedPassword,
+        tipoFatturazione: tipoFatturazione || null,
         codiceFiscale: codiceFiscale || null,
         indirizzo: indirizzo || null,
         cap: cap || null,

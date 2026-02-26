@@ -105,6 +105,7 @@ export const scSubscribers = pgTable("sc_subscribers", {
   cognome: text("cognome").notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
+  tipoFatturazione: text("tipo_fatturazione"),
   codiceFiscale: text("codice_fiscale"),
   indirizzo: text("indirizzo"),
   cap: text("cap"),

@@ -21,6 +21,9 @@ import {
   Shield,
   ArrowRight,
   Loader2,
+  User,
+  Briefcase,
+  Building2,
 } from "lucide-react";
 
 declare global {
@@ -42,6 +45,7 @@ export default function SpeakersCornerPurchase() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [tipoFatturazione, setTipoFatturazione] = useState<"privato" | "professionista" | "azienda">("privato");
   const [codiceFiscale, setCodiceFiscale] = useState("");
   const [indirizzo, setIndirizzo] = useState("");
   const [cap, setCap] = useState("");
@@ -109,9 +113,37 @@ export default function SpeakersCornerPurchase() {
       toast({ title: "Campi obbligatori", description: "Compila tutti i campi di fatturazione obbligatori.", variant: "destructive" });
       return;
     }
-    if (codiceFiscale.length !== 16 && codiceFiscale.length !== 11) {
-      toast({ title: "Codice Fiscale non valido", description: "Il codice fiscale deve essere di 16 caratteri (persona fisica) o 11 cifre (azienda).", variant: "destructive" });
+    if (tipoFatturazione === "privato" && codiceFiscale.length !== 16) {
+      toast({ title: "Codice Fiscale non valido", description: "Il codice fiscale deve essere di 16 caratteri.", variant: "destructive" });
       return;
+    }
+    if (tipoFatturazione === "professionista") {
+      if (codiceFiscale.length !== 16) {
+        toast({ title: "Codice Fiscale non valido", description: "Il codice fiscale deve essere di 16 caratteri.", variant: "destructive" });
+        return;
+      }
+      if (!partitaIva) {
+        toast({ title: "Partita IVA obbligatoria", description: "Inserisci la Partita IVA.", variant: "destructive" });
+        return;
+      }
+      if (!codiceSdi && !pec) {
+        toast({ title: "SDI o PEC obbligatorio", description: "Inserisci il Codice SDI oppure la PEC per la fatturazione elettronica.", variant: "destructive" });
+        return;
+      }
+    }
+    if (tipoFatturazione === "azienda") {
+      if (!ragioneSociale) {
+        toast({ title: "Ragione Sociale obbligatoria", description: "Inserisci la Ragione Sociale dell'azienda.", variant: "destructive" });
+        return;
+      }
+      if (!partitaIva) {
+        toast({ title: "Partita IVA obbligatoria", description: "Inserisci la Partita IVA dell'azienda.", variant: "destructive" });
+        return;
+      }
+      if (!codiceSdi && !pec) {
+        toast({ title: "SDI o PEC obbligatorio", description: "Inserisci il Codice SDI oppure la PEC per la fatturazione elettronica.", variant: "destructive" });
+        return;
+      }
     }
     if (cap.length !== 5) {
       toast({ title: "CAP non valido", description: "Il CAP deve essere di 5 cifre.", variant: "destructive" });
@@ -174,6 +206,7 @@ export default function SpeakersCornerPurchase() {
                   cognome,
                   email,
                   password,
+                  tipoFatturazione,
                   codiceFiscale,
                   indirizzo,
                   cap,
@@ -426,19 +459,85 @@ export default function SpeakersCornerPurchase() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <form onSubmit={handleBillingSubmit} className="space-y-4">
+                      <form onSubmit={handleBillingSubmit} className="space-y-5">
+                        <div className="space-y-3">
+                          <Label className="text-sm font-medium">Tipo di fatturazione *</Label>
+                          <div className="grid grid-cols-3 gap-3">
+                            <button
+                              type="button"
+                              onClick={() => setTipoFatturazione("privato")}
+                              className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${tipoFatturazione === "privato" ? "border-primary bg-primary/5" : "border-muted hover:border-muted-foreground/30"}`}
+                              data-testid="button-tipo-privato"
+                            >
+                              <User className={`w-6 h-6 ${tipoFatturazione === "privato" ? "text-primary" : "text-muted-foreground"}`} />
+                              <span className={`text-sm font-medium ${tipoFatturazione === "privato" ? "text-primary" : "text-muted-foreground"}`}>Privato</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setTipoFatturazione("professionista")}
+                              className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${tipoFatturazione === "professionista" ? "border-primary bg-primary/5" : "border-muted hover:border-muted-foreground/30"}`}
+                              data-testid="button-tipo-professionista"
+                            >
+                              <Briefcase className={`w-6 h-6 ${tipoFatturazione === "professionista" ? "text-primary" : "text-muted-foreground"}`} />
+                              <span className={`text-sm font-medium ${tipoFatturazione === "professionista" ? "text-primary" : "text-muted-foreground"}`}>Professionista</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setTipoFatturazione("azienda")}
+                              className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${tipoFatturazione === "azienda" ? "border-primary bg-primary/5" : "border-muted hover:border-muted-foreground/30"}`}
+                              data-testid="button-tipo-azienda"
+                            >
+                              <Building2 className={`w-6 h-6 ${tipoFatturazione === "azienda" ? "text-primary" : "text-muted-foreground"}`} />
+                              <span className={`text-sm font-medium ${tipoFatturazione === "azienda" ? "text-primary" : "text-muted-foreground"}`}>Azienda</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {tipoFatturazione === "azienda" && (
+                          <div className="space-y-2">
+                            <Label htmlFor="purchase-ragione">Ragione Sociale *</Label>
+                            <Input
+                              id="purchase-ragione"
+                              value={ragioneSociale}
+                              onChange={(e) => setRagioneSociale(e.target.value)}
+                              placeholder="Nome dell'azienda"
+                              required
+                              data-testid="input-purchase-ragione"
+                            />
+                          </div>
+                        )}
+
                         <div className="space-y-2">
                           <Label htmlFor="purchase-cf">Codice Fiscale *</Label>
                           <Input
                             id="purchase-cf"
                             value={codiceFiscale}
                             onChange={(e) => setCodiceFiscale(e.target.value.toUpperCase())}
-                            placeholder="RSSMRA85M01H501Z"
+                            placeholder={tipoFatturazione === "privato" || tipoFatturazione === "professionista" ? "RSSMRA85M01H501Z" : "01234567890"}
                             required
                             maxLength={16}
                             data-testid="input-purchase-cf"
                           />
+                          <p className="text-xs text-muted-foreground">
+                            {tipoFatturazione === "azienda" ? "Codice fiscale dell'azienda (11 cifre)" : "16 caratteri alfanumerici"}
+                          </p>
                         </div>
+
+                        {(tipoFatturazione === "professionista" || tipoFatturazione === "azienda") && (
+                          <div className="space-y-2">
+                            <Label htmlFor="purchase-piva">Partita IVA *</Label>
+                            <Input
+                              id="purchase-piva"
+                              value={partitaIva}
+                              onChange={(e) => setPartitaIva(e.target.value.replace(/\D/g, "").slice(0, 11))}
+                              placeholder="01234567890"
+                              required
+                              maxLength={11}
+                              data-testid="input-purchase-piva"
+                            />
+                          </div>
+                        )}
+
                         <div className="space-y-2">
                           <Label htmlFor="purchase-indirizzo">Indirizzo *</Label>
                           <Input
@@ -488,31 +587,11 @@ export default function SpeakersCornerPurchase() {
                           </div>
                         </div>
 
-                        <div className="pt-4 border-t">
-                          <p className="text-sm font-medium text-muted-foreground mb-4">
-                            Per aziende e professionisti (opzionale)
-                          </p>
-                          <div className="space-y-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="purchase-ragione">Ragione Sociale</Label>
-                              <Input
-                                id="purchase-ragione"
-                                value={ragioneSociale}
-                                onChange={(e) => setRagioneSociale(e.target.value)}
-                                placeholder="Nome dell'azienda"
-                                data-testid="input-purchase-ragione"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="purchase-piva">Partita IVA</Label>
-                              <Input
-                                id="purchase-piva"
-                                value={partitaIva}
-                                onChange={(e) => setPartitaIva(e.target.value)}
-                                placeholder="IT01234567890"
-                                data-testid="input-purchase-piva"
-                              />
-                            </div>
+                        {(tipoFatturazione === "professionista" || tipoFatturazione === "azienda") && (
+                          <div className="pt-3 border-t space-y-4">
+                            <p className="text-sm font-medium text-muted-foreground">
+                              Fatturazione elettronica (inserisci almeno uno) *
+                            </p>
                             <div className="grid grid-cols-2 gap-4">
                               <div className="space-y-2">
                                 <Label htmlFor="purchase-sdi">Codice SDI</Label>
@@ -532,13 +611,13 @@ export default function SpeakersCornerPurchase() {
                                   type="email"
                                   value={pec}
                                   onChange={(e) => setPec(e.target.value)}
-                                  placeholder="azienda@pec.it"
+                                  placeholder="nome@pec.it"
                                   data-testid="input-purchase-pec"
                                 />
                               </div>
                             </div>
                           </div>
-                        </div>
+                        )}
 
                         <div className="flex gap-3 pt-2">
                           <Button

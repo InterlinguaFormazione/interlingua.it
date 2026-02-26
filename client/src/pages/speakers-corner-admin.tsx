@@ -34,6 +34,7 @@ interface AdminSubscriber {
   nome: string;
   cognome: string;
   email: string;
+  tipoFatturazione: string | null;
   codiceFiscale: string | null;
   indirizzo: string | null;
   cap: string | null;
@@ -97,7 +98,7 @@ export default function SpeakersCornerAdmin() {
   const [subscriberDialogOpen, setSubscriberDialogOpen] = useState(false);
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
   const [editSubscriber, setEditSubscriber] = useState<AdminSubscriber | null>(null);
-  const [editSubData, setEditSubData] = useState({ nome: "", cognome: "", email: "", password: "", subscriptionStart: "", subscriptionEnd: "", codiceFiscale: "", indirizzo: "", cap: "", citta: "", provincia: "", ragioneSociale: "", partitaIva: "", codiceSdi: "", pec: "" });
+  const [editSubData, setEditSubData] = useState({ nome: "", cognome: "", email: "", password: "", subscriptionStart: "", subscriptionEnd: "", tipoFatturazione: "", codiceFiscale: "", indirizzo: "", cap: "", citta: "", provincia: "", ragioneSociale: "", partitaIva: "", codiceSdi: "", pec: "" });
   const [editSubDialogOpen, setEditSubDialogOpen] = useState(false);
 
   const { data: subscribers = [], isLoading: subscribersLoading } = useQuery<AdminSubscriber[]>({
@@ -163,6 +164,7 @@ export default function SpeakersCornerAdmin() {
       if (data.password) payload.password = data.password;
       if (data.subscriptionStart) payload.subscriptionStart = data.subscriptionStart;
       if (data.subscriptionEnd) payload.subscriptionEnd = data.subscriptionEnd;
+      payload.tipoFatturazione = data.tipoFatturazione || "";
       payload.codiceFiscale = data.codiceFiscale || "";
       payload.indirizzo = data.indirizzo || "";
       payload.cap = data.cap || "";
@@ -517,6 +519,7 @@ export default function SpeakersCornerAdmin() {
                                     password: "",
                                     subscriptionStart: sub.subscriptionStart,
                                     subscriptionEnd: sub.subscriptionEnd,
+                                    tipoFatturazione: sub.tipoFatturazione || "",
                                     codiceFiscale: sub.codiceFiscale || "",
                                     indirizzo: sub.indirizzo || "",
                                     cap: sub.cap || "",
@@ -634,6 +637,21 @@ export default function SpeakersCornerAdmin() {
                     <div className="pt-2 border-t">
                       <p className="text-sm font-medium text-muted-foreground mb-3">Dati di Fatturazione</p>
                       <div className="space-y-3">
+                        <div className="space-y-2">
+                          <Label htmlFor="edit-sub-tipo">Tipo Fatturazione</Label>
+                          <select
+                            id="edit-sub-tipo"
+                            value={editSubData.tipoFatturazione}
+                            onChange={(e) => setEditSubData({ ...editSubData, tipoFatturazione: e.target.value })}
+                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                            data-testid="select-edit-sub-tipo"
+                          >
+                            <option value="">Non specificato</option>
+                            <option value="privato">Privato</option>
+                            <option value="professionista">Libero Professionista</option>
+                            <option value="azienda">Azienda</option>
+                          </select>
+                        </div>
                         <div className="space-y-2">
                           <Label htmlFor="edit-sub-cf">Codice Fiscale</Label>
                           <Input
