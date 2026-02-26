@@ -24,6 +24,7 @@ import categoryDigital from "@/assets/images/category-digital.jpg";
 import courseIndividual from "@/assets/images/course-individual.jpg";
 import lingueStraniereImage from "@assets/lingue-straniere_1772143318023.webp";
 import languageCoachingImage from "@assets/Language_Coaching_1772143397641.webp";
+import corsoOnlineImage from "@assets/corso-lingua-online_1772143586662.jpg";
 
 const categories = [
   {
@@ -50,7 +51,7 @@ const categories = [
     title: "Formazione Online",
     description: "Piattaforma 24/7 con AI e riconoscimento vocale. Corsi blended con tutor madrelingua via Zoom. Studia quando e dove vuoi.",
     icon: Monitor,
-    image: categoryOnline,
+    image: corsoOnlineImage,
     color: "from-teal-500 to-teal-600",
     courseCount: 3,
   },
