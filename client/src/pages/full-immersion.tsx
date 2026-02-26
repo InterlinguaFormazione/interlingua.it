@@ -24,6 +24,8 @@ import {
   Globe,
   Heart,
   Coffee,
+  GraduationCap,
+  UserCheck,
 } from "lucide-react";
 import fullImmersionImage from "@assets/Full-Immersion-Workshop-di-Lingua-Inglese_1772143747179.jpg";
 
@@ -45,7 +47,7 @@ const benefits = [
   {
     icon: Users,
     title: "Persone Come Te",
-    description: "Quando sei circondato da persone che condividono la tua stessa curiosità e la tua stessa voglia di crescere, succede qualcosa di speciale. In gruppi di massimo 12, ognuno trova il proprio spazio per esprimersi, e tu scopri che gli altri sono la risorsa più preziosa per il tuo apprendimento.",
+    description: "Quando sei circondato da persone che condividono la tua stessa curiosità e la tua stessa voglia di crescere, succede qualcosa di speciale. In piccoli gruppi, ognuno trova il proprio spazio per esprimersi, e tu scopri che gli altri sono la risorsa più preziosa per il tuo apprendimento.",
     gradient: "from-emerald-500/10 to-teal-500/10",
     iconColor: "text-emerald-600",
   },
@@ -59,12 +61,14 @@ const benefits = [
 ];
 
 const programFeatures = [
-  "Moduli progettati per massimizzare ogni singola ora",
-  "Perfetto equilibrio tra impegno, pratica e risultati",
-  "Progetti reali e simulazioni professionali",
-  "Attività collaborative che ti fanno dimenticare di stare studiando",
-  "Tutti i materiali didattici inclusi",
-  "Attestato di partecipazione con livello QCER raggiunto",
+  "Programma interdisciplinare con metodologia CLIL",
+  "Grammatica attiva e linguaggio tecnico personalizzato",
+  "Soft skills, small talk e ascolto attivo (Ear Training)",
+  "Game-based learning e attività esperienziali",
+  "Elevator Pitch finale davanti ai colleghi",
+  "Certificato a fine corso con livello QCER raggiunto",
+  "Programma di consolidamento di 3 mesi post-corso",
+  "Accesso a corso online e Speaker's Corner inclusi",
 ];
 
 const testimonials = [
@@ -89,25 +93,65 @@ const testimonials = [
     author: "Partecipante weekend esperienziale",
   },
   {
-    text: "Ho vissuto una settimana full immersion con Interlingua. Professionalità, motivazione e una grande carica di energia sono solo alcuni degli ingredienti di questa bellissima e riuscitissima esperienza.",
+    text: "Ho vissuto una settimana full immersion con Interlingua. Professionalità, motivazione e una grande carica di energia sono solo alcuni degli ingredienti di questa bellissima e riuscitissima esperienza. Grazie e... spero a presto!",
     author: "Laura Bertolino",
+  },
+  {
+    text: "Mi è piaciuto soprattutto che ogni materia ci faceva portare avanti un lavoro o un progetto, quindi non si vedeva l'ora di ricominciare al cambio dell'ora.",
+    author: "Andrea",
+  },
+  {
+    text: "I don't like studying English, so this is perfect because you study leadership and marketing, and you learn English!",
+    author: "Paolo",
+  },
+  {
+    text: "Approccio dinamico e interattivo, pieno di diverse attività: il public speaking, l'ascolto, attività pratiche, il gioco.",
+    author: "Mauro",
+  },
+  {
+    text: "Mi ha stupito il metodo CLIL: con questo metodo ci si dimentica davvero di parlare una lingua straniera!",
+    author: "Elena",
+  },
+  {
+    text: "Mi ha sorpreso la professionalità e la passione trasmessa durante le lezioni.",
+    author: "Michele Dominici",
+  },
+  {
+    text: "Corso molto dinamico, il tempo vola e solo alla fine ti accorgi di quanto hai imparato!",
+    author: "Giampietro",
   },
 ];
 
 const formats = [
   {
-    title: "Full Immersion Workshop",
-    subtitle: "Cinque giorni che portano lontano",
-    description: "Alcune persone vanno a Londra per migliorare l'inglese. Altre scelgono di venire a Vicenza, dove tutto è progettato perché il cambiamento accada nel modo più profondo e naturale possibile. E spesso, chi sceglie questa strada, si sorprende di quanto lontano arriva restando vicino a casa.",
-    features: ["5 giorni intensivi (lun-ven)", "6 ore al giorno di pratica attiva", "Dal livello A2 al C1", "In sede a Vicenza"],
+    title: "FIW Collettivo",
+    subtitle: "5–8 partecipanti",
+    description: "Il formato più amato: un piccolo gruppo di persone motivate che condividono la stessa settimana di immersione totale. L'energia del gruppo diventa il motore del tuo apprendimento, e ogni giorno senti i progressi di chi ti sta accanto diventare anche i tuoi.",
+    features: ["5 giorni intensivi (lun-ven)", "30+ ore frontali, dalle 9:00 alle 16:30", "Team di coach madrelingua", "Livelli da A2 a C1", "Convenzioni B&B e hotel a Vicenza"],
     color: "from-primary to-blue-600",
-    icon: BookOpen,
+    icon: Users,
+  },
+  {
+    title: "FIW Semi-Individuale",
+    subtitle: "2–4 partecipanti",
+    description: "Quando cerchi un'attenzione più mirata, questo formato ti permette di andare più in profondità. In un gruppo ristretto, ogni conversazione diventa un'opportunità su misura, e i tuoi obiettivi specifici guidano il percorso fin dal primo giorno.",
+    features: ["5 giorni intensivi (lun-ven)", "Percorso più personalizzato e mirato", "Conversazioni reali e sfide pratiche", "Team di coach madrelingua dedicato", "Convenzioni B&B e hotel a Vicenza"],
+    color: "from-emerald-500 to-teal-600",
+    icon: UserCheck,
+  },
+  {
+    title: "FIW Individuale",
+    subtitle: "1 partecipante",
+    description: "Un'esperienza esclusiva, costruita interamente intorno a te: i tuoi obiettivi, il tuo stile, il tuo ritmo. Un team di 3-4 coach madrelingua dedicati lavora con te per una settimana. Tutto è progettato perché ogni minuto conti.",
+    features: ["5 giorni intensivi (lun-ven)", "3-4 coach madrelingua dedicati", "Programma 100% personalizzato", "Obiettivi specifici professionali", "Convenzioni B&B e hotel a Vicenza"],
+    color: "from-violet-500 to-purple-600",
+    icon: GraduationCap,
   },
   {
     title: "Experiential Weekend",
-    subtitle: "Quando il corpo impara insieme alla mente",
+    subtitle: "The Spirit of Leadership",
     description: "Ci sono esperienze che ti cambiano senza che tu te ne renda conto. Un weekend sui Colli Berici, tra cavalli, natura e sfide di leadership, tutto in inglese. Quando torni a casa, porti con te qualcosa di più di un inglese migliore: porti una nuova consapevolezza di quello che sei capace di fare.",
-    features: ["2 giorni immersivi (sab-dom)", "Attività outdoor ed equitazione", "Leadership & team building", "Colli Berici, provincia di Vicenza"],
+    features: ["2 giorni immersivi (sab-dom)", "Equitazione, leadership e team building", "Attività outdoor ed esperienziali", "Colli Berici, provincia di Vicenza"],
     color: "from-amber-500 to-orange-600",
     icon: Mountain,
   },
@@ -280,8 +324,8 @@ export default function FullImmersionPage() {
                 {[
                   { time: "9:00 - 10:30", title: "Warm-up & Discussion", desc: "Ti ritrovi a discutere di qualcosa che ti appassiona, e senza accorgertene stai già parlando con una scioltezza che ieri non avevi. Le parole iniziano a venire da sole.", icon: Sparkles },
                   { time: "10:30 - 11:00", title: "Coffee Break", desc: "È durante il caffè che succedono le cose più interessanti. Quando parli perché vuoi, non perché devi, scopri qualcosa di nuovo su te stesso e sul tuo inglese.", icon: Coffee },
-                  { time: "11:00 - 13:00", title: "Workshop Intensivo", desc: "Presentazioni, negoziazioni, simulazioni. Ogni attività ti fa sentire un po' più sicuro di prima, e quel senso di sicurezza resta con te anche dopo.", icon: Target },
-                  { time: "14:00 - 16:00", title: "Progetto di Gruppo", desc: "Lavori con persone che, come te, hanno scelto di fare questo passo. E mentre costruite qualcosa insieme, vi accorgete che l'inglese è diventato semplicemente il vostro modo di comunicare.", icon: Users },
+                  { time: "11:00 - 13:00", title: "Workshop Intensivo", desc: "Presentazioni, negoziazioni, simulazioni con metodologia CLIL. Ogni attività ti fa sentire un po' più sicuro di prima, e quel senso di sicurezza resta con te anche dopo.", icon: Target },
+                  { time: "14:00 - 16:30", title: "Progetto & Elevator Pitch", desc: "Lavori con persone che, come te, hanno scelto di fare questo passo. Progetti reali, public speaking e game-based learning: l'inglese diventa semplicemente il vostro modo di comunicare.", icon: Users },
                 ].map((slot, index) => (
                   <div
                     key={index}
@@ -311,16 +355,16 @@ export default function FullImmersionPage() {
             <div className="text-center mb-16">
               <Badge variant="secondary" className="mb-4 px-4 py-1.5">
                 <Calendar className="w-3 h-3 mr-1" />
-                Due Modi per Immergersi
+                Il Corso Giusto per Te
               </Badge>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-formats-title">
-                Scegli la Tua Avventura
+                Scegli il Tuo Formato
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Due formati, un solo obiettivo: farti vivere l'inglese come non l'hai mai vissuto.
+                Ogni persona ha il suo modo di imparare. Per questo abbiamo creato formati diversi, ognuno pensato per un tipo diverso di esperienza. Quello che li accomuna è il risultato.
               </p>
             </div>
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
               {formats.map((format, index) => (
                 <Card
                   key={index}
@@ -360,13 +404,13 @@ export default function FullImmersionPage() {
               <div className="text-center mb-16">
                 <Badge variant="secondary" className="mb-4 px-4 py-1.5">
                   <Target className="w-3 h-3 mr-1" />
-                  Tutto Incluso
+                  Risultati Garantiti
                 </Badge>
                 <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-program-title">
-                  Cosa Porti a Casa
+                  Programma Interdisciplinare
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                  Oltre a un inglese che finalmente funziona nella vita reale.
+                  Metodologia immersiva ed esperienziale. Ogni modulo è progettato per un sostanziale miglioramento della competenza linguistica, con un programma di consolidamento che continua anche dopo il corso.
                 </p>
               </div>
               <Card className="overflow-hidden border-primary/20 shadow-xl shadow-primary/5" data-testid="card-fi-program">
@@ -386,13 +430,13 @@ export default function FullImmersionPage() {
                           <Clock className="w-6 h-6 text-primary" />
                         </div>
                         <p className="text-2xl font-bold text-foreground">30+</p>
-                        <p className="text-xs text-muted-foreground">Ore di pratica</p>
+                        <p className="text-xs text-muted-foreground">Ore frontali</p>
                       </div>
                       <div className="text-center">
                         <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-2">
                           <Users className="w-6 h-6 text-primary" />
                         </div>
-                        <p className="text-2xl font-bold text-foreground">Max 12</p>
+                        <p className="text-2xl font-bold text-foreground">1–8</p>
                         <p className="text-xs text-muted-foreground">Partecipanti</p>
                       </div>
                       <div className="text-center">
@@ -425,7 +469,7 @@ export default function FullImmersionPage() {
                 Sono tornati a casa con un inglese migliore e la voglia di rifarlo. Ecco cosa dicono.
               </p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {testimonials.map((testimonial, index) => (
                 <Card
                   key={index}
