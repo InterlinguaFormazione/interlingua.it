@@ -94,11 +94,15 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `POST /api/chat` - AI chat endpoint
 
 ### Admin API (protected with server-side token auth)
-- `POST /api/admin/login` - Admin login (returns session token)
-- `GET /api/admin/contacts` - Get all contact submissions
-- `GET /api/admin/newsletter` - Get all newsletter subscriptions
-- `GET /api/admin/blog` - Get all blog posts
-- `POST /api/admin/blog/generate` - Trigger blog post generation
+- `POST /api/admin/login` - Admin login with username/password (returns session token)
+- `GET /api/admin/users` - List all users (admin only)
+- `POST /api/admin/users` - Create user (admin only)
+- `PATCH /api/admin/users/:id` - Update user (admin only)
+- `DELETE /api/admin/users/:id` - Delete user (admin only)
+- `GET /api/admin/contacts` - Get all contact submissions (admin + staff)
+- `GET /api/admin/newsletter` - Get all newsletter subscriptions (admin + staff)
+- `GET /api/admin/blog` - Get all blog posts (admin + staff)
+- `POST /api/admin/blog/generate` - Trigger blog post generation (admin + staff)
 
 ### Speaker's Corner Subscriber API
 - `POST /api/speakers-corner/login` - Subscriber login (email + password)
@@ -133,7 +137,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `AWS_REGION` - AWS SES region (default: eu-south-1)
 - `CRM_WEBHOOK_API_KEY` - CRM webhook key (sk-webhook-...)
 - `CRM_BASE_URL` - CRM base URL (default: https://crm.skillcraft.it)
-- `ADMIN_PASSWORD` - Password for the general admin panel (/admin)
+- `ADMIN_PASSWORD` - Default password for the initial admin user (used only for seeding)
 
 ## Contact Email
 - **Default email**: `infocorsi@skillcraft.interlingua.it` (used everywhere on site)

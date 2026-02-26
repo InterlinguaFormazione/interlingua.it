@@ -6,7 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
@@ -22,7 +25,19 @@ import {
   Eye,
   EyeOff,
   Lock,
+  Users,
+  UserPlus,
+  Trash2,
 } from "lucide-react";
+
+interface AdminUser {
+  id: string;
+  username: string;
+  name: string;
+  role: string;
+  active: boolean | null;
+  createdAt: string | null;
+}
 
 interface ContactSubmission {
   id: number;
@@ -61,40 +76,57 @@ function adminFetch(url: string, token: string, options?: RequestInit) {
 }
 
 export default function AdminPage() {
-  const [token, setToken] = useState<string | null>(() => {
-    return sessionStorage.getItem("admin_token");
+  const [token, setToken] = useState<string | null>(() => sessionStorage.getItem("admin_token"));
+  const [currentUser, setCurrentUser] = useState<AdminUser | null>(() => {
+    const stored = sessionStorage.getItem("admin_user");
+    return stored ? JSON.parse(stored) : null;
   });
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
+  const [newUser, setNewUser] = useState({ username: "", password: "", name: "", role: "staff" });
+  const [userDialogOpen, setUserDialogOpen] = useState(false);
+
   const authenticated = !!token;
+  const isAdmin = currentUser?.role === "admin";
 
   const loginMutation = useMutation({
-    mutationFn: async (pwd: string) => {
+    mutationFn: async (data: { username: string; password: string }) => {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: pwd }),
+        body: JSON.stringify(data),
       });
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Errore di accesso");
+        const body = await res.json();
+        throw new Error(body.message || "Errore di accesso");
       }
       return res.json();
     },
     onSuccess: (data) => {
       setToken(data.token);
+      setCurrentUser(data.user);
       sessionStorage.setItem("admin_token", data.token);
+      sessionStorage.setItem("admin_user", JSON.stringify(data.user));
+      setUsername("");
       setPassword("");
     },
     onError: (error: Error) => {
-      toast({
-        title: "Accesso negato",
-        description: error.message,
-        variant: "destructive",
-      });
+      toast({ title: "Accesso negato", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const { data: adminUsers = [], isLoading: usersLoading } = useQuery<AdminUser[]>({
+    queryKey: ["/api/admin/users"],
+    enabled: authenticated && isAdmin,
+    queryFn: async () => {
+      const res = await adminFetch("/api/admin/users", token!);
+      if (res.status === 401) { handleLogout(); throw new Error("Sessione scaduta"); }
+      if (!res.ok) throw new Error("Errore nel caricamento");
+      return res.json();
     },
   });
 
@@ -103,10 +135,7 @@ export default function AdminPage() {
     enabled: authenticated,
     queryFn: async () => {
       const res = await adminFetch("/api/admin/contacts", token!);
-      if (res.status === 401) {
-        handleLogout();
-        throw new Error("Sessione scaduta");
-      }
+      if (res.status === 401) { handleLogout(); throw new Error("Sessione scaduta"); }
       if (!res.ok) throw new Error("Errore nel caricamento");
       return res.json();
     },
@@ -117,10 +146,7 @@ export default function AdminPage() {
     enabled: authenticated,
     queryFn: async () => {
       const res = await adminFetch("/api/admin/newsletter", token!);
-      if (res.status === 401) {
-        handleLogout();
-        throw new Error("Sessione scaduta");
-      }
+      if (res.status === 401) { handleLogout(); throw new Error("Sessione scaduta"); }
       if (!res.ok) throw new Error("Errore nel caricamento");
       return res.json();
     },
@@ -131,24 +157,72 @@ export default function AdminPage() {
     enabled: authenticated,
     queryFn: async () => {
       const res = await adminFetch("/api/admin/blog", token!);
-      if (res.status === 401) {
-        handleLogout();
-        throw new Error("Sessione scaduta");
-      }
+      if (res.status === 401) { handleLogout(); throw new Error("Sessione scaduta"); }
       if (!res.ok) throw new Error("Errore nel caricamento");
       return res.json();
     },
   });
 
+  const createUserMutation = useMutation({
+    mutationFn: async (data: typeof newUser) => {
+      const res = await adminFetch("/api/admin/users", token!, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body.message || "Errore nella creazione");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: "Utente creato", description: "Il nuovo utente è stato aggiunto." });
+      setNewUser({ username: "", password: "", name: "", role: "staff" });
+      setUserDialogOpen(false);
+    },
+    onError: (error: Error) => {
+      toast({ title: "Errore", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const toggleUserMutation = useMutation({
+    mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
+      const res = await adminFetch(`/api/admin/users/${id}`, token!, {
+        method: "PATCH",
+        body: JSON.stringify({ active }),
+      });
+      if (!res.ok) throw new Error("Errore nell'aggiornamento");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: "Aggiornato", description: "Stato utente aggiornato." });
+    },
+  });
+
+  const deleteUserMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await adminFetch(`/api/admin/users/${id}`, token!, { method: "DELETE" });
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body.message || "Errore nell'eliminazione");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: "Utente eliminato" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Errore", description: error.message, variant: "destructive" });
+    },
+  });
+
   const generateBlogMutation = useMutation({
     mutationFn: async () => {
-      const res = await adminFetch("/api/admin/blog/generate", token!, {
-        method: "POST",
-      });
-      if (res.status === 401) {
-        handleLogout();
-        throw new Error("Sessione scaduta");
-      }
+      const res = await adminFetch("/api/admin/blog/generate", token!, { method: "POST" });
+      if (res.status === 401) { handleLogout(); throw new Error("Sessione scaduta"); }
       if (!res.ok) throw new Error("Errore nella generazione");
       return res.json();
     },
@@ -163,16 +237,18 @@ export default function AdminPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!password) {
-      toast({ title: "Campo obbligatorio", description: "Inserisci la password.", variant: "destructive" });
+    if (!username || !password) {
+      toast({ title: "Campi obbligatori", description: "Inserisci username e password.", variant: "destructive" });
       return;
     }
-    loginMutation.mutate(password);
+    loginMutation.mutate({ username, password });
   };
 
   const handleLogout = () => {
     setToken(null);
+    setCurrentUser(null);
     sessionStorage.removeItem("admin_token");
+    sessionStorage.removeItem("admin_user");
   };
 
   const formatDate = (dateStr: string | null) => {
@@ -201,18 +277,29 @@ export default function AdminPage() {
                   </div>
                   <CardTitle>Pannello Amministrazione</CardTitle>
                   <CardDescription>
-                    Inserisci la password per accedere al pannello di amministrazione.
+                    Inserisci le tue credenziali per accedere.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleLogin} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="admin-username">Username</Label>
+                      <Input
+                        id="admin-username"
+                        type="text"
+                        placeholder="Il tuo username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        data-testid="input-admin-username"
+                      />
+                    </div>
                     <div className="space-y-2">
                       <Label htmlFor="admin-password">Password</Label>
                       <div className="relative">
                         <Input
                           id="admin-password"
                           type={showPassword ? "text" : "password"}
-                          placeholder="Password amministratore"
+                          placeholder="La tua password"
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           data-testid="input-admin-password"
@@ -247,6 +334,8 @@ export default function AdminPage() {
     );
   }
 
+  const tabCount = isAdmin ? 4 : 3;
+
   return (
     <div className="min-h-screen">
       <Navigation />
@@ -259,7 +348,12 @@ export default function AdminPage() {
                 <h1 className="text-3xl font-bold text-foreground" data-testid="text-admin-title">
                   Pannello Amministrazione
                 </h1>
-                <p className="text-muted-foreground">Gestione contatti, newsletter, blog e servizi</p>
+                <p className="text-muted-foreground">
+                  Benvenuto, {currentUser?.name}
+                  <Badge variant="secondary" className="ml-2 text-xs">
+                    {currentUser?.role === "admin" ? "Amministratore" : "Staff"}
+                  </Badge>
+                </p>
               </div>
             </div>
             <Button
@@ -324,7 +418,7 @@ export default function AdminPage() {
           </div>
 
           <Tabs defaultValue="contacts" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className={`grid w-full ${isAdmin ? "grid-cols-4" : "grid-cols-3"}`}>
               <TabsTrigger value="contacts" data-testid="tab-contacts">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Messaggi
@@ -337,6 +431,12 @@ export default function AdminPage() {
                 <Newspaper className="w-4 h-4 mr-2" />
                 Blog
               </TabsTrigger>
+              {isAdmin && (
+                <TabsTrigger value="users" data-testid="tab-users">
+                  <Users className="w-4 h-4 mr-2" />
+                  Utenti
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="contacts">
@@ -508,6 +608,162 @@ export default function AdminPage() {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            {isAdmin && (
+              <TabsContent value="users">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle>Gestione Utenti</CardTitle>
+                      <CardDescription>Crea e gestisci utenti admin e staff</CardDescription>
+                    </div>
+                    <Dialog open={userDialogOpen} onOpenChange={setUserDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button data-testid="button-add-user">
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Nuovo Utente
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Crea Nuovo Utente</DialogTitle>
+                        </DialogHeader>
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            createUserMutation.mutate(newUser);
+                          }}
+                          className="space-y-4"
+                        >
+                          <div className="space-y-2">
+                            <Label htmlFor="new-user-name">Nome e Cognome</Label>
+                            <Input
+                              id="new-user-name"
+                              value={newUser.name}
+                              onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+                              required
+                              data-testid="input-new-user-name"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="new-user-username">Username</Label>
+                            <Input
+                              id="new-user-username"
+                              value={newUser.username}
+                              onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                              required
+                              data-testid="input-new-user-username"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="new-user-password">Password</Label>
+                            <Input
+                              id="new-user-password"
+                              type="password"
+                              value={newUser.password}
+                              onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                              required
+                              data-testid="input-new-user-password"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="new-user-role">Ruolo</Label>
+                            <Select
+                              value={newUser.role}
+                              onValueChange={(value) => setNewUser({ ...newUser, role: value })}
+                            >
+                              <SelectTrigger data-testid="select-new-user-role">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="staff">Staff</SelectItem>
+                                <SelectItem value="admin">Amministratore</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={createUserMutation.isPending}
+                            data-testid="button-create-user"
+                          >
+                            {createUserMutation.isPending ? "Creazione..." : "Crea Utente"}
+                          </Button>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
+                  </CardHeader>
+                  <CardContent>
+                    {usersLoading ? (
+                      <div className="space-y-3">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="h-16 bg-muted rounded animate-pulse" />
+                        ))}
+                      </div>
+                    ) : adminUsers.length === 0 ? (
+                      <div className="text-center py-12 text-muted-foreground">
+                        <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <p>Nessun utente trovato.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {adminUsers.map((user) => (
+                          <div
+                            key={user.id}
+                            className="flex items-center justify-between p-4 rounded-lg border bg-card"
+                            data-testid={`row-user-${user.id}`}
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <span className="text-primary font-semibold text-sm">
+                                  {user.name ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) : user.username.slice(0, 2).toUpperCase()}
+                                </span>
+                              </div>
+                              <div>
+                                <p className="font-medium text-foreground">{user.name || user.username}</p>
+                                <p className="text-sm text-muted-foreground">@{user.username}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                              <Badge variant={user.role === "admin" ? "default" : "secondary"}>
+                                {user.role === "admin" ? "Admin" : "Staff"}
+                              </Badge>
+                              {user.active ? (
+                                <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                  Attivo
+                                </Badge>
+                              ) : (
+                                <Badge variant="secondary">Disattivo</Badge>
+                              )}
+                              <Switch
+                                checked={user.active ?? true}
+                                onCheckedChange={(checked) => toggleUserMutation.mutate({ id: user.id, active: checked })}
+                                disabled={user.id === currentUser?.id}
+                                data-testid={`switch-user-${user.id}`}
+                              />
+                              {user.id !== currentUser?.id && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    if (confirm("Sei sicuro di voler eliminare questo utente?")) {
+                                      deleteUserMutation.mutate(user.id);
+                                    }
+                                  }}
+                                  data-testid={`button-delete-user-${user.id}`}
+                                >
+                                  <Trash2 className="w-4 h-4 text-destructive" />
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
           </Tabs>
         </div>
       </main>

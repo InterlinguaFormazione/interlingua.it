@@ -11,30 +11,46 @@ import { chatWithAI } from "./ai-chat";
 import cron from "node-cron";
 import crypto from "crypto";
 
-const adminSessions = new Map<string, { createdAt: number }>();
+const adminSessions = new Map<string, { createdAt: number; userId: string; role: string }>();
 const ADMIN_SESSION_DURATION = 4 * 60 * 60 * 1000;
 
 function generateAdminToken(): string {
   return crypto.randomBytes(32).toString("hex");
 }
 
-function isValidAdminSession(token: string | undefined): boolean {
-  if (!token) return false;
+function getAdminSession(token: string | undefined): { userId: string; role: string } | null {
+  if (!token) return null;
   const session = adminSessions.get(token);
-  if (!session) return false;
+  if (!session) return null;
   if (Date.now() - session.createdAt > ADMIN_SESSION_DURATION) {
     adminSessions.delete(token);
-    return false;
+    return null;
   }
-  return true;
+  return { userId: session.userId, role: session.role };
+}
+
+function requireAuth(req: any, res: any, next: any) {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.replace("Bearer ", "");
+  const session = getAdminSession(token);
+  if (!session) {
+    return res.status(401).json({ success: false, message: "Non autorizzato" });
+  }
+  req.adminSession = session;
+  next();
 }
 
 function requireAdmin(req: any, res: any, next: any) {
   const authHeader = req.headers.authorization;
   const token = authHeader?.replace("Bearer ", "");
-  if (!isValidAdminSession(token)) {
+  const session = getAdminSession(token);
+  if (!session) {
     return res.status(401).json({ success: false, message: "Non autorizzato" });
   }
+  if (session.role !== "admin") {
+    return res.status(403).json({ success: false, message: "Accesso riservato agli amministratori" });
+  }
+  req.adminSession = session;
   next();
 }
 
@@ -85,26 +101,139 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
 
+  const seedDefaultAdmin = async () => {
+    try {
+      const allUsers = await storage.getAllUsers();
+      if (allUsers.length === 0) {
+        const adminPassword = process.env.ADMIN_PASSWORD;
+        if (!adminPassword) {
+          console.warn("No ADMIN_PASSWORD set — skipping default admin user creation. Set ADMIN_PASSWORD env var to create the initial admin.");
+          return;
+        }
+        const hashedPassword = await bcrypt.hash(adminPassword, 10);
+        await storage.createUser({
+          username: "admin",
+          password: hashedPassword,
+          name: "Amministratore",
+          role: "admin",
+          active: true,
+        });
+        console.log("Default admin user created (username: admin)");
+      }
+    } catch (error) {
+      console.error("Error seeding default admin:", error);
+    }
+  };
+  seedDefaultAdmin();
+
   app.post("/api/admin/login", async (req, res) => {
     try {
-      const { password } = req.body;
-      const adminPassword = process.env.ADMIN_PASSWORD;
-      if (!adminPassword) {
-        return res.status(500).json({ success: false, message: "Admin password not configured" });
+      const { username, password } = req.body;
+      if (!username || !password) {
+        return res.status(400).json({ success: false, message: "Username e password sono obbligatori" });
       }
-      if (password !== adminPassword) {
-        return res.status(401).json({ success: false, message: "Password non corretta" });
+      const user = await storage.getUserByUsername(username);
+      if (!user || !user.active) {
+        return res.status(401).json({ success: false, message: "Credenziali non valide" });
+      }
+      const validPassword = await bcrypt.compare(password, user.password);
+      if (!validPassword) {
+        return res.status(401).json({ success: false, message: "Credenziali non valide" });
       }
       const token = generateAdminToken();
-      adminSessions.set(token, { createdAt: Date.now() });
-      res.json({ success: true, token });
+      adminSessions.set(token, { createdAt: Date.now(), userId: user.id, role: user.role });
+      res.json({
+        success: true,
+        token,
+        user: { id: user.id, username: user.username, name: user.name, role: user.role },
+      });
     } catch (error) {
       console.error("Admin login error:", error);
       res.status(500).json({ success: false, message: "Internal server error" });
     }
   });
 
-  app.get("/api/admin/contacts", requireAdmin, async (_req, res) => {
+  app.get("/api/admin/users", requireAdmin, async (_req, res) => {
+    try {
+      const allUsers = await storage.getAllUsers();
+      const safeUsers = allUsers.map(({ password, ...u }) => u);
+      res.json(safeUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/users", requireAdmin, async (req, res) => {
+    try {
+      const { username, password, name, role } = req.body;
+      if (!username || !password || !name) {
+        return res.status(400).json({ success: false, message: "Tutti i campi sono obbligatori" });
+      }
+      if (username.length < 3) {
+        return res.status(400).json({ success: false, message: "Username deve avere almeno 3 caratteri" });
+      }
+      if (password.length < 6) {
+        return res.status(400).json({ success: false, message: "La password deve avere almeno 6 caratteri" });
+      }
+      const existing = await storage.getUserByUsername(username);
+      if (existing) {
+        return res.status(400).json({ success: false, message: "Username già in uso" });
+      }
+      const validRole = role === "admin" ? "admin" : "staff";
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await storage.createUser({
+        username,
+        password: hashedPassword,
+        name,
+        role: validRole,
+        active: true,
+      });
+      const { password: _, ...safeUser } = user;
+      res.status(201).json(safeUser);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/admin/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name, role, active, password } = req.body;
+      const updateData: any = {};
+      if (name !== undefined) updateData.name = name;
+      if (role !== undefined) updateData.role = role === "admin" ? "admin" : "staff";
+      if (active !== undefined) updateData.active = active;
+      if (password) updateData.password = await bcrypt.hash(password, 10);
+      const user = await storage.updateUser(id, updateData);
+      if (!user) {
+        return res.status(404).json({ success: false, message: "Utente non trovato" });
+      }
+      const { password: _, ...safeUser } = user;
+      res.json(safeUser);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/admin/users/:id", requireAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const session = (req as any).adminSession;
+      if (session.userId === id) {
+        return res.status(400).json({ success: false, message: "Non puoi eliminare il tuo account" });
+      }
+      await storage.deleteUser(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/admin/contacts", requireAuth, async (_req, res) => {
     try {
       const submissions = await storage.getContactSubmissions();
       res.json(submissions);
@@ -114,7 +243,7 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/admin/newsletter", requireAdmin, async (_req, res) => {
+  app.get("/api/admin/newsletter", requireAuth, async (_req, res) => {
     try {
       const subscriptions = await storage.getNewsletterSubscriptions();
       res.json(subscriptions);
@@ -124,7 +253,7 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/admin/blog", requireAdmin, async (_req, res) => {
+  app.get("/api/admin/blog", requireAuth, async (_req, res) => {
     try {
       const posts = await storage.getBlogPosts();
       res.json(posts);
@@ -134,7 +263,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/admin/blog/generate", requireAdmin, async (_req, res) => {
+  app.post("/api/admin/blog/generate", requireAuth, async (_req, res) => {
     try {
       await generateBlogPost();
       res.json({ success: true, message: "Blog post generation triggered" });
