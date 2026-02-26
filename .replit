@@ -42,3 +42,6 @@ waitForPort = 5000
 
 [userenv.shared]
 ADMIN_PASSWORD = "Interlingua2025!"
+
+[agent]
+integrations = ["javascript_paypal:1.0.0"]
