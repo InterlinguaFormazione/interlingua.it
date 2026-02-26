@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import { SiPaypal, SiVisa, SiMastercard } from "react-icons/si";
 import {
   Mic,
   Calendar,
@@ -311,14 +312,15 @@ export default function SpeakersCornerPurchase() {
                         <span className="text-sm text-muted-foreground">Moderatore madrelingua</span>
                       </div>
                     </div>
-                    <div className="pt-4 border-t">
+                    <div className="pt-4 border-t space-y-3">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Shield className="w-4 h-4" />
-                        <span>Pagamento sicuro via PayPal</span>
+                        <span>Pagamento sicuro</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
-                        <CreditCard className="w-4 h-4" />
-                        <span>Accetta Visa, Mastercard, PayPal</span>
+                      <div className="flex items-center justify-center gap-4 py-2">
+                        <SiPaypal className="w-10 h-10 text-[#003087]" />
+                        <SiVisa className="w-10 h-10 text-[#1A1F71]" />
+                        <SiMastercard className="w-10 h-10 text-[#EB001B]" />
                       </div>
                     </div>
                   </CardContent>
@@ -551,6 +553,12 @@ export default function SpeakersCornerPurchase() {
                           </div>
                           <span className="text-2xl font-bold text-foreground" data-testid="text-payment-amount">€200</span>
                         </div>
+                      </div>
+
+                      <div className="flex items-center justify-center gap-5 py-2">
+                        <SiPaypal className="w-9 h-9 text-[#003087]" />
+                        <SiVisa className="w-9 h-9 text-[#1A1F71]" />
+                        <SiMastercard className="w-9 h-9 text-[#EB001B]" />
                       </div>
 
                       {processing ? (
