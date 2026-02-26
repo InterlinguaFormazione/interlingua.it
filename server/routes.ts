@@ -115,6 +115,7 @@ export async function registerRoutes(
           username: "admin",
           password: hashedPassword,
           name: "Amministratore",
+          email: "",
           role: "admin",
           active: true,
         });
@@ -166,7 +167,7 @@ export async function registerRoutes(
 
   app.post("/api/admin/users", requireAdmin, async (req, res) => {
     try {
-      const { username, password, name, role } = req.body;
+      const { username, password, name, email, role } = req.body;
       if (!username || !password || !name) {
         return res.status(400).json({ success: false, message: "Tutti i campi sono obbligatori" });
       }
@@ -186,6 +187,7 @@ export async function registerRoutes(
         username,
         password: hashedPassword,
         name,
+        email: email || "",
         role: validRole,
         active: true,
       });
@@ -200,9 +202,10 @@ export async function registerRoutes(
   app.patch("/api/admin/users/:id", requireAdmin, async (req, res) => {
     try {
       const { id } = req.params;
-      const { name, role, active, password } = req.body;
+      const { name, email, role, active, password } = req.body;
       const updateData: any = {};
       if (name !== undefined) updateData.name = name;
+      if (email !== undefined) updateData.email = email;
       if (role !== undefined) updateData.role = role === "admin" ? "admin" : "staff";
       if (active !== undefined) updateData.active = active;
       if (password) updateData.password = await bcrypt.hash(password, 10);

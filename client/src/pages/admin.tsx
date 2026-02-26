@@ -34,6 +34,7 @@ interface AdminUser {
   id: string;
   username: string;
   name: string;
+  email: string;
   role: string;
   active: boolean | null;
   createdAt: string | null;
@@ -87,7 +88,7 @@ export default function AdminPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const [newUser, setNewUser] = useState({ username: "", password: "", name: "", role: "staff" });
+  const [newUser, setNewUser] = useState({ username: "", password: "", name: "", email: "", role: "staff" });
   const [userDialogOpen, setUserDialogOpen] = useState(false);
 
   const authenticated = !!token;
@@ -178,7 +179,7 @@ export default function AdminPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
       toast({ title: "Utente creato", description: "Il nuovo utente è stato aggiunto." });
-      setNewUser({ username: "", password: "", name: "", role: "staff" });
+      setNewUser({ username: "", password: "", name: "", email: "", role: "staff" });
       setUserDialogOpen(false);
     },
     onError: (error: Error) => {
@@ -656,6 +657,16 @@ export default function AdminPage() {
                             />
                           </div>
                           <div className="space-y-2">
+                            <Label htmlFor="new-user-email">Email</Label>
+                            <Input
+                              id="new-user-email"
+                              type="email"
+                              value={newUser.email}
+                              onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                              data-testid="input-new-user-email"
+                            />
+                          </div>
+                          <div className="space-y-2">
                             <Label htmlFor="new-user-password">Password</Label>
                             <Input
                               id="new-user-password"
@@ -721,7 +732,7 @@ export default function AdminPage() {
                               </div>
                               <div>
                                 <p className="font-medium text-foreground">{user.name || user.username}</p>
-                                <p className="text-sm text-muted-foreground">@{user.username}</p>
+                                <p className="text-sm text-muted-foreground">@{user.username}{user.email ? ` · ${user.email}` : ""}</p>
                               </div>
                             </div>
                             <div className="flex items-center gap-4">
