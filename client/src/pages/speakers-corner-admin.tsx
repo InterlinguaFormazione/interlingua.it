@@ -24,7 +24,8 @@ import {
   XCircle,
   Pause,
   Play,
-  RefreshCw
+  RefreshCw,
+  Pencil,
 } from "lucide-react";
 
 interface AdminSubscriber {
@@ -72,6 +73,9 @@ export default function SpeakersCornerAdmin() {
   const [suspensionReason, setSuspensionReason] = useState("");
   const [subscriberDialogOpen, setSubscriberDialogOpen] = useState(false);
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
+  const [editSubscriber, setEditSubscriber] = useState<AdminSubscriber | null>(null);
+  const [editSubData, setEditSubData] = useState({ name: "", email: "", password: "", subscriptionStart: "", subscriptionEnd: "" });
+  const [editSubDialogOpen, setEditSubDialogOpen] = useState(false);
 
   const { data: subscribers = [], isLoading: subscribersLoading } = useQuery<AdminSubscriber[]>({
     queryKey: ["/api/admin/speakers-corner/subscribers"],
@@ -119,6 +123,28 @@ export default function SpeakersCornerAdmin() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/speakers-corner/subscribers"] });
       toast({ title: "Aggiornato", description: "Stato iscritto aggiornato." });
+    },
+  });
+
+  const updateSubscriberMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Record<string, any> }) => {
+      const payload: Record<string, any> = {};
+      if (data.name) payload.name = data.name;
+      if (data.email) payload.email = data.email;
+      if (data.password) payload.password = data.password;
+      if (data.subscriptionStart) payload.subscriptionStart = data.subscriptionStart;
+      if (data.subscriptionEnd) payload.subscriptionEnd = data.subscriptionEnd;
+      const res = await apiRequest("PATCH", `/api/admin/speakers-corner/subscribers/${id}`, payload);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/speakers-corner/subscribers"] });
+      toast({ title: "Iscritto aggiornato", description: "Le modifiche sono state salvate." });
+      setEditSubDialogOpen(false);
+      setEditSubscriber(null);
+    },
+    onError: () => {
+      toast({ title: "Errore", description: "Errore nell'aggiornamento.", variant: "destructive" });
     },
   });
 
@@ -419,6 +445,24 @@ export default function SpeakersCornerAdmin() {
                                 onCheckedChange={(checked) => toggleSubscriberMutation.mutate({ id: sub.id, active: checked })}
                                 data-testid={`switch-subscriber-${sub.id}`}
                               />
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setEditSubscriber(sub);
+                                  setEditSubData({
+                                    name: sub.name,
+                                    email: sub.email,
+                                    password: "",
+                                    subscriptionStart: sub.subscriptionStart,
+                                    subscriptionEnd: sub.subscriptionEnd,
+                                  });
+                                  setEditSubDialogOpen(true);
+                                }}
+                                data-testid={`button-edit-subscriber-${sub.id}`}
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </Button>
                             </div>
                           </div>
                         );
@@ -427,6 +471,88 @@ export default function SpeakersCornerAdmin() {
                   )}
                 </CardContent>
               </Card>
+
+              <Dialog open={editSubDialogOpen} onOpenChange={setEditSubDialogOpen}>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Modifica Iscritto — {editSubscriber?.name}</DialogTitle>
+                  </DialogHeader>
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      if (editSubscriber) {
+                        updateSubscriberMutation.mutate({ id: editSubscriber.id, data: editSubData });
+                      }
+                    }}
+                    className="space-y-4"
+                  >
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-sub-name">Nome e Cognome</Label>
+                      <Input
+                        id="edit-sub-name"
+                        value={editSubData.name}
+                        onChange={(e) => setEditSubData({ ...editSubData, name: e.target.value })}
+                        required
+                        data-testid="input-edit-sub-name"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-sub-email">Email</Label>
+                      <Input
+                        id="edit-sub-email"
+                        type="email"
+                        value={editSubData.email}
+                        onChange={(e) => setEditSubData({ ...editSubData, email: e.target.value })}
+                        required
+                        data-testid="input-edit-sub-email"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="edit-sub-password">Nuova Password (lascia vuoto per non cambiarla)</Label>
+                      <Input
+                        id="edit-sub-password"
+                        type="password"
+                        value={editSubData.password}
+                        onChange={(e) => setEditSubData({ ...editSubData, password: e.target.value })}
+                        placeholder="Lascia vuoto per non modificare"
+                        data-testid="input-edit-sub-password"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-sub-start">Inizio Abbonamento</Label>
+                        <Input
+                          id="edit-sub-start"
+                          type="date"
+                          value={editSubData.subscriptionStart}
+                          onChange={(e) => setEditSubData({ ...editSubData, subscriptionStart: e.target.value })}
+                          required
+                          data-testid="input-edit-sub-start"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-sub-end">Fine Abbonamento</Label>
+                        <Input
+                          id="edit-sub-end"
+                          type="date"
+                          value={editSubData.subscriptionEnd}
+                          onChange={(e) => setEditSubData({ ...editSubData, subscriptionEnd: e.target.value })}
+                          required
+                          data-testid="input-edit-sub-end"
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={updateSubscriberMutation.isPending}
+                      data-testid="button-save-subscriber"
+                    >
+                      {updateSubscriberMutation.isPending ? "Salvataggio..." : "Salva Modifiche"}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </TabsContent>
 
             <TabsContent value="sessions">
