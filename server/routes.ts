@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { insertContactSchema, insertNewsletterSchema, insertCookieConsentSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation } from "./email";
+import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendSubscriptionConfirmation, sendBookingConfirmation } from "./email";
 import { forwardToCRM } from "./crm";
 import { generateBlogPost } from "./blog-generator";
 import { chatWithAI } from "./ai-chat";
@@ -780,6 +780,20 @@ export async function registerRoutes(
       }
 
       const booking = await storage.createScBooking({ subscriberId, sessionId });
+
+      try {
+        await sendBookingConfirmation({
+          nome: subscriber.nome,
+          cognome: subscriber.cognome,
+          email: subscriber.email,
+          sessionDate: session.sessionDate,
+          sessionTime: session.sessionTime || "18:30",
+          topic: session.topic,
+        });
+      } catch (emailError) {
+        console.error("Failed to send booking confirmation email:", emailError);
+      }
+
       res.status(201).json({ success: true, booking });
     } catch (error) {
       console.error("Error creating SC booking:", error);
@@ -1102,6 +1116,20 @@ export async function registerRoutes(
         billingCodiceSdi: codiceSdi || null,
         billingPec: pec || null,
       });
+
+      try {
+        await sendSubscriptionConfirmation({
+          nome,
+          cognome,
+          email,
+          subscriptionStart: today.toISOString().split('T')[0],
+          subscriptionEnd: endDate.toISOString().split('T')[0],
+          amount: verification.amount || "200.00",
+          paypalOrderId,
+        });
+      } catch (emailError) {
+        console.error("Failed to send subscription confirmation email:", emailError);
+      }
 
       const { password: _, ...safeSubscriber } = subscriber;
       res.json({ success: true, subscriber: safeSubscriber });

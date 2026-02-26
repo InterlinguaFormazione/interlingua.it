@@ -62,7 +62,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `routes.ts` - API endpoints with bot protection (honeypot, timestamp check, rate limiting)
 - `storage.ts` - PostgreSQL database storage (Drizzle ORM)
 - `ai-chat.ts` - AI chat endpoint (OpenAI GPT-4o-mini with full site context)
-- `email.ts` - AWS SES email notifications (contact + newsletter confirmation)
+- `email.ts` - AWS SES email notifications (contact, newsletter, subscription payment, booking confirmation)
 - `crm.ts` - CRM webhook integration (forwards contact submissions)
 - `blog-generator.ts` - Automated blog generation
 
@@ -107,7 +107,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 
 ### Speaker's Corner Subscriber API
 - `POST /api/speakers-corner/login` - Subscriber login (email + password)
-- `GET /api/speakers-corner/sessions` - Get upcoming sessions with participant counts
+- `GET /api/speakers-corner/sessions` - Get this week's sessions with participant counts
 - `POST /api/speakers-corner/book` - Book a session
 - `DELETE /api/speakers-corner/book/:bookingId` - Cancel a booking
 - `GET /api/speakers-corner/my-bookings/:subscriberId` - Get subscriber's bookings

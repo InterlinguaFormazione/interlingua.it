@@ -216,3 +216,172 @@ export async function sendNewsletterConfirmation(email: string) {
 
   await ses.send(command);
 }
+
+export async function sendSubscriptionConfirmation(data: {
+  nome: string;
+  cognome: string;
+  email: string;
+  subscriptionStart: string;
+  subscriptionEnd: string;
+  amount: string;
+  paypalOrderId: string;
+}) {
+  const htmlBody = `
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #7c3aed, #14b8a6); padding: 24px; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 22px;">Abbonamento Speaker's Corner Attivato!</h1>
+        <p style="color: rgba(255,255,255,0.85); margin: 8px 0 0; font-size: 14px;">SkillCraft-Interlingua</p>
+      </div>
+      <div style="background: white; padding: 24px; border-radius: 0 0 12px 12px; border: 1px solid #e5e7eb; border-top: none;">
+        <p style="color: #4b5563; line-height: 1.6;">Gentile <strong>${data.nome} ${data.cognome}</strong>,</p>
+        <p style="color: #4b5563; line-height: 1.6;">Il tuo abbonamento a Speaker's Corner è stato attivato con successo. Ecco il riepilogo:</p>
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 6px 0; font-weight: 600; color: #374151; width: 160px;">Importo pagato</td>
+              <td style="padding: 6px 0; color: #16a34a; font-weight: 700;">&euro;${data.amount}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; font-weight: 600; color: #374151;">Inizio abbonamento</td>
+              <td style="padding: 6px 0; color: #4b5563;">${data.subscriptionStart}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; font-weight: 600; color: #374151;">Scadenza</td>
+              <td style="padding: 6px 0; color: #4b5563;">${data.subscriptionEnd}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; font-weight: 600; color: #374151;">ID transazione PayPal</td>
+              <td style="padding: 6px 0; color: #4b5563; font-size: 13px;">${data.paypalOrderId}</td>
+            </tr>
+          </table>
+        </div>
+        <p style="color: #4b5563; line-height: 1.6;">Puoi accedere alla tua area personale e prenotare le sessioni settimanali dalla pagina <a href="https://skillcraft.interlingua.it/speakers-corner" style="color: #7c3aed; text-decoration: none; font-weight: 600;">Speaker's Corner</a>.</p>
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+          <p style="color: #6b7280; font-size: 14px; margin: 0;">Per qualsiasi domanda contattaci a:</p>
+          <p style="margin: 4px 0 0;"><a href="mailto:infocorsi@skillcraft.interlingua.it" style="color: #7c3aed; font-size: 14px;">infocorsi@skillcraft.interlingua.it</a></p>
+        </div>
+        <p style="color: #9ca3af; font-size: 12px; margin-top: 24px;">Questa è un'email automatica di conferma pagamento.</p>
+      </div>
+    </div>
+  `;
+
+  const textBody = `Gentile ${data.nome} ${data.cognome},
+
+Il tuo abbonamento a Speaker's Corner è stato attivato con successo.
+
+Importo pagato: €${data.amount}
+Inizio abbonamento: ${data.subscriptionStart}
+Scadenza: ${data.subscriptionEnd}
+ID transazione PayPal: ${data.paypalOrderId}
+
+Puoi accedere alla tua area personale e prenotare le sessioni settimanali dalla pagina Speaker's Corner su https://skillcraft.interlingua.it/speakers-corner
+
+Per qualsiasi domanda contattaci a: infocorsi@skillcraft.interlingua.it
+
+— SkillCraft-Interlingua`;
+
+  if (!ses) {
+    console.log("Email sending disabled — skipping subscription confirmation");
+    return;
+  }
+
+  const command = new SendEmailCommand({
+    Source: FROM_EMAIL,
+    Destination: {
+      ToAddresses: [data.email],
+    },
+    Message: {
+      Subject: {
+        Data: "Speaker's Corner — Conferma Abbonamento e Pagamento",
+        Charset: "UTF-8",
+      },
+      Body: {
+        Html: { Data: htmlBody, Charset: "UTF-8" },
+        Text: { Data: textBody, Charset: "UTF-8" },
+      },
+    },
+    ReplyToAddresses: [NOTIFICATION_EMAIL],
+  });
+
+  await ses.send(command);
+}
+
+export async function sendBookingConfirmation(data: {
+  nome: string;
+  cognome: string;
+  email: string;
+  sessionDate: string;
+  sessionTime: string;
+  topic?: string | null;
+}) {
+  const topicLine = data.topic ? `<tr><td style="padding: 6px 0; font-weight: 600; color: #374151; width: 120px;">Tema</td><td style="padding: 6px 0; color: #4b5563;">${data.topic}</td></tr>` : "";
+  const htmlBody = `
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #7c3aed, #14b8a6); padding: 24px; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 22px;">Prenotazione Confermata!</h1>
+        <p style="color: rgba(255,255,255,0.85); margin: 8px 0 0; font-size: 14px;">Speaker's Corner — SkillCraft-Interlingua</p>
+      </div>
+      <div style="background: white; padding: 24px; border-radius: 0 0 12px 12px; border: 1px solid #e5e7eb; border-top: none;">
+        <p style="color: #4b5563; line-height: 1.6;">Gentile <strong>${data.nome} ${data.cognome}</strong>,</p>
+        <p style="color: #4b5563; line-height: 1.6;">La tua prenotazione per la sessione di Speaker's Corner è confermata:</p>
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 6px 0; font-weight: 600; color: #374151; width: 120px;">Data</td>
+              <td style="padding: 6px 0; color: #4b5563;">${data.sessionDate}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; font-weight: 600; color: #374151;">Ora</td>
+              <td style="padding: 6px 0; color: #4b5563;">${data.sessionTime}</td>
+            </tr>
+            ${topicLine}
+          </table>
+        </div>
+        <p style="color: #4b5563; line-height: 1.6;">Puoi gestire le tue prenotazioni dalla tua <a href="https://skillcraft.interlingua.it/speakers-corner" style="color: #7c3aed; text-decoration: none; font-weight: 600;">area personale</a>.</p>
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+          <p style="color: #6b7280; font-size: 14px; margin: 0;">Per qualsiasi domanda contattaci a:</p>
+          <p style="margin: 4px 0 0;"><a href="mailto:infocorsi@skillcraft.interlingua.it" style="color: #7c3aed; font-size: 14px;">infocorsi@skillcraft.interlingua.it</a></p>
+        </div>
+        <p style="color: #9ca3af; font-size: 12px; margin-top: 24px;">Questa è un'email automatica di conferma prenotazione.</p>
+      </div>
+    </div>
+  `;
+
+  const textBody = `Gentile ${data.nome} ${data.cognome},
+
+La tua prenotazione per la sessione di Speaker's Corner è confermata:
+
+Data: ${data.sessionDate}
+Ora: ${data.sessionTime}${data.topic ? `\nTema: ${data.topic}` : ""}
+
+Puoi gestire le tue prenotazioni dalla tua area personale su https://skillcraft.interlingua.it/speakers-corner
+
+Per qualsiasi domanda contattaci a: infocorsi@skillcraft.interlingua.it
+
+— SkillCraft-Interlingua`;
+
+  if (!ses) {
+    console.log("Email sending disabled — skipping booking confirmation");
+    return;
+  }
+
+  const command = new SendEmailCommand({
+    Source: FROM_EMAIL,
+    Destination: {
+      ToAddresses: [data.email],
+    },
+    Message: {
+      Subject: {
+        Data: `Speaker's Corner — Prenotazione confermata per il ${data.sessionDate}`,
+        Charset: "UTF-8",
+      },
+      Body: {
+        Html: { Data: htmlBody, Charset: "UTF-8" },
+        Text: { Data: textBody, Charset: "UTF-8" },
+      },
+    },
+    ReplyToAddresses: [NOTIFICATION_EMAIL],
+  });
+
+  await ses.send(command);
+}
