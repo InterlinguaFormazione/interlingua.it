@@ -60,7 +60,24 @@ A modern, visually stunning website for SkillCraft-Interlingua, a training cente
 ## Running the Project
 The project runs with `npm run dev` which starts both the Express backend and Vite frontend on port 5000.
 
+## Pages
+- `/` - Home page with hero, courses, features, testimonials, about, contact, newsletter
+- `/corsi` - Course catalog
+- `/corsi/:id` - Course detail
+- `/chi-siamo` - About us
+- `/bandi-e-corsi-finanziati` - Funded courses and tenders listing (recreated from interlingua.it)
+- `/bandi/:id` - Individual bando/funded course detail page
+
+## Bandi e Corsi Finanziati
+- Data source: `client/src/data/bandi-data.ts` (all card and detail data)
+- Images stored locally in `client/public/images/bandi/` (downloaded from original interlingua.it site)
+- 22 bando cards (active + expired) with detail pages
+- Includes FSE+ projects, Fondimpresa, Fondo ForTe, Fondirigenti, and older POR FSE bandi
+
 ## Recent Changes
+- Added Bandi e Corsi Finanziati page with all linked detail pages
+- Downloaded and stored all original images locally
+- Added navigation link for Bandi e Corsi Finanziati
 - Initial website build with all core sections
 - Implemented contact form and newsletter API
 - Added dark mode support

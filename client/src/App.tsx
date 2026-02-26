@@ -8,6 +8,8 @@ import Home from "@/pages/home";
 import CoursesPage from "@/pages/courses";
 import CourseDetailPage from "@/pages/course-detail";
 import ChiSiamoPage from "@/pages/chi-siamo";
+import BandiECorsiPage from "@/pages/bandi-e-corsi";
+import BandoDetailPage from "@/pages/bando-detail";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -17,6 +19,8 @@ function Router() {
       <Route path="/corsi" component={CoursesPage} />
       <Route path="/corsi/:id" component={CourseDetailPage} />
       <Route path="/chi-siamo" component={ChiSiamoPage} />
+      <Route path="/bandi-e-corsi-finanziati" component={BandiECorsiPage} />
+      <Route path="/bandi/:id" component={BandoDetailPage} />
       <Route component={NotFound} />
     </Switch>
   );
