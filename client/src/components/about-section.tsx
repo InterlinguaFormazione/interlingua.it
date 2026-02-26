@@ -40,6 +40,8 @@ export function AboutSection() {
             src={aboutTeam} 
             alt="Il nostro team di formatori" 
             className="w-full h-64 md:h-96 object-cover"
+            loading="lazy"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/20" />
           <div className="absolute bottom-6 left-6 right-6">

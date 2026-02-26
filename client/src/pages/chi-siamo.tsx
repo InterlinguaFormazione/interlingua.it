@@ -194,6 +194,8 @@ export default function ChiSiamoPage() {
                   src={aboutTeamImage} 
                   alt="Il nostro team" 
                   className="w-full h-[400px] object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6">
@@ -341,6 +343,8 @@ export default function ChiSiamoPage() {
                   src={aboutTeachingImage} 
                   alt="Metodologia didattica" 
                   className="w-full h-[500px] object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               <Card className="absolute -bottom-8 -left-8 p-6 shadow-xl max-w-xs">
@@ -429,6 +433,8 @@ export default function ChiSiamoPage() {
                   src={aboutVicenzaImage} 
                   alt="Vicenza, sede Interlingua" 
                   className="w-full h-[400px] object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             </motion.div>

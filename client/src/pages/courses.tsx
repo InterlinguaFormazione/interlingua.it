@@ -524,6 +524,8 @@ export default function CoursesPage() {
                     src={categoryImages[category.id]} 
                     alt={category.title}
                     className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
                     data-testid={`img-category-${category.id}`}
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/40" />

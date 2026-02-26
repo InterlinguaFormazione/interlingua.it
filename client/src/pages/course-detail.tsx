@@ -452,6 +452,8 @@ export default function CourseDetailPage() {
           src={courseImage} 
           alt={course.title}
           className="w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
