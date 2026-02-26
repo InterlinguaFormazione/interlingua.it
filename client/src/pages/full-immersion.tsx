@@ -20,86 +20,42 @@ import {
   Quote,
   Phone,
   Mail,
-  Zap,
   Globe,
   Heart,
-  Coffee,
   GraduationCap,
   UserCheck,
   Languages,
   Mic2,
   Briefcase,
   Brain,
-  Compass,
-  ClipboardCheck,
 } from "lucide-react";
 import fullImmersionImage from "@assets/Full-Immersion-Workshop-di-Lingua-Inglese_1772143747179.jpg";
-
-const benefits = [
-  {
-    icon: TrendingUp,
-    title: "Un Livello in Una Settimana",
-    description: "Forse non te ne accorgi subito, ma già dal secondo giorno qualcosa dentro di te inizia a cambiare. Le parole arrivano più facilmente, le frasi si formano da sole. E quando venerdì ti rendi conto di aver fatto un salto di un intero livello QCER, capisci che il cambiamento era già iniziato prima ancora che potessi notarlo.",
-    gradient: "from-primary/10 to-blue-500/10",
-    iconColor: "text-primary",
-  },
-  {
-    icon: Globe,
-    title: "Solo Inglese. Naturalmente.",
-    description: "C'è quel momento, forse al secondo caffè, forse durante una risata, in cui ti accorgi che stai pensando in inglese. Non stai più traducendo. Il tuo cervello ha semplicemente scelto la via più naturale, e tu puoi goderti la sensazione di esprimerti con una fluidità che non sapevi di avere.",
-    gradient: "from-amber-500/10 to-orange-500/10",
-    iconColor: "text-amber-600",
-  },
-  {
-    icon: Users,
-    title: "Persone Come Te",
-    description: "Quando sei circondato da persone che condividono la tua stessa curiosità e la tua stessa voglia di crescere, succede qualcosa di speciale. In piccoli gruppi, ognuno trova il proprio spazio per esprimersi, e tu scopri che gli altri sono la risorsa più preziosa per il tuo apprendimento.",
-    gradient: "from-emerald-500/10 to-teal-500/10",
-    iconColor: "text-emerald-600",
-  },
-  {
-    icon: Award,
-    title: "Guide che Ispirano",
-    description: "Ci sono insegnanti che spiegano, e poi ci sono quelli che ti fanno sentire capace. I nostri docenti madrelingua hanno quel dono raro di creare uno spazio in cui ti senti libero di provare, di sbagliare, di scoprire che sai molto più di quanto pensavi.",
-    gradient: "from-rose-500/10 to-pink-500/10",
-    iconColor: "text-rose-600",
-  },
-];
 
 const programTopics = [
   {
     title: "Language Studies",
-    description: "Un approccio attivo alla lingua e alla grammatica, orientato all'uso reale dell'inglese. Grazie al Task-Based Learning, ogni lezione è personalizzata e interattiva, centrata sui bisogni concreti degli studenti — dalla scrittura di email alla gestione di dialoghi quotidiani o professionali.",
+    description: "Approccio attivo alla lingua e alla grammatica orientato all'uso reale, con Task-Based Learning personalizzato e interattivo — dalla scrittura di email alla gestione di dialoghi professionali.",
     icon: Languages,
     gradient: "from-primary to-blue-600",
   },
   {
     title: "Small Talk & Ear Training",
-    description: "Sessioni dinamiche dedicate alla conversazione, alla comprensione orale e alla pronuncia. Attraverso roleplay, giochi d'aula, tecniche di mirroring e imitation learning, si lavora su scioltezza e spontaneità, superando inibizioni e blocchi linguistici.",
+    description: "Conversazione, comprensione orale e pronuncia attraverso roleplay, giochi d'aula, mirroring e imitation learning. Si lavora su scioltezza e spontaneità, superando blocchi linguistici.",
     icon: Mic2,
     gradient: "from-amber-500 to-orange-600",
   },
   {
     title: "Specialist & Executive Language",
-    description: "Per chi vuole approfondire il linguaggio specifico del proprio contesto: business, tecnico, accademico o personale. I contenuti sono adattati al profilo dei partecipanti, con esercitazioni pratiche, sviluppo di progetti e simulazioni reali, attraverso Experiential Learning e Design Thinking.",
+    description: "Linguaggio specifico del proprio contesto: business, tecnico, accademico. Contenuti adattati al profilo dei partecipanti con Experiential Learning e Design Thinking.",
     icon: Briefcase,
     gradient: "from-emerald-500 to-teal-600",
   },
   {
     title: "Specialist & Executive Mindset",
-    description: "Un modulo trasversale e motivazionale focalizzato sulla comunicazione efficace, sull'intelligenza emotiva e sulla crescita personale. Qui si potenziano soft skills come public speaking, team-working, leadership e creatività, attraverso metodologie esperienziali e game-based learning.",
+    description: "Comunicazione efficace, intelligenza emotiva e crescita personale. Public speaking, leadership, team-working e creatività attraverso metodologie esperienziali e game-based learning.",
     icon: Brain,
     gradient: "from-violet-500 to-purple-600",
   },
-];
-
-const programHighlights = [
-  "4 sessioni da 90 minuti al giorno, 5 giorni consecutivi",
-  "4 docenti madrelingua, ciascuno esperto nel proprio topic",
-  "Almeno 30 ore frontali totali",
-  "Certificato a fine corso con livello QCER raggiunto",
-  "Programma di consolidamento di 3 mesi post-corso",
-  "Accesso a corso online e Speaker's Corner inclusi",
 ];
 
 const testimonials = [
@@ -136,16 +92,16 @@ const testimonials = [
     author: "Paolo",
   },
   {
-    text: "Approccio dinamico e interattivo, pieno di diverse attività: il public speaking, l'ascolto, attività pratiche, il gioco.",
-    author: "Mauro",
-  },
-  {
     text: "Mi ha stupito il metodo CLIL: con questo metodo ci si dimentica davvero di parlare una lingua straniera!",
     author: "Elena",
   },
   {
     text: "Mi ha sorpreso la professionalità e la passione trasmessa durante le lezioni.",
     author: "Michele Dominici",
+  },
+  {
+    text: "Approccio dinamico e interattivo, pieno di diverse attività: il public speaking, l'ascolto, attività pratiche, il gioco.",
+    author: "Mauro",
   },
   {
     text: "Corso molto dinamico, il tempo vola e solo alla fine ti accorgi di quanto hai imparato!",
@@ -156,24 +112,24 @@ const testimonials = [
 const formats = [
   {
     title: "FIW Collettivo",
-    subtitle: "5–8 partecipanti",
-    description: "Il formato più amato: un piccolo gruppo di persone motivate che condividono la stessa settimana di immersione totale. L'energia del gruppo diventa il motore del tuo apprendimento, e ogni giorno senti i progressi di chi ti sta accanto diventare anche i tuoi.",
+    subtitle: "5-8 partecipanti",
+    description: "Il formato più amato: un piccolo gruppo di persone motivate che condividono la stessa settimana di immersione totale. L'energia del gruppo diventa il motore del tuo apprendimento.",
     features: ["5 giorni intensivi (lun-ven)", "30+ ore frontali, dalle 9:00 alle 16:30", "Team di coach madrelingua", "Livelli da A2 a C1", "Convenzioni B&B e hotel a Vicenza"],
     color: "from-primary to-blue-600",
     icon: Users,
   },
   {
     title: "FIW Semi-Individuale",
-    subtitle: "2–4 partecipanti",
-    description: "Quando cerchi un'attenzione più mirata, questo formato ti permette di andare più in profondità. In un gruppo ristretto, ogni conversazione diventa un'opportunità su misura, e i tuoi obiettivi specifici guidano il percorso fin dal primo giorno.",
-    features: ["5 giorni intensivi (lun-ven)", "Percorso più personalizzato e mirato", "Conversazioni reali e sfide pratiche", "Team di coach madrelingua dedicato", "Convenzioni B&B e hotel a Vicenza"],
+    subtitle: "2-4 partecipanti",
+    description: "Un'attenzione più mirata in un gruppo ristretto, dove ogni conversazione diventa un'opportunità su misura e i tuoi obiettivi specifici guidano il percorso fin dal primo giorno.",
+    features: ["5 giorni intensivi (lun-ven)", "Percorso personalizzato e mirato", "Conversazioni reali e sfide pratiche", "Team di coach madrelingua dedicato", "Convenzioni B&B e hotel a Vicenza"],
     color: "from-emerald-500 to-teal-600",
     icon: UserCheck,
   },
   {
     title: "FIW Individuale",
     subtitle: "1 partecipante",
-    description: "Un'esperienza esclusiva, costruita interamente intorno a te: i tuoi obiettivi, il tuo stile, il tuo ritmo. Un team di 3-4 coach madrelingua dedicati lavora con te per una settimana. Tutto è progettato perché ogni minuto conti.",
+    description: "Un'esperienza esclusiva costruita interamente intorno a te: i tuoi obiettivi, il tuo stile, il tuo ritmo. Un team di 3-4 coach madrelingua dedicati lavora con te per una settimana.",
     features: ["5 giorni intensivi (lun-ven)", "3-4 coach madrelingua dedicati", "Programma 100% personalizzato", "Obiettivi specifici professionali", "Convenzioni B&B e hotel a Vicenza"],
     color: "from-violet-500 to-purple-600",
     icon: GraduationCap,
@@ -181,7 +137,7 @@ const formats = [
   {
     title: "Experiential Weekend",
     subtitle: "The Spirit of Leadership",
-    description: "Ci sono esperienze che ti cambiano senza che tu te ne renda conto. Un weekend sui Colli Berici, tra cavalli, natura e sfide di leadership, tutto in inglese. Quando torni a casa, porti con te qualcosa di più di un inglese migliore: porti una nuova consapevolezza di quello che sei capace di fare.",
+    description: "Un weekend sui Colli Berici tra cavalli, natura e sfide di leadership, tutto in inglese. Torni a casa con un inglese migliore e una nuova consapevolezza di quello che sei capace di fare.",
     features: ["2 giorni immersivi (sab-dom)", "Equitazione, leadership e team building", "Attività outdoor ed esperienziali", "Colli Berici, provincia di Vicenza"],
     color: "from-amber-500 to-orange-600",
     icon: Mountain,
@@ -208,10 +164,10 @@ export default function FullImmersionPage() {
                   E Se Bastasse<br />Una Settimana?
                 </h1>
                 <p className="text-xl text-white/90 mb-4 leading-relaxed max-w-xl">
-                  Sai già che il tuo inglese potrebbe essere migliore. Forse lo senti quando cerchi una parola che è lì, sulla punta della lingua, ma non esce. O quando capisci tutto, ma rispondere ti sembra un'altra cosa. Quella sensazione ti sta dicendo qualcosa.
+                  Sai già che il tuo inglese potrebbe essere migliore. Forse lo senti quando cerchi una parola che è lì, sulla punta della lingua, ma non esce. O quando capisci tutto, ma rispondere ti sembra un'altra cosa.
                 </p>
                 <p className="text-lg text-white/75 mb-8 leading-relaxed max-w-xl">
-                  In cinque giorni di immersione totale, succede qualcosa che mesi di studio tradizionale non riescono a darti: il tuo inglese smette di essere qualcosa che sai e diventa qualcosa che sei. I nostri docenti madrelingua sanno esattamente come guidarti in quel passaggio, nel modo più naturale possibile.
+                  In cinque giorni di immersione totale, il tuo inglese smette di essere qualcosa che sai e diventa qualcosa che sei. I nostri docenti madrelingua sanno esattamente come guidarti in quel passaggio, nel modo più naturale possibile.
                 </p>
 
                 <div className="flex flex-wrap gap-6 mb-10">
@@ -307,56 +263,47 @@ export default function FullImmersionPage() {
                   Un Livello in Una Settimana
                 </Badge>
                 <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6" data-testid="text-fi-intro-title">
-                  Sostanziale Miglioramento della Competenza Linguistica
+                  Metodologia Immersiva ed Esperienziale
                 </h2>
               </div>
-              <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
+              <div className="space-y-5 text-lg text-muted-foreground leading-relaxed">
                 <p>
-                  Hai mai pensato a quanto potrebbe cambiare il tuo inglese... senza dover partire per l'estero? I nostri workshop, attivi anche ad agosto, rappresentano un'alternativa concreta e stimolante ai soggiorni studio tradizionali.
+                  Hai mai pensato a quanto potrebbe cambiare il tuo inglese... senza dover partire per l'estero? I nostri workshop rappresentano un'alternativa concreta e stimolante ai soggiorni studio tradizionali. Molte persone — professionisti, studenti, lavoratori — scoprono che basta la giusta esperienza, nel contesto giusto, per fare un vero salto di qualità.
                 </p>
                 <p>
-                  Molte persone — professionisti, studenti, lavoratori, e chiunque senta il desiderio di esprimersi meglio in inglese — scoprono che basta la giusta esperienza, nel contesto giusto, per fare un vero salto di qualità. Se hai già qualche base, potresti sorprenderti nel vedere quanto puoi migliorare in poco tempo, quando imparare diventa naturale, pratico, adatto al tuo ritmo.
+                  Per cinque giorni entrerai in un ambiente dove si comunica, si pensa e si vive in inglese. Un programma superintensivo di almeno 30 ore frontali, dalle 9:00 alle 16:30, che puoi prolungare fino alle 18:00 con attività esperienziali. Il tutto basato sul metodo Interlingua, che unisce l'experiential learning al Task-Based Learning e al CLIL (Content and Language Integrated Learning). Non impari solo l'inglese: lo vivi.
                 </p>
                 <p>
-                  Che tu voglia comunicare con più sicurezza in ambito lavorativo o semplicemente sentirti più libero di parlare, capire e relazionarti in inglese anche nella vita di tutti i giorni, questa esperienza può fare la differenza.
-                </p>
-                <p className="text-xl font-semibold text-foreground text-center py-4">
-                  Non si tratta solo di imparare...<br />
-                  Si tratta di scoprire quanto l'inglese che hai dentro può diventare parte di te.
+                  E ciò che costruisci durante la settimana continua a crescere: 3 mesi di accesso a un corso online completo sulla nostra piattaforma 24/7, più sessioni di conversazione con coach madrelingua nello Speaker's Corner.
                 </p>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-muted/50 to-muted/20" />
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <div className="text-center mb-12">
-              <Badge variant="secondary" className="mb-4 px-4 py-1.5">
-                <Compass className="w-3 h-3 mr-1" />
-                Metodologia Immersiva ed Esperienziale
-              </Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6" data-testid="text-fi-methodology-title">
-                Immagina di Immergerti Completamente nella Lingua Inglese
-              </h2>
-            </div>
-            <div className="max-w-4xl mx-auto space-y-6 text-lg text-muted-foreground leading-relaxed">
-              <p>
-                Non c'è bisogno di viaggiare all'estero per vivere un'esperienza autentica, coinvolgente e trasformativa: è tutto qui, a portata di mano.
+              <p className="text-xl font-semibold text-foreground text-center py-8">
+                Non si tratta solo di imparare...<br />
+                Si tratta di scoprire quanto l'inglese che hai dentro può diventare parte di te.
               </p>
-              <p>
-                Per cinque giorni — dal lunedi al venerdi — entrerai in un ambiente dove si comunica, si pensa e si vive in inglese. Un programma superintensivo di almeno 30 ore frontali, dalle 9:00 alle 16:30, che puoi prolungare fino alle 18:00 con attività esperienziali in lingua che ti portano a usare l'inglese nella pratica, in situazioni reali e stimolanti.
-              </p>
-              <p>
-                Questa immersione profonda si basa sul metodo Interlingua, che unisce l'experiential learning alla concretezza del Task-Based Learning e alla ricchezza del CLIL (Content and Language Integrated Learning). In altre parole, non impari solo l'inglese: lo vivi, mentre esplori contenuti interessanti, affronti compiti significativi e partecipi attivamente alla costruzione del tuo apprendimento.
-              </p>
-              <p>
-                E ciò che costruisci durante la settimana continua a crescere nel tempo: hai 3 mesi di accesso a un corso online completo, disponibile 24/7 sulla nostra piattaforma interattiva. E ogni volta che senti il bisogno di parlare, confrontarti o semplicemente continuare a esercitarti, puoi prenotare sessioni di conversazione con coach madrelingua nello "Speakers' Corner".
-              </p>
-              <p>
-                Il programma segue i livelli QCER e ti guida nello sviluppo delle competenze fondamentali: grammatica, listening, reading, writing e pronunciation. Con la libertà di decidere quando, dove e come imparare. Perché imparare davvero è più facile quando ciò che fai ha senso, ti coinvolge... e ti fa sentire parte di qualcosa di reale.
-              </p>
+              <div className="grid grid-cols-3 gap-6 mt-4">
+                <div className="text-center p-4 rounded-2xl bg-primary/5 border border-primary/10">
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-2">
+                    <Clock className="w-6 h-6 text-primary" />
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">30+</p>
+                  <p className="text-xs text-muted-foreground">Ore frontali</p>
+                </div>
+                <div className="text-center p-4 rounded-2xl bg-primary/5 border border-primary/10">
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-2">
+                    <Users className="w-6 h-6 text-primary" />
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">1-8</p>
+                  <p className="text-xs text-muted-foreground">Partecipanti</p>
+                </div>
+                <div className="text-center p-4 rounded-2xl bg-primary/5 border border-primary/10">
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-2">
+                    <Award className="w-6 h-6 text-primary" />
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">+1</p>
+                  <p className="text-xs text-muted-foreground">Livello QCER</p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -366,32 +313,32 @@ export default function FullImmersionPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div className="text-center mb-6">
               <Badge variant="secondary" className="mb-4 px-4 py-1.5">
-                <Zap className="w-3 h-3 mr-1" />
-                Perché Funziona
+                <Target className="w-3 h-3 mr-1" />
+                Programma Interdisciplinare
               </Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-benefits-title">
-                Quello Che Succede Dentro di Te
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-program-title">
+                Quattro Aree Tematiche, Quattro Docenti
               </h2>
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-4">
-                Alcune cose si capiscono solo vivendole. Chi ha partecipato racconta sempre dello stesso momento: quel punto in cui smetti di pensare all'inglese come a qualcosa di difficile e inizi semplicemente a usarlo. Come se una porta che era sempre stata lì si fosse finalmente aperta.
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Quattro sessioni da 90 minuti al giorno, ciascuna guidata da un coach madrelingua esperto nel proprio topic. Il programma è customizzato e interdisciplinare: ogni partecipante diventa protagonista attivo del proprio apprendimento.
               </p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
-              {benefits.map((benefit, index) => (
+            <div className="grid md:grid-cols-2 gap-6 mt-12 max-w-5xl mx-auto">
+              {programTopics.map((topic, index) => (
                 <Card
                   key={index}
-                  className="group relative overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1"
-                  data-testid={`card-fi-benefit-${index}`}
+                  className="group overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                  data-testid={`card-fi-topic-${index}`}
                 >
-                  <CardContent className="pt-8 pb-6 text-center relative">
-                    <div className={`absolute inset-0 bg-gradient-to-br ${benefit.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-                    <div className="relative">
-                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${benefit.gradient} flex items-center justify-center mx-auto mb-5`}>
-                        <benefit.icon className={`w-7 h-7 ${benefit.iconColor}`} />
+                  <div className={`h-1.5 bg-gradient-to-r ${topic.gradient}`} />
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4 mb-3">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${topic.gradient} flex items-center justify-center shadow-md flex-shrink-0`}>
+                        <topic.icon className="w-6 h-6 text-white" />
                       </div>
-                      <h3 className="font-bold text-foreground mb-2 text-lg">{benefit.title}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
+                      <h3 className="text-lg font-bold text-foreground">{topic.title}</h3>
                     </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{topic.description}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -412,7 +359,7 @@ export default function FullImmersionPage() {
                 </h2>
               </div>
               <p className="text-lg text-muted-foreground text-center max-w-3xl mx-auto mb-12">
-                Quattro sessioni da 90 minuti al giorno, quattro docenti madrelingua, cinque giorni di immersione totale. Ogni giorno i topic ruotano, per tenerti sempre stimolato e farti vivere la lingua da prospettive diverse.
+                Ogni giorno i topic ruotano, per tenerti sempre stimolato e farti vivere la lingua da prospettive diverse. Il venerdi si conclude con l'Elevator Pitch: la tua presentazione finale in inglese.
               </p>
               <div className="overflow-x-auto" data-testid="table-fi-schedule">
                 <table className="w-full border-collapse text-sm">
@@ -540,168 +487,50 @@ export default function FullImmersionPage() {
         <section className="py-24">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-5xl mx-auto">
-              <div className="text-center mb-6">
-                <Badge variant="secondary" className="mb-4 px-4 py-1.5">
-                  <Target className="w-3 h-3 mr-1" />
-                  Programma Customizzato
-                </Badge>
-                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-program-title">
-                  Programma Interdisciplinare
-                </h2>
-                <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-4">
-                  La Learning Week offre un'esperienza intensiva, coinvolgente e trasformativa, adatta a professionisti, studenti e a chiunque desideri migliorare le proprie competenze comunicative in inglese in modo pratico e concreto.
-                </p>
-                <p className="text-base text-muted-foreground max-w-3xl mx-auto">
-                  Cinque giornate consecutive, dal lunedi al venerdi, articolate in quattro sessioni da 90 minuti al giorno, per un totale di almeno 30 ore, guidate da quattro docenti madrelingua, ciascuno esperto nel proprio topic.
-                </p>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6 mt-12 mb-12">
-                {programTopics.map((topic, index) => (
-                  <Card
-                    key={index}
-                    className="group overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-                    data-testid={`card-fi-topic-${index}`}
-                  >
-                    <div className={`h-1.5 bg-gradient-to-r ${topic.gradient}`} />
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${topic.gradient} flex items-center justify-center shadow-md flex-shrink-0`}>
-                          <topic.icon className="w-6 h-6 text-white" />
-                        </div>
-                        <h3 className="text-lg font-bold text-foreground">{topic.title}</h3>
-                      </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{topic.description}</p>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              <Card className="overflow-hidden border-primary/20 shadow-xl shadow-primary/5" data-testid="card-fi-program">
-                <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-1">
-                  <CardContent className="p-8 md:p-10 bg-card rounded-lg">
-                    <p className="text-sm text-muted-foreground leading-relaxed text-center mb-8 max-w-2xl mx-auto">
-                      Questo approccio rende ogni partecipante protagonista attivo del proprio apprendimento, permettendo di costruire competenze linguistiche solide e durature, che vadano ben oltre la teoria.
-                    </p>
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      {programHighlights.map((feature, index) => (
-                        <div key={index} className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
-                          <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                          <span className="text-sm font-medium text-foreground">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-8 grid grid-cols-3 gap-6 pt-6 border-t border-border/50">
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-2">
-                          <Clock className="w-6 h-6 text-primary" />
-                        </div>
-                        <p className="text-2xl font-bold text-foreground">30+</p>
-                        <p className="text-xs text-muted-foreground">Ore frontali</p>
-                      </div>
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-2">
-                          <Users className="w-6 h-6 text-primary" />
-                        </div>
-                        <p className="text-2xl font-bold text-foreground">1-8</p>
-                        <p className="text-xs text-muted-foreground">Partecipanti</p>
-                      </div>
-                      <div className="text-center">
-                        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-2">
-                          <Award className="w-6 h-6 text-primary" />
-                        </div>
-                        <p className="text-2xl font-bold text-foreground">+1</p>
-                        <p className="text-xs text-muted-foreground">Livello QCER</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </div>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-muted/50 to-muted/20" />
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
-            <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
                 <Badge variant="secondary" className="mb-4 px-4 py-1.5">
                   <Award className="w-3 h-3 mr-1" />
                   Risultati Garantiti
                 </Badge>
-                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6" data-testid="text-fi-results-title">
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-results-title">
                   Competenze e Risultati
                 </h2>
-              </div>
-              <div className="space-y-6 text-muted-foreground leading-relaxed">
-                <p className="text-lg">
-                  Le statistiche parlano chiaro: chi partecipa a questa esperienza formativa vive un livello di soddisfazione più alto e ottiene risultati migliori rispetto ai format più tradizionali. I dati lo confermano, con punteggi superiori nei test finali e nei questionari di feedback. Ma al di là dei numeri, ciò che conta davvero è ciò che accade dentro ogni partecipante: un cambiamento tangibile, misurabile, vissuto.
-                </p>
-                <p>
-                  Questa learning week è progettata per produrre un miglioramento concreto delle competenze comunicative, con particolare attenzione a quelle richieste nelle relazioni professionali con l'estero. Non solo un avanzamento del livello linguistico, ma un vero salto di qualità nella padronanza dell'inglese in ambito lavorativo.
-                </p>
-                <p>
-                  Il programma è strutturato in topics mirati, che rendono il percorso specifico e mirato, permettendo a ogni partecipante di affinare in modo rapido ed equilibrato ogni aspetto della comunicazione: dalla comprensione alla produzione, dalla spontaneità all'efficacia.
-                </p>
-                <p>
-                  A differenza dei corsi distribuiti nel tempo, questa formula intensiva permette di affidarsi pienamente al team docente, che accompagna lo studente in ogni fase del percorso: lezione, esercitazione, consolidamento, ripasso, verifica. Il tutto culmina con l'Elevator Pitch, una prova di public speaking in cui ciascuno presenta il proprio progetto sviluppato durante la settimana, con il supporto del docente di riferimento o all'interno di un lavoro di gruppo nato dalle attività della settimana.
-                </p>
-                <p>
-                  In questo modo, lo studente è parte attiva del proprio apprendimento. Contribuisce con la propria esperienza, lavora su contenuti autentici, e costruisce i propri obiettivi di miglioramento:
-                </p>
-                <div className="grid sm:grid-cols-3 gap-4 my-8">
-                  <Card className="border-primary/20">
-                    <CardContent className="p-5 text-center">
-                      <Globe className="w-8 h-8 text-primary mx-auto mb-3" />
-                      <p className="text-sm font-medium text-foreground">Comunicazione orale e scritta in contesti professionali</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-primary/20">
-                    <CardContent className="p-5 text-center">
-                      <Users className="w-8 h-8 text-primary mx-auto mb-3" />
-                      <p className="text-sm font-medium text-foreground">Consapevolezza e gestione delle differenze interculturali</p>
-                    </CardContent>
-                  </Card>
-                  <Card className="border-primary/20">
-                    <CardContent className="p-5 text-center">
-                      <Brain className="w-8 h-8 text-primary mx-auto mb-3" />
-                      <p className="text-sm font-medium text-foreground">Competenze trasversali: leadership, team-working, public speaking, pensiero creativo</p>
-                    </CardContent>
-                  </Card>
-                </div>
-                <p className="font-medium text-foreground text-center text-lg">
-                  Tutto questo avviene in un ambiente dinamico, sicuro e stimolante, dove imparare non è solo una questione di teoria, ma un'esperienza che lascia un segno duraturo.
+                <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                  Chi partecipa ottiene risultati migliori rispetto ai format tradizionali: punteggi superiori nei test finali, soddisfazione più alta, un cambiamento tangibile e misurabile. La formula intensiva permette di affidarsi pienamente al team docente in ogni fase — lezione, esercitazione, consolidamento, verifica — fino all'Elevator Pitch finale.
                 </p>
               </div>
-            </div>
-          </div>
-        </section>
 
-        <section className="py-24">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-12">
-                <Badge variant="secondary" className="mb-4 px-4 py-1.5">
-                  <BookOpen className="w-3 h-3 mr-1" />
-                  Foundation e Consolidation
-                </Badge>
-                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6" data-testid="text-fi-consolidation-title">
-                  Il Percorso Continua Dopo la Settimana
-                </h2>
+              <div className="grid sm:grid-cols-3 gap-6 mb-12">
+                <Card className="border-primary/20 hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-6 text-center">
+                    <Globe className="w-8 h-8 text-primary mx-auto mb-3" />
+                    <p className="text-sm font-medium text-foreground">Comunicazione orale e scritta in contesti professionali</p>
+                  </CardContent>
+                </Card>
+                <Card className="border-primary/20 hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-6 text-center">
+                    <Users className="w-8 h-8 text-primary mx-auto mb-3" />
+                    <p className="text-sm font-medium text-foreground">Consapevolezza e gestione delle differenze interculturali</p>
+                  </CardContent>
+                </Card>
+                <Card className="border-primary/20 hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-6 text-center">
+                    <Brain className="w-8 h-8 text-primary mx-auto mb-3" />
+                    <p className="text-sm font-medium text-foreground">Leadership, team-working, public speaking e pensiero creativo</p>
+                  </CardContent>
+                </Card>
               </div>
-              <div className="space-y-6 text-muted-foreground leading-relaxed">
-                <p className="text-lg">
-                  Indipendentemente da quanto intensamente scegli di vivere le tue giornate durante la learning week, questa esperienza non si conclude con l'ultima lezione. Al contrario, è solo l'inizio di un percorso che continua nel tempo, per rafforzare e consolidare tutto ciò che hai appreso.
-                </p>
-                <p>
-                  Dopo la settimana intensiva, avrai automaticamente accesso a un programma completo di Foundation e Consolidation, progettato per accompagnarti nei mesi successivi e valorizzare al massimo il tuo investimento formativo.
+
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold text-foreground mb-3">Foundation e Consolidation</h3>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  L'esperienza non si conclude con l'ultima lezione. Dopo la settimana intensiva, hai accesso automatico a un programma di consolidamento per valorizzare al massimo il tuo investimento.
                 </p>
               </div>
-              <div className="grid md:grid-cols-2 gap-6 mt-10">
+              <div className="grid md:grid-cols-2 gap-6">
                 <Card className="border-primary/20 hover:shadow-lg transition-all duration-300">
                   <CardContent className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
+                    <div className="flex items-center gap-4 mb-3">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-md flex-shrink-0">
                         <BookOpen className="w-6 h-6 text-white" />
                       </div>
@@ -711,13 +540,13 @@ export default function FullImmersionPage() {
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Uno spazio digitale interattivo, ricco di contenuti strutturati per guidarti nel consolidamento delle competenze — dalla grammatica al listening, dal reading al writing, fino alla pronuncia — sempre disponibile, quando e dove vuoi.
+                      Contenuti strutturati per il consolidamento — grammatica, listening, reading, writing, pronuncia — sempre disponibili, quando e dove vuoi.
                     </p>
                   </CardContent>
                 </Card>
                 <Card className="border-primary/20 hover:shadow-lg transition-all duration-300">
                   <CardContent className="p-6">
-                    <div className="flex items-center gap-4 mb-4">
+                    <div className="flex items-center gap-4 mb-3">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-md flex-shrink-0">
                         <Mic2 className="w-6 h-6 text-white" />
                       </div>
@@ -727,14 +556,11 @@ export default function FullImmersionPage() {
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      Il nostro corso di conversazione con coach madrelingua, che ti aiuterà a mantenere attiva e fluida la tua capacità di esprimerti in inglese. Prenota le sessioni quando vuoi e continua a crescere.
+                      Sessioni di conversazione per mantenere attiva e fluida la tua capacità di esprimerti in inglese. Prenota quando vuoi.
                     </p>
                   </CardContent>
                 </Card>
               </div>
-              <p className="text-center text-muted-foreground leading-relaxed mt-10 text-lg font-medium">
-                Tutto ciò è pensato per offrirti continuità, sicurezza e risultati duraturi. Perché imparare davvero è un'esperienza che cresce con te, anche dopo la fine del corso.
-              </p>
             </div>
           </div>
         </section>
@@ -747,20 +573,17 @@ export default function FullImmersionPage() {
                 <div>
                   <Badge variant="secondary" className="mb-4 px-4 py-1.5">
                     <Users className="w-3 h-3 mr-1" />
-                    Il Corso Giusto per Te
-                  </Badge>
-                  <h2 className="text-3xl font-bold text-foreground mb-6" data-testid="text-fi-audience-title">
                     A Chi è Rivolto
+                  </Badge>
+                  <h2 className="text-2xl font-bold text-foreground mb-6" data-testid="text-fi-audience-title">
+                    Per Chi Vuole Fare il Salto
                   </h2>
                   <div className="space-y-4 text-muted-foreground leading-relaxed">
                     <p>
-                      Il workshop intensivo di inglese in full immersion è pensato per chi desidera fare un salto di qualità nella lingua, senza dover seguire lunghi percorsi tradizionali.
+                      Professionisti, studenti universitari, freelance, viaggiatori, insegnanti — chiunque voglia migliorare rapidamente fluidità e sicurezza in inglese, per usarlo con naturalezza in contesti professionali e nella vita quotidiana.
                     </p>
                     <p>
-                      È ideale per professionisti, studenti universitari, freelance, viaggiatori, genitori, insegnanti e chiunque voglia migliorare rapidamente la propria fluidità e sicurezza in inglese, per usarlo con naturalezza sia in contesti professionali che nella vita quotidiana.
-                    </p>
-                    <p>
-                      È particolarmente adatto a chi ha poco tempo, impegni variabili o responsabilità che rendono difficile seguire corsi regolari e prolungati nel tempo. In una sola settimana, vivi un'esperienza intensiva, pratica e su misura, che ti aiuta a sbloccare il tuo inglese in modo diretto, stimolante e duraturo.
+                      Particolarmente adatto a chi ha poco tempo e impegni che rendono difficile seguire corsi regolari. In una sola settimana, un'esperienza intensiva e su misura che sblocca il tuo inglese in modo diretto e duraturo.
                     </p>
                     <p className="font-medium text-foreground">
                       Quando il metodo si adatta a te — e non il contrario — scoprire quanto puoi evolvere diventa solo questione di giorni.
@@ -769,13 +592,13 @@ export default function FullImmersionPage() {
                 </div>
                 <div>
                   <Badge variant="secondary" className="mb-4 px-4 py-1.5">
-                    <ClipboardCheck className="w-3 h-3 mr-1" />
-                    Livelli e Requisiti d'Accesso
+                    <Award className="w-3 h-3 mr-1" />
+                    Livelli e Requisiti
                   </Badge>
-                  <h2 className="text-3xl font-bold text-foreground mb-6" data-testid="text-fi-levels-title">
+                  <h2 className="text-2xl font-bold text-foreground mb-6" data-testid="text-fi-levels-title">
                     Livelli Disponibili
                   </h2>
-                  <div className="space-y-3 mb-8">
+                  <div className="space-y-3 mb-6">
                     {[
                       { level: "A2", name: "Pre-intermediate" },
                       { level: "B1", name: "Intermediate" },
@@ -790,15 +613,10 @@ export default function FullImmersionPage() {
                       </div>
                     ))}
                   </div>
-                  <div className="space-y-4 text-muted-foreground leading-relaxed">
-                    <p className="font-medium text-foreground">
-                      Test di ingresso online incluso.
-                    </p>
+                  <div className="space-y-3 text-sm text-muted-foreground leading-relaxed">
+                    <p className="font-medium text-foreground">Test di ingresso online incluso.</p>
                     <p>
-                      Il workshop è aperto a tutte le persone con una conoscenza minima della lingua inglese, indipendentemente dal loro percorso personale o professionale. Puoi accedere se hai frequentato un corso di livello almeno pre-intermediate (A2) con Interlingua negli ultimi 3 anni, oppure se superi un test online di valutazione iniziale con almeno il 40%.
-                    </p>
-                    <p>
-                      Che tu venga dal mondo del lavoro, dall'università o che tu voglia semplicemente migliorare l'inglese per viaggiare, comunicare meglio o crescere a livello personale, questo percorso è pensato per accompagnarti dove vuoi arrivare.
+                      Aperto a tutti con conoscenza minima dell'inglese. Accesso con corso A2+ negli ultimi 3 anni con Interlingua, oppure superando il test online con almeno il 40%.
                     </p>
                   </div>
                 </div>
@@ -807,9 +625,8 @@ export default function FullImmersionPage() {
           </div>
         </section>
 
-        <section className="py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-transparent" />
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <section className="py-24">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <Badge variant="secondary" className="mb-4 px-4 py-1.5">
                 <Star className="w-3 h-3 mr-1" />
