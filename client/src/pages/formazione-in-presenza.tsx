@@ -101,7 +101,7 @@ const courses = [
     subtitle: "In sede + piattaforma online",
     description: "Formazione linguistica modulare per 1 partecipante in inglese, francese, tedesco o spagnolo. Un percorso ibrido che combina lezioni in sede con la piattaforma e-learning 24/7.",
     image: languageCoachingImage,
-    price: "Su richiesta",
+    price: "645",
     duration: "12 settimane",
     gradient: "from-teal-500 to-teal-600",
     icon: Monitor,
