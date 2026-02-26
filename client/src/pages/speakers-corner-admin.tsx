@@ -33,6 +33,14 @@ interface AdminSubscriber {
   id: string;
   name: string;
   email: string;
+  codiceFiscale: string | null;
+  indirizzo: string | null;
+  cap: string | null;
+  citta: string | null;
+  provincia: string | null;
+  partitaIva: string | null;
+  codiceSdi: string | null;
+  pec: string | null;
   subscriptionStart: string;
   subscriptionEnd: string;
   active: boolean;
@@ -86,7 +94,7 @@ export default function SpeakersCornerAdmin() {
   const [subscriberDialogOpen, setSubscriberDialogOpen] = useState(false);
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
   const [editSubscriber, setEditSubscriber] = useState<AdminSubscriber | null>(null);
-  const [editSubData, setEditSubData] = useState({ name: "", email: "", password: "", subscriptionStart: "", subscriptionEnd: "" });
+  const [editSubData, setEditSubData] = useState({ name: "", email: "", password: "", subscriptionStart: "", subscriptionEnd: "", codiceFiscale: "", indirizzo: "", cap: "", citta: "", provincia: "", partitaIva: "", codiceSdi: "", pec: "" });
   const [editSubDialogOpen, setEditSubDialogOpen] = useState(false);
 
   const { data: subscribers = [], isLoading: subscribersLoading } = useQuery<AdminSubscriber[]>({
@@ -150,6 +158,14 @@ export default function SpeakersCornerAdmin() {
       if (data.password) payload.password = data.password;
       if (data.subscriptionStart) payload.subscriptionStart = data.subscriptionStart;
       if (data.subscriptionEnd) payload.subscriptionEnd = data.subscriptionEnd;
+      payload.codiceFiscale = data.codiceFiscale || "";
+      payload.indirizzo = data.indirizzo || "";
+      payload.cap = data.cap || "";
+      payload.citta = data.citta || "";
+      payload.provincia = data.provincia || "";
+      payload.partitaIva = data.partitaIva || "";
+      payload.codiceSdi = data.codiceSdi || "";
+      payload.pec = data.pec || "";
       const res = await apiRequest("PATCH", `/api/admin/speakers-corner/subscribers/${id}`, payload);
       return res.json();
     },
@@ -476,6 +492,14 @@ export default function SpeakersCornerAdmin() {
                                     password: "",
                                     subscriptionStart: sub.subscriptionStart,
                                     subscriptionEnd: sub.subscriptionEnd,
+                                    codiceFiscale: sub.codiceFiscale || "",
+                                    indirizzo: sub.indirizzo || "",
+                                    cap: sub.cap || "",
+                                    citta: sub.citta || "",
+                                    provincia: sub.provincia || "",
+                                    partitaIva: sub.partitaIva || "",
+                                    codiceSdi: sub.codiceSdi || "",
+                                    pec: sub.pec || "",
                                   });
                                   setEditSubDialogOpen(true);
                                 }}
@@ -493,7 +517,7 @@ export default function SpeakersCornerAdmin() {
               </Card>
 
               <Dialog open={editSubDialogOpen} onOpenChange={setEditSubDialogOpen}>
-                <DialogContent>
+                <DialogContent className="max-h-[85vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Modifica Iscritto — {editSubscriber?.name}</DialogTitle>
                   </DialogHeader>
@@ -560,6 +584,90 @@ export default function SpeakersCornerAdmin() {
                           required
                           data-testid="input-edit-sub-end"
                         />
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t">
+                      <p className="text-sm font-medium text-muted-foreground mb-3">Dati di Fatturazione</p>
+                      <div className="space-y-3">
+                        <div className="space-y-2">
+                          <Label htmlFor="edit-sub-cf">Codice Fiscale</Label>
+                          <Input
+                            id="edit-sub-cf"
+                            value={editSubData.codiceFiscale}
+                            onChange={(e) => setEditSubData({ ...editSubData, codiceFiscale: e.target.value.toUpperCase() })}
+                            data-testid="input-edit-sub-cf"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="edit-sub-indirizzo">Indirizzo</Label>
+                          <Input
+                            id="edit-sub-indirizzo"
+                            value={editSubData.indirizzo}
+                            onChange={(e) => setEditSubData({ ...editSubData, indirizzo: e.target.value })}
+                            data-testid="input-edit-sub-indirizzo"
+                          />
+                        </div>
+                        <div className="grid grid-cols-3 gap-2">
+                          <div className="space-y-2">
+                            <Label htmlFor="edit-sub-cap">CAP</Label>
+                            <Input
+                              id="edit-sub-cap"
+                              value={editSubData.cap}
+                              onChange={(e) => setEditSubData({ ...editSubData, cap: e.target.value })}
+                              data-testid="input-edit-sub-cap"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="edit-sub-citta">Città</Label>
+                            <Input
+                              id="edit-sub-citta"
+                              value={editSubData.citta}
+                              onChange={(e) => setEditSubData({ ...editSubData, citta: e.target.value })}
+                              data-testid="input-edit-sub-citta"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="edit-sub-prov">Prov.</Label>
+                            <Input
+                              id="edit-sub-prov"
+                              value={editSubData.provincia}
+                              onChange={(e) => setEditSubData({ ...editSubData, provincia: e.target.value.toUpperCase() })}
+                              maxLength={2}
+                              data-testid="input-edit-sub-prov"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="edit-sub-piva">Partita IVA</Label>
+                          <Input
+                            id="edit-sub-piva"
+                            value={editSubData.partitaIva}
+                            onChange={(e) => setEditSubData({ ...editSubData, partitaIva: e.target.value })}
+                            data-testid="input-edit-sub-piva"
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-2">
+                            <Label htmlFor="edit-sub-sdi">Codice SDI</Label>
+                            <Input
+                              id="edit-sub-sdi"
+                              value={editSubData.codiceSdi}
+                              onChange={(e) => setEditSubData({ ...editSubData, codiceSdi: e.target.value.toUpperCase() })}
+                              maxLength={7}
+                              data-testid="input-edit-sub-sdi"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="edit-sub-pec">PEC</Label>
+                            <Input
+                              id="edit-sub-pec"
+                              type="email"
+                              value={editSubData.pec}
+                              onChange={(e) => setEditSubData({ ...editSubData, pec: e.target.value })}
+                              data-testid="input-edit-sub-pec"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <Button

@@ -40,13 +40,21 @@ export default function SpeakersCornerPurchase() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [step, setStep] = useState<"details" | "payment" | "success">("details");
+  const [codiceFiscale, setCodiceFiscale] = useState("");
+  const [indirizzo, setIndirizzo] = useState("");
+  const [cap, setCap] = useState("");
+  const [citta, setCitta] = useState("");
+  const [provincia, setProvincia] = useState("");
+  const [partitaIva, setPartitaIva] = useState("");
+  const [codiceSdi, setCodiceSdi] = useState("");
+  const [pec, setPec] = useState("");
+  const [step, setStep] = useState<"details" | "billing" | "payment" | "success">("details");
   const [paypalReady, setPaypalReady] = useState(false);
   const [processing, setProcessing] = useState(false);
   const paypalInitialized = useRef(false);
 
   const purchaseMutation = useMutation({
-    mutationFn: async (data: { paypalOrderId: string; name: string; email: string; password: string }) => {
+    mutationFn: async (data: Record<string, string>) => {
       const res = await apiRequest("POST", "/api/speakers-corner/purchase", data);
       return res.json();
     },
@@ -83,6 +91,27 @@ export default function SpeakersCornerPurchase() {
     }
     if (password !== confirmPassword) {
       toast({ title: "Password non coincidono", description: "Le password inserite non corrispondono.", variant: "destructive" });
+      return;
+    }
+    setStep("billing");
+  };
+
+  const handleBillingSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!codiceFiscale || !indirizzo || !cap || !citta || !provincia) {
+      toast({ title: "Campi obbligatori", description: "Compila tutti i campi di fatturazione obbligatori.", variant: "destructive" });
+      return;
+    }
+    if (codiceFiscale.length !== 16 && codiceFiscale.length !== 11) {
+      toast({ title: "Codice Fiscale non valido", description: "Il codice fiscale deve essere di 16 caratteri (persona fisica) o 11 cifre (azienda).", variant: "destructive" });
+      return;
+    }
+    if (cap.length !== 5) {
+      toast({ title: "CAP non valido", description: "Il CAP deve essere di 5 cifre.", variant: "destructive" });
+      return;
+    }
+    if (provincia.length !== 2) {
+      toast({ title: "Provincia non valida", description: "Inserisci la sigla della provincia (es. TN, MI, RM).", variant: "destructive" });
       return;
     }
     setStep("payment");
@@ -137,6 +166,14 @@ export default function SpeakersCornerPurchase() {
                   name,
                   email,
                   password,
+                  codiceFiscale,
+                  indirizzo,
+                  cap,
+                  citta,
+                  provincia,
+                  partitaIva,
+                  codiceSdi,
+                  pec,
                 });
               } else {
                 setProcessing(false);
@@ -345,10 +382,146 @@ export default function SpeakersCornerPurchase() {
                             data-testid="input-purchase-confirm-password"
                           />
                         </div>
-                        <Button type="submit" className="w-full" size="lg" data-testid="button-continue-payment">
-                          Continua al pagamento
+                        <Button type="submit" className="w-full" size="lg" data-testid="button-continue-billing">
+                          Continua
                           <ArrowRight className="w-4 h-4 ml-2" />
                         </Button>
+                      </form>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {step === "billing" && (
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">2</div>
+                        <div>
+                          <CardTitle>Dati di Fatturazione</CardTitle>
+                          <CardDescription>Dati necessari per l'emissione della fattura</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <form onSubmit={handleBillingSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="purchase-cf">Codice Fiscale *</Label>
+                          <Input
+                            id="purchase-cf"
+                            value={codiceFiscale}
+                            onChange={(e) => setCodiceFiscale(e.target.value.toUpperCase())}
+                            placeholder="RSSMRA85M01H501Z"
+                            required
+                            maxLength={16}
+                            data-testid="input-purchase-cf"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="purchase-indirizzo">Indirizzo *</Label>
+                          <Input
+                            id="purchase-indirizzo"
+                            value={indirizzo}
+                            onChange={(e) => setIndirizzo(e.target.value)}
+                            placeholder="Via Roma 1"
+                            required
+                            data-testid="input-purchase-indirizzo"
+                          />
+                        </div>
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="space-y-2 col-span-1">
+                            <Label htmlFor="purchase-cap">CAP *</Label>
+                            <Input
+                              id="purchase-cap"
+                              value={cap}
+                              onChange={(e) => setCap(e.target.value.replace(/\D/g, "").slice(0, 5))}
+                              placeholder="38122"
+                              required
+                              maxLength={5}
+                              data-testid="input-purchase-cap"
+                            />
+                          </div>
+                          <div className="space-y-2 col-span-1">
+                            <Label htmlFor="purchase-citta">Città *</Label>
+                            <Input
+                              id="purchase-citta"
+                              value={citta}
+                              onChange={(e) => setCitta(e.target.value)}
+                              placeholder="Trento"
+                              required
+                              data-testid="input-purchase-citta"
+                            />
+                          </div>
+                          <div className="space-y-2 col-span-1">
+                            <Label htmlFor="purchase-provincia">Prov. *</Label>
+                            <Input
+                              id="purchase-provincia"
+                              value={provincia}
+                              onChange={(e) => setProvincia(e.target.value.toUpperCase().slice(0, 2))}
+                              placeholder="TN"
+                              required
+                              maxLength={2}
+                              data-testid="input-purchase-provincia"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="pt-4 border-t">
+                          <p className="text-sm font-medium text-muted-foreground mb-4">
+                            Per aziende e professionisti (opzionale)
+                          </p>
+                          <div className="space-y-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="purchase-piva">Partita IVA</Label>
+                              <Input
+                                id="purchase-piva"
+                                value={partitaIva}
+                                onChange={(e) => setPartitaIva(e.target.value)}
+                                placeholder="IT01234567890"
+                                data-testid="input-purchase-piva"
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-2">
+                                <Label htmlFor="purchase-sdi">Codice SDI</Label>
+                                <Input
+                                  id="purchase-sdi"
+                                  value={codiceSdi}
+                                  onChange={(e) => setCodiceSdi(e.target.value.toUpperCase())}
+                                  placeholder="XXXXXXX"
+                                  maxLength={7}
+                                  data-testid="input-purchase-sdi"
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="purchase-pec">PEC</Label>
+                                <Input
+                                  id="purchase-pec"
+                                  type="email"
+                                  value={pec}
+                                  onChange={(e) => setPec(e.target.value)}
+                                  placeholder="azienda@pec.it"
+                                  data-testid="input-purchase-pec"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-3 pt-2">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="flex-1"
+                            onClick={() => setStep("details")}
+                            data-testid="button-back-details-from-billing"
+                          >
+                            ← Indietro
+                          </Button>
+                          <Button type="submit" className="flex-1" size="lg" data-testid="button-continue-payment">
+                            Continua al pagamento
+                            <ArrowRight className="w-4 h-4 ml-2" />
+                          </Button>
+                        </div>
                       </form>
                     </CardContent>
                   </Card>
@@ -358,7 +531,7 @@ export default function SpeakersCornerPurchase() {
                   <Card>
                     <CardHeader>
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">2</div>
+                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">3</div>
                         <div>
                           <CardTitle>Pagamento</CardTitle>
                           <CardDescription>Completa l'acquisto con PayPal o carta di credito</CardDescription>
@@ -397,11 +570,11 @@ export default function SpeakersCornerPurchase() {
                             className="w-full"
                             onClick={() => {
                               paypalInitialized.current = false;
-                              setStep("details");
+                              setStep("billing");
                             }}
-                            data-testid="button-back-details"
+                            data-testid="button-back-billing"
                           >
-                            ← Torna ai dati
+                            ← Torna ai dati di fatturazione
                           </Button>
                         </div>
                       )}

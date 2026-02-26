@@ -860,7 +860,7 @@ export async function registerRoutes(
 
   app.patch("/api/admin/speakers-corner/subscribers/:id", async (req, res) => {
     try {
-      const { name, email, subscriptionStart, subscriptionEnd, active, password } = req.body;
+      const { name, email, subscriptionStart, subscriptionEnd, active, password, codiceFiscale, indirizzo, cap, citta, provincia, partitaIva, codiceSdi, pec } = req.body;
       const updateData: any = {};
       if (name !== undefined) updateData.name = name;
       if (email !== undefined) updateData.email = email;
@@ -868,6 +868,14 @@ export async function registerRoutes(
       if (subscriptionEnd !== undefined) updateData.subscriptionEnd = subscriptionEnd;
       if (active !== undefined) updateData.active = active;
       if (password) updateData.password = await bcrypt.hash(password, 10);
+      if (codiceFiscale !== undefined) updateData.codiceFiscale = codiceFiscale || null;
+      if (indirizzo !== undefined) updateData.indirizzo = indirizzo || null;
+      if (cap !== undefined) updateData.cap = cap || null;
+      if (citta !== undefined) updateData.citta = citta || null;
+      if (provincia !== undefined) updateData.provincia = provincia || null;
+      if (partitaIva !== undefined) updateData.partitaIva = partitaIva || null;
+      if (codiceSdi !== undefined) updateData.codiceSdi = codiceSdi || null;
+      if (pec !== undefined) updateData.pec = pec || null;
 
       const subscriber = await storage.updateScSubscriber(req.params.id, updateData);
       if (!subscriber) {
@@ -1001,9 +1009,9 @@ export async function registerRoutes(
 
   app.post("/api/speakers-corner/purchase", async (req, res) => {
     try {
-      const { paypalOrderId, name, email, password } = req.body;
-      if (!paypalOrderId || !name || !email || !password) {
-        return res.status(400).json({ success: false, message: "Dati mancanti" });
+      const { paypalOrderId, name, email, password, codiceFiscale, indirizzo, cap, citta, provincia, partitaIva, codiceSdi, pec } = req.body;
+      if (!paypalOrderId || !name || !email || !password || !codiceFiscale || !indirizzo || !cap || !citta || !provincia) {
+        return res.status(400).json({ success: false, message: "Dati mancanti. Compila tutti i campi obbligatori." });
       }
 
       const existing = await storage.getScSubscriberByEmail(email);
@@ -1034,6 +1042,14 @@ export async function registerRoutes(
         name,
         email,
         password: hashedPassword,
+        codiceFiscale: codiceFiscale || null,
+        indirizzo: indirizzo || null,
+        cap: cap || null,
+        citta: citta || null,
+        provincia: provincia || null,
+        partitaIva: partitaIva || null,
+        codiceSdi: codiceSdi || null,
+        pec: pec || null,
         subscriptionStart: today.toISOString().split('T')[0],
         subscriptionEnd: endDate.toISOString().split('T')[0],
         active: true,
@@ -1046,6 +1062,15 @@ export async function registerRoutes(
         currency: verification.currency || "EUR",
         status: "completed",
         payerEmail: verification.payerEmail || email,
+        billingName: name,
+        billingCodiceFiscale: codiceFiscale || null,
+        billingIndirizzo: indirizzo || null,
+        billingCap: cap || null,
+        billingCitta: citta || null,
+        billingProvincia: provincia || null,
+        billingPartitaIva: partitaIva || null,
+        billingCodiceSdi: codiceSdi || null,
+        billingPec: pec || null,
       });
 
       const { password: _, ...safeSubscriber } = subscriber;
