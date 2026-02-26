@@ -367,7 +367,7 @@ Per qualsiasi domanda contattaci a: infocorsi@skillcraft.interlingua.it
   }
 
   const command = new SendEmailCommand({
-    Source: SC_FROM_EMAIL,
+    Source: `${data.nome} ${data.cognome} <speakers_corner@interlingua.it>`,
     Destination: {
       ToAddresses: [data.email],
       CcAddresses: [SC_FROM_EMAIL],
