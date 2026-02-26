@@ -370,6 +370,7 @@ Per qualsiasi domanda contattaci a: infocorsi@skillcraft.interlingua.it
     Source: SC_FROM_EMAIL,
     Destination: {
       ToAddresses: [data.email],
+      CcAddresses: [SC_FROM_EMAIL],
     },
     Message: {
       Subject: {
@@ -381,7 +382,7 @@ Per qualsiasi domanda contattaci a: infocorsi@skillcraft.interlingua.it
         Text: { Data: textBody, Charset: "UTF-8" },
       },
     },
-    ReplyToAddresses: [NOTIFICATION_EMAIL],
+    ReplyToAddresses: [SC_FROM_EMAIL],
   });
 
   await ses.send(command);
