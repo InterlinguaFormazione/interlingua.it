@@ -23,6 +23,7 @@ import categoryImmersion from "@/assets/images/category-immersion.jpg";
 import categoryDigital from "@/assets/images/category-digital.jpg";
 import courseIndividual from "@/assets/images/course-individual.jpg";
 import lingueStraniereImage from "@assets/lingue-straniere_1772143318023.webp";
+import languageCoachingImage from "@assets/Language_Coaching_1772143397641.webp";
 
 const categories = [
   {
@@ -40,7 +41,7 @@ const categories = [
     title: "Language Coaching",
     description: "Percorsi personalizzati 1-to-1 con coach madrelingua. Sviluppa fluency, confidence e competenze comunicative su misura per i tuoi obiettivi.",
     icon: Mic,
-    image: courseIndividual,
+    image: languageCoachingImage,
     color: "from-indigo-500 to-indigo-600",
     courseCount: 3,
   },
