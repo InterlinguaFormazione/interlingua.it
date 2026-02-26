@@ -23,6 +23,7 @@ import BlogPage from "@/pages/blog";
 import BlogPostPage from "@/pages/blog-post";
 import CookiePolicyPage from "@/pages/cookie-policy";
 import PrivacyPolicyPage from "@/pages/privacy-policy";
+import FullImmersionPage from "@/pages/full-immersion";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/speakers-corner/dashboard" component={SpeakersCornerDashboard} />
       <Route path="/speakers-corner/acquista" component={SpeakersCornerPurchase} />
       <Route path="/speakers-corner/admin" component={SpeakersCornerAdmin} />
+      <Route path="/full-immersion" component={FullImmersionPage} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={BlogPostPage} />
