@@ -624,6 +624,124 @@ export default function FullImmersionPage() {
         <section className="py-24 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-muted/50 to-muted/20" />
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <Badge variant="secondary" className="mb-4 px-4 py-1.5">
+                  <Award className="w-3 h-3 mr-1" />
+                  Risultati Garantiti
+                </Badge>
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6" data-testid="text-fi-results-title">
+                  Competenze e Risultati
+                </h2>
+              </div>
+              <div className="space-y-6 text-muted-foreground leading-relaxed">
+                <p className="text-lg">
+                  Le statistiche parlano chiaro: chi partecipa a questa esperienza formativa vive un livello di soddisfazione più alto e ottiene risultati migliori rispetto ai format più tradizionali. I dati lo confermano, con punteggi superiori nei test finali e nei questionari di feedback. Ma al di là dei numeri, ciò che conta davvero è ciò che accade dentro ogni partecipante: un cambiamento tangibile, misurabile, vissuto.
+                </p>
+                <p>
+                  Questa learning week è progettata per produrre un miglioramento concreto delle competenze comunicative, con particolare attenzione a quelle richieste nelle relazioni professionali con l'estero. Non solo un avanzamento del livello linguistico, ma un vero salto di qualità nella padronanza dell'inglese in ambito lavorativo.
+                </p>
+                <p>
+                  Il programma è strutturato in topics mirati, che rendono il percorso specifico e mirato, permettendo a ogni partecipante di affinare in modo rapido ed equilibrato ogni aspetto della comunicazione: dalla comprensione alla produzione, dalla spontaneità all'efficacia.
+                </p>
+                <p>
+                  A differenza dei corsi distribuiti nel tempo, questa formula intensiva permette di affidarsi pienamente al team docente, che accompagna lo studente in ogni fase del percorso: lezione, esercitazione, consolidamento, ripasso, verifica. Il tutto culmina con l'Elevator Pitch, una prova di public speaking in cui ciascuno presenta il proprio progetto sviluppato durante la settimana, con il supporto del docente di riferimento o all'interno di un lavoro di gruppo nato dalle attività della settimana.
+                </p>
+                <p>
+                  In questo modo, lo studente è parte attiva del proprio apprendimento. Contribuisce con la propria esperienza, lavora su contenuti autentici, e costruisce i propri obiettivi di miglioramento:
+                </p>
+                <div className="grid sm:grid-cols-3 gap-4 my-8">
+                  <Card className="border-primary/20">
+                    <CardContent className="p-5 text-center">
+                      <Globe className="w-8 h-8 text-primary mx-auto mb-3" />
+                      <p className="text-sm font-medium text-foreground">Comunicazione orale e scritta in contesti professionali</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-primary/20">
+                    <CardContent className="p-5 text-center">
+                      <Users className="w-8 h-8 text-primary mx-auto mb-3" />
+                      <p className="text-sm font-medium text-foreground">Consapevolezza e gestione delle differenze interculturali</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-primary/20">
+                    <CardContent className="p-5 text-center">
+                      <Brain className="w-8 h-8 text-primary mx-auto mb-3" />
+                      <p className="text-sm font-medium text-foreground">Competenze trasversali: leadership, team-working, public speaking, pensiero creativo</p>
+                    </CardContent>
+                  </Card>
+                </div>
+                <p className="font-medium text-foreground text-center text-lg">
+                  Tutto questo avviene in un ambiente dinamico, sicuro e stimolante, dove imparare non è solo una questione di teoria, ma un'esperienza che lascia un segno duraturo.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-24">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <Badge variant="secondary" className="mb-4 px-4 py-1.5">
+                  <BookOpen className="w-3 h-3 mr-1" />
+                  Foundation e Consolidation
+                </Badge>
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6" data-testid="text-fi-consolidation-title">
+                  Il Percorso Continua Dopo la Settimana
+                </h2>
+              </div>
+              <div className="space-y-6 text-muted-foreground leading-relaxed">
+                <p className="text-lg">
+                  Indipendentemente da quanto intensamente scegli di vivere le tue giornate durante la learning week, questa esperienza non si conclude con l'ultima lezione. Al contrario, è solo l'inizio di un percorso che continua nel tempo, per rafforzare e consolidare tutto ciò che hai appreso.
+                </p>
+                <p>
+                  Dopo la settimana intensiva, avrai automaticamente accesso a un programma completo di Foundation e Consolidation, progettato per accompagnarti nei mesi successivi e valorizzare al massimo il tuo investimento formativo.
+                </p>
+              </div>
+              <div className="grid md:grid-cols-2 gap-6 mt-10">
+                <Card className="border-primary/20 hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center shadow-md flex-shrink-0">
+                        <BookOpen className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-foreground">3 Mesi di E-Learning</h3>
+                        <p className="text-sm text-muted-foreground">Piattaforma interattiva 24/7</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Uno spazio digitale interattivo, ricco di contenuti strutturati per guidarti nel consolidamento delle competenze — dalla grammatica al listening, dal reading al writing, fino alla pronuncia — sempre disponibile, quando e dove vuoi.
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card className="border-primary/20 hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-md flex-shrink-0">
+                        <Mic2 className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-foreground">3 Mesi di Speaker's Corner</h3>
+                        <p className="text-sm text-muted-foreground">Conversazione con coach madrelingua</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Il nostro corso di conversazione con coach madrelingua, che ti aiuterà a mantenere attiva e fluida la tua capacità di esprimerti in inglese. Prenota le sessioni quando vuoi e continua a crescere.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+              <p className="text-center text-muted-foreground leading-relaxed mt-10 text-lg font-medium">
+                Tutto ciò è pensato per offrirti continuità, sicurezza e risultati duraturi. Perché imparare davvero è un'esperienza che cresce con te, anche dopo la fine del corso.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-muted/50 to-muted/20" />
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div className="max-w-5xl mx-auto">
               <div className="grid md:grid-cols-2 gap-12">
                 <div>
