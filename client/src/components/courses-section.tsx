@@ -27,6 +27,7 @@ import languageCoachingImage from "@assets/Language_Coaching_1772143397641.webp"
 import corsoOnlineImage from "@assets/corso-lingua-online_1772143586662.jpg";
 import speakersCornerCourseImage from "@assets/Speakers-Corner-Conversazione-in-lingua-Inglese_1772143640698.jpg";
 import fullImmersionImage from "@assets/Full-Immersion-Workshop-di-Lingua-Inglese_1772143747179.jpg";
+import managementImage from "@assets/management-leadership_1772143822898.webp";
 
 const categories = [
   {
@@ -81,7 +82,7 @@ const categories = [
     title: "Competenze Professionali",
     description: "Office, AI, digital skills e crescita personale. Comunicazione efficace, leadership e time management per il tuo sviluppo.",
     icon: Briefcase,
-    image: categoryDigital,
+    image: managementImage,
     color: "from-blue-500 to-blue-600",
     courseCount: 5,
     featured: true,
