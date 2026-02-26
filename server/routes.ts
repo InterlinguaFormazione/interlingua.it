@@ -3,10 +3,11 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertContactSchema, insertNewsletterSchema } from "@shared/schema";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
 
 const GOOGLE_PLACE_ID = "ChIJDWsIWn0xf0cR9w29gPorTls";
 let reviewsCache: { data: any; timestamp: number } | null = null;
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
 export async function registerRoutes(
   httpServer: Server,
@@ -104,7 +105,6 @@ export async function registerRoutes(
 
   app.get("/api/reviews", async (_req, res) => {
     try {
-      // Check cache first
       if (reviewsCache && Date.now() - reviewsCache.timestamp < CACHE_DURATION) {
         return res.json(reviewsCache.data);
       }
@@ -145,7 +145,6 @@ export async function registerRoutes(
         })),
       };
 
-      // Update cache
       reviewsCache = { data: result, timestamp: Date.now() };
 
       res.json(result);
@@ -219,6 +218,303 @@ export async function registerRoutes(
     ];
     
     res.json(courses);
+  });
+
+  // =========================================
+  // Speaker's Corner API Routes
+  // =========================================
+
+  app.post("/api/speakers-corner/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({ success: false, message: "Email e password sono obbligatori" });
+      }
+
+      const subscriber = await storage.getScSubscriberByEmail(email);
+      if (!subscriber) {
+        return res.status(401).json({ success: false, message: "Credenziali non valide" });
+      }
+
+      const validPassword = await bcrypt.compare(password, subscriber.password);
+      if (!validPassword) {
+        return res.status(401).json({ success: false, message: "Credenziali non valide" });
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+      if (!subscriber.active || subscriber.subscriptionEnd < today) {
+        return res.status(403).json({ 
+          success: false, 
+          message: "Il tuo abbonamento non è attivo o è scaduto" 
+        });
+      }
+
+      const { password: _, ...subscriberData } = subscriber;
+      res.json({ success: true, subscriber: subscriberData });
+    } catch (error) {
+      console.error("Speaker's Corner login error:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.get("/api/speakers-corner/sessions", async (_req, res) => {
+    try {
+      const sessions = await storage.getUpcomingScSessions();
+      const sessionsWithBookings = await Promise.all(
+        sessions.map(async (session) => {
+          const bookings = await storage.getScBookingsBySession(session.id);
+          return { ...session, currentParticipants: bookings.length };
+        })
+      );
+      res.json(sessionsWithBookings);
+    } catch (error) {
+      console.error("Error fetching SC sessions:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/speakers-corner/book", async (req, res) => {
+    try {
+      const { subscriberId, sessionId } = req.body;
+      if (!subscriberId || !sessionId) {
+        return res.status(400).json({ success: false, message: "Dati mancanti" });
+      }
+
+      const subscriber = await storage.getScSubscriberById(subscriberId);
+      if (!subscriber || !subscriber.active) {
+        return res.status(403).json({ success: false, message: "Abbonamento non attivo" });
+      }
+
+      const session = await storage.getScSessionById(sessionId);
+      if (!session || session.status !== "active") {
+        return res.status(404).json({ success: false, message: "Sessione non trovata o non attiva" });
+      }
+
+      const existingBooking = await storage.getScBooking(subscriberId, sessionId);
+      if (existingBooking) {
+        return res.status(400).json({ success: false, message: "Sei già prenotato per questa sessione" });
+      }
+
+      const bookings = await storage.getScBookingsBySession(sessionId);
+      if (bookings.length >= (session.maxParticipants || 12)) {
+        return res.status(400).json({ success: false, message: "Sessione al completo" });
+      }
+
+      const booking = await storage.createScBooking({ subscriberId, sessionId });
+      res.status(201).json({ success: true, booking });
+    } catch (error) {
+      console.error("Error creating SC booking:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.delete("/api/speakers-corner/book/:bookingId", async (req, res) => {
+    try {
+      const { subscriberId } = req.query;
+      if (!subscriberId) {
+        return res.status(400).json({ success: false, message: "ID iscritto mancante" });
+      }
+      const bookings = await storage.getScBookingsBySubscriber(subscriberId as string);
+      const booking = bookings.find(b => b.id === req.params.bookingId);
+      if (!booking) {
+        return res.status(403).json({ success: false, message: "Prenotazione non trovata o non autorizzata" });
+      }
+      await storage.deleteScBooking(req.params.bookingId);
+      res.json({ success: true, message: "Prenotazione cancellata" });
+    } catch (error) {
+      console.error("Error deleting SC booking:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.get("/api/speakers-corner/my-bookings/:subscriberId", async (req, res) => {
+    try {
+      const bookings = await storage.getScBookingsBySubscriber(req.params.subscriberId);
+      const bookingsWithSessions = await Promise.all(
+        bookings.map(async (booking) => {
+          const session = await storage.getScSessionById(booking.sessionId);
+          return { ...booking, session };
+        })
+      );
+      res.json(bookingsWithSessions);
+    } catch (error) {
+      console.error("Error fetching SC bookings:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  // =========================================
+  // Speaker's Corner Admin Routes
+  // =========================================
+
+  app.get("/api/admin/speakers-corner/subscribers", async (_req, res) => {
+    try {
+      const subscribers = await storage.getAllScSubscribers();
+      const safeSubscribers = subscribers.map(({ password, ...rest }) => rest);
+      res.json(safeSubscribers);
+    } catch (error) {
+      console.error("Error fetching SC subscribers:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/admin/speakers-corner/subscribers", async (req, res) => {
+    try {
+      const { name, email, password, subscriptionStart, subscriptionEnd } = req.body;
+      if (!name || !email || !password || !subscriptionStart || !subscriptionEnd) {
+        return res.status(400).json({ success: false, message: "Tutti i campi sono obbligatori" });
+      }
+
+      const existing = await storage.getScSubscriberByEmail(email);
+      if (existing) {
+        return res.status(400).json({ success: false, message: "Email già registrata" });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const subscriber = await storage.createScSubscriber({
+        name,
+        email,
+        password: hashedPassword,
+        subscriptionStart,
+        subscriptionEnd,
+        active: true,
+      });
+
+      const { password: _, ...safeSubscriber } = subscriber;
+      res.status(201).json({ success: true, subscriber: safeSubscriber });
+    } catch (error) {
+      console.error("Error creating SC subscriber:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.patch("/api/admin/speakers-corner/subscribers/:id", async (req, res) => {
+    try {
+      const { name, email, subscriptionStart, subscriptionEnd, active, password } = req.body;
+      const updateData: any = {};
+      if (name !== undefined) updateData.name = name;
+      if (email !== undefined) updateData.email = email;
+      if (subscriptionStart !== undefined) updateData.subscriptionStart = subscriptionStart;
+      if (subscriptionEnd !== undefined) updateData.subscriptionEnd = subscriptionEnd;
+      if (active !== undefined) updateData.active = active;
+      if (password) updateData.password = await bcrypt.hash(password, 10);
+
+      const subscriber = await storage.updateScSubscriber(req.params.id, updateData);
+      if (!subscriber) {
+        return res.status(404).json({ success: false, message: "Iscritto non trovato" });
+      }
+
+      const { password: _, ...safeSubscriber } = subscriber;
+      res.json({ success: true, subscriber: safeSubscriber });
+    } catch (error) {
+      console.error("Error updating SC subscriber:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.get("/api/admin/speakers-corner/sessions", async (_req, res) => {
+    try {
+      const sessions = await storage.getAllScSessions();
+      const sessionsWithBookings = await Promise.all(
+        sessions.map(async (session) => {
+          const bookings = await storage.getScBookingsBySession(session.id);
+          return { ...session, currentParticipants: bookings.length };
+        })
+      );
+      res.json(sessionsWithBookings);
+    } catch (error) {
+      console.error("Error fetching SC sessions:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/admin/speakers-corner/sessions", async (req, res) => {
+    try {
+      const { sessionDate, sessionTime, topic, maxParticipants, status } = req.body;
+      if (!sessionDate) {
+        return res.status(400).json({ success: false, message: "La data della sessione è obbligatoria" });
+      }
+
+      const session = await storage.createScSession({
+        sessionDate,
+        sessionTime: sessionTime || "18:30",
+        topic: topic || null,
+        maxParticipants: maxParticipants || 12,
+        status: status || "active",
+      });
+      res.status(201).json({ success: true, session });
+    } catch (error) {
+      console.error("Error creating SC session:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.patch("/api/admin/speakers-corner/sessions/:id", async (req, res) => {
+    try {
+      const session = await storage.updateScSession(req.params.id, req.body);
+      if (!session) {
+        return res.status(404).json({ success: false, message: "Sessione non trovata" });
+      }
+      res.json({ success: true, session });
+    } catch (error) {
+      console.error("Error updating SC session:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.get("/api/admin/speakers-corner/email-settings", async (_req, res) => {
+    try {
+      const settings = await storage.getScEmailSettings();
+      res.json(settings);
+    } catch (error) {
+      console.error("Error fetching SC email settings:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.patch("/api/admin/speakers-corner/email-settings", async (req, res) => {
+    try {
+      const { emailsSuspended, suspensionReason } = req.body;
+      const settings = await storage.updateScEmailSettings(emailsSuspended, suspensionReason);
+      res.json({ success: true, settings });
+    } catch (error) {
+      console.error("Error updating SC email settings:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/admin/speakers-corner/generate-sessions", async (req, res) => {
+    try {
+      const { weeks } = req.body;
+      const numWeeks = weeks || 8;
+      const created: any[] = [];
+
+      for (let i = 0; i < numWeeks; i++) {
+        const date = new Date();
+        const dayOfWeek = date.getDay();
+        const daysUntilFriday = (5 - dayOfWeek + 7) % 7 || 7;
+        date.setDate(date.getDate() + daysUntilFriday + (i * 7));
+        const sessionDate = date.toISOString().split('T')[0];
+
+        const existing = await storage.getAllScSessions();
+        const alreadyExists = existing.some(s => s.sessionDate === sessionDate);
+        if (!alreadyExists) {
+          const session = await storage.createScSession({
+            sessionDate,
+            sessionTime: "18:30",
+            topic: null,
+            maxParticipants: 12,
+            status: "active",
+          });
+          created.push(session);
+        }
+      }
+
+      res.json({ success: true, created: created.length, sessions: created });
+    } catch (error) {
+      console.error("Error generating SC sessions:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
   });
 
   return httpServer;

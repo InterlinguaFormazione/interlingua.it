@@ -5,16 +5,20 @@ A modern, visually stunning website for SkillCraft-Interlingua, a training cente
 
 ## Tech Stack
 - **Frontend**: React with TypeScript, Vite, TailwindCSS, Shadcn/ui components
-- **Backend**: Express.js
+- **Backend**: Express.js with PostgreSQL (Drizzle ORM)
 - **State Management**: TanStack React Query
 - **Animations**: Framer Motion
 - **Routing**: Wouter
 - **Forms**: React Hook Form with Zod validation
+- **Auth**: bcryptjs for password hashing
 
 ## Project Structure
 
 ### Frontend (`client/`)
 - `src/pages/home.tsx` - Main landing page with all sections
+- `src/pages/speakers-corner.tsx` - Speaker's Corner landing page with login
+- `src/pages/speakers-corner-dashboard.tsx` - Subscriber dashboard for booking sessions
+- `src/pages/speakers-corner-admin.tsx` - Admin panel for managing subscribers, sessions, email settings
 - `src/components/` - Reusable UI components
   - `navigation.tsx` - Fixed header with mobile menu
   - `hero-section.tsx` - Hero with animated stats
@@ -29,11 +33,21 @@ A modern, visually stunning website for SkillCraft-Interlingua, a training cente
   - `theme-toggle.tsx` - Theme switcher button
 
 ### Backend (`server/`)
-- `routes.ts` - API endpoints for contact form and newsletter
-- `storage.ts` - In-memory storage for submissions
+- `db.ts` - PostgreSQL database connection (drizzle-orm/node-postgres)
+- `routes.ts` - API endpoints for contact form, newsletter, Speaker's Corner
+- `storage.ts` - Storage interface (in-memory for legacy, PostgreSQL for Speaker's Corner)
 
 ### Shared (`shared/`)
-- `schema.ts` - TypeScript interfaces and Zod schemas
+- `schema.ts` - TypeScript interfaces, Drizzle tables, and Zod schemas
+
+## Database Tables
+- `users` - Basic user accounts
+- `contact_submissions` - Contact form submissions
+- `newsletter_subscriptions` - Newsletter subscribers
+- `sc_subscribers` - Speaker's Corner subscribers (name, email, hashed password, subscription dates)
+- `sc_sessions` - Weekly Friday sessions (date, time, topic, max participants, status)
+- `sc_bookings` - Session bookings (subscriber + session link)
+- `sc_email_settings` - Email notification settings (suspend/resume for holidays)
 
 ## API Endpoints
 - `POST /api/contact` - Submit contact form
@@ -41,44 +55,49 @@ A modern, visually stunning website for SkillCraft-Interlingua, a training cente
 - `POST /api/newsletter` - Subscribe to newsletter
 - `GET /api/newsletter` - Get all newsletter subscriptions
 - `GET /api/courses` - Get available courses
+- `GET /api/reviews` - Get Google reviews (cached)
 
-## Design System
-- **Primary Color**: Purple (262° hue) - Innovation and creativity
-- **Accent Color**: Teal (172° hue) - Trust and growth
-- **Font**: Plus Jakarta Sans (modern, professional)
-- **Dark Mode**: Full support with system preference detection
+### Speaker's Corner Subscriber API
+- `POST /api/speakers-corner/login` - Subscriber login (email + password)
+- `GET /api/speakers-corner/sessions` - Get upcoming sessions with participant counts
+- `POST /api/speakers-corner/book` - Book a session
+- `DELETE /api/speakers-corner/book/:bookingId` - Cancel a booking
+- `GET /api/speakers-corner/my-bookings/:subscriberId` - Get subscriber's bookings
 
-## Features
-- Responsive design (mobile-first)
-- Smooth scroll navigation
-- Animated sections with Framer Motion
-- SEO optimized with structured data
-- Contact form with validation
-- Newsletter subscription
-- Theme toggle (light/dark)
-
-## Running the Project
-The project runs with `npm run dev` which starts both the Express backend and Vite frontend on port 5000.
+### Speaker's Corner Admin API
+- `GET /api/admin/speakers-corner/subscribers` - List all subscribers
+- `POST /api/admin/speakers-corner/subscribers` - Create subscriber
+- `PATCH /api/admin/speakers-corner/subscribers/:id` - Update subscriber
+- `GET /api/admin/speakers-corner/sessions` - List all sessions
+- `POST /api/admin/speakers-corner/sessions` - Create session
+- `PATCH /api/admin/speakers-corner/sessions/:id` - Update session
+- `GET /api/admin/speakers-corner/email-settings` - Get email settings
+- `PATCH /api/admin/speakers-corner/email-settings` - Update email settings
+- `POST /api/admin/speakers-corner/generate-sessions` - Auto-generate Friday sessions
 
 ## Pages
 - `/` - Home page with hero, courses, features, testimonials, about, contact, newsletter
 - `/corsi` - Course catalog
 - `/corsi/:id` - Course detail
 - `/chi-siamo` - About us
-- `/bandi-e-corsi-finanziati` - Funded courses and tenders listing (recreated from interlingua.it)
+- `/bandi-e-corsi-finanziati` - Funded courses and tenders listing
 - `/bandi/:id` - Individual bando/funded course detail page
+- `/speakers-corner` - Speaker's Corner info page with subscriber login
+- `/speakers-corner/dashboard` - Subscriber dashboard (view/book sessions)
+- `/speakers-corner/admin` - Admin panel (manage subscribers, sessions, email settings)
 
 ## Bandi e Corsi Finanziati
-- Data source: `client/src/data/bandi-data.ts` (all card and detail data)
-- Images stored locally in `client/public/images/bandi/` (downloaded from original interlingua.it site)
+- Data source: `client/src/data/bandi-data.ts`
+- Images stored locally in `client/public/images/bandi/`
 - 22 bando cards (active + expired) with detail pages
-- Includes FSE+ projects, Fondimpresa, Fondo ForTe, Fondirigenti, and older POR FSE bandi
 
-## Recent Changes
-- Added Bandi e Corsi Finanziati page with all linked detail pages
-- Downloaded and stored all original images locally
-- Added navigation link for Bandi e Corsi Finanziati
-- Initial website build with all core sections
-- Implemented contact form and newsletter API
-- Added dark mode support
-- SEO meta tags and structured data
+## Speaker's Corner Feature
+- Weekly English conversation sessions every Friday at 18:30
+- Subscribers login to view and book sessions (max 12 per session)
+- Admin panel to manage subscribers, create/cancel sessions, suspend email notifications
+- Tuesday weekly email invitations to active subscribers (email service integration pending)
+- Email suspension feature for holiday periods
+
+## Running the Project
+The project runs with `npm run dev` which starts both the Express backend and Vite frontend on port 5000.
+Use `npm run db:push` to sync database schema changes.

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, date, integer, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -50,6 +50,69 @@ export const insertNewsletterSchema = createInsertSchema(newsletterSubscriptions
 
 export type InsertNewsletter = z.infer<typeof insertNewsletterSchema>;
 export type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;
+
+export const scSubscribers = pgTable("sc_subscribers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  subscriptionStart: date("subscription_start").notNull(),
+  subscriptionEnd: date("subscription_end").notNull(),
+  active: boolean("active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertScSubscriberSchema = createInsertSchema(scSubscribers).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertScSubscriber = z.infer<typeof insertScSubscriberSchema>;
+export type ScSubscriber = typeof scSubscribers.$inferSelect;
+
+export const scSessions = pgTable("sc_sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionDate: date("session_date").notNull(),
+  sessionTime: text("session_time").notNull().default("18:30"),
+  topic: text("topic"),
+  maxParticipants: integer("max_participants").default(12),
+  status: text("status").notNull().default("active"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertScSessionSchema = createInsertSchema(scSessions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertScSession = z.infer<typeof insertScSessionSchema>;
+export type ScSession = typeof scSessions.$inferSelect;
+
+export const scBookings = pgTable("sc_bookings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  subscriberId: varchar("subscriber_id").notNull(),
+  sessionId: varchar("session_id").notNull(),
+  bookedAt: timestamp("booked_at").defaultNow(),
+}, (table) => [
+  unique("unique_subscriber_session").on(table.subscriberId, table.sessionId),
+]);
+
+export const insertScBookingSchema = createInsertSchema(scBookings).omit({
+  id: true,
+  bookedAt: true,
+});
+
+export type InsertScBooking = z.infer<typeof insertScBookingSchema>;
+export type ScBooking = typeof scBookings.$inferSelect;
+
+export const scEmailSettings = pgTable("sc_email_settings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  emailsSuspended: boolean("emails_suspended").default(false),
+  suspensionReason: text("suspension_reason"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type ScEmailSettings = typeof scEmailSettings.$inferSelect;
 
 export interface Course {
   id: string;

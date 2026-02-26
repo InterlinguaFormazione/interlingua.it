@@ -10,6 +10,9 @@ import CourseDetailPage from "@/pages/course-detail";
 import ChiSiamoPage from "@/pages/chi-siamo";
 import BandiECorsiPage from "@/pages/bandi-e-corsi";
 import BandoDetailPage from "@/pages/bando-detail";
+import SpeakersCornerPage from "@/pages/speakers-corner";
+import SpeakersCornerDashboard from "@/pages/speakers-corner-dashboard";
+import SpeakersCornerAdmin from "@/pages/speakers-corner-admin";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,6 +24,9 @@ function Router() {
       <Route path="/chi-siamo" component={ChiSiamoPage} />
       <Route path="/bandi-e-corsi-finanziati" component={BandiECorsiPage} />
       <Route path="/bandi/:id" component={BandoDetailPage} />
+      <Route path="/speakers-corner" component={SpeakersCornerPage} />
+      <Route path="/speakers-corner/dashboard" component={SpeakersCornerDashboard} />
+      <Route path="/speakers-corner/admin" component={SpeakersCornerAdmin} />
       <Route component={NotFound} />
     </Switch>
   );
