@@ -25,6 +25,7 @@ import courseIndividual from "@/assets/images/course-individual.jpg";
 import lingueStraniereImage from "@assets/lingue-straniere_1772143318023.webp";
 import languageCoachingImage from "@assets/Language_Coaching_1772143397641.webp";
 import corsoOnlineImage from "@assets/corso-lingua-online_1772143586662.jpg";
+import speakersCornerCourseImage from "@assets/Speakers-Corner-Conversazione-in-lingua-Inglese_1772143640698.jpg";
 
 const categories = [
   {
@@ -60,7 +61,7 @@ const categories = [
     title: "Speakers' Corner",
     description: "Pratica la conversazione in inglese ogni venerdì con docenti madrelingua. Abbonamento annuale, prova gratuita o lezioni individuali.",
     icon: MessageCircle,
-    image: categorySpeakers,
+    image: speakersCornerCourseImage,
     color: "from-orange-500 to-orange-600",
     courseCount: 3,
   },
