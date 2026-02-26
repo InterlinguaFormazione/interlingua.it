@@ -18,8 +18,8 @@ function createSESClient(): SESClient | null {
 
 const ses = createSESClient();
 
-const FROM_EMAIL = "noreply@skillcraft.interlingua.it";
-const SC_FROM_EMAIL = "speakers_corner@interlingua.it";
+const FROM_EMAIL = "SkillCraft-Interlingua <noreply@skillcraft.interlingua.it>";
+const SC_FROM_EMAIL = "Speaker's Corner - Interlingua <speakers_corner@interlingua.it>";
 const NOTIFICATION_EMAIL = "infocorsi@skillcraft.interlingua.it";
 
 export async function sendContactNotification(data: {
