@@ -46,6 +46,7 @@ export default function SpeakersCornerPurchase() {
   const [cap, setCap] = useState("");
   const [citta, setCitta] = useState("");
   const [provincia, setProvincia] = useState("");
+  const [ragioneSociale, setRagioneSociale] = useState("");
   const [partitaIva, setPartitaIva] = useState("");
   const [codiceSdi, setCodiceSdi] = useState("");
   const [pec, setPec] = useState("");
@@ -176,6 +177,7 @@ export default function SpeakersCornerPurchase() {
                   cap,
                   citta,
                   provincia,
+                  ragioneSociale,
                   partitaIva,
                   codiceSdi,
                   pec,
@@ -476,6 +478,16 @@ export default function SpeakersCornerPurchase() {
                             Per aziende e professionisti (opzionale)
                           </p>
                           <div className="space-y-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="purchase-ragione">Ragione Sociale</Label>
+                              <Input
+                                id="purchase-ragione"
+                                value={ragioneSociale}
+                                onChange={(e) => setRagioneSociale(e.target.value)}
+                                placeholder="Nome dell'azienda"
+                                data-testid="input-purchase-ragione"
+                              />
+                            </div>
                             <div className="space-y-2">
                               <Label htmlFor="purchase-piva">Partita IVA</Label>
                               <Input

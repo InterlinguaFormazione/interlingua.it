@@ -872,7 +872,7 @@ export async function registerRoutes(
 
   app.patch("/api/admin/speakers-corner/subscribers/:id", async (req, res) => {
     try {
-      const { name, email, subscriptionStart, subscriptionEnd, active, password, codiceFiscale, indirizzo, cap, citta, provincia, partitaIva, codiceSdi, pec } = req.body;
+      const { name, email, subscriptionStart, subscriptionEnd, active, password, codiceFiscale, indirizzo, cap, citta, provincia, ragioneSociale, partitaIva, codiceSdi, pec } = req.body;
       const updateData: any = {};
       if (name !== undefined) updateData.name = name;
       if (email !== undefined) updateData.email = email;
@@ -890,6 +890,7 @@ export async function registerRoutes(
       if (cap !== undefined) updateData.cap = cap || null;
       if (citta !== undefined) updateData.citta = citta || null;
       if (provincia !== undefined) updateData.provincia = provincia || null;
+      if (ragioneSociale !== undefined) updateData.ragioneSociale = ragioneSociale || null;
       if (partitaIva !== undefined) updateData.partitaIva = partitaIva || null;
       if (codiceSdi !== undefined) updateData.codiceSdi = codiceSdi || null;
       if (pec !== undefined) updateData.pec = pec || null;
@@ -1026,7 +1027,7 @@ export async function registerRoutes(
 
   app.post("/api/speakers-corner/purchase", async (req, res) => {
     try {
-      const { paypalOrderId, name, email, password, codiceFiscale, indirizzo, cap, citta, provincia, partitaIva, codiceSdi, pec } = req.body;
+      const { paypalOrderId, name, email, password, codiceFiscale, indirizzo, cap, citta, provincia, ragioneSociale, partitaIva, codiceSdi, pec } = req.body;
       if (!paypalOrderId || !name || !email || !password || !codiceFiscale || !indirizzo || !cap || !citta || !provincia) {
         return res.status(400).json({ success: false, message: "Dati mancanti. Compila tutti i campi obbligatori." });
       }
@@ -1067,6 +1068,7 @@ export async function registerRoutes(
         cap: cap || null,
         citta: citta || null,
         provincia: provincia || null,
+        ragioneSociale: ragioneSociale || null,
         partitaIva: partitaIva || null,
         codiceSdi: codiceSdi || null,
         pec: pec || null,

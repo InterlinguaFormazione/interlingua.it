@@ -38,6 +38,7 @@ interface AdminSubscriber {
   cap: string | null;
   citta: string | null;
   provincia: string | null;
+  ragioneSociale: string | null;
   partitaIva: string | null;
   codiceSdi: string | null;
   pec: string | null;
@@ -94,7 +95,7 @@ export default function SpeakersCornerAdmin() {
   const [subscriberDialogOpen, setSubscriberDialogOpen] = useState(false);
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
   const [editSubscriber, setEditSubscriber] = useState<AdminSubscriber | null>(null);
-  const [editSubData, setEditSubData] = useState({ name: "", email: "", password: "", subscriptionStart: "", subscriptionEnd: "", codiceFiscale: "", indirizzo: "", cap: "", citta: "", provincia: "", partitaIva: "", codiceSdi: "", pec: "" });
+  const [editSubData, setEditSubData] = useState({ name: "", email: "", password: "", subscriptionStart: "", subscriptionEnd: "", codiceFiscale: "", indirizzo: "", cap: "", citta: "", provincia: "", ragioneSociale: "", partitaIva: "", codiceSdi: "", pec: "" });
   const [editSubDialogOpen, setEditSubDialogOpen] = useState(false);
 
   const { data: subscribers = [], isLoading: subscribersLoading } = useQuery<AdminSubscriber[]>({
@@ -163,6 +164,7 @@ export default function SpeakersCornerAdmin() {
       payload.cap = data.cap || "";
       payload.citta = data.citta || "";
       payload.provincia = data.provincia || "";
+      payload.ragioneSociale = data.ragioneSociale || "";
       payload.partitaIva = data.partitaIva || "";
       payload.codiceSdi = data.codiceSdi || "";
       payload.pec = data.pec || "";
@@ -503,6 +505,7 @@ export default function SpeakersCornerAdmin() {
                                     cap: sub.cap || "",
                                     citta: sub.citta || "",
                                     provincia: sub.provincia || "",
+                                    ragioneSociale: sub.ragioneSociale || "",
                                     partitaIva: sub.partitaIva || "",
                                     codiceSdi: sub.codiceSdi || "",
                                     pec: sub.pec || "",
@@ -649,6 +652,15 @@ export default function SpeakersCornerAdmin() {
                               data-testid="input-edit-sub-prov"
                             />
                           </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="edit-sub-ragione">Ragione Sociale</Label>
+                          <Input
+                            id="edit-sub-ragione"
+                            value={editSubData.ragioneSociale}
+                            onChange={(e) => setEditSubData({ ...editSubData, ragioneSociale: e.target.value })}
+                            data-testid="input-edit-sub-ragione"
+                          />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="edit-sub-piva">Partita IVA</Label>
