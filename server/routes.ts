@@ -131,9 +131,12 @@ export async function registerRoutes(
     try {
       const { username, password } = req.body;
       if (!username || !password) {
-        return res.status(400).json({ success: false, message: "Username e password sono obbligatori" });
+        return res.status(400).json({ success: false, message: "Username/email e password sono obbligatori" });
       }
-      const user = await storage.getUserByUsername(username);
+      let user = await storage.getUserByUsername(username);
+      if (!user && username.includes("@")) {
+        user = await storage.getUserByEmail(username);
+      }
       if (!user || !user.active) {
         return res.status(401).json({ success: false, message: "Credenziali non valide" });
       }

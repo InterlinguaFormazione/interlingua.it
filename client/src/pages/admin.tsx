@@ -316,11 +316,11 @@ export default function AdminPage() {
                 <CardContent>
                   <form onSubmit={handleLogin} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="admin-username">Username</Label>
+                      <Label htmlFor="admin-username">Username o Email</Label>
                       <Input
                         id="admin-username"
                         type="text"
-                        placeholder="Il tuo username"
+                        placeholder="Username o email"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         data-testid="input-admin-username"
