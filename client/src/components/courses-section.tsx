@@ -22,6 +22,7 @@ import categorySpeakers from "@/assets/images/category-speakers.jpg";
 import categoryImmersion from "@/assets/images/category-immersion.jpg";
 import categoryDigital from "@/assets/images/category-digital.jpg";
 import courseIndividual from "@/assets/images/course-individual.jpg";
+import lingueStraniereImage from "@assets/lingue-straniere_1772143318023.webp";
 
 const categories = [
   {
@@ -29,7 +30,7 @@ const categories = [
     title: "Corsi di Lingua",
     description: "Inglese, francese, tedesco, spagnolo e russo. Corsi di gruppo, individuali e preparazione certificazioni in presenza a Vicenza e Thiene.",
     icon: Globe,
-    image: categoryPresence,
+    image: lingueStraniereImage,
     color: "from-purple-500 to-purple-600",
     courseCount: 4,
     featured: true,
