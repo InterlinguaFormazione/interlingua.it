@@ -157,7 +157,7 @@ function BandoCardComponent({ bando, index, expired = false }: { bando: typeof b
         <img
           src={bando.image}
           alt={bando.title}
-          className="w-full h-48 object-cover transition-transform duration-500"
+          className="w-full h-48 object-contain bg-white transition-transform duration-500"
           data-testid={`img-bando-${bando.id}`}
         />
         <div className="absolute top-3 right-3">
