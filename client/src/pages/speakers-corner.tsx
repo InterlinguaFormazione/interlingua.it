@@ -122,10 +122,6 @@ export default function SpeakersCornerPage() {
                     <Clock className="w-5 h-5 text-primary" />
                     <span>18:30 - 19:30</span>
                   </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Users className="w-5 h-5 text-primary" />
-                    <span>Max 12 persone</span>
-                  </div>
                 </div>
                 <div className="mb-6">
                   <span className="text-3xl font-bold text-foreground" data-testid="text-sc-price">€200</span>
