@@ -30,6 +30,8 @@ import {
   Mic2,
   Briefcase,
   Brain,
+  Compass,
+  ClipboardCheck,
 } from "lucide-react";
 import fullImmersionImage from "@assets/Full-Immersion-Workshop-di-Lingua-Inglese_1772143747179.jpg";
 
@@ -296,6 +298,69 @@ export default function FullImmersionPage() {
           </div>
         </section>
 
+        <section className="py-24">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-12">
+                <Badge variant="secondary" className="mb-4 px-4 py-1.5">
+                  <TrendingUp className="w-3 h-3 mr-1" />
+                  Un Livello in Una Settimana
+                </Badge>
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6" data-testid="text-fi-intro-title">
+                  Sostanziale Miglioramento della Competenza Linguistica
+                </h2>
+              </div>
+              <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
+                <p>
+                  Hai mai pensato a quanto potrebbe cambiare il tuo inglese... senza dover partire per l'estero? I nostri workshop, attivi anche ad agosto, rappresentano un'alternativa concreta e stimolante ai soggiorni studio tradizionali.
+                </p>
+                <p>
+                  Molte persone — professionisti, studenti, lavoratori, e chiunque senta il desiderio di esprimersi meglio in inglese — scoprono che basta la giusta esperienza, nel contesto giusto, per fare un vero salto di qualità. Se hai già qualche base, potresti sorprenderti nel vedere quanto puoi migliorare in poco tempo, quando imparare diventa naturale, pratico, adatto al tuo ritmo.
+                </p>
+                <p>
+                  Che tu voglia comunicare con più sicurezza in ambito lavorativo o semplicemente sentirti più libero di parlare, capire e relazionarti in inglese anche nella vita di tutti i giorni, questa esperienza può fare la differenza.
+                </p>
+                <p className="text-xl font-semibold text-foreground text-center py-4">
+                  Non si tratta solo di imparare...<br />
+                  Si tratta di scoprire quanto l'inglese che hai dentro può diventare parte di te.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-muted/50 to-muted/20" />
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div className="text-center mb-12">
+              <Badge variant="secondary" className="mb-4 px-4 py-1.5">
+                <Compass className="w-3 h-3 mr-1" />
+                Metodologia Immersiva ed Esperienziale
+              </Badge>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6" data-testid="text-fi-methodology-title">
+                Immagina di Immergerti Completamente nella Lingua Inglese
+              </h2>
+            </div>
+            <div className="max-w-4xl mx-auto space-y-6 text-lg text-muted-foreground leading-relaxed">
+              <p>
+                Non c'è bisogno di viaggiare all'estero per vivere un'esperienza autentica, coinvolgente e trasformativa: è tutto qui, a portata di mano.
+              </p>
+              <p>
+                Per cinque giorni — dal lunedi al venerdi — entrerai in un ambiente dove si comunica, si pensa e si vive in inglese. Un programma superintensivo di almeno 30 ore frontali, dalle 9:00 alle 16:30, che puoi prolungare fino alle 18:00 con attività esperienziali in lingua che ti portano a usare l'inglese nella pratica, in situazioni reali e stimolanti.
+              </p>
+              <p>
+                Questa immersione profonda si basa sul metodo Interlingua, che unisce l'experiential learning alla concretezza del Task-Based Learning e alla ricchezza del CLIL (Content and Language Integrated Learning). In altre parole, non impari solo l'inglese: lo vivi, mentre esplori contenuti interessanti, affronti compiti significativi e partecipi attivamente alla costruzione del tuo apprendimento.
+              </p>
+              <p>
+                E ciò che costruisci durante la settimana continua a crescere nel tempo: hai 3 mesi di accesso a un corso online completo, disponibile 24/7 sulla nostra piattaforma interattiva. E ogni volta che senti il bisogno di parlare, confrontarti o semplicemente continuare a esercitarti, puoi prenotare sessioni di conversazione con coach madrelingua nello "Speakers' Corner".
+              </p>
+              <p>
+                Il programma segue i livelli QCER e ti guida nello sviluppo delle competenze fondamentali: grammatica, listening, reading, writing e pronunciation. Con la libertà di decidere quando, dove e come imparare. Perché imparare davvero è più facile quando ciò che fai ha senso, ti coinvolge... e ti fa sentire parte di qualcosa di reale.
+              </p>
+            </div>
+          </div>
+        </section>
+
         <section className="py-24 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-muted/50 to-muted/20" />
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
@@ -507,6 +572,74 @@ export default function FullImmersionPage() {
                   </CardContent>
                 </div>
               </Card>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-muted/50 to-muted/20" />
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div className="max-w-5xl mx-auto">
+              <div className="grid md:grid-cols-2 gap-12">
+                <div>
+                  <Badge variant="secondary" className="mb-4 px-4 py-1.5">
+                    <Users className="w-3 h-3 mr-1" />
+                    Il Corso Giusto per Te
+                  </Badge>
+                  <h2 className="text-3xl font-bold text-foreground mb-6" data-testid="text-fi-audience-title">
+                    A Chi è Rivolto
+                  </h2>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p>
+                      Il workshop intensivo di inglese in full immersion è pensato per chi desidera fare un salto di qualità nella lingua, senza dover seguire lunghi percorsi tradizionali.
+                    </p>
+                    <p>
+                      È ideale per professionisti, studenti universitari, freelance, viaggiatori, genitori, insegnanti e chiunque voglia migliorare rapidamente la propria fluidità e sicurezza in inglese, per usarlo con naturalezza sia in contesti professionali che nella vita quotidiana.
+                    </p>
+                    <p>
+                      È particolarmente adatto a chi ha poco tempo, impegni variabili o responsabilità che rendono difficile seguire corsi regolari e prolungati nel tempo. In una sola settimana, vivi un'esperienza intensiva, pratica e su misura, che ti aiuta a sbloccare il tuo inglese in modo diretto, stimolante e duraturo.
+                    </p>
+                    <p className="font-medium text-foreground">
+                      Quando il metodo si adatta a te — e non il contrario — scoprire quanto puoi evolvere diventa solo questione di giorni.
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <Badge variant="secondary" className="mb-4 px-4 py-1.5">
+                    <ClipboardCheck className="w-3 h-3 mr-1" />
+                    Livelli e Requisiti d'Accesso
+                  </Badge>
+                  <h2 className="text-3xl font-bold text-foreground mb-6" data-testid="text-fi-levels-title">
+                    Livelli Disponibili
+                  </h2>
+                  <div className="space-y-3 mb-8">
+                    {[
+                      { level: "A2", name: "Pre-intermediate" },
+                      { level: "B1", name: "Intermediate" },
+                      { level: "B2", name: "Upper-intermediate" },
+                      { level: "C1", name: "Advanced" },
+                    ].map((item) => (
+                      <div key={item.level} className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                          {item.level}
+                        </div>
+                        <span className="text-foreground font-medium">{item.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="space-y-4 text-muted-foreground leading-relaxed">
+                    <p className="font-medium text-foreground">
+                      Test di ingresso online incluso.
+                    </p>
+                    <p>
+                      Il workshop è aperto a tutte le persone con una conoscenza minima della lingua inglese, indipendentemente dal loro percorso personale o professionale. Puoi accedere se hai frequentato un corso di livello almeno pre-intermediate (A2) con Interlingua negli ultimi 3 anni, oppure se superi un test online di valutazione iniziale con almeno il 40%.
+                    </p>
+                    <p>
+                      Che tu venga dal mondo del lavoro, dall'università o che tu voglia semplicemente migliorare l'inglese per viaggiare, comunicare meglio o crescere a livello personale, questo percorso è pensato per accompagnarti dove vuoi arrivare.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
