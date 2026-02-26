@@ -356,6 +356,11 @@ export default function SpeakersCornerAdmin() {
                       <form
                         onSubmit={(e) => {
                           e.preventDefault();
+                          const pwd = newSubscriber.password;
+                          if (pwd.length < 8 || !/[A-Z]/.test(pwd) || !/[a-z]/.test(pwd) || !/[0-9]/.test(pwd) || !/[^A-Za-z0-9]/.test(pwd)) {
+                            toast({ title: "Password troppo debole", description: "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale.", variant: "destructive" });
+                            return;
+                          }
                           createSubscriberMutation.mutate(newSubscriber);
                         }}
                         className="space-y-4"
@@ -389,6 +394,7 @@ export default function SpeakersCornerAdmin() {
                             value={newSubscriber.password}
                             onChange={(e) => setNewSubscriber({ ...newSubscriber, password: e.target.value })}
                             required
+                            placeholder="Min. 8 caratteri, maiuscola, numero, speciale"
                             data-testid="input-sub-password"
                           />
                         </div>
@@ -524,6 +530,13 @@ export default function SpeakersCornerAdmin() {
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
+                      if (editSubData.password) {
+                        const pwd = editSubData.password;
+                        if (pwd.length < 8 || !/[A-Z]/.test(pwd) || !/[a-z]/.test(pwd) || !/[0-9]/.test(pwd) || !/[^A-Za-z0-9]/.test(pwd)) {
+                          toast({ title: "Password troppo debole", description: "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale.", variant: "destructive" });
+                          return;
+                        }
+                      }
                       if (editSubscriber) {
                         updateSubscriberMutation.mutate({ id: editSubscriber.id, data: editSubData });
                       }

@@ -12,6 +12,10 @@ import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalO
 import cron from "node-cron";
 import crypto from "crypto";
 
+function isStrongPassword(password: string): boolean {
+  return password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password);
+}
+
 const adminSessions = new Map<string, { createdAt: number; userId: string; role: string }>();
 const ADMIN_SESSION_DURATION = 4 * 60 * 60 * 1000;
 
@@ -178,8 +182,8 @@ export async function registerRoutes(
       if (username.length < 3) {
         return res.status(400).json({ success: false, message: "Username deve avere almeno 3 caratteri" });
       }
-      if (password.length < 6) {
-        return res.status(400).json({ success: false, message: "La password deve avere almeno 6 caratteri" });
+      if (!isStrongPassword(password)) {
+        return res.status(400).json({ success: false, message: "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale." });
       }
       const existing = await storage.getUserByUsername(username);
       if (existing) {
@@ -212,7 +216,12 @@ export async function registerRoutes(
       if (email !== undefined) updateData.email = email;
       if (role !== undefined) updateData.role = role === "admin" ? "admin" : "staff";
       if (active !== undefined) updateData.active = active;
-      if (password) updateData.password = await bcrypt.hash(password, 10);
+      if (password) {
+        if (!isStrongPassword(password)) {
+          return res.status(400).json({ success: false, message: "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale." });
+        }
+        updateData.password = await bcrypt.hash(password, 10);
+      }
       const user = await storage.updateUser(id, updateData);
       if (!user) {
         return res.status(404).json({ success: false, message: "Utente non trovato" });
@@ -834,6 +843,9 @@ export async function registerRoutes(
       if (!name || !email || !password || !subscriptionStart || !subscriptionEnd) {
         return res.status(400).json({ success: false, message: "Tutti i campi sono obbligatori" });
       }
+      if (!isStrongPassword(password)) {
+        return res.status(400).json({ success: false, message: "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale." });
+      }
 
       const existing = await storage.getScSubscriberByEmail(email);
       if (existing) {
@@ -867,7 +879,12 @@ export async function registerRoutes(
       if (subscriptionStart !== undefined) updateData.subscriptionStart = subscriptionStart;
       if (subscriptionEnd !== undefined) updateData.subscriptionEnd = subscriptionEnd;
       if (active !== undefined) updateData.active = active;
-      if (password) updateData.password = await bcrypt.hash(password, 10);
+      if (password) {
+        if (!isStrongPassword(password)) {
+          return res.status(400).json({ success: false, message: "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale." });
+        }
+        updateData.password = await bcrypt.hash(password, 10);
+      }
       if (codiceFiscale !== undefined) updateData.codiceFiscale = codiceFiscale || null;
       if (indirizzo !== undefined) updateData.indirizzo = indirizzo || null;
       if (cap !== undefined) updateData.cap = cap || null;
@@ -1012,6 +1029,9 @@ export async function registerRoutes(
       const { paypalOrderId, name, email, password, codiceFiscale, indirizzo, cap, citta, provincia, partitaIva, codiceSdi, pec } = req.body;
       if (!paypalOrderId || !name || !email || !password || !codiceFiscale || !indirizzo || !cap || !citta || !provincia) {
         return res.status(400).json({ success: false, message: "Dati mancanti. Compila tutti i campi obbligatori." });
+      }
+      if (!isStrongPassword(password)) {
+        return res.status(400).json({ success: false, message: "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale." });
       }
 
       const existing = await storage.getScSubscriberByEmail(email);

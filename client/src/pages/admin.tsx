@@ -664,6 +664,11 @@ export default function AdminPage() {
                         <form
                           onSubmit={(e) => {
                             e.preventDefault();
+                            const pwd = newUser.password;
+                            if (pwd.length < 8 || !/[A-Z]/.test(pwd) || !/[a-z]/.test(pwd) || !/[0-9]/.test(pwd) || !/[^A-Za-z0-9]/.test(pwd)) {
+                              toast({ title: "Password troppo debole", description: "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale.", variant: "destructive" });
+                              return;
+                            }
                             createUserMutation.mutate(newUser);
                           }}
                           className="space-y-4"
@@ -706,6 +711,7 @@ export default function AdminPage() {
                               value={newUser.password}
                               onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                               required
+                              placeholder="Min. 8 caratteri, maiuscola, numero, speciale"
                               data-testid="input-new-user-password"
                             />
                           </div>
@@ -831,6 +837,13 @@ export default function AdminPage() {
                     <form
                       onSubmit={(e) => {
                         e.preventDefault();
+                        if (editUserData.password) {
+                          const pwd = editUserData.password;
+                          if (pwd.length < 8 || !/[A-Z]/.test(pwd) || !/[a-z]/.test(pwd) || !/[0-9]/.test(pwd) || !/[^A-Za-z0-9]/.test(pwd)) {
+                            toast({ title: "Password troppo debole", description: "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale.", variant: "destructive" });
+                            return;
+                          }
+                        }
                         if (editUser) {
                           updateUserMutation.mutate({ id: editUser.id, data: editUserData });
                         }

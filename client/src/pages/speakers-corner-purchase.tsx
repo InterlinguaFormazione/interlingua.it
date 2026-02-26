@@ -85,8 +85,12 @@ export default function SpeakersCornerPurchase() {
       toast({ title: "Campi obbligatori", description: "Compila tutti i campi.", variant: "destructive" });
       return;
     }
-    if (password.length < 6) {
-      toast({ title: "Password troppo corta", description: "La password deve avere almeno 6 caratteri.", variant: "destructive" });
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasLowercase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[^A-Za-z0-9]/.test(password);
+    if (password.length < 8 || !hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {
+      toast({ title: "Password troppo debole", description: "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale.", variant: "destructive" });
       return;
     }
     if (password !== confirmPassword) {
@@ -365,7 +369,7 @@ export default function SpeakersCornerPurchase() {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Minimo 6 caratteri"
+                            placeholder="Min. 8 caratteri, maiuscola, numero, speciale"
                             required
                             data-testid="input-purchase-password"
                           />
