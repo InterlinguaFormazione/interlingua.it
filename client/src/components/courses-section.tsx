@@ -26,6 +26,7 @@ import lingueStraniereImage from "@assets/lingue-straniere_1772143318023.webp";
 import languageCoachingImage from "@assets/Language_Coaching_1772143397641.webp";
 import corsoOnlineImage from "@assets/corso-lingua-online_1772143586662.jpg";
 import speakersCornerCourseImage from "@assets/Speakers-Corner-Conversazione-in-lingua-Inglese_1772143640698.jpg";
+import fullImmersionImage from "@assets/Full-Immersion-Workshop-di-Lingua-Inglese_1772143747179.jpg";
 
 const categories = [
   {
@@ -70,7 +71,7 @@ const categories = [
     title: "Full Immersion",
     description: "Workshop intensivi a Vicenza e esperienze outdoor sui colli Vicentini con equitazione. Avanza un livello QCER in una settimana.",
     icon: Mountain,
-    image: categoryImmersion,
+    image: fullImmersionImage,
     color: "from-green-500 to-green-600",
     courseCount: 2,
     featured: true,
