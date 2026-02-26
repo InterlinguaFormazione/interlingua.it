@@ -423,9 +423,9 @@ export default function FullImmersionPage() {
             </AnimatedSection>
             <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
               {programTopics.map((topic, index) => (
-                <AnimatedSection key={index} delay={index * 0.1}>
+                <AnimatedSection key={index} delay={index * 0.1} className="h-full">
                   <Card
-                    className={`group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-shadow duration-500 ${topic.bgLight}`}
+                    className={`group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-shadow duration-500 h-full ${topic.bgLight}`}
                     data-testid={`card-fi-topic-${index}`}
                   >
                     <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${topic.gradient}`} />
