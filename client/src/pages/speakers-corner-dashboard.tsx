@@ -23,7 +23,8 @@ import {
 
 interface Subscriber {
   id: string;
-  name: string;
+  nome: string;
+  cognome: string;
   email: string;
   subscriptionStart: string;
   subscriptionEnd: string;
@@ -172,7 +173,7 @@ export default function SpeakersCornerDashboard() {
                 </h1>
               </div>
               <p className="text-muted-foreground" data-testid="text-dashboard-welcome">
-                Benvenuto/a, <span className="font-medium text-foreground">{subscriber.name}</span>
+                Benvenuto/a, <span className="font-medium text-foreground">{subscriber.nome} {subscriber.cognome}</span>
               </p>
             </div>
             <Button variant="outline" onClick={handleLogout} data-testid="button-sc-logout">

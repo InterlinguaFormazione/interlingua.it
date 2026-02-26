@@ -101,7 +101,8 @@ export type BlogPost = typeof blogPosts.$inferSelect;
 
 export const scSubscribers = pgTable("sc_subscribers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: text("name").notNull(),
+  nome: text("nome").notNull(),
+  cognome: text("cognome").notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   codiceFiscale: text("codice_fiscale"),
@@ -179,7 +180,8 @@ export const scPayments = pgTable("sc_payments", {
   currency: text("currency").notNull().default("EUR"),
   status: text("status").notNull().default("pending"),
   payerEmail: text("payer_email"),
-  billingName: text("billing_name"),
+  billingNome: text("billing_nome"),
+  billingCognome: text("billing_cognome"),
   billingCodiceFiscale: text("billing_codice_fiscale"),
   billingIndirizzo: text("billing_indirizzo"),
   billingCap: text("billing_cap"),

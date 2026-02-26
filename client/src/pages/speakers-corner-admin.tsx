@@ -31,7 +31,8 @@ import {
 
 interface AdminSubscriber {
   id: string;
-  name: string;
+  nome: string;
+  cognome: string;
   email: string;
   codiceFiscale: string | null;
   indirizzo: string | null;
@@ -79,7 +80,8 @@ interface AdminPayment {
 export default function SpeakersCornerAdmin() {
   const { toast } = useToast();
   const [newSubscriber, setNewSubscriber] = useState({
-    name: "",
+    nome: "",
+    cognome: "",
     email: "",
     password: "",
     subscriptionStart: new Date().toISOString().split('T')[0],
@@ -95,7 +97,7 @@ export default function SpeakersCornerAdmin() {
   const [subscriberDialogOpen, setSubscriberDialogOpen] = useState(false);
   const [sessionDialogOpen, setSessionDialogOpen] = useState(false);
   const [editSubscriber, setEditSubscriber] = useState<AdminSubscriber | null>(null);
-  const [editSubData, setEditSubData] = useState({ name: "", email: "", password: "", subscriptionStart: "", subscriptionEnd: "", codiceFiscale: "", indirizzo: "", cap: "", citta: "", provincia: "", ragioneSociale: "", partitaIva: "", codiceSdi: "", pec: "" });
+  const [editSubData, setEditSubData] = useState({ nome: "", cognome: "", email: "", password: "", subscriptionStart: "", subscriptionEnd: "", codiceFiscale: "", indirizzo: "", cap: "", citta: "", provincia: "", ragioneSociale: "", partitaIva: "", codiceSdi: "", pec: "" });
   const [editSubDialogOpen, setEditSubDialogOpen] = useState(false);
 
   const { data: subscribers = [], isLoading: subscribersLoading } = useQuery<AdminSubscriber[]>({
@@ -123,7 +125,8 @@ export default function SpeakersCornerAdmin() {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/speakers-corner/subscribers"] });
       toast({ title: "Iscritto creato", description: "Il nuovo iscritto è stato aggiunto." });
       setNewSubscriber({
-        name: "",
+        nome: "",
+        cognome: "",
         email: "",
         password: "",
         subscriptionStart: new Date().toISOString().split('T')[0],
@@ -154,7 +157,8 @@ export default function SpeakersCornerAdmin() {
   const updateSubscriberMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Record<string, any> }) => {
       const payload: Record<string, any> = {};
-      if (data.name) payload.name = data.name;
+      if (data.nome) payload.nome = data.nome;
+      if (data.cognome) payload.cognome = data.cognome;
       if (data.email) payload.email = data.email;
       if (data.password) payload.password = data.password;
       if (data.subscriptionStart) payload.subscriptionStart = data.subscriptionStart;
@@ -367,15 +371,27 @@ export default function SpeakersCornerAdmin() {
                         }}
                         className="space-y-4"
                       >
-                        <div className="space-y-2">
-                          <Label htmlFor="sub-name">Nome e Cognome</Label>
-                          <Input
-                            id="sub-name"
-                            value={newSubscriber.name}
-                            onChange={(e) => setNewSubscriber({ ...newSubscriber, name: e.target.value })}
-                            required
-                            data-testid="input-sub-name"
-                          />
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="sub-nome">Nome</Label>
+                            <Input
+                              id="sub-nome"
+                              value={newSubscriber.nome}
+                              onChange={(e) => setNewSubscriber({ ...newSubscriber, nome: e.target.value })}
+                              required
+                              data-testid="input-sub-nome"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="sub-cognome">Cognome</Label>
+                            <Input
+                              id="sub-cognome"
+                              value={newSubscriber.cognome}
+                              onChange={(e) => setNewSubscriber({ ...newSubscriber, cognome: e.target.value })}
+                              required
+                              data-testid="input-sub-cognome"
+                            />
+                          </div>
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="sub-email">Email</Label>
@@ -461,11 +477,11 @@ export default function SpeakersCornerAdmin() {
                             <div className="flex items-center gap-4">
                               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                                 <span className="text-primary font-semibold text-sm">
-                                  {sub.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                  {(sub.nome[0] + sub.cognome[0]).toUpperCase()}
                                 </span>
                               </div>
                               <div>
-                                <p className="font-medium text-foreground">{sub.name}</p>
+                                <p className="font-medium text-foreground">{sub.nome} {sub.cognome}</p>
                                 <p className="text-sm text-muted-foreground">{sub.email}</p>
                               </div>
                             </div>
@@ -495,7 +511,8 @@ export default function SpeakersCornerAdmin() {
                                 onClick={() => {
                                   setEditSubscriber(sub);
                                   setEditSubData({
-                                    name: sub.name,
+                                    nome: sub.nome,
+                                    cognome: sub.cognome,
                                     email: sub.email,
                                     password: "",
                                     subscriptionStart: sub.subscriptionStart,
@@ -528,7 +545,7 @@ export default function SpeakersCornerAdmin() {
               <Dialog open={editSubDialogOpen} onOpenChange={setEditSubDialogOpen}>
                 <DialogContent className="max-h-[85vh] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle>Modifica Iscritto — {editSubscriber?.name}</DialogTitle>
+                    <DialogTitle>Modifica Iscritto — {editSubscriber?.nome} {editSubscriber?.cognome}</DialogTitle>
                   </DialogHeader>
                   <form
                     onSubmit={(e) => {
@@ -546,15 +563,27 @@ export default function SpeakersCornerAdmin() {
                     }}
                     className="space-y-4"
                   >
-                    <div className="space-y-2">
-                      <Label htmlFor="edit-sub-name">Nome e Cognome</Label>
-                      <Input
-                        id="edit-sub-name"
-                        value={editSubData.name}
-                        onChange={(e) => setEditSubData({ ...editSubData, name: e.target.value })}
-                        required
-                        data-testid="input-edit-sub-name"
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-sub-nome">Nome</Label>
+                        <Input
+                          id="edit-sub-nome"
+                          value={editSubData.nome}
+                          onChange={(e) => setEditSubData({ ...editSubData, nome: e.target.value })}
+                          required
+                          data-testid="input-edit-sub-nome"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="edit-sub-cognome">Cognome</Label>
+                        <Input
+                          id="edit-sub-cognome"
+                          value={editSubData.cognome}
+                          onChange={(e) => setEditSubData({ ...editSubData, cognome: e.target.value })}
+                          required
+                          data-testid="input-edit-sub-cognome"
+                        />
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="edit-sub-email">Email</Label>

@@ -75,7 +75,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `newsletter_subscriptions` - Newsletter subscribers
 - `cookie_consents` - GDPR cookie consent records
 - `blog_posts` - AI-generated blog posts
-- `sc_subscribers` - Speaker's Corner subscribers (name, email, hashed password, subscription dates)
+- `sc_subscribers` - Speaker's Corner subscribers (nome, cognome, email, hashed password, billing fields, subscription dates)
 - `sc_sessions` - Weekly Friday sessions (date, time, topic, max participants, status)
 - `sc_bookings` - Session bookings (subscriber + session link)
 - `sc_email_settings` - Email notification settings (suspend/resume for holidays)

@@ -37,7 +37,8 @@ declare global {
 export default function SpeakersCornerPurchase() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
-  const [name, setName] = useState("");
+  const [nome, setNome] = useState("");
+  const [cognome, setCognome] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -83,7 +84,7 @@ export default function SpeakersCornerPurchase() {
 
   const handleDetailsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email || !password || !confirmPassword) {
+    if (!nome || !cognome || !email || !password || !confirmPassword) {
       toast({ title: "Campi obbligatori", description: "Compila tutti i campi.", variant: "destructive" });
       return;
     }
@@ -169,7 +170,8 @@ export default function SpeakersCornerPurchase() {
               if (captureData.status === "COMPLETED") {
                 purchaseMutation.mutate({
                   paypalOrderId: data.orderId,
-                  name,
+                  nome,
+                  cognome,
                   email,
                   password,
                   codiceFiscale,
@@ -343,16 +345,29 @@ export default function SpeakersCornerPurchase() {
                     </CardHeader>
                     <CardContent>
                       <form onSubmit={handleDetailsSubmit} className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="purchase-name">Nome e Cognome</Label>
-                          <Input
-                            id="purchase-name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Mario Rossi"
-                            required
-                            data-testid="input-purchase-name"
-                          />
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="purchase-nome">Nome</Label>
+                            <Input
+                              id="purchase-nome"
+                              value={nome}
+                              onChange={(e) => setNome(e.target.value)}
+                              placeholder="Mario"
+                              required
+                              data-testid="input-purchase-nome"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="purchase-cognome">Cognome</Label>
+                            <Input
+                              id="purchase-cognome"
+                              value={cognome}
+                              onChange={(e) => setCognome(e.target.value)}
+                              placeholder="Rossi"
+                              required
+                              data-testid="input-purchase-cognome"
+                            />
+                          </div>
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="purchase-email">Email</Label>
@@ -561,7 +576,7 @@ export default function SpeakersCornerPurchase() {
                         <div className="flex justify-between items-center">
                           <div>
                             <p className="font-medium text-foreground">Speaker's Corner — Abbonamento Annuale</p>
-                            <p className="text-sm text-muted-foreground">{name} ({email})</p>
+                            <p className="text-sm text-muted-foreground">{nome} {cognome} ({email})</p>
                           </div>
                           <span className="text-2xl font-bold text-foreground" data-testid="text-payment-amount">€200</span>
                         </div>

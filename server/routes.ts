@@ -839,8 +839,8 @@ export async function registerRoutes(
 
   app.post("/api/admin/speakers-corner/subscribers", async (req, res) => {
     try {
-      const { name, email, password, subscriptionStart, subscriptionEnd } = req.body;
-      if (!name || !email || !password || !subscriptionStart || !subscriptionEnd) {
+      const { nome, cognome, email, password, subscriptionStart, subscriptionEnd } = req.body;
+      if (!nome || !cognome || !email || !password || !subscriptionStart || !subscriptionEnd) {
         return res.status(400).json({ success: false, message: "Tutti i campi sono obbligatori" });
       }
       if (!isStrongPassword(password)) {
@@ -854,7 +854,8 @@ export async function registerRoutes(
 
       const hashedPassword = await bcrypt.hash(password, 10);
       const subscriber = await storage.createScSubscriber({
-        name,
+        nome,
+        cognome,
         email,
         password: hashedPassword,
         subscriptionStart,
@@ -872,9 +873,10 @@ export async function registerRoutes(
 
   app.patch("/api/admin/speakers-corner/subscribers/:id", async (req, res) => {
     try {
-      const { name, email, subscriptionStart, subscriptionEnd, active, password, codiceFiscale, indirizzo, cap, citta, provincia, ragioneSociale, partitaIva, codiceSdi, pec } = req.body;
+      const { nome, cognome, email, subscriptionStart, subscriptionEnd, active, password, codiceFiscale, indirizzo, cap, citta, provincia, ragioneSociale, partitaIva, codiceSdi, pec } = req.body;
       const updateData: any = {};
-      if (name !== undefined) updateData.name = name;
+      if (nome !== undefined) updateData.nome = nome;
+      if (cognome !== undefined) updateData.cognome = cognome;
       if (email !== undefined) updateData.email = email;
       if (subscriptionStart !== undefined) updateData.subscriptionStart = subscriptionStart;
       if (subscriptionEnd !== undefined) updateData.subscriptionEnd = subscriptionEnd;
@@ -1027,8 +1029,8 @@ export async function registerRoutes(
 
   app.post("/api/speakers-corner/purchase", async (req, res) => {
     try {
-      const { paypalOrderId, name, email, password, codiceFiscale, indirizzo, cap, citta, provincia, ragioneSociale, partitaIva, codiceSdi, pec } = req.body;
-      if (!paypalOrderId || !name || !email || !password || !codiceFiscale || !indirizzo || !cap || !citta || !provincia) {
+      const { paypalOrderId, nome, cognome, email, password, codiceFiscale, indirizzo, cap, citta, provincia, ragioneSociale, partitaIva, codiceSdi, pec } = req.body;
+      if (!paypalOrderId || !nome || !cognome || !email || !password || !codiceFiscale || !indirizzo || !cap || !citta || !provincia) {
         return res.status(400).json({ success: false, message: "Dati mancanti. Compila tutti i campi obbligatori." });
       }
       if (!isStrongPassword(password)) {
@@ -1060,7 +1062,8 @@ export async function registerRoutes(
 
       const hashedPassword = await bcrypt.hash(password, 10);
       const subscriber = await storage.createScSubscriber({
-        name,
+        nome,
+        cognome,
         email,
         password: hashedPassword,
         codiceFiscale: codiceFiscale || null,
@@ -1084,7 +1087,8 @@ export async function registerRoutes(
         currency: verification.currency || "EUR",
         status: "completed",
         payerEmail: verification.payerEmail || email,
-        billingName: name,
+        billingNome: nome,
+        billingCognome: cognome,
         billingCodiceFiscale: codiceFiscale || null,
         billingIndirizzo: indirizzo || null,
         billingCap: cap || null,
