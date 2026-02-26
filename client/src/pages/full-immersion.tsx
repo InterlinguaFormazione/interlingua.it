@@ -401,44 +401,89 @@ export default function FullImmersionPage() {
 
         <section className="py-24">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-6xl mx-auto">
               <div className="text-center mb-6">
                 <Badge variant="secondary" className="mb-4 px-4 py-1.5">
-                  <Coffee className="w-3 h-3 mr-1" />
-                  Una Giornata Tipo
+                  <Calendar className="w-3 h-3 mr-1" />
+                  La Settimana Tipo
                 </Badge>
                 <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4" data-testid="text-fi-day-title">
-                  Lasciati Portare dalla Giornata
+                  Come Si Vive il Full Immersion
                 </h2>
               </div>
               <p className="text-lg text-muted-foreground text-center max-w-3xl mx-auto mb-12">
-                Non sai ancora esattamente cosa accadrà, ma puoi già immaginarlo. Arrivi la mattina, e qualcosa nell'aria ti dice che questa non sarà una giornata qualunque. Ogni momento è pensato per farti dimenticare che stai imparando, e lasciarti semplicemente vivere l'inglese come se fosse sempre stato parte di te.
+                Quattro sessioni da 90 minuti al giorno, quattro docenti madrelingua, cinque giorni di immersione totale. Ogni giorno i topic ruotano, per tenerti sempre stimolato e farti vivere la lingua da prospettive diverse.
               </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                {[
-                  { time: "9:00 - 10:30", title: "Warm-up & Discussion", desc: "Ti ritrovi a discutere di qualcosa che ti appassiona, e senza accorgertene stai già parlando con una scioltezza che ieri non avevi. Le parole iniziano a venire da sole.", icon: Sparkles },
-                  { time: "10:30 - 11:00", title: "Coffee Break", desc: "È durante il caffè che succedono le cose più interessanti. Quando parli perché vuoi, non perché devi, scopri qualcosa di nuovo su te stesso e sul tuo inglese.", icon: Coffee },
-                  { time: "11:00 - 13:00", title: "Workshop Intensivo", desc: "Presentazioni, negoziazioni, simulazioni con metodologia CLIL. Ogni attività ti fa sentire un po' più sicuro di prima, e quel senso di sicurezza resta con te anche dopo.", icon: Target },
-                  { time: "14:00 - 16:30", title: "Progetto & Elevator Pitch", desc: "Lavori con persone che, come te, hanno scelto di fare questo passo. Progetti reali, public speaking e game-based learning: l'inglese diventa semplicemente il vostro modo di comunicare.", icon: Users },
-                ].map((slot, index) => (
-                  <div
-                    key={index}
-                    className="group relative flex gap-5 p-6 rounded-2xl border border-border/50 bg-card hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
-                    data-testid={`slot-fi-${index}`}
-                  >
-                    <div className="flex-shrink-0">
-                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center text-primary-foreground shadow-md shadow-primary/25">
-                        <slot.icon className="w-6 h-6" />
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-xs text-primary font-bold uppercase tracking-wider mb-1">{slot.time}</p>
-                      <h3 className="font-bold text-foreground text-lg mb-1">{slot.title}</h3>
-                      <p className="text-muted-foreground leading-relaxed text-sm">{slot.desc}</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="overflow-x-auto" data-testid="table-fi-schedule">
+                <table className="w-full border-collapse text-sm">
+                  <thead>
+                    <tr>
+                      <th className="p-3 text-left text-muted-foreground font-medium border-b border-border/50 w-[130px]">Orario</th>
+                      <th className="p-3 text-center font-bold text-white bg-primary rounded-tl-lg">Lunedi</th>
+                      <th className="p-3 text-center font-bold text-white bg-primary/90">Martedi</th>
+                      <th className="p-3 text-center font-bold text-white bg-primary/80">Mercoledi</th>
+                      <th className="p-3 text-center font-bold text-white bg-primary/70">Giovedi</th>
+                      <th className="p-3 text-center font-bold text-white bg-primary/60 rounded-tr-lg">Venerdi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-border/30">
+                      <td className="p-3 font-medium text-foreground">9,00-10,30</td>
+                      <td className="p-3 text-center text-muted-foreground bg-blue-50/50 dark:bg-blue-950/20">Small Talk & Ear Training</td>
+                      <td className="p-3 text-center text-muted-foreground bg-violet-50/50 dark:bg-violet-950/20">B&E Mindset</td>
+                      <td className="p-3 text-center text-muted-foreground bg-primary/5">Language Studies</td>
+                      <td className="p-3 text-center text-muted-foreground bg-emerald-50/50 dark:bg-emerald-950/20">B&E Studies</td>
+                      <td className="p-3 text-center text-muted-foreground bg-blue-50/50 dark:bg-blue-950/20">Small Talk & Ear Training</td>
+                    </tr>
+                    <tr className="border-b border-border/30">
+                      <td className="p-3 font-medium text-foreground">10,30-12,00</td>
+                      <td className="p-3 text-center text-muted-foreground bg-violet-50/50 dark:bg-violet-950/20">B&E Mindset</td>
+                      <td className="p-3 text-center text-muted-foreground bg-primary/5">Language Studies</td>
+                      <td className="p-3 text-center text-muted-foreground bg-emerald-50/50 dark:bg-emerald-950/20">B&E Studies</td>
+                      <td className="p-3 text-center text-muted-foreground bg-blue-50/50 dark:bg-blue-950/20">Small Talk & Ear Training</td>
+                      <td className="p-3 text-center text-muted-foreground bg-violet-50/50 dark:bg-violet-950/20">B&E Mindset</td>
+                    </tr>
+                    <tr className="border-b border-border/30">
+                      <td className="p-3 font-medium text-foreground">12,00-13,30</td>
+                      <td className="p-3 text-center text-muted-foreground bg-primary/5">Language Studies</td>
+                      <td className="p-3 text-center text-muted-foreground bg-emerald-50/50 dark:bg-emerald-950/20">B&E Studies</td>
+                      <td className="p-3 text-center text-muted-foreground bg-blue-50/50 dark:bg-blue-950/20">Small Talk & Ear Training</td>
+                      <td className="p-3 text-center text-muted-foreground bg-violet-50/50 dark:bg-violet-950/20">B&E Mindset</td>
+                      <td className="p-3 text-center text-muted-foreground bg-amber-50/50 dark:bg-amber-950/20 font-medium italic">Final Event Preparation</td>
+                    </tr>
+                    <tr className="border-b border-border/30 bg-muted/30">
+                      <td className="p-3 font-medium text-foreground">13,30-15,00</td>
+                      <td className="p-3 text-center text-muted-foreground italic">Lunch-break</td>
+                      <td className="p-3 text-center text-muted-foreground italic">Lunch-break</td>
+                      <td className="p-3 text-center text-muted-foreground italic">Lunch-break</td>
+                      <td className="p-3 text-center text-muted-foreground italic">Lunch-break</td>
+                      <td className="p-3 text-center text-muted-foreground italic">Lunch-break</td>
+                    </tr>
+                    <tr className="border-b border-border/30">
+                      <td className="p-3 font-medium text-foreground">15,00-16,30</td>
+                      <td className="p-3 text-center text-muted-foreground bg-emerald-50/50 dark:bg-emerald-950/20">B&E Studies</td>
+                      <td className="p-3 text-center text-muted-foreground bg-blue-50/50 dark:bg-blue-950/20">Small Talk & Ear Training</td>
+                      <td className="p-3 text-center text-muted-foreground bg-violet-50/50 dark:bg-violet-950/20">B&E Mindset</td>
+                      <td className="p-3 text-center text-muted-foreground bg-primary/5">Language Studies</td>
+                      <td className="p-3 text-center text-muted-foreground bg-amber-50/50 dark:bg-amber-950/20 font-semibold">Final Event (Elevator Pitch)</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 font-medium text-foreground">
+                        <span className="text-xs uppercase tracking-wider text-primary font-bold block">Potenziamento</span>
+                        16,30-18,00
+                      </td>
+                      <td className="p-3 text-center font-semibold text-primary bg-primary/10">Extension</td>
+                      <td className="p-3 text-center font-semibold text-primary bg-primary/10">Extension</td>
+                      <td className="p-3 text-center font-semibold text-primary bg-primary/10">Extension</td>
+                      <td className="p-3 text-center font-semibold text-primary bg-primary/10">Extension</td>
+                      <td className="p-3 text-center text-muted-foreground"></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
+              <p className="text-sm text-muted-foreground text-center mt-6">
+                B&E Studies = Specialist & Executive Language | B&E Mindset = Specialist & Executive Mindset
+              </p>
             </div>
           </div>
         </section>
