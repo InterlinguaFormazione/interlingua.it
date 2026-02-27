@@ -405,7 +405,7 @@ export function ContactSection() {
                   <p className="text-white/80 mb-4">
                     Scopri il tuo livello attuale con un test gratuito e ricevi consigli personalizzati.
                   </p>
-                  <Link href="/business-english-test">
+                  <Link href="/english-test">
                     <Button 
                       variant="secondary" 
                       className="w-full bg-primary-foreground text-primary"

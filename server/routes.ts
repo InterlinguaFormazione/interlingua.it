@@ -1457,7 +1457,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/business-english-test/start", async (req, res) => {
+  app.post("/api/english-test/start", async (req, res) => {
     try {
       const { firstName, lastName, email, company, phone, selfAssessedLevel } = req.body;
       if (!firstName || !lastName || !email || !selfAssessedLevel) {
@@ -1519,7 +1519,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/business-english-test/answer", async (req, res) => {
+  app.post("/api/english-test/answer", async (req, res) => {
     try {
       const { sessionId, questionId, answer, timeSpent } = req.body;
       if (!sessionId || !questionId || !answer) {
@@ -1695,7 +1695,7 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/business-english-test/session/:id", async (req, res) => {
+  app.get("/api/english-test/session/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const session = await storage.getBeTestSession(id);
@@ -1706,7 +1706,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/business-english-test/submit-writing", async (req, res) => {
+  app.post("/api/english-test/submit-writing", async (req, res) => {
     try {
       const { sessionId, response: writtenResponse, prompt } = req.body;
       if (!sessionId || !writtenResponse) {
@@ -1773,7 +1773,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/business-english-test/submit-speaking", upload.single("audio"), async (req: any, res) => {
+  app.post("/api/english-test/submit-speaking", upload.single("audio"), async (req: any, res) => {
     try {
       const { sessionId, prompt } = req.body;
       if (!sessionId || !req.file) {
@@ -1840,7 +1840,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/business-english-test/complete", async (req, res) => {
+  app.post("/api/english-test/complete", async (req, res) => {
     try {
       const { sessionId } = req.body;
       if (!sessionId) return res.status(400).json({ success: false, message: "Missing sessionId" });
@@ -1948,7 +1948,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/business-english-test/complete-without-speaking", async (req, res) => {
+  app.post("/api/english-test/complete-without-speaking", async (req, res) => {
     try {
       const { sessionId } = req.body;
       if (!sessionId) return res.status(400).json({ success: false, message: "Missing sessionId" });
@@ -2022,7 +2022,7 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/admin/business-english-results", requireAdmin, async (_req, res) => {
+  app.get("/api/admin/english-test-results", requireAdmin, async (_req, res) => {
     try {
       const sessions = await storage.getBeTestSessions();
       res.json(sessions);
@@ -2032,7 +2032,7 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/admin/business-english-results/:id", requireAdmin, async (req, res) => {
+  app.get("/api/admin/english-test-results/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const session = await storage.getBeTestSession(id);

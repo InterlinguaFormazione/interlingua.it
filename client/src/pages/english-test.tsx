@@ -153,7 +153,7 @@ export default function BusinessEnglishTestPage() {
   const handleSelfAssessment = async (level: string) => {
     setIsSubmitting(true);
     try {
-      const res = await apiRequest("POST", "/api/business-english-test/start", {
+      const res = await apiRequest("POST", "/api/english-test/start", {
         ...registrationData,
         selfAssessedLevel: level,
       });
@@ -180,7 +180,7 @@ export default function BusinessEnglishTestPage() {
     const timeSpent = Math.round((Date.now() - questionStartTime) / 1000);
 
     try {
-      const res = await apiRequest("POST", "/api/business-english-test/answer", {
+      const res = await apiRequest("POST", "/api/english-test/answer", {
         sessionId,
         questionId: currentQuestion.id,
         answer: selectedAnswer,
@@ -219,7 +219,7 @@ export default function BusinessEnglishTestPage() {
     if (!writingResponse.trim() || !sessionId) return;
     setIsSubmitting(true);
     try {
-      const res = await apiRequest("POST", "/api/business-english-test/submit-writing", {
+      const res = await apiRequest("POST", "/api/english-test/submit-writing", {
         sessionId,
         response: writingResponse,
         prompt: writingPrompt,
@@ -307,7 +307,7 @@ export default function BusinessEnglishTestPage() {
       formData.append("sessionId", sessionId.toString());
       formData.append("prompt", speakingPrompt);
 
-      const res = await fetch("/api/business-english-test/submit-speaking", {
+      const res = await fetch("/api/english-test/submit-speaking", {
         method: "POST",
         body: formData,
       });
@@ -326,7 +326,7 @@ export default function BusinessEnglishTestPage() {
     if (!sessionId) return;
     setIsSubmitting(true);
     try {
-      const res = await apiRequest("POST", "/api/business-english-test/complete-without-speaking", { sessionId });
+      const res = await apiRequest("POST", "/api/english-test/complete-without-speaking", { sessionId });
       const data = await res.json();
       if (data.success) {
         setResults({
@@ -346,7 +346,7 @@ export default function BusinessEnglishTestPage() {
   const completeTest = async () => {
     if (!sessionId) return;
     try {
-      const res = await apiRequest("POST", "/api/business-english-test/complete", { sessionId });
+      const res = await apiRequest("POST", "/api/english-test/complete", { sessionId });
       const data = await res.json();
       if (data.success) {
         setResults({

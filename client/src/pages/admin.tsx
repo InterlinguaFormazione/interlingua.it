@@ -199,9 +199,9 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
   const [filterLevel, setFilterLevel] = useState("");
 
   const { data: sessions = [], isLoading } = useQuery<BeSession[]>({
-    queryKey: ["/api/admin/business-english-results"],
+    queryKey: ["/api/admin/english-test-results"],
     queryFn: async () => {
-      const res = await fetch("/api/admin/business-english-results", {
+      const res = await fetch("/api/admin/english-test-results", {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.json();
@@ -209,9 +209,9 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
   });
 
   const { data: detail } = useQuery<BeSessionDetail>({
-    queryKey: ["/api/admin/business-english-results", selectedId],
+    queryKey: ["/api/admin/english-test-results", selectedId],
     queryFn: async () => {
-      const res = await fetch(`/api/admin/business-english-results/${selectedId}`, {
+      const res = await fetch(`/api/admin/english-test-results/${selectedId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.json();
