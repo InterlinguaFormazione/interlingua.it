@@ -213,8 +213,10 @@ Respond ONLY with valid JSON:
   const content = result.choices[0]?.message?.content;
   if (!content) throw new Error("Empty AI response");
   const parsed = JSON.parse(content);
+  const validLevels = ["A0", "A1", "A2", "B1", "B2", "C1"];
+  const normalizedLevel = (parsed.level || "").replace(/[^A-C0-2]/g, "").toUpperCase();
   return {
-    level: parsed.level || "A1",
+    level: validLevels.includes(normalizedLevel) ? normalizedLevel : currentLevel,
     grammar: Math.min(100, Math.max(0, parsed.grammar || 0)),
     vocabulary: Math.min(100, Math.max(0, parsed.vocabulary || 0)),
     coherence: Math.min(100, Math.max(0, parsed.coherence || 0)),
@@ -261,8 +263,10 @@ Respond ONLY with valid JSON:
   const content = result.choices[0]?.message?.content;
   if (!content) throw new Error("Empty AI response");
   const parsed = JSON.parse(content);
+  const validLevels = ["A0", "A1", "A2", "B1", "B2", "C1"];
+  const normalizedLevel = (parsed.level || "").replace(/[^A-C0-2]/g, "").toUpperCase();
   return {
-    level: parsed.level || "A1",
+    level: validLevels.includes(normalizedLevel) ? normalizedLevel : currentLevel,
     grammar: Math.min(100, Math.max(0, parsed.grammar || 0)),
     vocabulary: Math.min(100, Math.max(0, parsed.vocabulary || 0)),
     coherence: Math.min(100, Math.max(0, parsed.coherence || 0)),

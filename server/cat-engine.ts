@@ -120,10 +120,9 @@ export function checkPhaseTransitions(
     }
   } else if (totalQuestions <= 15) {
     if (totalQuestions >= 14) {
-      const recentCorrect = correctAnswers;
-      const window5Correct = Math.min(recentCorrect, 5);
-      if (window5Correct >= 4 && levelIdx < 5) return { newLevel: NUMERIC_LEVEL[levelIdx + 1], phaseComplete: false };
-      if (window5Correct <= 1 && levelIdx > 0) return { newLevel: NUMERIC_LEVEL[levelIdx - 1], phaseComplete: false };
+      const accuracy = correctAnswers / totalQuestions;
+      if (accuracy >= 0.8 && levelIdx < 5) return { newLevel: NUMERIC_LEVEL[levelIdx + 1], phaseComplete: false };
+      if (accuracy <= 0.2 && levelIdx > 0) return { newLevel: NUMERIC_LEVEL[levelIdx - 1], phaseComplete: false };
     }
   } else {
     if (questionsAtCurrentLevel >= 8) {

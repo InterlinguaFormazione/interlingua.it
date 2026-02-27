@@ -1588,7 +1588,8 @@ export async function registerRoutes(
       const newTotalQ = (session.totalQuestions ?? 0) + 1;
       const newCorrect = (session.correctAnswers ?? 0) + (isCorrect ? 1 : 0);
       const newLevel = thetaToCEFR(newTheta);
-      const prevQuestions: number[] = JSON.parse(session.previousQuestions || "[]");
+      let prevQuestions: number[];
+      try { prevQuestions = JSON.parse(session.previousQuestions || "[]"); } catch { prevQuestions = []; }
       prevQuestions.push(questionId);
 
       let questionsAtCurrentLevel = session.questionsAtCurrentLevel ?? 0;
@@ -1605,7 +1606,8 @@ export async function registerRoutes(
         consecutiveIncorrectA1 = 0;
       }
 
-      const levelHistory: string[] = JSON.parse(session.levelHistory || "[]");
+      let levelHistory: string[];
+      try { levelHistory = JSON.parse(session.levelHistory || "[]"); } catch { levelHistory = []; }
       levelHistory.push(newLevel);
 
       const confidence = Math.max(0, Math.min(100, Math.round((1 - newSE / 100) * 100)));
@@ -1797,6 +1799,10 @@ export async function registerRoutes(
       const session = await storage.getBeTestSession(sessionId);
       if (!session) return res.status(404).json({ success: false, message: "Session not found" });
 
+      if (session.writingScore !== null && session.writingScore !== undefined) {
+        return res.status(400).json({ success: false, message: "Writing already submitted" });
+      }
+
       const responseText = writtenResponse || "";
       const aiResult = responseText.trim().length < 5
         ? { level: "A0", grammar: 0, vocabulary: 0, coherence: 0, taskCompletion: 0, feedback: "No writing response provided or response too short to evaluate." }
@@ -1872,13 +1878,24 @@ export async function registerRoutes(
       const session = await storage.getBeTestSession(sessionId);
       if (!session) return res.status(404).json({ success: false, message: "Session not found" });
 
-      const transcript = await transcribeAudio(req.file.buffer, req.file.originalname || "audio.webm");
+      if (session.speakingScore !== null && session.speakingScore !== undefined) {
+        return res.status(400).json({ success: false, message: "Speaking already submitted" });
+      }
 
-      const aiResult = await scoreBusinessSpeaking(
-        prompt || getSpeakingPrompt(session.currentLevel),
-        transcript,
-        session.currentLevel
-      );
+      let transcript = "";
+      try {
+        transcript = await transcribeAudio(req.file.buffer, req.file.originalname || "audio.webm");
+      } catch (transcribeErr) {
+        console.error("Whisper transcription failed:", transcribeErr);
+      }
+
+      const aiResult = !transcript || transcript.trim().length < 3
+        ? { level: "A0", grammar: 0, vocabulary: 0, coherence: 0, taskCompletion: 0, feedback: "Audio could not be transcribed or was too short to evaluate." }
+        : await scoreBusinessSpeaking(
+            prompt || getSpeakingPrompt(session.currentLevel),
+            transcript,
+            session.currentLevel
+          );
 
       await storage.createBeWritingSpeaking({
         sessionId,
