@@ -8,7 +8,6 @@ import logoImage from "@assets/SKILLCRAFT-INTERLINGUA_1769354785857.png";
 
 const navLinks = [
   { href: "/bandi-e-corsi-finanziati", label: "Bandi e Corsi Finanziati" },
-  { href: "/speakers-corner", label: "Speaker's Corner" },
   { href: "/chi-siamo", label: "Chi Siamo" },
   { href: "/blog", label: "Blog" },
   { href: "#contact", label: "Contatti" },
