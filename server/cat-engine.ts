@@ -67,7 +67,7 @@ export function selectNextQuestion(
 
 export function updateTheta(oldTheta: number, isCorrect: boolean, standardError: number): number {
   const se = standardError / 100;
-  const step = (isCorrect ? 0.3 : -0.3) * (1 / se);
+  const step = (isCorrect ? 0.4 : -0.4) * (1 / se);
   const newTheta = oldTheta + Math.round(step * 100);
   return Math.max(-300, Math.min(300, newTheta));
 }
