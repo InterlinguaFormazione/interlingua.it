@@ -33,7 +33,9 @@ import {
   ArrowDown,
   Play,
   Zap,
+  ShoppingCart,
 } from "lucide-react";
+import { Link } from "wouter";
 import fullImmersionImage from "@assets/Full-Immersion-Workshop-di-Lingua-Inglese_1772143747179.jpg";
 
 function usePrefersReducedMotion() {
@@ -259,15 +261,16 @@ export default function FullImmersionPage() {
                   transition={{ duration: 0.6, delay: 0.65 }}
                   className="flex flex-wrap gap-4"
                 >
-                  <Button
-                    size="lg"
-                    className="h-14 px-10 text-base rounded-2xl bg-white text-primary hover:bg-white/90 shadow-2xl shadow-black/20 font-bold"
-                    onClick={() => document.querySelector("#contact-section")?.scrollIntoView({ behavior: "smooth" })}
-                    data-testid="button-fi-cta"
-                  >
-                    <Sparkles className="w-5 h-5 mr-2" />
-                    Voglio Partecipare
-                  </Button>
+                  <Link href="/shop/checkout/full-immersion">
+                    <Button
+                      size="lg"
+                      className="h-14 px-10 text-base rounded-2xl bg-white text-primary hover:bg-white/90 shadow-2xl shadow-black/20 font-bold"
+                      data-testid="button-fi-buy"
+                    >
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                      Acquista Online
+                    </Button>
+                  </Link>
                   <Button
                     size="lg"
                     variant="outline"
@@ -838,9 +841,20 @@ export default function FullImmersionPage() {
                   Contattaci per scoprire le prossime date e riservare il tuo posto. Una chiacchierata al telefono o un'email: è tutto quello che serve per iniziare.
                 </p>
                 <div className="flex flex-wrap justify-center gap-5">
+                  <Link href="/shop/checkout/full-immersion">
+                    <Button
+                      size="lg"
+                      className="h-16 px-10 text-lg rounded-2xl bg-white text-primary hover:bg-white/90 shadow-2xl shadow-black/20 font-bold"
+                      data-testid="button-fi-buy-bottom"
+                    >
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                      Acquista Online
+                    </Button>
+                  </Link>
                   <Button
                     size="lg"
-                    className="h-16 px-10 text-lg rounded-2xl bg-white text-primary hover:bg-white/90 shadow-2xl shadow-black/20 font-bold"
+                    variant="outline"
+                    className="h-16 px-10 text-lg rounded-2xl border-white/25 text-white hover:bg-white/10 backdrop-blur-sm font-medium"
                     asChild
                     data-testid="button-fi-call"
                   >
