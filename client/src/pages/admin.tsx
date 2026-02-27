@@ -29,7 +29,84 @@ import {
   UserPlus,
   Trash2,
   Pencil,
+  ShoppingBag,
 } from "lucide-react";
+
+interface ShopOrder {
+  id: string;
+  productSlug: string;
+  productName: string;
+  amount: string;
+  currency: string;
+  paypalOrderId: string;
+  status: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string | null;
+  createdAt: string | null;
+}
+
+function ShopOrdersTab({ token }: { token: string }) {
+  const { data: orders = [], isLoading } = useQuery<ShopOrder[]>({
+    queryKey: ["/api/admin/shop/orders"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/shop/orders", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to fetch orders");
+      return res.json();
+    },
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Ordini Shop</CardTitle>
+        <CardDescription>Tutti gli acquisti effettuati online</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="text-center py-8 text-muted-foreground">Caricamento...</div>
+        ) : orders.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">Nessun ordine ancora</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-3 px-2 font-medium">Data</th>
+                  <th className="text-left py-3 px-2 font-medium">Corso</th>
+                  <th className="text-left py-3 px-2 font-medium">Cliente</th>
+                  <th className="text-left py-3 px-2 font-medium">Email</th>
+                  <th className="text-right py-3 px-2 font-medium">Importo</th>
+                  <th className="text-center py-3 px-2 font-medium">Stato</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((order) => (
+                  <tr key={order.id} className="border-b last:border-0" data-testid={`row-order-${order.id}`}>
+                    <td className="py-3 px-2 text-muted-foreground whitespace-nowrap">
+                      {order.createdAt ? new Date(order.createdAt).toLocaleDateString("it-IT") : "-"}
+                    </td>
+                    <td className="py-3 px-2 font-medium">{order.productName}</td>
+                    <td className="py-3 px-2">{order.customerName}</td>
+                    <td className="py-3 px-2 text-muted-foreground">{order.customerEmail}</td>
+                    <td className="py-3 px-2 text-right font-medium">&euro;{parseFloat(order.amount).toFixed(2)}</td>
+                    <td className="py-3 px-2 text-center">
+                      <Badge variant={order.status === "completed" ? "default" : "secondary"}>
+                        {order.status === "completed" ? "Completato" : order.status}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 interface AdminUser {
   id: string;
@@ -451,7 +528,7 @@ export default function AdminPage() {
           </div>
 
           <Tabs defaultValue="contacts" className="space-y-6">
-            <TabsList className={`grid w-full ${isAdmin ? "grid-cols-4" : "grid-cols-3"}`}>
+            <TabsList className={`grid w-full ${isAdmin ? "grid-cols-5" : "grid-cols-4"}`}>
               <TabsTrigger value="contacts" data-testid="tab-contacts">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Messaggi
@@ -459,6 +536,10 @@ export default function AdminPage() {
               <TabsTrigger value="newsletter" data-testid="tab-newsletter">
                 <Mail className="w-4 h-4 mr-2" />
                 Newsletter
+              </TabsTrigger>
+              <TabsTrigger value="orders" data-testid="tab-orders">
+                <ShoppingBag className="w-4 h-4 mr-2" />
+                Ordini
               </TabsTrigger>
               <TabsTrigger value="blog" data-testid="tab-blog">
                 <Newspaper className="w-4 h-4 mr-2" />
@@ -579,6 +660,10 @@ export default function AdminPage() {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="orders">
+              <ShopOrdersTab token={token} />
             </TabsContent>
 
             <TabsContent value="blog">

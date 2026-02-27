@@ -1,7 +1,7 @@
 import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactSchema, insertNewsletterSchema, insertCookieConsentSchema } from "@shared/schema";
+import { insertContactSchema, insertNewsletterSchema, insertCookieConsentSchema, insertShopOrderSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendSubscriptionConfirmation, sendBookingConfirmation } from "./email";
@@ -9,6 +9,7 @@ import { forwardToCRM } from "./crm";
 import { generateBlogPost } from "./blog-generator";
 import { chatWithAI } from "./ai-chat";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalOrder } from "./paypal";
+import { SHOP_PRODUCTS, getProductBySlug } from "@shared/products";
 import cron from "node-cron";
 import crypto from "crypto";
 
@@ -1136,6 +1137,94 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error processing SC purchase:", error);
       res.status(500).json({ success: false, message: "Errore durante l'elaborazione dell'acquisto" });
+    }
+  });
+
+  app.get("/api/shop/products", async (_req, res) => {
+    res.json(SHOP_PRODUCTS);
+  });
+
+  app.post("/api/shop/purchase", async (req, res) => {
+    try {
+      const { paypalOrderId, productSlug, customerName, customerEmail, customerPhone, billingCodiceFiscale, billingIndirizzo, billingCap, billingCitta, billingProvincia, billingPartitaIva, billingCodiceSdi, billingPec, notes } = req.body;
+
+      const orderData = {
+        productSlug: req.body.productSlug,
+        productName: "",
+        amount: "",
+        currency: "EUR",
+        paypalOrderId: req.body.paypalOrderId,
+        status: "completed",
+        customerName: req.body.customerName,
+        customerEmail: req.body.customerEmail,
+        customerPhone: req.body.customerPhone || null,
+        billingCodiceFiscale: req.body.billingCodiceFiscale || null,
+        billingIndirizzo: req.body.billingIndirizzo || null,
+        billingCap: req.body.billingCap || null,
+        billingCitta: req.body.billingCitta || null,
+        billingProvincia: req.body.billingProvincia || null,
+        billingPartitaIva: req.body.billingPartitaIva || null,
+        billingCodiceSdi: req.body.billingCodiceSdi || null,
+        billingPec: req.body.billingPec || null,
+        notes: req.body.notes || null,
+      };
+
+      const parsed = insertShopOrderSchema.safeParse(orderData);
+      if (!parsed.success) {
+        return res.status(400).json({ success: false, message: "Dati mancanti o non validi.", errors: parsed.error.errors });
+      }
+
+      const product = getProductBySlug(parsed.data.productSlug);
+      if (!product) {
+        return res.status(400).json({ success: false, message: "Prodotto non trovato." });
+      }
+
+      const existingOrder = await storage.getShopOrderByPaypalId(parsed.data.paypalOrderId);
+      if (existingOrder) {
+        return res.status(400).json({ success: false, message: "Questo pagamento è già stato elaborato." });
+      }
+
+      const verification = await verifyPaypalOrder(parsed.data.paypalOrderId, product.price);
+      if (!verification.verified) {
+        console.error("PayPal order verification failed for shop:", verification);
+        return res.status(400).json({
+          success: false,
+          message: "Pagamento non verificato. Contatta l'assistenza se il problema persiste.",
+        });
+      }
+
+      const order = await storage.createShopOrder({
+        ...parsed.data,
+        productName: product.name,
+        amount: product.price,
+      });
+
+      try {
+        await sendContactNotification({
+          name: customerName,
+          email: customerEmail,
+          phone: customerPhone || undefined,
+          courseInterest: `Acquisto: ${product.name} (${product.price} EUR)`,
+          message: `Ordine completato via PayPal. ID: ${paypalOrderId}`,
+        });
+      } catch (emailError) {
+        console.error("Failed to send shop purchase notification:", emailError);
+      }
+
+      res.json({ success: true, order });
+    } catch (error) {
+      console.error("Error processing shop purchase:", error);
+      res.status(500).json({ success: false, message: "Errore durante l'elaborazione dell'acquisto." });
+    }
+  });
+
+  app.get("/api/admin/shop/orders", requireAuth, async (_req, res) => {
+    try {
+      const orders = await storage.getShopOrders();
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching shop orders:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
     }
   });
 

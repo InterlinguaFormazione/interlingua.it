@@ -203,6 +203,37 @@ export const insertScPaymentSchema = createInsertSchema(scPayments).omit({
 export type InsertScPayment = z.infer<typeof insertScPaymentSchema>;
 export type ScPayment = typeof scPayments.$inferSelect;
 
+export const shopOrders = pgTable("shop_orders", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  productSlug: text("product_slug").notNull(),
+  productName: text("product_name").notNull(),
+  amount: text("amount").notNull(),
+  currency: text("currency").notNull().default("EUR"),
+  paypalOrderId: text("paypal_order_id").notNull(),
+  status: text("status").notNull().default("pending"),
+  customerName: text("customer_name").notNull(),
+  customerEmail: text("customer_email").notNull(),
+  customerPhone: text("customer_phone"),
+  billingCodiceFiscale: text("billing_codice_fiscale"),
+  billingIndirizzo: text("billing_indirizzo"),
+  billingCap: text("billing_cap"),
+  billingCitta: text("billing_citta"),
+  billingProvincia: text("billing_provincia"),
+  billingPartitaIva: text("billing_partita_iva"),
+  billingCodiceSdi: text("billing_codice_sdi"),
+  billingPec: text("billing_pec"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertShopOrderSchema = createInsertSchema(shopOrders).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertShopOrder = z.infer<typeof insertShopOrderSchema>;
+export type ShopOrder = typeof shopOrders.$inferSelect;
+
 export interface Course {
   id: string;
   title: string;

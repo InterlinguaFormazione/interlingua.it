@@ -124,7 +124,7 @@ export async function capturePaypalOrder(req: Request, res: Response) {
   }
 }
 
-export async function verifyPaypalOrder(orderId: string): Promise<{
+export async function verifyPaypalOrder(orderId: string, expectedAmount?: string): Promise<{
   verified: boolean;
   status: string;
   amount?: string;
@@ -145,7 +145,8 @@ export async function verifyPaypalOrder(orderId: string): Promise<{
       return { verified: false, status };
     }
 
-    if (amount !== "200.00" || currency !== "EUR") {
+    const checkAmount = expectedAmount || "200.00";
+    if (amount !== checkAmount || currency !== "EUR") {
       return { verified: false, status, amount, currency };
     }
 

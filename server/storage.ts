@@ -18,6 +18,8 @@ import {
   type ScEmailSettings,
   type ScPayment,
   type InsertScPayment,
+  type ShopOrder,
+  type InsertShopOrder,
   users,
   contactSubmissions,
   newsletterSubscriptions,
@@ -28,6 +30,7 @@ import {
   scBookings,
   scEmailSettings,
   scPayments,
+  shopOrders,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte, desc } from "drizzle-orm";
@@ -82,6 +85,11 @@ export interface IStorage {
   getScPayments(): Promise<ScPayment[]>;
   getScPaymentByOrderId(paypalOrderId: string): Promise<ScPayment | undefined>;
   updateScPaymentStatus(id: string, status: string): Promise<ScPayment | undefined>;
+
+  createShopOrder(order: InsertShopOrder): Promise<ShopOrder>;
+  getShopOrders(): Promise<ShopOrder[]>;
+  getShopOrderByPaypalId(paypalOrderId: string): Promise<ShopOrder | undefined>;
+  updateShopOrderStatus(id: string, status: string): Promise<ShopOrder | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -305,6 +313,25 @@ export class DatabaseStorage implements IStorage {
 
   async updateScPaymentStatus(id: string, status: string): Promise<ScPayment | undefined> {
     const [result] = await db.update(scPayments).set({ status }).where(eq(scPayments.id, id)).returning();
+    return result;
+  }
+
+  async createShopOrder(order: InsertShopOrder): Promise<ShopOrder> {
+    const [result] = await db.insert(shopOrders).values(order).returning();
+    return result;
+  }
+
+  async getShopOrders(): Promise<ShopOrder[]> {
+    return db.select().from(shopOrders).orderBy(desc(shopOrders.createdAt));
+  }
+
+  async getShopOrderByPaypalId(paypalOrderId: string): Promise<ShopOrder | undefined> {
+    const [result] = await db.select().from(shopOrders).where(eq(shopOrders.paypalOrderId, paypalOrderId));
+    return result;
+  }
+
+  async updateShopOrderStatus(id: string, status: string): Promise<ShopOrder | undefined> {
+    const [result] = await db.update(shopOrders).set({ status }).where(eq(shopOrders.id, id)).returning();
     return result;
   }
 }

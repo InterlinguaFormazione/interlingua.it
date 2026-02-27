@@ -69,6 +69,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 
 ### Shared (`shared/`)
 - `schema.ts` - Drizzle schema + Zod validation schemas
+- `products.ts` - Static product catalog for the online shop (15 courses with fixed prices)
 
 ## Database Tables
 - `users` - Basic user accounts
@@ -81,6 +82,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `sc_bookings` - Session bookings (subscriber + session link)
 - `sc_email_settings` - Email notification settings (suspend/resume for holidays)
 - `sc_payments` - PayPal payment records (subscriber ID, PayPal order ID, amount, currency, status, payer email)
+- `shop_orders` - Online shop orders (product slug/name, amount, PayPal order ID, customer info, billing, status)
 
 ## API Endpoints
 - `POST /api/contact` - Submit contact form (saves to DB + emails + CRM)
@@ -131,6 +133,11 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `POST /paypal/order/:orderID/capture` - Capture a PayPal order after approval
 - `POST /api/speakers-corner/purchase` - Complete purchase (creates subscriber + records payment)
 
+### Shop API
+- `GET /api/shop/products` - Get all purchasable products
+- `POST /api/shop/purchase` - Complete shop purchase (verifies PayPal, creates order)
+- `GET /api/admin/shop/orders` - List all shop orders (admin)
+
 ## Bot Protection
 - **Honeypot fields**: Hidden fields in both forms — bots fill them, humans don't
 - **Timestamp check**: Submissions under 3 seconds rejected (too fast = bot)
@@ -165,7 +172,9 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `/speakers-corner` - Speaker's Corner info page with subscriber login
 - `/speakers-corner/acquista` - Purchase Speaker's Corner subscription (PayPal checkout)
 - `/speakers-corner/dashboard` - Subscriber dashboard (view/book sessions)
-- `/admin` - General admin panel (contacts, newsletter, blog management)
+- `/shop` - Online course shop (all fixed-price courses)
+- `/shop/checkout/:slug` - Checkout page with billing and PayPal payment
+- `/admin` - General admin panel (contacts, newsletter, orders, blog management)
 - `/speakers-corner/admin` - Speaker's Corner admin (manage subscribers, sessions, email settings)
 - `/blog` - Blog listing
 - `/blog/:slug` - Blog post detail
