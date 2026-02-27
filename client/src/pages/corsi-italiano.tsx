@@ -108,8 +108,8 @@ const content = {
     heroSubtitle: "Interlingua insegna italiano per uso professionale e quotidiano. Negli anni abbiamo raggiunto un alto riconoscimento e un apprezzamento a livello mondiale.",
     heroCta: "Scopri i Corsi",
     heroCtaSecondary: "Richiedi Informazioni",
-    vicenzaTitle: "Vicenza: Una Città Meravigliosa",
-    vicenzaText: "I tesori naturali e artistici di Vicenza sono una realtà conosciuta in tutto il mondo, accreditata dall'UNESCO. Situata ai piedi dei colli Berici, a meno di un'ora da Venezia e Verona, vicina a spiagge per il relax e montagne attrezzate per ogni sport. Ma non dimentichiamo che è una delle città più antiche e importanti del Veneto.",
+    vicenzaTitle: "Vicenza: La Città del Palladio",
+    vicenzaText: "Vicenza è un gioiello incastonato nel cuore del Veneto, dove ogni via racconta secoli di storia, arte e bellezza. Patrimonio UNESCO grazie ai capolavori di Andrea Palladio \u2014 dalla maestosa Basilica Palladiana alla scenografica Villa La Rotonda \u2014 la città incanta con i suoi eleganti palazzi, le piazze animate e un'atmosfera che unisce tradizione e vivacità contemporanea. Ai piedi dei dolci colli Berici, a meno di un'ora da Venezia, Verona e le Dolomiti, Vicenza offre un'esperienza unica: passeggiare tra portici rinascimentali, gustare la cucina veneta in osterie storiche, esplorare mercati e botteghe artigiane, e vivere il calore autentico di una città a misura d'uomo. Studiare italiano qui significa immergersi nella vera Italia.",
     culturalTourism: "Turismo Culturale",
     whyUsTitle: "Perché Scegliere Interlingua",
     whyUs: [
@@ -221,8 +221,8 @@ const content = {
     heroSubtitle: "Interlingua is a language training organisation which teaches Italian for both professional and everyday use. Over the years we have achieved high recognition and world-wide appreciation.",
     heroCta: "Explore Courses",
     heroCtaSecondary: "Request Information",
-    vicenzaTitle: "Vicenza: A Beautiful City",
-    vicenzaText: "The natural and artistic treasures of Vicenza are a reality known worldwide, accredited by UNESCO. Located in the northern foothills of the Berici mountains, an hour's drive at most from Venice and Verona, close to beaches for relaxation and equipped mountains for most sports. But let's not forget that it is one of the oldest and most important cities of Veneto.",
+    vicenzaTitle: "Vicenza: City of Palladio",
+    vicenzaText: "Vicenza is a jewel nestled in the heart of the Veneto region, where every street tells centuries of history, art and beauty. A UNESCO World Heritage Site thanks to the masterpieces of Andrea Palladio \u2014 from the majestic Basilica Palladiana to the iconic Villa La Rotonda \u2014 the city enchants with its elegant palaces, lively piazzas and an atmosphere that blends tradition with contemporary vibrancy. Set at the foot of the gentle Berici hills, less than an hour from Venice, Verona and the Dolomites, Vicenza offers a truly unique experience: strolling under Renaissance arcades, savouring Venetian cuisine in historic osterias, exploring artisan workshops and local markets, and feeling the warm, authentic spirit of a city built on a human scale. Studying Italian here means immersing yourself in the real Italy.",
     culturalTourism: "Cultural Tourism",
     whyUsTitle: "Why Choose Interlingua",
     whyUs: [
