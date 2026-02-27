@@ -1459,7 +1459,7 @@ export async function registerRoutes(
 
   app.post("/api/english-test/start", async (req, res) => {
     try {
-      const { firstName, lastName, email, company, phone, selfAssessedLevel } = req.body;
+      const { firstName, lastName, email, company, phone, city, province, selfAssessedLevel } = req.body;
       if (!firstName || !lastName || !email || !selfAssessedLevel) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
       }
@@ -1477,8 +1477,10 @@ export async function registerRoutes(
         firstName,
         lastName,
         email,
-        company: company || "",
+        company: company || null,
         phone: phone || null,
+        city: city || null,
+        province: province || null,
         selfAssessedLevel,
         currentLevel: thetaToCEFR(startingTheta),
         currentTheta: startingTheta,

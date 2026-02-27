@@ -47,11 +47,13 @@ interface TestResults {
 }
 
 const registrationSchema = z.object({
-  firstName: z.string().min(1, "Required"),
-  lastName: z.string().min(1, "Required"),
-  email: z.string().email("Invalid email"),
-  company: z.string().optional(),
+  firstName: z.string().min(1, "Campo obbligatorio"),
+  lastName: z.string().min(1, "Campo obbligatorio"),
+  email: z.string().email("Email non valida"),
   phone: z.string().optional(),
+  company: z.string().optional(),
+  city: z.string().optional(),
+  province: z.string().optional(),
 });
 
 const CEFR_DESCRIPTIONS: Record<string, { label: string; desc: string }> = {
@@ -114,7 +116,7 @@ export default function BusinessEnglishTestPage() {
 
   const form = useForm({
     resolver: zodResolver(registrationSchema),
-    defaultValues: { firstName: "", lastName: "", email: "", company: "", phone: "" },
+    defaultValues: { firstName: "", lastName: "", email: "", phone: "", company: "", city: "", province: "" },
   });
 
   useEffect(() => {
@@ -449,15 +451,15 @@ export default function BusinessEnglishTestPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="firstName" render={({ field }) => (
                       <FormItem>
-                        <FormLabel>First Name *</FormLabel>
-                        <FormControl><Input {...field} data-testid="input-first-name" placeholder="First name" /></FormControl>
+                        <FormLabel>Nome *</FormLabel>
+                        <FormControl><Input {...field} data-testid="input-first-name" placeholder="Nome" /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                     <FormField control={form.control} name="lastName" render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Last Name *</FormLabel>
-                        <FormControl><Input {...field} data-testid="input-last-name" placeholder="Last name" /></FormControl>
+                        <FormLabel>Cognome *</FormLabel>
+                        <FormControl><Input {...field} data-testid="input-last-name" placeholder="Cognome" /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
@@ -465,24 +467,40 @@ export default function BusinessEnglishTestPage() {
                   <FormField control={form.control} name="email" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email *</FormLabel>
-                      <FormControl><Input type="email" {...field} data-testid="input-email" placeholder="your@email.com" /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                  <FormField control={form.control} name="company" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Company / School (optional)</FormLabel>
-                      <FormControl><Input {...field} data-testid="input-company" placeholder="Company or school name" /></FormControl>
+                      <FormControl><Input type="email" {...field} data-testid="input-email" placeholder="la-tua@email.com" /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
                   <FormField control={form.control} name="phone" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone (optional)</FormLabel>
-                      <FormControl><Input {...field} data-testid="input-phone" placeholder="Phone number" /></FormControl>
+                      <FormLabel>Telefono</FormLabel>
+                      <FormControl><Input {...field} data-testid="input-phone" placeholder="Numero di telefono" /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
+                  <FormField control={form.control} name="company" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Azienda</FormLabel>
+                      <FormControl><Input {...field} data-testid="input-company" placeholder="Nome azienda" /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField control={form.control} name="city" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Citta</FormLabel>
+                        <FormControl><Input {...field} data-testid="input-city" placeholder="Citta" /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="province" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Provincia (sigla)</FormLabel>
+                        <FormControl><Input {...field} data-testid="input-province" placeholder="es. VI" maxLength={2} className="uppercase" /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
                   <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" data-testid="button-start-test">
                     Continue <ChevronRight className="w-4 h-4 ml-2" />
                   </Button>
