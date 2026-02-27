@@ -1476,14 +1476,18 @@ export async function registerRoutes(
 
   app.post("/api/english-test/submit", async (req, res) => {
     try {
-      const { candidateName, candidateEmail, candidatePhone, grammarScore, grammarLevel, writingScore, writingLevel, writingResponses, speakingScore, speakingLevel, speakingResponses, overallLevel, overallScore } = req.body;
+      const { candidateNome, candidateCognome, candidateEmail, candidatePhone, candidateAzienda, candidateCitta, candidateProvincia, grammarScore, grammarLevel, writingScore, writingLevel, writingResponses, speakingScore, speakingLevel, speakingResponses, overallLevel, overallScore } = req.body;
 
-      if (!candidateName || !candidateEmail) {
-        return res.status(400).json({ success: false, message: "Missing candidate name or email" });
+      if (!candidateNome || !candidateCognome || !candidateEmail) {
+        return res.status(400).json({ success: false, message: "Missing candidate nome, cognome, or email" });
       }
 
       const saved = await storage.createEnglishTestResult({
-        candidateName, candidateEmail, candidatePhone: candidatePhone || null,
+        candidateNome, candidateCognome, candidateEmail,
+        candidatePhone: candidatePhone || null,
+        candidateAzienda: candidateAzienda || null,
+        candidateCitta: candidateCitta || null,
+        candidateProvincia: candidateProvincia || null,
         grammarScore, grammarLevel,
         writingScore, writingLevel, writingResponses: writingResponses || null,
         speakingScore, speakingLevel, speakingResponses: speakingResponses || null,
@@ -1492,7 +1496,9 @@ export async function registerRoutes(
 
       try {
         await sendTestResultEmail({
-          candidateName, candidateEmail, candidatePhone,
+          candidateName: `${candidateNome} ${candidateCognome}`,
+          candidateEmail, candidatePhone,
+          candidateAzienda, candidateCitta, candidateProvincia,
           grammarScore, grammarLevel,
           writingScore, writingLevel,
           speakingScore, speakingLevel,

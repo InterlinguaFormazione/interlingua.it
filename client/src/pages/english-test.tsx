@@ -188,9 +188,13 @@ interface SpeakingScoreResult {
 type Phase = "intro" | "grammar" | "writing" | "speaking" | "results";
 
 interface CandidateInfo {
-  name: string;
+  nome: string;
+  cognome: string;
   email: string;
   phone: string;
+  azienda: string;
+  citta: string;
+  provincia: string;
 }
 
 function determineGrammarLevel(answers: Record<number, number>): { level: string; scores: Record<string, { correct: number; total: number }>; totalCorrect: number } {
@@ -225,7 +229,7 @@ function countWords(text: string): number {
 
 export default function EnglishTestPage() {
   const [phase, setPhase] = useState<Phase>("intro");
-  const [candidateInfo, setCandidateInfo] = useState<CandidateInfo>({ name: "", email: "", phone: "" });
+  const [candidateInfo, setCandidateInfo] = useState<CandidateInfo>({ nome: "", cognome: "", email: "", phone: "", azienda: "", citta: "", provincia: "" });
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [grammarAnswers, setGrammarAnswers] = useState<Record<number, number>>({});
@@ -379,9 +383,13 @@ export default function EnglishTestPage() {
     setSubmitting(true);
     try {
       await apiRequest("POST", "/api/english-test/submit", {
-        candidateName: candidateInfo.name,
+        candidateNome: candidateInfo.nome,
+        candidateCognome: candidateInfo.cognome,
         candidateEmail: candidateInfo.email,
         candidatePhone: candidateInfo.phone || null,
+        candidateAzienda: candidateInfo.azienda || null,
+        candidateCitta: candidateInfo.citta || null,
+        candidateProvincia: candidateInfo.provincia || null,
         grammarScore: overallResults.grammarScore,
         grammarLevel: overallResults.grammarLevel,
         writingScore: overallResults.writingScore,
@@ -421,7 +429,7 @@ export default function EnglishTestPage() {
 
   const handleRestart = useCallback(() => {
     setPhase("intro");
-    setCandidateInfo({ name: "", email: "", phone: "" });
+    setCandidateInfo({ nome: "", cognome: "", email: "", phone: "", azienda: "", citta: "", provincia: "" });
     setCurrentQuestion(0);
     setGrammarAnswers({});
     setSelectedOption(null);
@@ -516,7 +524,8 @@ function IntroSection({
 
   const handleStart = () => {
     const newErrors: Record<string, string> = {};
-    if (!candidateInfo.name.trim()) newErrors.name = "Il nome e obbligatorio";
+    if (!candidateInfo.nome.trim()) newErrors.nome = "Il nome e obbligatorio";
+    if (!candidateInfo.cognome.trim()) newErrors.cognome = "Il cognome e obbligatorio";
     if (!candidateInfo.email.trim()) newErrors.email = "L'email e obbligatoria";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(candidateInfo.email)) newErrors.email = "Email non valida";
     if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
@@ -569,19 +578,35 @@ function IntroSection({
               <CardContent className="p-6">
                 <h2 className="text-xl font-bold mb-6 text-center">I Tuoi Dati</h2>
                 <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="name" className="flex items-center gap-2 mb-2">
-                      <User className="w-4 h-4 text-muted-foreground" />
-                      Nome e Cognome *
-                    </Label>
-                    <Input
-                      id="name"
-                      value={candidateInfo.name}
-                      onChange={e => onCandidateChange({ ...candidateInfo, name: e.target.value })}
-                      placeholder="Mario Rossi"
-                      data-testid="input-candidate-name"
-                    />
-                    {errors.name && <p className="text-sm text-destructive mt-1" data-testid="error-name">{errors.name}</p>}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="nome" className="flex items-center gap-2 mb-2">
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        Nome *
+                      </Label>
+                      <Input
+                        id="nome"
+                        value={candidateInfo.nome}
+                        onChange={e => onCandidateChange({ ...candidateInfo, nome: e.target.value })}
+                        placeholder="Mario"
+                        data-testid="input-candidate-nome"
+                      />
+                      {errors.nome && <p className="text-sm text-destructive mt-1" data-testid="error-nome">{errors.nome}</p>}
+                    </div>
+                    <div>
+                      <Label htmlFor="cognome" className="flex items-center gap-2 mb-2">
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        Cognome *
+                      </Label>
+                      <Input
+                        id="cognome"
+                        value={candidateInfo.cognome}
+                        onChange={e => onCandidateChange({ ...candidateInfo, cognome: e.target.value })}
+                        placeholder="Rossi"
+                        data-testid="input-candidate-cognome"
+                      />
+                      {errors.cognome && <p className="text-sm text-destructive mt-1" data-testid="error-cognome">{errors.cognome}</p>}
+                    </div>
                   </div>
                   <div>
                     <Label htmlFor="email" className="flex items-center gap-2 mb-2">
@@ -598,19 +623,63 @@ function IntroSection({
                     />
                     {errors.email && <p className="text-sm text-destructive mt-1" data-testid="error-email">{errors.email}</p>}
                   </div>
-                  <div>
-                    <Label htmlFor="phone" className="flex items-center gap-2 mb-2">
-                      <Phone className="w-4 h-4 text-muted-foreground" />
-                      Telefono (opzionale)
-                    </Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      value={candidateInfo.phone}
-                      onChange={e => onCandidateChange({ ...candidateInfo, phone: e.target.value })}
-                      placeholder="+39 333 1234567"
-                      data-testid="input-candidate-phone"
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="phone" className="flex items-center gap-2 mb-2">
+                        <Phone className="w-4 h-4 text-muted-foreground" />
+                        Telefono
+                      </Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        value={candidateInfo.phone}
+                        onChange={e => onCandidateChange({ ...candidateInfo, phone: e.target.value })}
+                        placeholder="+39 333 1234567"
+                        data-testid="input-candidate-phone"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="azienda" className="flex items-center gap-2 mb-2">
+                        <GraduationCap className="w-4 h-4 text-muted-foreground" />
+                        Azienda
+                      </Label>
+                      <Input
+                        id="azienda"
+                        value={candidateInfo.azienda}
+                        onChange={e => onCandidateChange({ ...candidateInfo, azienda: e.target.value })}
+                        placeholder="Azienda"
+                        data-testid="input-candidate-azienda"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="citta" className="flex items-center gap-2 mb-2">
+                        <Globe className="w-4 h-4 text-muted-foreground" />
+                        Citta
+                      </Label>
+                      <Input
+                        id="citta"
+                        value={candidateInfo.citta}
+                        onChange={e => onCandidateChange({ ...candidateInfo, citta: e.target.value })}
+                        placeholder="Vicenza"
+                        data-testid="input-candidate-citta"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="provincia" className="flex items-center gap-2 mb-2">
+                        <Globe className="w-4 h-4 text-muted-foreground" />
+                        Provincia (sigla)
+                      </Label>
+                      <Input
+                        id="provincia"
+                        value={candidateInfo.provincia}
+                        onChange={e => onCandidateChange({ ...candidateInfo, provincia: e.target.value.toUpperCase().slice(0, 2) })}
+                        placeholder="VI"
+                        maxLength={2}
+                        data-testid="input-candidate-provincia"
+                      />
+                    </div>
                   </div>
                   <Button className="w-full mt-2" size="lg" onClick={handleStart} data-testid="button-start-test">
                     Inizia il Test

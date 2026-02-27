@@ -277,9 +277,13 @@ export type CourseMaterial = typeof courseMaterials.$inferSelect;
 
 export const englishTestResults = pgTable("english_test_results", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  candidateName: text("candidate_name").notNull(),
+  candidateNome: text("candidate_nome").notNull(),
+  candidateCognome: text("candidate_cognome").notNull(),
   candidateEmail: text("candidate_email").notNull(),
   candidatePhone: text("candidate_phone"),
+  candidateAzienda: text("candidate_azienda"),
+  candidateCitta: text("candidate_citta"),
+  candidateProvincia: text("candidate_provincia"),
   grammarScore: integer("grammar_score"),
   grammarLevel: text("grammar_level"),
   writingScore: integer("writing_score"),

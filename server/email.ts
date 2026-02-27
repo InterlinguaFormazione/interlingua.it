@@ -392,6 +392,9 @@ export async function sendTestResultEmail(data: {
   candidateName: string;
   candidateEmail: string;
   candidatePhone?: string | null;
+  candidateAzienda?: string | null;
+  candidateCitta?: string | null;
+  candidateProvincia?: string | null;
   grammarScore: number;
   grammarLevel: string;
   writingScore: number;
@@ -472,6 +475,8 @@ export async function sendTestResultEmail(data: {
             <td style="padding: 8px 0; border-bottom: 1px solid #f1f3f5;"><a href="mailto:${data.candidateEmail}" style="color: #1e40af;">${data.candidateEmail}</a></td>
           </tr>
           ${data.candidatePhone ? `<tr><td style="padding: 8px 0; border-bottom: 1px solid #f1f3f5; font-weight: 600; color: #374151;">Phone</td><td style="padding: 8px 0; border-bottom: 1px solid #f1f3f5; color: #4b5563;">${data.candidatePhone}</td></tr>` : ""}
+          ${data.candidateAzienda ? `<tr><td style="padding: 8px 0; border-bottom: 1px solid #f1f3f5; font-weight: 600; color: #374151;">Azienda</td><td style="padding: 8px 0; border-bottom: 1px solid #f1f3f5; color: #4b5563;">${data.candidateAzienda}</td></tr>` : ""}
+          ${data.candidateCitta || data.candidateProvincia ? `<tr><td style="padding: 8px 0; border-bottom: 1px solid #f1f3f5; font-weight: 600; color: #374151;">Localita</td><td style="padding: 8px 0; border-bottom: 1px solid #f1f3f5; color: #4b5563;">${[data.candidateCitta, data.candidateProvincia ? `(${data.candidateProvincia})` : ""].filter(Boolean).join(" ")}</td></tr>` : ""}
         </table>
 
         <h3 style="margin: 20px 0 12px; color: #1e40af;">Section Scores</h3>
