@@ -27,6 +27,7 @@ import PrivacyPolicyPage from "@/pages/privacy-policy";
 import FullImmersionPage from "@/pages/full-immersion";
 import FormazioneInPresenzaPage from "@/pages/formazione-in-presenza";
 import CorsiELearningPage from "@/pages/corsi-e-learning";
+import LanguageCoachingPage from "@/pages/language-coaching";
 import NotFound from "@/pages/not-found";
 
 function ScrollToTop() {
@@ -53,6 +54,7 @@ function Router() {
       <Route path="/full-immersion" component={FullImmersionPage} />
       <Route path="/formazione-in-presenza" component={FormazioneInPresenzaPage} />
       <Route path="/corsi-e-learning" component={CorsiELearningPage} />
+      <Route path="/language-coaching" component={LanguageCoachingPage} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={BlogPostPage} />

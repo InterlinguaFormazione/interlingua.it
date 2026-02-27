@@ -40,6 +40,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/speakers-corner-admin.tsx` - Admin panel for managing subscribers, sessions, email settings
 - `src/pages/blog.tsx` - Blog listing page
 - `src/pages/blog-post.tsx` - Blog post detail page
+- `src/pages/language-coaching.tsx` - Premium language coaching page (1-to-1, 30% premium pricing, Milton Method copy)
 - `src/pages/cookie-policy.tsx` - GDPR cookie policy
 - `src/pages/privacy-policy.tsx` - GDPR privacy policy
 - `src/components/` - Reusable UI components

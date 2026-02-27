@@ -124,7 +124,7 @@ export function CoursesSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Link href={category.id === "immersion" ? "/full-immersion" : category.id === "lingua" ? "/formazione-in-presenza" : category.id === "online" ? "/corsi-e-learning" : `/corsi#${category.id}`}>
+                <Link href={category.id === "immersion" ? "/full-immersion" : category.id === "lingua" ? "/formazione-in-presenza" : category.id === "online" ? "/corsi-e-learning" : category.id === "coaching" ? "/language-coaching" : `/corsi#${category.id}`}>
                   <Card 
                     className="h-full hover-elevate group cursor-pointer relative overflow-hidden"
                     data-testid={`card-category-${category.id}`}

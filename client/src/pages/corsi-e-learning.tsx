@@ -129,7 +129,7 @@ const province = [
   "Agrigento","Alessandria","Ancona","Aosta","L'Aquila","Arezzo","Ascoli Piceno","Asti","Avellino",
   "Bari","Barletta-Andria-Trani","Belluno","Benevento","Bergamo","Biella","Bologna","Bolzano","Brescia","Brindisi",
   "Cagliari","Caltanissetta","Campobasso","Caserta","Catania","Catanzaro","Chieti","Como","Cosenza","Cremona","Crotone","Cuneo",
-  "Enna","Fermo","Ferrara","Firenze","Foggia","Forli-Cesena","Frosinone",
+  "Enna","Fermo","Ferrara","Firenze","Foggia","Forlì-Cesena","Frosinone",
   "Genova","Gorizia","Grosseto",
   "Imperia","Isernia",
   "La Spezia","Latina","Lecce","Lecco","Livorno","Lodi","Lucca",
