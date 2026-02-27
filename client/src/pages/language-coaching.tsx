@@ -331,12 +331,29 @@ function CoachingContactForm({ packageTitle, gradient }: { packageTitle: string;
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const mutation = useMutation({
-    mutationFn: async (data: Record<string, unknown>) => {
-      const body = { ...data, source: `Language Coaching: ${packageTitle}`, type: "coaching" };
+    mutationFn: async (formData: FormData) => {
+      const parts = [
+        `Lingua: ${lingua}`,
+        `Livello: ${livello}`,
+        `Provincia: ${provincia}`,
+        formData.get("azienda") ? `Azienda: ${formData.get("azienda")}` : "",
+        `Come conosciuto: ${comeConosciuto}`,
+        newsletter ? "Newsletter: Si" : "",
+        formData.get("message") ? `\n${formData.get("message")}` : "",
+      ].filter(Boolean);
+
+      const body = {
+        name: `${formData.get("nome")} ${formData.get("cognome")}`,
+        email: formData.get("email") as string,
+        phone: (formData.get("telefono") as string) || undefined,
+        courseInterest: `Language Coaching: ${packageTitle}`,
+        message: parts.join("\n"),
+      };
+
       await apiRequest("POST", "/api/contact", body);
     },
     onSuccess: () => {
-      toast({ title: "Richiesta inviata", description: "Ti contatteremo al più presto per il tuo percorso di coaching." });
+      toast({ title: "Richiesta inviata", description: "Ti contatteremo al più presto con tutte le informazioni." });
       setSuccess(true);
     },
     onError: () => {
@@ -361,21 +378,7 @@ function CoachingContactForm({ packageTitle, gradient }: { packageTitle: string;
     if (!gdpr) newErrors.gdpr = "Devi accettare il trattamento dei dati";
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
-    mutation.mutate({
-      nome: fd.get("nome"),
-      cognome: fd.get("cognome"),
-      email,
-      telefono: fd.get("telefono"),
-      azienda: fd.get("azienda") || "",
-      lingua,
-      livello,
-      provincia,
-      comeConosciuto,
-      messaggio: fd.get("message") || "",
-      newsletter,
-      gdpr,
-      corso: packageTitle,
-    });
+    mutation.mutate(fd);
   };
 
   if (success) {
