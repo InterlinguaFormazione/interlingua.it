@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { SHOP_PRODUCTS, type ShopProduct } from "@shared/products";
 import {
   ShoppingBag,
@@ -14,6 +14,7 @@ import {
   CheckCircle,
   Clock,
   Filter,
+  User,
 } from "lucide-react";
 
 const CATEGORIES = [
@@ -74,6 +75,7 @@ function ProductCard({ product }: { product: ShopProduct }) {
 }
 
 export default function ShopPage() {
+  const [, setLocation] = useLocation();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Tutti");
 
@@ -99,9 +101,13 @@ export default function ShopPage() {
             <h1 className="text-3xl md:text-4xl font-bold mb-3" data-testid="text-shop-title">
               Acquista il Tuo Corso Online
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
               Scegli tra i nostri corsi di formazione linguistica e professionale. Pagamento sicuro con PayPal, Visa e Mastercard.
             </p>
+            <Button variant="outline" size="sm" onClick={() => setLocation("/shop/dashboard")} data-testid="button-area-clienti">
+              <User className="w-4 h-4 mr-1" />
+              Area Clienti
+            </Button>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mb-8">

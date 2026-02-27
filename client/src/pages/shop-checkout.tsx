@@ -25,6 +25,7 @@ import {
   Building2,
   ShoppingBag,
   Clock,
+  Lock,
 } from "lucide-react";
 
 declare global {
@@ -47,6 +48,7 @@ export default function ShopCheckout() {
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [customerPassword, setCustomerPassword] = useState("");
   const [notes, setNotes] = useState("");
 
   const [tipoFatturazione, setTipoFatturazione] = useState<"privato" | "professionista" | "azienda">("privato");
@@ -72,6 +74,9 @@ export default function ShopCheckout() {
     },
     onSuccess: (data) => {
       if (data.success) {
+        if (data.customerToken) {
+          localStorage.setItem("shop_customer_token", data.customerToken);
+        }
         setStep("success");
         toast({
           title: "Acquisto completato!",
@@ -111,6 +116,10 @@ export default function ShopCheckout() {
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
       toast({ title: "Email non valida", description: "Inserisci un indirizzo email valido.", variant: "destructive" });
+      return;
+    }
+    if (customerPassword && customerPassword.length < 6) {
+      toast({ title: "Password troppo corta", description: "La password deve avere almeno 6 caratteri.", variant: "destructive" });
       return;
     }
     setStep("billing");
@@ -215,6 +224,7 @@ export default function ShopCheckout() {
                   customerName,
                   customerEmail,
                   customerPhone,
+                  customerPassword,
                   codiceFiscale,
                   billingCodiceFiscale: codiceFiscale,
                   billingIndirizzo: indirizzo,
@@ -445,6 +455,24 @@ export default function ShopCheckout() {
                           data-testid="input-customer-phone"
                         />
                       </div>
+                      <div className="border-t pt-4 mt-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Lock className="w-4 h-4 text-primary" />
+                          <Label htmlFor="customerPassword" className="font-medium">Crea il tuo account</Label>
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-2">
+                          Inserisci una password per accedere alla tua area clienti dopo l'acquisto, dove troverai i materiali del corso.
+                        </p>
+                        <Input
+                          id="customerPassword"
+                          type="password"
+                          value={customerPassword}
+                          onChange={(e) => setCustomerPassword(e.target.value)}
+                          placeholder="Minimo 6 caratteri"
+                          className="mt-1"
+                          data-testid="input-customer-password"
+                        />
+                      </div>
                       <div>
                         <Label htmlFor="notes">Note aggiuntive</Label>
                         <Textarea
@@ -651,16 +679,30 @@ export default function ShopCheckout() {
                   <p className="text-muted-foreground mb-2 max-w-md mx-auto">
                     Grazie per aver acquistato <strong>{product.name}</strong>.
                   </p>
-                  <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+                  <p className="text-muted-foreground mb-4 max-w-md mx-auto">
                     Riceverai una conferma via email a <strong>{customerEmail}</strong> con tutti i dettagli del corso.
                     Il nostro team ti contatterà per organizzare l'inizio delle lezioni.
                   </p>
+                  {customerPassword && (
+                    <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-8 max-w-md mx-auto">
+                      <p className="text-sm font-medium mb-1">Il tuo account è stato creato!</p>
+                      <p className="text-xs text-muted-foreground">
+                        Accedi alla tua <strong>Area Clienti</strong> per visualizzare i corsi acquistati e scaricare i materiali didattici.
+                      </p>
+                    </div>
+                  )}
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    {customerPassword && (
+                      <Button onClick={() => setLocation("/shop/dashboard")} data-testid="button-go-dashboard">
+                        <User className="mr-2 h-4 w-4" />
+                        Area Clienti
+                      </Button>
+                    )}
                     <Button onClick={() => setLocation("/shop")} variant="outline" data-testid="button-continue-shopping">
                       <ShoppingBag className="mr-2 h-4 w-4" />
                       Continua gli Acquisti
                     </Button>
-                    <Button onClick={() => setLocation("/")} data-testid="button-home">
+                    <Button onClick={() => setLocation("/")} variant="outline" data-testid="button-home">
                       Torna alla Home
                     </Button>
                   </div>

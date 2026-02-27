@@ -30,6 +30,7 @@ import LanguageCoachingPage from "@/pages/language-coaching";
 import CorsiItalianoPage from "@/pages/corsi-italiano";
 import ShopPage from "@/pages/shop";
 import ShopCheckoutPage from "@/pages/shop-checkout";
+import ShopDashboardPage from "@/pages/shop-dashboard";
 import NotFound from "@/pages/not-found";
 
 function ScrollToTop() {
@@ -59,6 +60,7 @@ function Router() {
       <Route path="/corsi-italiano" component={CorsiItalianoPage} />
       <Route path="/shop" component={ShopPage} />
       <Route path="/shop/checkout/:slug" component={ShopCheckoutPage} />
+      <Route path="/shop/dashboard" component={ShopDashboardPage} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={BlogPostPage} />

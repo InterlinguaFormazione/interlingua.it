@@ -30,6 +30,8 @@ import {
   Trash2,
   Pencil,
   ShoppingBag,
+  FileText,
+  Plus,
 } from "lucide-react";
 
 interface ShopOrder {
@@ -96,6 +98,214 @@ function ShopOrdersTab({ token }: { token: string }) {
                       <Badge variant={order.status === "completed" ? "default" : "secondary"}>
                         {order.status === "completed" ? "Completato" : order.status}
                       </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+interface CourseMaterial {
+  id: string;
+  productSlug: string;
+  fileName: string;
+  fileUrl: string;
+  fileSize: string | null;
+  fileType: string | null;
+  description: string | null;
+  createdAt: string | null;
+}
+
+function CourseMaterialsTab({ token }: { token: string }) {
+  const [showForm, setShowForm] = useState(false);
+  const [newSlug, setNewSlug] = useState("");
+  const [newFileName, setNewFileName] = useState("");
+  const [newFileUrl, setNewFileUrl] = useState("");
+  const [newFileSize, setNewFileSize] = useState("");
+  const [newDescription, setNewDescription] = useState("");
+
+  const { data: materials = [], isLoading } = useQuery<CourseMaterial[]>({
+    queryKey: ["/api/admin/shop/materials"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/shop/materials", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+  });
+
+  const addMutation = useMutation({
+    mutationFn: async (data: Record<string, string | null>) => {
+      const res = await fetch("/api/admin/shop/materials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(data),
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/shop/materials"] });
+      setShowForm(false);
+      setNewSlug("");
+      setNewFileName("");
+      setNewFileUrl("");
+      setNewFileSize("");
+      setNewDescription("");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await fetch(`/api/admin/shop/materials/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/shop/materials"] });
+    },
+  });
+
+  const handleAdd = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newSlug || !newFileName || !newFileUrl) return;
+    addMutation.mutate({
+      productSlug: newSlug,
+      fileName: newFileName,
+      fileUrl: newFileUrl,
+      fileSize: newFileSize || null,
+      fileType: null,
+      description: newDescription || null,
+    });
+  };
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>Materiali Didattici</CardTitle>
+          <CardDescription>Gestisci i file scaricabili per ogni corso acquistato</CardDescription>
+        </div>
+        <Button size="sm" onClick={() => setShowForm(!showForm)} data-testid="button-add-material">
+          <Plus className="w-4 h-4 mr-1" />
+          Aggiungi
+        </Button>
+      </CardHeader>
+      <CardContent>
+        {showForm && (
+          <form onSubmit={handleAdd} className="border rounded-lg p-4 mb-6 space-y-3 bg-muted/30">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="mat-slug">Slug Prodotto *</Label>
+                <Input
+                  id="mat-slug"
+                  value={newSlug}
+                  onChange={(e) => setNewSlug(e.target.value)}
+                  placeholder="es. ai-senza-segreti"
+                  className="mt-1"
+                  data-testid="input-material-slug"
+                />
+              </div>
+              <div>
+                <Label htmlFor="mat-name">Nome File *</Label>
+                <Input
+                  id="mat-name"
+                  value={newFileName}
+                  onChange={(e) => setNewFileName(e.target.value)}
+                  placeholder="es. Dispensa Modulo 1.pdf"
+                  className="mt-1"
+                  data-testid="input-material-name"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="mat-url">URL del File *</Label>
+              <Input
+                id="mat-url"
+                value={newFileUrl}
+                onChange={(e) => setNewFileUrl(e.target.value)}
+                placeholder="https://..."
+                className="mt-1"
+                data-testid="input-material-url"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="mat-size">Dimensione</Label>
+                <Input
+                  id="mat-size"
+                  value={newFileSize}
+                  onChange={(e) => setNewFileSize(e.target.value)}
+                  placeholder="es. 2.5 MB"
+                  className="mt-1"
+                  data-testid="input-material-size"
+                />
+              </div>
+              <div>
+                <Label htmlFor="mat-desc">Descrizione</Label>
+                <Input
+                  id="mat-desc"
+                  value={newDescription}
+                  onChange={(e) => setNewDescription(e.target.value)}
+                  placeholder="es. Slides lezione 1"
+                  className="mt-1"
+                  data-testid="input-material-desc"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button type="submit" size="sm" disabled={addMutation.isPending} data-testid="button-save-material">
+                {addMutation.isPending ? "Salvataggio..." : "Salva"}
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => setShowForm(false)}>
+                Annulla
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {isLoading ? (
+          <div className="text-center py-8 text-muted-foreground">Caricamento...</div>
+        ) : materials.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            Nessun materiale caricato. Aggiungi file che i clienti potranno scaricare dalla loro area personale.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-3 px-2 font-medium">Corso (slug)</th>
+                  <th className="text-left py-3 px-2 font-medium">Nome File</th>
+                  <th className="text-left py-3 px-2 font-medium">Descrizione</th>
+                  <th className="text-left py-3 px-2 font-medium">Dim.</th>
+                  <th className="text-center py-3 px-2 font-medium">Azioni</th>
+                </tr>
+              </thead>
+              <tbody>
+                {materials.map((m) => (
+                  <tr key={m.id} className="border-b last:border-0" data-testid={`row-material-${m.id}`}>
+                    <td className="py-3 px-2 font-mono text-xs">{m.productSlug}</td>
+                    <td className="py-3 px-2 font-medium">{m.fileName}</td>
+                    <td className="py-3 px-2 text-muted-foreground text-xs">{m.description || "-"}</td>
+                    <td className="py-3 px-2 text-muted-foreground text-xs">{m.fileSize || "-"}</td>
+                    <td className="py-3 px-2 text-center">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => deleteMutation.mutate(m.id)}
+                        disabled={deleteMutation.isPending}
+                        data-testid={`button-delete-material-${m.id}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -528,7 +738,7 @@ export default function AdminPage() {
           </div>
 
           <Tabs defaultValue="contacts" className="space-y-6">
-            <TabsList className={`grid w-full ${isAdmin ? "grid-cols-5" : "grid-cols-4"}`}>
+            <TabsList className={`grid w-full ${isAdmin ? "grid-cols-6" : "grid-cols-5"}`}>
               <TabsTrigger value="contacts" data-testid="tab-contacts">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Messaggi
@@ -540,6 +750,10 @@ export default function AdminPage() {
               <TabsTrigger value="orders" data-testid="tab-orders">
                 <ShoppingBag className="w-4 h-4 mr-2" />
                 Ordini
+              </TabsTrigger>
+              <TabsTrigger value="materials" data-testid="tab-materials">
+                <FileText className="w-4 h-4 mr-2" />
+                Materiali
               </TabsTrigger>
               <TabsTrigger value="blog" data-testid="tab-blog">
                 <Newspaper className="w-4 h-4 mr-2" />
@@ -664,6 +878,10 @@ export default function AdminPage() {
 
             <TabsContent value="orders">
               <ShopOrdersTab token={token} />
+            </TabsContent>
+
+            <TabsContent value="materials">
+              <CourseMaterialsTab token={token} />
             </TabsContent>
 
             <TabsContent value="blog">

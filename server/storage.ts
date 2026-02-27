@@ -18,8 +18,12 @@ import {
   type ScEmailSettings,
   type ScPayment,
   type InsertScPayment,
+  type ShopCustomer,
+  type InsertShopCustomer,
   type ShopOrder,
   type InsertShopOrder,
+  type CourseMaterial,
+  type InsertCourseMaterial,
   users,
   contactSubmissions,
   newsletterSubscriptions,
@@ -30,7 +34,9 @@ import {
   scBookings,
   scEmailSettings,
   scPayments,
+  shopCustomers,
   shopOrders,
+  courseMaterials,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte, desc } from "drizzle-orm";
@@ -86,10 +92,21 @@ export interface IStorage {
   getScPaymentByOrderId(paypalOrderId: string): Promise<ScPayment | undefined>;
   updateScPaymentStatus(id: string, status: string): Promise<ScPayment | undefined>;
 
+  createShopCustomer(customer: InsertShopCustomer): Promise<ShopCustomer>;
+  getShopCustomerByEmail(email: string): Promise<ShopCustomer | undefined>;
+  getShopCustomerById(id: string): Promise<ShopCustomer | undefined>;
+  getAllShopCustomers(): Promise<ShopCustomer[]>;
+
   createShopOrder(order: InsertShopOrder): Promise<ShopOrder>;
   getShopOrders(): Promise<ShopOrder[]>;
+  getShopOrdersByCustomerId(customerId: string): Promise<ShopOrder[]>;
   getShopOrderByPaypalId(paypalOrderId: string): Promise<ShopOrder | undefined>;
   updateShopOrderStatus(id: string, status: string): Promise<ShopOrder | undefined>;
+
+  createCourseMaterial(material: InsertCourseMaterial): Promise<CourseMaterial>;
+  getCourseMaterialsBySlug(productSlug: string): Promise<CourseMaterial[]>;
+  getAllCourseMaterials(): Promise<CourseMaterial[]>;
+  deleteCourseMaterial(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -316,6 +333,25 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
+  async createShopCustomer(customer: InsertShopCustomer): Promise<ShopCustomer> {
+    const [result] = await db.insert(shopCustomers).values(customer).returning();
+    return result;
+  }
+
+  async getShopCustomerByEmail(email: string): Promise<ShopCustomer | undefined> {
+    const [result] = await db.select().from(shopCustomers).where(eq(shopCustomers.email, email));
+    return result;
+  }
+
+  async getShopCustomerById(id: string): Promise<ShopCustomer | undefined> {
+    const [result] = await db.select().from(shopCustomers).where(eq(shopCustomers.id, id));
+    return result;
+  }
+
+  async getAllShopCustomers(): Promise<ShopCustomer[]> {
+    return db.select().from(shopCustomers).orderBy(desc(shopCustomers.createdAt));
+  }
+
   async createShopOrder(order: InsertShopOrder): Promise<ShopOrder> {
     const [result] = await db.insert(shopOrders).values(order).returning();
     return result;
@@ -323,6 +359,10 @@ export class DatabaseStorage implements IStorage {
 
   async getShopOrders(): Promise<ShopOrder[]> {
     return db.select().from(shopOrders).orderBy(desc(shopOrders.createdAt));
+  }
+
+  async getShopOrdersByCustomerId(customerId: string): Promise<ShopOrder[]> {
+    return db.select().from(shopOrders).where(eq(shopOrders.customerId, customerId)).orderBy(desc(shopOrders.createdAt));
   }
 
   async getShopOrderByPaypalId(paypalOrderId: string): Promise<ShopOrder | undefined> {
@@ -333,6 +373,23 @@ export class DatabaseStorage implements IStorage {
   async updateShopOrderStatus(id: string, status: string): Promise<ShopOrder | undefined> {
     const [result] = await db.update(shopOrders).set({ status }).where(eq(shopOrders.id, id)).returning();
     return result;
+  }
+
+  async createCourseMaterial(material: InsertCourseMaterial): Promise<CourseMaterial> {
+    const [result] = await db.insert(courseMaterials).values(material).returning();
+    return result;
+  }
+
+  async getCourseMaterialsBySlug(productSlug: string): Promise<CourseMaterial[]> {
+    return db.select().from(courseMaterials).where(eq(courseMaterials.productSlug, productSlug)).orderBy(desc(courseMaterials.createdAt));
+  }
+
+  async getAllCourseMaterials(): Promise<CourseMaterial[]> {
+    return db.select().from(courseMaterials).orderBy(desc(courseMaterials.createdAt));
+  }
+
+  async deleteCourseMaterial(id: string): Promise<void> {
+    await db.delete(courseMaterials).where(eq(courseMaterials.id, id));
   }
 }
 

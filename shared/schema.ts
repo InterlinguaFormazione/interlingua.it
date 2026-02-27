@@ -203,8 +203,26 @@ export const insertScPaymentSchema = createInsertSchema(scPayments).omit({
 export type InsertScPayment = z.infer<typeof insertScPaymentSchema>;
 export type ScPayment = typeof scPayments.$inferSelect;
 
+export const shopCustomers = pgTable("shop_customers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  name: text("name").notNull(),
+  phone: text("phone"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertShopCustomerSchema = createInsertSchema(shopCustomers).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertShopCustomer = z.infer<typeof insertShopCustomerSchema>;
+export type ShopCustomer = typeof shopCustomers.$inferSelect;
+
 export const shopOrders = pgTable("shop_orders", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  customerId: varchar("customer_id"),
   productSlug: text("product_slug").notNull(),
   productName: text("product_name").notNull(),
   amount: text("amount").notNull(),
@@ -233,6 +251,25 @@ export const insertShopOrderSchema = createInsertSchema(shopOrders).omit({
 
 export type InsertShopOrder = z.infer<typeof insertShopOrderSchema>;
 export type ShopOrder = typeof shopOrders.$inferSelect;
+
+export const courseMaterials = pgTable("course_materials", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  productSlug: text("product_slug").notNull(),
+  fileName: text("file_name").notNull(),
+  fileUrl: text("file_url").notNull(),
+  fileSize: text("file_size"),
+  fileType: text("file_type"),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertCourseMaterialSchema = createInsertSchema(courseMaterials).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertCourseMaterial = z.infer<typeof insertCourseMaterialSchema>;
+export type CourseMaterial = typeof courseMaterials.$inferSelect;
 
 export interface Course {
   id: string;

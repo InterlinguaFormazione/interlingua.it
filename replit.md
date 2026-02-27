@@ -82,7 +82,9 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `sc_bookings` - Session bookings (subscriber + session link)
 - `sc_email_settings` - Email notification settings (suspend/resume for holidays)
 - `sc_payments` - PayPal payment records (subscriber ID, PayPal order ID, amount, currency, status, payer email)
-- `shop_orders` - Online shop orders (product slug/name, amount, PayPal order ID, customer info, billing, status)
+- `shop_customers` - Customer accounts created during shop checkout (email, hashed password, name, phone)
+- `shop_orders` - Online shop orders (product slug/name, amount, PayPal order ID, customer info, billing, status, linked to customer account)
+- `course_materials` - Downloadable files per course product (slug, file name, URL, size, description)
 
 ## API Endpoints
 - `POST /api/contact` - Submit contact form (saves to DB + emails + CRM)
@@ -135,8 +137,15 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 
 ### Shop API
 - `GET /api/shop/products` - Get all purchasable products
-- `POST /api/shop/purchase` - Complete shop purchase (verifies PayPal, creates order)
+- `POST /api/shop/purchase` - Complete shop purchase (verifies PayPal, creates order + customer account)
+- `POST /api/shop/login` - Customer login (email + password)
+- `GET /api/shop/me` - Get current customer info (auth required)
+- `GET /api/shop/my-orders` - Get customer's orders (auth required)
+- `GET /api/shop/materials/:slug` - Get downloadable materials for a purchased course (auth required)
 - `GET /api/admin/shop/orders` - List all shop orders (admin)
+- `GET /api/admin/shop/materials` - List all course materials (admin)
+- `POST /api/admin/shop/materials` - Add course material (admin)
+- `DELETE /api/admin/shop/materials/:id` - Delete course material (admin)
 
 ## Bot Protection
 - **Honeypot fields**: Hidden fields in both forms — bots fill them, humans don't
@@ -173,7 +182,8 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `/speakers-corner/acquista` - Purchase Speaker's Corner subscription (PayPal checkout)
 - `/speakers-corner/dashboard` - Subscriber dashboard (view/book sessions)
 - `/shop` - Online course shop (all fixed-price courses)
-- `/shop/checkout/:slug` - Checkout page with billing and PayPal payment
+- `/shop/checkout/:slug` - Checkout page with billing, account creation, and PayPal payment
+- `/shop/dashboard` - Customer area (login, purchased courses, downloadable materials)
 - `/admin` - General admin panel (contacts, newsletter, orders, blog management)
 - `/speakers-corner/admin` - Speaker's Corner admin (manage subscribers, sessions, email settings)
 - `/blog` - Blog listing

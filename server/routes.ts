@@ -1,7 +1,7 @@
 import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactSchema, insertNewsletterSchema, insertCookieConsentSchema, insertShopOrderSchema } from "@shared/schema";
+import { insertContactSchema, insertNewsletterSchema, insertCookieConsentSchema, insertShopOrderSchema, insertCourseMaterialSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendSubscriptionConfirmation, sendBookingConfirmation } from "./email";
@@ -19,6 +19,9 @@ function isStrongPassword(password: string): boolean {
 
 const adminSessions = new Map<string, { createdAt: number; userId: string; role: string }>();
 const ADMIN_SESSION_DURATION = 4 * 60 * 60 * 1000;
+
+const shopCustomerSessions = new Map<string, { createdAt: number; customerId: string }>();
+const SHOP_SESSION_DURATION = 24 * 60 * 60 * 1000;
 
 function generateAdminToken(): string {
   return crypto.randomBytes(32).toString("hex");
@@ -1193,11 +1196,40 @@ export async function registerRoutes(
         });
       }
 
+      let customerId: string | null = null;
+      const customerPassword = req.body.customerPassword;
+
+      if (customerPassword && customerPassword.length >= 6) {
+        const existingCustomer = await storage.getShopCustomerByEmail(parsed.data.customerEmail);
+        if (existingCustomer) {
+          const passwordMatch = await bcrypt.compare(customerPassword, existingCustomer.password);
+          if (passwordMatch) {
+            customerId = existingCustomer.id;
+          }
+        } else {
+          const hashedPassword = await bcrypt.hash(customerPassword, 10);
+          const newCustomer = await storage.createShopCustomer({
+            email: parsed.data.customerEmail,
+            password: hashedPassword,
+            name: parsed.data.customerName,
+            phone: parsed.data.customerPhone || null,
+          });
+          customerId = newCustomer.id;
+        }
+      }
+
       const order = await storage.createShopOrder({
         ...parsed.data,
         productName: product.name,
         amount: product.price,
+        customerId: customerId,
       });
+
+      let customerToken: string | undefined;
+      if (customerId) {
+        customerToken = generateAdminToken();
+        shopCustomerSessions.set(customerToken, { createdAt: Date.now(), customerId });
+      }
 
       try {
         await sendContactNotification({
@@ -1211,10 +1243,131 @@ export async function registerRoutes(
         console.error("Failed to send shop purchase notification:", emailError);
       }
 
-      res.json({ success: true, order });
+      res.json({ success: true, order, customerToken, customerId });
     } catch (error) {
       console.error("Error processing shop purchase:", error);
       res.status(500).json({ success: false, message: "Errore durante l'elaborazione dell'acquisto." });
+    }
+  });
+
+  app.post("/api/shop/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({ success: false, message: "Email e password sono obbligatori." });
+      }
+      const customer = await storage.getShopCustomerByEmail(email);
+      if (!customer) {
+        return res.status(401).json({ success: false, message: "Email o password non corretti." });
+      }
+      const valid = await bcrypt.compare(password, customer.password);
+      if (!valid) {
+        return res.status(401).json({ success: false, message: "Email o password non corretti." });
+      }
+      const token = generateAdminToken();
+      shopCustomerSessions.set(token, { createdAt: Date.now(), customerId: customer.id });
+      res.json({
+        success: true,
+        token,
+        customer: { id: customer.id, name: customer.name, email: customer.email },
+      });
+    } catch (error) {
+      console.error("Shop customer login error:", error);
+      res.status(500).json({ success: false, message: "Errore del server." });
+    }
+  });
+
+  app.get("/api/shop/me", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.replace("Bearer ", "");
+      if (!token) return res.status(401).json({ success: false, message: "Non autorizzato." });
+      const session = shopCustomerSessions.get(token);
+      if (!session || Date.now() - session.createdAt > SHOP_SESSION_DURATION) {
+        if (session) shopCustomerSessions.delete(token);
+        return res.status(401).json({ success: false, message: "Sessione scaduta." });
+      }
+      const customer = await storage.getShopCustomerById(session.customerId);
+      if (!customer) return res.status(401).json({ success: false, message: "Cliente non trovato." });
+      res.json({ id: customer.id, name: customer.name, email: customer.email });
+    } catch (error) {
+      console.error("Shop me error:", error);
+      res.status(500).json({ success: false, message: "Errore del server." });
+    }
+  });
+
+  app.get("/api/shop/my-orders", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.replace("Bearer ", "");
+      if (!token) return res.status(401).json({ success: false, message: "Non autorizzato." });
+      const session = shopCustomerSessions.get(token);
+      if (!session || Date.now() - session.createdAt > SHOP_SESSION_DURATION) {
+        if (session) shopCustomerSessions.delete(token);
+        return res.status(401).json({ success: false, message: "Sessione scaduta." });
+      }
+      const orders = await storage.getShopOrdersByCustomerId(session.customerId);
+      res.json(orders);
+    } catch (error) {
+      console.error("Shop my-orders error:", error);
+      res.status(500).json({ success: false, message: "Errore del server." });
+    }
+  });
+
+  app.get("/api/shop/materials/:slug", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.replace("Bearer ", "");
+      if (!token) return res.status(401).json({ success: false, message: "Non autorizzato." });
+      const session = shopCustomerSessions.get(token);
+      if (!session || Date.now() - session.createdAt > SHOP_SESSION_DURATION) {
+        if (session) shopCustomerSessions.delete(token);
+        return res.status(401).json({ success: false, message: "Sessione scaduta." });
+      }
+      const orders = await storage.getShopOrdersByCustomerId(session.customerId);
+      const hasPurchased = orders.some((o) => o.productSlug === req.params.slug && o.status === "completed");
+      if (!hasPurchased) {
+        return res.status(403).json({ success: false, message: "Non hai acquistato questo corso." });
+      }
+      const materials = await storage.getCourseMaterialsBySlug(req.params.slug);
+      res.json(materials);
+    } catch (error) {
+      console.error("Shop materials error:", error);
+      res.status(500).json({ success: false, message: "Errore del server." });
+    }
+  });
+
+  app.get("/api/admin/shop/materials", requireAuth, async (_req, res) => {
+    try {
+      const materials = await storage.getAllCourseMaterials();
+      res.json(materials);
+    } catch (error) {
+      console.error("Error fetching materials:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/admin/shop/materials", requireAuth, async (req, res) => {
+    try {
+      const parsed = insertCourseMaterialSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ success: false, message: "Dati non validi.", errors: parsed.error.errors });
+      }
+      const material = await storage.createCourseMaterial(parsed.data);
+      res.json({ success: true, material });
+    } catch (error) {
+      console.error("Error creating material:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.delete("/api/admin/shop/materials/:id", requireAuth, async (req, res) => {
+    try {
+      await storage.deleteCourseMaterial(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting material:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
     }
   });
 
