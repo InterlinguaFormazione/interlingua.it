@@ -11,7 +11,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation, useParams } from "wouter";
-import { getProductBySlug } from "@shared/products";
+import { getProductBySlug, getEffectivePrice } from "@shared/products";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { SiPaypal, SiVisa, SiMastercard } from "react-icons/si";
 import {
   CheckCircle,
@@ -62,10 +69,16 @@ export default function ShopCheckout() {
   const [codiceSdi, setCodiceSdi] = useState("");
   const [pec, setPec] = useState("");
 
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [step, setStep] = useState<"details" | "billing" | "payment" | "success">("details");
   const [paypalReady, setPaypalReady] = useState(false);
   const [processing, setProcessing] = useState(false);
   const paypalInitialized = useRef(false);
+
+  const effectivePrice = product ? getEffectivePrice(product, selectedOptions) : "0";
+  const hasRequiredOptions = product?.options
+    ? product.options.every((opt) => selectedOptions[opt.name])
+    : true;
 
   const purchaseMutation = useMutation({
     mutationFn: async (data: Record<string, string>) => {
@@ -99,7 +112,7 @@ export default function ShopCheckout() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: product!.price,
+        amount: effectivePrice,
         currency: "EUR",
         intent: "CAPTURE",
       }),
@@ -110,6 +123,10 @@ export default function ShopCheckout() {
 
   const handleDetailsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!hasRequiredOptions) {
+      toast({ title: "Opzioni mancanti", description: "Seleziona tutte le opzioni del corso.", variant: "destructive" });
+      return;
+    }
     if (!customerName || !customerEmail) {
       toast({ title: "Campi obbligatori", description: "Inserisci nome e email.", variant: "destructive" });
       return;
@@ -218,9 +235,13 @@ export default function ShopCheckout() {
               const captureData = await captureRes.json();
 
               if (captureData.status === "COMPLETED") {
+                const optionsSummary = Object.entries(selectedOptions)
+                  .map(([k, v]) => `${k}: ${v}`)
+                  .join(", ");
                 purchaseMutation.mutate({
                   paypalOrderId: data.orderId,
                   productSlug: product!.slug,
+                  selectedOptions: JSON.stringify(selectedOptions),
                   customerName,
                   customerEmail,
                   customerPhone,
@@ -234,7 +255,7 @@ export default function ShopCheckout() {
                   billingPartitaIva: partitaIva,
                   billingCodiceSdi: codiceSdi,
                   billingPec: pec,
-                  notes,
+                  notes: optionsSummary ? `[${optionsSummary}] ${notes}` : notes,
                 });
               } else {
                 setProcessing(false);
@@ -386,11 +407,21 @@ export default function ShopCheckout() {
                           </li>
                         ))}
                       </ul>
+                      {product.options && Object.keys(selectedOptions).length > 0 && (
+                        <div className="space-y-1 text-xs text-muted-foreground border-t pt-2">
+                          {Object.entries(selectedOptions).map(([key, value]) => (
+                            <div key={key} className="flex justify-between">
+                              <span className="capitalize">{product.options!.find(o => o.name === key)?.label || key}:</span>
+                              <span className="font-medium text-foreground">{value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       <div className="border-t pt-3 mt-3">
                         <div className="flex justify-between items-baseline">
                           <span className="text-sm text-muted-foreground">Totale</span>
                           <div>
-                            <span className="text-2xl font-bold text-primary">&euro;{parseFloat(product.price).toFixed(2)}</span>
+                            <span className="text-2xl font-bold text-primary">&euro;{parseFloat(effectivePrice).toFixed(2)}</span>
                           </div>
                         </div>
                       </div>
@@ -423,6 +454,39 @@ export default function ShopCheckout() {
                       </div>
                     </div>
                     <form onSubmit={handleDetailsSubmit} className="space-y-4">
+                      {product.options && product.options.length > 0 && (
+                        <div className="space-y-4 pb-4 border-b">
+                          <p className="text-sm font-medium text-muted-foreground">Configura il tuo corso</p>
+                          {product.options.map((opt) => (
+                            <div key={opt.name}>
+                              <Label htmlFor={`option-${opt.name}`}>{opt.label} *</Label>
+                              <Select
+                                value={selectedOptions[opt.name] || ""}
+                                onValueChange={(val) =>
+                                  setSelectedOptions((prev) => ({ ...prev, [opt.name]: val }))
+                                }
+                              >
+                                <SelectTrigger className="mt-1" id={`option-${opt.name}`} data-testid={`select-option-${opt.name}`}>
+                                  <SelectValue placeholder={`Seleziona ${opt.label.toLowerCase()}`} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {opt.values.map((v) => (
+                                    <SelectItem key={v} value={v} data-testid={`option-${opt.name}-${v}`}>
+                                      {v}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          ))}
+                          {product.variations && product.variations.length > 0 && (
+                            <div className="bg-primary/5 rounded-lg p-3 flex items-center justify-between">
+                              <span className="text-sm font-medium">Prezzo</span>
+                              <span className="text-xl font-bold text-primary">&euro;{parseFloat(effectivePrice).toFixed(2)}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                       <div>
                         <Label htmlFor="customerName">Nome e Cognome *</Label>
                         <Input
@@ -619,11 +683,21 @@ export default function ShopCheckout() {
                         <div className="bg-muted/50 rounded-lg p-4 space-y-2">
                           <div className="flex justify-between text-sm">
                             <span>{product.name}</span>
-                            <span className="font-medium">&euro;{parseFloat(product.price).toFixed(2)}</span>
+                            <span className="font-medium">&euro;{parseFloat(effectivePrice).toFixed(2)}</span>
                           </div>
+                          {Object.keys(selectedOptions).length > 0 && (
+                            <div className="space-y-1 text-xs text-muted-foreground">
+                              {Object.entries(selectedOptions).map(([key, value]) => (
+                                <div key={key} className="flex justify-between">
+                                  <span>{product.options?.find(o => o.name === key)?.label || key}</span>
+                                  <span>{value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                           <div className="flex justify-between font-bold border-t pt-2">
                             <span>Totale</span>
-                            <span className="text-primary">&euro;{parseFloat(product.price).toFixed(2)}</span>
+                            <span className="text-primary">&euro;{parseFloat(effectivePrice).toFixed(2)}</span>
                           </div>
                         </div>
 
@@ -645,7 +719,7 @@ export default function ShopCheckout() {
                             data-testid="button-paypal-pay"
                           >
                             <SiPaypal className="w-5 h-5" />
-                            Paga &euro;{parseFloat(product.price).toFixed(2)} con PayPal
+                            Paga &euro;{parseFloat(effectivePrice).toFixed(2)} con PayPal
                           </button>
                           <p className="text-xs text-muted-foreground text-center">
                             Puoi pagare con il tuo conto PayPal oppure con carta Visa/Mastercard

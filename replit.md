@@ -69,7 +69,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 
 ### Shared (`shared/`)
 - `schema.ts` - Drizzle schema + Zod validation schemas
-- `products.ts` - Static product catalog for the online shop (15 courses with fixed prices)
+- `products.ts` - Product catalog for the online shop (22 courses with options/variations and dynamic pricing)
 
 ## Database Tables
 - `users` - Basic user accounts

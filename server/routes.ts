@@ -9,7 +9,7 @@ import { forwardToCRM } from "./crm";
 import { generateBlogPost } from "./blog-generator";
 import { chatWithAI } from "./ai-chat";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalOrder } from "./paypal";
-import { SHOP_PRODUCTS, getProductBySlug } from "@shared/products";
+import { SHOP_PRODUCTS, getProductBySlug, getEffectivePrice } from "@shared/products";
 import cron from "node-cron";
 import crypto from "crypto";
 
@@ -1187,7 +1187,37 @@ export async function registerRoutes(
         return res.status(400).json({ success: false, message: "Questo pagamento è già stato elaborato." });
       }
 
-      const verification = await verifyPaypalOrder(parsed.data.paypalOrderId, product.price);
+      let selectedOptions: Record<string, string> = {};
+      try {
+        if (req.body.selectedOptions) {
+          selectedOptions = JSON.parse(req.body.selectedOptions);
+        }
+      } catch {}
+
+      if (product.options && product.options.length > 0) {
+        for (const opt of product.options) {
+          const val = selectedOptions[opt.name];
+          if (!val) {
+            return res.status(400).json({ success: false, message: `Opzione obbligatoria mancante: ${opt.label}` });
+          }
+          if (!opt.values.includes(val)) {
+            return res.status(400).json({ success: false, message: `Valore non valido per ${opt.label}: ${val}` });
+          }
+        }
+      }
+
+      if (product.variations && product.variations.length > 0) {
+        const matchedVariation = product.variations.find((v) =>
+          Object.entries(v.options).every(([key, value]) => selectedOptions[key] === value)
+        );
+        if (!matchedVariation) {
+          return res.status(400).json({ success: false, message: "Combinazione di opzioni non valida per questo prodotto." });
+        }
+      }
+
+      const expectedPrice = getEffectivePrice(product, selectedOptions);
+
+      const verification = await verifyPaypalOrder(parsed.data.paypalOrderId, expectedPrice);
       if (!verification.verified) {
         console.error("PayPal order verification failed for shop:", verification);
         return res.status(400).json({
@@ -1218,10 +1248,13 @@ export async function registerRoutes(
         }
       }
 
+      const optionsSummary = Object.entries(selectedOptions).map(([k, v]) => `${k}: ${v}`).join(", ");
+      const productNameWithOptions = optionsSummary ? `${product.name} (${optionsSummary})` : product.name;
+
       const order = await storage.createShopOrder({
         ...parsed.data,
-        productName: product.name,
-        amount: product.price,
+        productName: productNameWithOptions,
+        amount: expectedPrice,
         customerId: customerId,
       });
 
@@ -1236,7 +1269,7 @@ export async function registerRoutes(
           name: customerName,
           email: customerEmail,
           phone: customerPhone || undefined,
-          courseInterest: `Acquisto: ${product.name} (${product.price} EUR)`,
+          courseInterest: `Acquisto: ${productNameWithOptions} (${expectedPrice} EUR)`,
           message: `Ordine completato via PayPal. ID: ${paypalOrderId}`,
         });
       } catch (emailError) {

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useLocation } from "wouter";
-import { SHOP_PRODUCTS, type ShopProduct } from "@shared/products";
+import { SHOP_PRODUCTS, type ShopProduct, formatPriceDisplay } from "@shared/products";
 import {
   ShoppingBag,
   Search,
@@ -59,8 +59,16 @@ function ProductCard({ product }: { product: ShopProduct }) {
 
         <div className="flex items-end justify-between mt-auto pt-4 border-t">
           <div>
-            <span className="text-2xl font-bold text-primary">&euro;{parseFloat(product.price).toFixed(0)}</span>
-            <span className="text-sm text-muted-foreground ml-1">/{product.priceLabel}</span>
+            {product.priceRange ? (
+              <>
+                <span className="text-lg font-bold text-primary">&euro;{formatPriceDisplay(product)}</span>
+              </>
+            ) : (
+              <>
+                <span className="text-2xl font-bold text-primary">&euro;{parseFloat(product.price).toFixed(0)}</span>
+                <span className="text-sm text-muted-foreground ml-1">/{product.priceLabel}</span>
+              </>
+            )}
           </div>
           <Link href={`/shop/checkout/${product.slug}`}>
             <Button size="sm" data-testid={`button-buy-${product.slug}`}>
