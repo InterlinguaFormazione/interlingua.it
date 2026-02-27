@@ -29,7 +29,7 @@ import corsoOnlineImage from "@assets/corso-lingua-online_1772143586662.jpg";
 import speakersCornerCourseImage from "@assets/Speakers-Corner-Conversazione-in-lingua-Inglese_1772143640698.jpg";
 import fullImmersionImage from "@assets/Full-Immersion-Workshop-di-Lingua-Inglese_1772143747179.jpg";
 import managementImage from "@assets/management-leadership_1772143822898.webp";
-import courseItalianImage from "@/assets/images/course-italian.jpg";
+import courseItalianImage from "@assets/Learn_Italin_in_Vicenza_1772214437453.png";
 
 const categories = [
   {
