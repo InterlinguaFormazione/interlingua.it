@@ -48,7 +48,7 @@ import {
   Shield,
 } from "lucide-react";
 import courseItalianImage from "@/assets/images/course-italian.jpg";
-import aboutVicenzaImage from "@/assets/images/about-vicenza.jpg";
+import aboutVicenzaImage from "@assets/vicenza_1772179633305.jpg";
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
