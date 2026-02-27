@@ -31,8 +31,6 @@ import fullImmersionImage from "@assets/Full-Immersion-Workshop-di-Lingua-Ingles
 import managementImage from "@assets/management-leadership_1772143822898.webp";
 import courseItalianImage from "@/assets/images/course-italian.jpg";
 
-const LIVE_SITE = "https://skillcraft.interlingua.it";
-
 const categories = [
   {
     id: "lingua",
@@ -43,7 +41,6 @@ const categories = [
     color: "from-purple-500 to-purple-600",
     courseCount: 4,
     featured: true,
-    href: `${LIVE_SITE}/formazione-in-presenza`,
   },
   {
     id: "coaching",
@@ -53,7 +50,6 @@ const categories = [
     image: languageCoachingImage,
     color: "from-indigo-500 to-indigo-600",
     courseCount: 3,
-    href: `${LIVE_SITE}/language-coaching`,
   },
   {
     id: "online",
@@ -63,7 +59,6 @@ const categories = [
     image: corsoOnlineImage,
     color: "from-teal-500 to-teal-600",
     courseCount: 3,
-    href: `${LIVE_SITE}/corsi-e-learning`,
   },
   {
     id: "speakers",
@@ -73,7 +68,6 @@ const categories = [
     image: speakersCornerCourseImage,
     color: "from-orange-500 to-orange-600",
     courseCount: 3,
-    href: `${LIVE_SITE}/speakers-corner`,
   },
   {
     id: "immersion",
@@ -84,7 +78,6 @@ const categories = [
     color: "from-green-500 to-green-600",
     courseCount: 2,
     featured: true,
-    href: `${LIVE_SITE}/full-immersion`,
   },
   {
     id: "professional",
@@ -95,7 +88,6 @@ const categories = [
     color: "from-blue-500 to-blue-600",
     courseCount: 5,
     featured: true,
-    href: "#contact",
   },
 ];
 
@@ -134,59 +126,99 @@ export function CoursesSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <a
-                  href={category.href}
-                  target={category.href.startsWith("http") ? "_blank" : undefined}
-                  rel={category.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                >
-                  <Card 
-                    className="h-full hover-elevate group cursor-pointer relative overflow-hidden"
-                    data-testid={`card-category-${category.id}`}
-                  >
-                    <div className="relative h-48 overflow-hidden">
-                      <img 
-                        src={category.image} 
-                        alt={category.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
-                        decoding="async"
-                        width={400}
-                        height={192}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
-                      
-                      <div className={`absolute bottom-3 left-3 p-2 rounded-lg bg-gradient-to-r ${category.color} shadow-lg`}>
-                        <Icon className="h-5 w-5 text-white" />
-                      </div>
-                    </div>
-                    
-                    <CardContent className="pt-4">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <h3 className="text-lg font-bold group-hover:text-primary transition-colors">
-                          {category.title}
-                        </h3>
-                        <Badge variant="secondary" className="text-xs shrink-0">
-                          {category.courseCount} {category.courseCount === 1 ? "corso" : "corsi"}
-                        </Badge>
-                      </div>
-                      
-                      <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                        {category.description}
-                      </p>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                          <Users className="h-4 w-4" />
-                          <span>Tutti i livelli</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-primary font-medium text-sm">
-                          Esplora
-                          <ArrowRight className="h-4 w-4" />
+                {category.id === "professional" ? (
+                  <a href="https://skillcraft.interlingua.it/" target="_blank" rel="noopener noreferrer">
+                    <Card 
+                      className="h-full hover-elevate group cursor-pointer relative overflow-hidden"
+                      data-testid={`card-category-${category.id}`}
+                    >
+                      <div className="relative h-48 overflow-hidden">
+                        <img 
+                          src={category.image} 
+                          alt={category.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                          decoding="async"
+                          width={400}
+                          height={192}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
+                        <div className={`absolute bottom-3 left-3 p-2 rounded-lg bg-gradient-to-r ${category.color} shadow-lg`}>
+                          <Icon className="h-5 w-5 text-white" />
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </a>
+                      <CardContent className="pt-4">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <h3 className="text-lg font-bold group-hover:text-primary transition-colors">
+                            {category.title}
+                          </h3>
+                          <Badge variant="secondary" className="text-xs shrink-0">
+                            {category.courseCount} {category.courseCount === 1 ? "corso" : "corsi"}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                          {category.description}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                            <Users className="h-4 w-4" />
+                            <span>Tutti i livelli</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-primary font-medium text-sm">
+                            Esplora
+                            <ArrowRight className="h-4 w-4" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </a>
+                ) : (
+                  <Link href={category.id === "immersion" ? "/full-immersion" : category.id === "lingua" ? "/formazione-in-presenza" : category.id === "online" ? "/corsi-e-learning" : category.id === "coaching" ? "/language-coaching" : category.id === "speakers" ? "/speakers-corner" : "/"}>
+                    <Card 
+                      className="h-full hover-elevate group cursor-pointer relative overflow-hidden"
+                      data-testid={`card-category-${category.id}`}
+                    >
+                      <div className="relative h-48 overflow-hidden">
+                        <img 
+                          src={category.image} 
+                          alt={category.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                          decoding="async"
+                          width={400}
+                          height={192}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-card via-card/20 to-transparent" />
+                        <div className={`absolute bottom-3 left-3 p-2 rounded-lg bg-gradient-to-r ${category.color} shadow-lg`}>
+                          <Icon className="h-5 w-5 text-white" />
+                        </div>
+                      </div>
+                      <CardContent className="pt-4">
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <h3 className="text-lg font-bold group-hover:text-primary transition-colors">
+                            {category.title}
+                          </h3>
+                          <Badge variant="secondary" className="text-xs shrink-0">
+                            {category.courseCount} {category.courseCount === 1 ? "corso" : "corsi"}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                          {category.description}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                            <Users className="h-4 w-4" />
+                            <span>Tutti i livelli</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-primary font-medium text-sm">
+                            Esplora
+                            <ArrowRight className="h-4 w-4" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                )}
               </motion.div>
             );
           })}
