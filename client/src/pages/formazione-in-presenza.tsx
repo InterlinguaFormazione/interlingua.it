@@ -47,6 +47,7 @@ import {
   TrendingUp,
   Zap,
   Shield,
+  ShoppingCart,
 } from "lucide-react";
 import { Link } from "wouter";
 import lingueStraniereImage from "@assets/lingue-straniere_1772143318023.webp";
@@ -148,6 +149,7 @@ const province = [
 const courses = [
   {
     id: "corsi-gruppo",
+    shopSlug: "corsi-gruppo",
     title: "Corsi di Gruppo",
     subtitle: "Lingue straniere per tutti i livelli",
     description: "Corsi collettivi serali e diurni nelle nostre sedi di Vicenza e Thiene, con docenti madrelingua qualificati. Formazione strutturata e certificata per tutti i livelli QCER, dal principiante all'avanzato.",
@@ -176,6 +178,7 @@ const courses = [
   },
   {
     id: "corsi-individuali",
+    shopSlug: null,
     title: "Corsi Individuali o Semi-Individuali",
     subtitle: "1 o 2 partecipanti, massima personalizzazione",
     description: "Apprendimento personalizzato con docenti madrelingua, lezioni su misura e massima flessibilità. Un percorso efficace per un progresso rapido in un ambiente motivante.",
@@ -205,6 +208,7 @@ const courses = [
   },
   {
     id: "corso-blended",
+    shopSlug: "individuale-blended",
     title: "Corso Individuale Blended",
     subtitle: "In sede + piattaforma online",
     description: "Il meglio dei due mondi: lezioni individuali in sede con docente madrelingua, integrate dalla piattaforma e-learning attiva 24/7 per uno studio continuo e autonomo tra una lezione e l'altra.",
@@ -234,6 +238,7 @@ const courses = [
   },
   {
     id: "office",
+    shopSlug: "office-senza-segreti",
     title: "Office senza segreti",
     subtitle: "Excel, Word, PowerPoint e Copilot",
     description: "Un corso pratico e diretto per padroneggiare gli strumenti Office che usi ogni giorno. Dalle formule di Excel alle presentazioni PowerPoint, fino alle funzionalità AI di Copilot per lavorare il doppio in metà tempo.",
@@ -260,6 +265,7 @@ const courses = [
   },
   {
     id: "ai",
+    shopSlug: "ai-senza-segreti",
     title: "AI senza segreti",
     subtitle: "Creatività, produttività e soluzioni per tutti",
     description: "Scopri come l'Intelligenza Artificiale può diventare il tuo alleato quotidiano: dalla scrittura alla creatività, dall'analisi dei dati all'automazione. Un corso accessibile a tutti, anche senza competenze tecniche.",
@@ -661,10 +667,23 @@ function CourseCard({ course, index }: { course: typeof courses[0]; index: numbe
                   </div>
                 ))}
               </div>
-              <div className="mt-7 pt-6 border-t border-border/50">
+              <div className="mt-7 pt-6 border-t border-border/50 flex flex-wrap gap-3">
+                {course.shopSlug && (
+                  <Link href={`/shop/checkout/${course.shopSlug}`}>
+                    <Button
+                      size="lg"
+                      className={`rounded-xl bg-gradient-to-r ${course.gradient} hover:opacity-90 text-white shadow-lg`}
+                      data-testid={`button-fip-buy-${course.id}`}
+                    >
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      Acquista Online
+                    </Button>
+                  </Link>
+                )}
                 <Button
                   size="lg"
-                  className={`rounded-xl ${!formOpen ? `bg-gradient-to-r ${course.gradient} hover:opacity-90 text-white shadow-lg` : "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}
+                  variant={course.shopSlug ? "outline" : "default"}
+                  className={`rounded-xl ${!course.shopSlug && !formOpen ? `bg-gradient-to-r ${course.gradient} hover:opacity-90 text-white shadow-lg` : ""}`}
                   onClick={() => setFormOpen(!formOpen)}
                   data-testid={`button-fip-toggle-form-${course.id}`}
                 >
