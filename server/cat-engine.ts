@@ -11,11 +11,11 @@ const THETA_THRESHOLDS: Record<string, number> = {
 };
 
 const SELF_ASSESSMENT_THETA: Record<string, number> = {
-  A1: -200,
-  A2: -100,
-  B1: 0,
-  B2: 100,
-  C1: 200,
+  A1: -150,
+  A2: -50,
+  B1: 50,
+  B2: 150,
+  C1: 250,
 };
 
 const LEVEL_NUMERIC: Record<string, number> = {
@@ -70,7 +70,7 @@ export function updateTheta(oldTheta: number, isCorrect: boolean, standardError:
   const se = safeSE / 100;
   const p = calculateProbability(oldTheta, difficulty, discrimination);
   const residual = (isCorrect ? 1 : 0) - p;
-  const step = 0.8 * residual * (1 / se);
+  const step = 0.8 * residual * se;
   const newTheta = oldTheta + Math.round(step * 100);
   return Math.max(-300, Math.min(300, newTheta));
 }
