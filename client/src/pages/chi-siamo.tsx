@@ -170,7 +170,7 @@ export default function ChiSiamoPage() {
                 AI e competenze digitali.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link href="/corsi">
+                <Link href="/#courses">
                   <Button size="lg" data-testid="button-discover-courses">
                     Scopri i Corsi
                   </Button>
@@ -636,7 +636,7 @@ export default function ChiSiamoPage() {
                       Contattaci Ora
                     </Button>
                   </Link>
-                  <Link href="/corsi">
+                  <Link href="/#courses">
                     <Button variant="outline" size="lg" className="min-w-[200px]" data-testid="button-courses-cta">
                       Esplora i Corsi
                     </Button>

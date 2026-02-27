@@ -419,8 +419,8 @@ export default function CourseDetailPage() {
         <Card className="p-8 text-center">
           <h1 className="text-2xl font-bold mb-4">Corso non trovato</h1>
           <p className="text-muted-foreground mb-6">Il corso che cerchi non esiste o è stato rimosso.</p>
-          <Link href="/corsi">
-            <Button data-testid="button-back-courses">Torna ai Corsi</Button>
+          <Link href="/">
+            <Button data-testid="button-back-courses">Torna alla Home</Button>
           </Link>
         </Card>
       </div>
@@ -434,10 +434,10 @@ export default function CourseDetailPage() {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
-          <Link href="/corsi">
+          <Link href="/">
             <Button variant="ghost" className="gap-2" data-testid="button-back-courses">
               <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Tutti i Corsi</span>
+              <span className="hidden sm:inline">Home</span>
             </Button>
           </Link>
           <Badge variant="secondary" className="hidden sm:flex">

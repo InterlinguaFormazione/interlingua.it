@@ -122,7 +122,7 @@ export default function BlogPostPage() {
                   Scopri i nostri corsi di formazione professionale e inizia il tuo percorso di crescita.
                 </p>
                 <div className="flex flex-wrap gap-3 justify-center">
-                  <Link href="/corsi">
+                  <Link href="/#courses">
                     <Button data-testid="button-explore-courses">Esplora i Corsi</Button>
                   </Link>
                   <Link href="/#contact">

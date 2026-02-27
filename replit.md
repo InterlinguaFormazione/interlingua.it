@@ -30,7 +30,6 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 ### Frontend (`client/`)
 - `src/pages/home.tsx` - Main landing page with all sections
 - `src/pages/course-detail.tsx` - Individual course detail pages (20 courses)
-- `src/pages/courses.tsx` - All courses listing
 - `src/pages/chi-siamo.tsx` - About us page
 - `src/pages/bandi-e-corsi.tsx` - Funded courses and tenders listing
 - `src/pages/bando-detail.tsx` - Individual bando/funded course detail page

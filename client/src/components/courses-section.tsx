@@ -125,7 +125,7 @@ export function CoursesSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Link href={category.id === "immersion" ? "/full-immersion" : category.id === "lingua" ? "/formazione-in-presenza" : category.id === "online" ? "/corsi-e-learning" : category.id === "coaching" ? "/language-coaching" : `/corsi#${category.id}`}>
+                <Link href={category.id === "immersion" ? "/full-immersion" : category.id === "lingua" ? "/formazione-in-presenza" : category.id === "online" ? "/corsi-e-learning" : category.id === "coaching" ? "/language-coaching" : category.id === "speakers" ? "/speakers-corner" : "#contact"}>
                   <Card 
                     className="h-full hover-elevate group cursor-pointer relative overflow-hidden"
                     data-testid={`card-category-${category.id}`}
@@ -215,19 +215,8 @@ export function CoursesSection() {
           className="text-center mt-8"
         >
           <div className="inline-flex flex-col sm:flex-row gap-4 items-center">
-            <Link href="/corsi">
-              <Button 
-                size="lg" 
-                data-testid="button-all-courses"
-              >
-                <BookOpen className="w-4 h-4 mr-2" />
-                Vedi Tutti i Corsi
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
             <Button 
               size="lg" 
-              variant="outline"
               onClick={() => {
                 const element = document.querySelector("#contact");
                 if (element) element.scrollIntoView({ behavior: "smooth" });
@@ -235,6 +224,7 @@ export function CoursesSection() {
               data-testid="button-request-info"
             >
               Richiedi Informazioni
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
           

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Link } from "wouter";
+
 import { ArrowRight, Sparkles, Users, Award, BookOpen, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -178,16 +178,18 @@ export function HeroSection() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
           >
-            <Link href="/corsi">
-              <Button
-                size="lg"
-                className="text-base px-8 shadow-lg shadow-primary/25"
-                data-testid="button-explore-courses"
-              >
-                Esplora i Corsi
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+            <Button
+              size="lg"
+              className="text-base px-8 shadow-lg shadow-primary/25"
+              data-testid="button-explore-courses"
+              onClick={() => {
+                const el = document.querySelector("#courses");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              Esplora i Corsi
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
             <Button
               size="lg"
               variant="outline"

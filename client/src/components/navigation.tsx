@@ -11,6 +11,7 @@ const navLinks = [
   { href: "/speakers-corner", label: "Speaker's Corner" },
   { href: "/chi-siamo", label: "Chi Siamo" },
   { href: "/blog", label: "Blog" },
+  { href: "#contact", label: "Contatti" },
 ];
 
 const audienceTabs = [
