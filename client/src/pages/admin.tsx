@@ -79,6 +79,7 @@ function ShopOrdersTab({ token }: { token: string }) {
                   <th className="text-left py-3 px-2 font-medium">Data</th>
                   <th className="text-left py-3 px-2 font-medium">Corso</th>
                   <th className="text-left py-3 px-2 font-medium">Cliente</th>
+                  <th className="text-left py-3 px-2 font-medium">Studente</th>
                   <th className="text-left py-3 px-2 font-medium">Email</th>
                   <th className="text-right py-3 px-2 font-medium">Importo</th>
                   <th className="text-center py-3 px-2 font-medium">Stato</th>
@@ -92,6 +93,9 @@ function ShopOrdersTab({ token }: { token: string }) {
                     </td>
                     <td className="py-3 px-2 font-medium">{order.productName}</td>
                     <td className="py-3 px-2">{order.customerName}</td>
+                    <td className="py-3 px-2 text-muted-foreground">
+                      {order.studentName || <span className="text-xs italic">stesso</span>}
+                    </td>
                     <td className="py-3 px-2 text-muted-foreground">{order.customerEmail}</td>
                     <td className="py-3 px-2 text-right font-medium">&euro;{parseFloat(order.amount).toFixed(2)}</td>
                     <td className="py-3 px-2 text-center">

@@ -1161,6 +1161,7 @@ export async function registerRoutes(
         customerName: req.body.customerName,
         customerEmail: req.body.customerEmail,
         customerPhone: req.body.customerPhone || null,
+        studentName: req.body.studentName || null,
         billingCodiceFiscale: req.body.billingCodiceFiscale || null,
         billingIndirizzo: req.body.billingIndirizzo || null,
         billingCap: req.body.billingCap || null,

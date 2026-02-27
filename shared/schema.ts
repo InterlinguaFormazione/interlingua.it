@@ -232,6 +232,7 @@ export const shopOrders = pgTable("shop_orders", {
   customerName: text("customer_name").notNull(),
   customerEmail: text("customer_email").notNull(),
   customerPhone: text("customer_phone"),
+  studentName: text("student_name"),
   billingCodiceFiscale: text("billing_codice_fiscale"),
   billingIndirizzo: text("billing_indirizzo"),
   billingCap: text("billing_cap"),

@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
@@ -56,6 +57,8 @@ export default function ShopCheckout() {
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerPassword, setCustomerPassword] = useState("");
+  const [buyingForOther, setBuyingForOther] = useState(false);
+  const [studentName, setStudentName] = useState("");
   const [notes, setNotes] = useState("");
 
   const [tipoFatturazione, setTipoFatturazione] = useState<"privato" | "professionista" | "azienda">("privato");
@@ -129,6 +132,10 @@ export default function ShopCheckout() {
     }
     if (!customerName || !customerEmail) {
       toast({ title: "Campi obbligatori", description: "Inserisci nome e email.", variant: "destructive" });
+      return;
+    }
+    if (buyingForOther && !studentName.trim()) {
+      toast({ title: "Nome studente obbligatorio", description: "Inserisci il nome di chi frequenterà il corso.", variant: "destructive" });
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
@@ -246,6 +253,7 @@ export default function ShopCheckout() {
                   customerEmail,
                   customerPhone,
                   customerPassword,
+                  studentName: buyingForOther ? studentName : "",
                   codiceFiscale,
                   billingCodiceFiscale: codiceFiscale,
                   billingIndirizzo: indirizzo,
@@ -519,6 +527,33 @@ export default function ShopCheckout() {
                           data-testid="input-customer-phone"
                         />
                       </div>
+                      <div className="flex items-center gap-2 pt-2">
+                        <Checkbox
+                          id="buyingForOther"
+                          checked={buyingForOther}
+                          onCheckedChange={(checked) => {
+                            setBuyingForOther(checked === true);
+                            if (!checked) setStudentName("");
+                          }}
+                          data-testid="checkbox-buying-for-other"
+                        />
+                        <Label htmlFor="buyingForOther" className="text-sm cursor-pointer">
+                          Il corso è per un'altra persona
+                        </Label>
+                      </div>
+                      {buyingForOther && (
+                        <div>
+                          <Label htmlFor="studentName">Nome e Cognome dello studente *</Label>
+                          <Input
+                            id="studentName"
+                            value={studentName}
+                            onChange={(e) => setStudentName(e.target.value)}
+                            placeholder="Nome e cognome di chi frequenterà il corso"
+                            className="mt-1"
+                            data-testid="input-student-name"
+                          />
+                        </div>
+                      )}
                       <div className="border-t pt-4 mt-2">
                         <div className="flex items-center gap-2 mb-2">
                           <Lock className="w-4 h-4 text-primary" />
