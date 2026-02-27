@@ -690,9 +690,26 @@ export default function BusinessEnglishTestPage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {currentQuestion.passage && (
-                    <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-700" data-testid="text-passage">
-                      <div className="text-xs uppercase tracking-wider text-slate-500 mb-2 font-medium">Reading Passage</div>
-                      <div className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line leading-relaxed">{currentQuestion.passage}</div>
+                    <div className={`rounded-xl p-4 border ${
+                      currentQuestion.skillType === "listening"
+                        ? "bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800"
+                        : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                    }`} data-testid="text-passage">
+                      <div className="flex items-center gap-2 mb-2">
+                        {currentQuestion.skillType === "listening" ? (
+                          <>
+                            <Volume2 className="w-4 h-4 text-indigo-500" />
+                            <span className="text-xs uppercase tracking-wider text-indigo-500 font-medium">Listening Transcript</span>
+                          </>
+                        ) : (
+                          <span className="text-xs uppercase tracking-wider text-slate-500 font-medium">Reading Passage</span>
+                        )}
+                      </div>
+                      <div className={`text-sm whitespace-pre-line leading-relaxed ${
+                        currentQuestion.skillType === "listening"
+                          ? "text-indigo-900 dark:text-indigo-200 italic"
+                          : "text-slate-700 dark:text-slate-300"
+                      }`}>{currentQuestion.passage}</div>
                     </div>
                   )}
 
@@ -767,13 +784,13 @@ export default function BusinessEnglishTestPage() {
                 />
                 <div className="flex justify-between mt-2 text-sm text-slate-500">
                   <span data-testid="text-word-count">{wordCount} words</span>
-                  <span>{wordCount < 50 ? "Aim for at least 50 words" : "Good length"}</span>
+                  <span>{wordCount < 20 ? "Scrivi quanto riesci" : wordCount < 50 ? "Buon inizio, continua se vuoi" : "Ottima lunghezza"}</span>
                 </div>
               </div>
 
               <Button
                 onClick={handleWritingSubmit}
-                disabled={wordCount < 10 || isSubmitting}
+                disabled={isSubmitting}
                 className="w-full bg-blue-600 hover:bg-blue-700"
                 data-testid="button-submit-writing"
               >
