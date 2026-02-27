@@ -460,14 +460,18 @@ export default function EnglishTestPage() {
           onCandidateChange={setCandidateInfo}
           onStart={() => {
             const startIdx = levels.indexOf(candidateInfo.selfAssessedLevel);
-            const reordered: Question[] = [];
-            for (let i = startIdx; i < levels.length; i++) {
-              reordered.push(...questions.filter(q => q.level === levels[i]));
+            const autoAnswers: Record<number, number> = {};
+            const filtered: Question[] = [];
+            for (const q of questions) {
+              const qLevelIdx = levels.indexOf(q.level);
+              if (qLevelIdx < startIdx) {
+                autoAnswers[q.id] = q.correct;
+              } else {
+                filtered.push(q);
+              }
             }
-            for (let i = 0; i < startIdx; i++) {
-              reordered.push(...questions.filter(q => q.level === levels[i]));
-            }
-            setOrderedQuestions(reordered);
+            setGrammarAnswers(autoAnswers);
+            setOrderedQuestions(filtered);
             setPhase("grammar");
           }}
         />
