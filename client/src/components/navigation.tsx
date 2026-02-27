@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Users, Building2, ExternalLink } from "lucide-react";
+import { Menu, X, Users, Building2, ExternalLink, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,7 +20,8 @@ const audienceTabs = [
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
+  const isHome = location === "/";
 
   const handleNavClick = (href: string) => {
     setIsOpen(false);
@@ -73,13 +74,26 @@ export function Navigation() {
       <div className="glass border-b border-border/50">
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
-          <Link href="/" className="flex items-center group" data-testid="link-home">
-            <img 
-              src={logoImage} 
-              alt="SkillCraft Interlingua" 
-              className="h-10 md:h-12 w-auto"
-            />
-          </Link>
+          <div className="flex items-center gap-2">
+            {!isHome && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => window.history.length > 1 ? window.history.back() : setLocation("/")}
+                data-testid="button-back"
+                className="shrink-0"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            )}
+            <Link href="/" className="flex items-center group" data-testid="link-home">
+              <img 
+                src={logoImage} 
+                alt="SkillCraft Interlingua" 
+                className="h-10 md:h-12 w-auto"
+              />
+            </Link>
+          </div>
 
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
