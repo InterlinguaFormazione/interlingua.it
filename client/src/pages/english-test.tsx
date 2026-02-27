@@ -218,7 +218,7 @@ export default function BusinessEnglishTestPage() {
   };
 
   const handleWritingSubmit = async () => {
-    if (!writingResponse.trim() || !sessionId) return;
+    if (!sessionId) return;
     setIsSubmitting(true);
     try {
       const res = await apiRequest("POST", "/api/english-test/submit-writing", {
