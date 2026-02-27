@@ -1643,7 +1643,6 @@ export async function registerRoutes(
           recentSectionLevels.push(thetaToCEFR(resp.thetaAfter));
         }
       }
-      recentSectionLevels.push(thetaToCEFR(newTheta));
 
       let nextSectionIndex = currentSectionIndex;
       let advanceSection = false;
