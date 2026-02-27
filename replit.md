@@ -65,7 +65,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `storage.ts` - PostgreSQL database storage (Drizzle ORM)
 - `ai-chat.ts` - AI chat endpoint (OpenAI GPT-4o-mini with full site context)
 - `english-test.ts` - AI scoring for English test (GPT-4o writing/speaking scoring, Whisper transcription) + business English scoring functions
-- `cat-engine.ts` - CAT/IRT engine for Business English test (2PL model, Fisher information, theta updates, CEFR mapping)
+- `cat-engine.ts` - CAT/IRT engine (2PL model, Fisher information, theta ×100, step=0.4, CEFR mapping). Adaptive section length: min 3, max 12 questions per section — ends when SE≤35 or level stable for 3 consecutive answers
 - `business-english-questions.ts` - Question bank (300 questions, 5 skills x 6 levels x 10 topics)
 - `email.ts` - AWS SES email notifications (contact, newsletter, subscription payment, booking confirmation, business English results)
 - `crm.ts` - CRM webhook integration (forwards contact submissions)

@@ -16,7 +16,8 @@ import {
   calculateProbability, calculateFisherInformation, selectNextQuestion,
   updateTheta, updateStandardError, thetaToCEFR, selfAssessmentToTheta,
   checkPhaseTransitions, checkA0HardFail, calculateFinalLevel,
-  getWritingPrompt, getSpeakingPrompt, SECTION_SKILLS, MAX_QUESTIONS_PER_SECTION
+  getWritingPrompt, getSpeakingPrompt, SECTION_SKILLS,
+  shouldEndSection
 } from "./cat-engine";
 import { sendBusinessEnglishResultEmail, sendBusinessEnglishConfirmationEmail } from "./email";
 import multer from "multer";
@@ -1604,9 +1605,18 @@ export async function registerRoutes(
       const phaseResult = checkPhaseTransitions(newTotalQ, newCorrect, newLevel, questionsAtCurrentLevel);
       const adaptedLevel = a0HardFail ? "A0" : phaseResult.newLevel;
 
+      const recentSectionLevels: string[] = [];
+      for (const resp of sectionResponses) {
+        const rq = allQs.find(q => q.id === resp.questionId);
+        if (rq && rq.skillType === currentSkill && resp.thetaAfter != null) {
+          recentSectionLevels.push(thetaToCEFR(resp.thetaAfter));
+        }
+      }
+      recentSectionLevels.push(thetaToCEFR(newTheta));
+
       let nextSectionIndex = currentSectionIndex;
       let advanceSection = false;
-      if (a0HardFail || questionsInCurrentSection >= MAX_QUESTIONS_PER_SECTION || (newSE <= 35 && questionsInCurrentSection >= 3)) {
+      if (a0HardFail || shouldEndSection(questionsInCurrentSection, newSE, recentSectionLevels)) {
         await storage.createBeSectionResult({
           sessionId,
           sectionName: currentSkill,

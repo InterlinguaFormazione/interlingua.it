@@ -187,5 +187,24 @@ export function getSpeakingPrompt(level: string): string {
 }
 
 export const SECTION_SKILLS = ["grammar", "vocabulary", "use_of_english", "reading", "listening"] as const;
-export const MAX_QUESTIONS_PER_SECTION = 5;
+export const MIN_QUESTIONS_PER_SECTION = 3;
+export const MAX_QUESTIONS_PER_SECTION = 12;
 export const TOTAL_MC_SECTIONS = 5;
+
+export function shouldEndSection(
+  questionsInSection: number,
+  standardError: number,
+  recentSectionLevels: string[]
+): boolean {
+  if (questionsInSection >= MAX_QUESTIONS_PER_SECTION) return true;
+  if (questionsInSection < MIN_QUESTIONS_PER_SECTION) return false;
+
+  if (standardError <= 35) return true;
+
+  if (recentSectionLevels.length >= 3) {
+    const last3 = recentSectionLevels.slice(-3);
+    if (last3[0] === last3[1] && last3[1] === last3[2]) return true;
+  }
+
+  return false;
+}
