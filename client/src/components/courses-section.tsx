@@ -10,7 +10,8 @@ import {
   ArrowRight,
   Users,
   BookOpen,
-  Sparkles
+  Sparkles,
+  Languages
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -182,7 +183,35 @@ export function CoursesSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.6 }}
+          transition={{ duration: 0.5, delay: 0.7 }}
+          className="mt-6"
+        >
+          <Link href="/corsi-italiano">
+            <Card className="hover-elevate cursor-pointer group overflow-hidden" data-testid="card-italian-courses">
+              <div className="flex flex-col sm:flex-row items-center gap-4 p-5">
+                <div className="flex items-center gap-3 shrink-0">
+                  <div className="p-2.5 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 shadow-lg">
+                    <Languages className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-bold group-hover:text-primary transition-colors">Italiano per Stranieri / Italian for Foreigners</h3>
+                    <p className="text-sm text-muted-foreground">Corsi intensivi di lingua italiana a Vicenza - Intensive Italian courses in Vicenza</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-primary font-medium text-sm shrink-0 sm:ml-auto">
+                  Scopri / Discover
+                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </Card>
+          </Link>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.8 }}
           className="text-center mt-8"
         >
           <div className="inline-flex flex-col sm:flex-row gap-4 items-center">
