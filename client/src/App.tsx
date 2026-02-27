@@ -31,7 +31,6 @@ import CorsiItalianoPage from "@/pages/corsi-italiano";
 import ShopPage from "@/pages/shop";
 import ShopCheckoutPage from "@/pages/shop-checkout";
 import ShopDashboardPage from "@/pages/shop-dashboard";
-import EnglishTestPage from "@/pages/english-test";
 import BusinessEnglishTestPage from "@/pages/business-english-test";
 import NotFound from "@/pages/not-found";
 
@@ -63,7 +62,6 @@ function Router() {
       <Route path="/shop" component={ShopPage} />
       <Route path="/shop/checkout/:slug" component={ShopCheckoutPage} />
       <Route path="/shop/dashboard" component={ShopDashboardPage} />
-      <Route path="/test-inglese" component={EnglishTestPage} />
       <Route path="/business-english-test" component={BusinessEnglishTestPage} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/blog" component={BlogPage} />
