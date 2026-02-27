@@ -446,6 +446,10 @@ export default function EnglishTestPage() {
     setSubmitted(false);
   }, []);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [phase]);
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
