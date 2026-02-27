@@ -416,7 +416,7 @@ export default function BusinessEnglishTestPage() {
                   Level: <span className={`inline-block px-2 py-0.5 rounded text-white text-xs font-bold ${levelColor(currentLevel)}`}>{currentLevel}</span>
                 </span>
                 <span className="text-slate-600 dark:text-slate-400" data-testid="text-questions-answered">
-                  Questions: {totalAnswered}/25
+                  Questions: {totalAnswered}
                 </span>
               </div>
               <div className="flex items-center gap-2">

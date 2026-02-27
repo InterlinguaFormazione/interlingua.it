@@ -1616,9 +1616,9 @@ export async function registerRoutes(
 
       let nextSectionIndex = currentSectionIndex;
       let advanceSection = false;
-      const nextSkillForCheck = advanceSection ? SECTION_SKILLS[nextSectionIndex - 1] : currentSkill;
-      const wouldHaveQuestion = selectNextQuestion(newTheta, prevQuestions, nextSkillForCheck ?? currentSkill, allQs);
-      const outOfQuestions = !wouldHaveQuestion && !advanceSection;
+
+      const wouldHaveQuestion = selectNextQuestion(newTheta, prevQuestions, currentSkill, allQs);
+      const outOfQuestions = !wouldHaveQuestion;
 
       if (a0HardFail || outOfQuestions || shouldEndSection(questionsInCurrentSection, newSE, recentSectionLevels)) {
         await storage.createBeSectionResult({
@@ -1682,8 +1682,43 @@ export async function registerRoutes(
         });
       }
 
-      const nextSkill = SECTION_SKILLS[nextSectionIndex - 1];
-      const nextQuestion = selectNextQuestion(newTheta, prevQuestions, nextSkill, allQs);
+      let nextSkill = SECTION_SKILLS[nextSectionIndex - 1];
+      let nextQuestion = selectNextQuestion(newTheta, prevQuestions, nextSkill, allQs);
+
+      while (!nextQuestion) {
+        await storage.createBeSectionResult({
+          sessionId,
+          sectionName: nextSkill,
+          sectionIndex: nextSectionIndex,
+          questionsAttempted: 0,
+          questionsCorrect: 0,
+          accuracyPercentage: 0,
+          cefrLevel: adaptedLevel,
+          finalTheta: newTheta,
+          finalStandardError: newSE,
+          sectionConfidence: confidence,
+        });
+        nextSectionIndex++;
+        advanceSection = true;
+        await storage.updateBeTestSession(sessionId, { currentSectionIndex: nextSectionIndex });
+
+        if (nextSectionIndex > SECTION_SKILLS.length) {
+          const writingPrompt = getWritingPrompt(adaptedLevel);
+          return res.json({
+            success: true,
+            isCorrect,
+            newTheta,
+            newLevel: adaptedLevel,
+            confidence,
+            mcPhaseComplete: true,
+            mcLevel: adaptedLevel,
+            writingPrompt,
+          });
+        }
+
+        nextSkill = SECTION_SKILLS[nextSectionIndex - 1];
+        nextQuestion = selectNextQuestion(newTheta, prevQuestions, nextSkill, allQs);
+      }
 
       res.json({
         success: true,
@@ -1695,7 +1730,7 @@ export async function registerRoutes(
         currentSectionIndex: nextSectionIndex,
         currentSkill: nextSkill,
         sectionAdvanced: advanceSection,
-        question: nextQuestion ? {
+        question: {
           id: nextQuestion.id,
           question: nextQuestion.question,
           options: JSON.parse(nextQuestion.options),
@@ -1703,7 +1738,7 @@ export async function registerRoutes(
           level: nextQuestion.level,
           passage: nextQuestion.passage,
           audioUrl: nextQuestion.audioUrl,
-        } : null,
+        },
       });
     } catch (error) {
       console.error("Error answering business English question:", error);
@@ -1725,24 +1760,27 @@ export async function registerRoutes(
   app.post("/api/english-test/submit-writing", async (req, res) => {
     try {
       const { sessionId, response: writtenResponse, prompt } = req.body;
-      if (!sessionId || !writtenResponse) {
-        return res.status(400).json({ success: false, message: "Missing fields" });
+      if (!sessionId) {
+        return res.status(400).json({ success: false, message: "Missing sessionId" });
       }
 
       const session = await storage.getBeTestSession(sessionId);
       if (!session) return res.status(404).json({ success: false, message: "Session not found" });
 
-      const aiResult = await scoreBusinessWriting(
-        prompt || getWritingPrompt(session.currentLevel),
-        writtenResponse,
-        session.currentLevel
-      );
+      const responseText = writtenResponse || "";
+      const aiResult = responseText.trim().length < 5
+        ? { level: "A0", grammar: 0, vocabulary: 0, coherence: 0, taskCompletion: 0, feedback: "No writing response provided or response too short to evaluate." }
+        : await scoreBusinessWriting(
+            prompt || getWritingPrompt(session.currentLevel),
+            responseText,
+            session.currentLevel
+          );
 
       await storage.createBeWritingSpeaking({
         sessionId,
         taskType: "writing",
         prompt: prompt || getWritingPrompt(session.currentLevel),
-        response: writtenResponse,
+        response: responseText,
         aiScore: aiResult.level,
         aiGrammarScore: aiResult.grammar,
         aiVocabularyScore: aiResult.vocabulary,
