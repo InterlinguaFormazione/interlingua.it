@@ -1954,17 +1954,52 @@ export async function registerRoutes(
       const session = await storage.getBeTestSession(sessionId);
       if (!session) return res.status(404).json({ success: false, message: "Session not found" });
 
-      if (session.resultsEmailSentAt) {
-        return res.json({ success: true, message: "Already completed", finalLevel: session.finalLevel });
+      if (session.writingScore === null || session.writingScore === undefined) {
+        return res.status(400).json({ success: false, message: "Writing section not yet completed" });
+      }
+      if ((session.speakingScore === null || session.speakingScore === undefined) && !session.audioUnavailable) {
+        return res.status(400).json({ success: false, message: "Speaking section not yet completed" });
       }
 
       const mcLevel = session.currentLevel;
-      const finalLevel = calculateFinalLevel(mcLevel, session.writingScore, session.speakingScore);
-
       const sectionResults = await storage.getBeSectionResultsBySession(sessionId);
       const writingSpeaking = await storage.getBeWritingSpeakingBySession(sessionId);
       const writingTask = writingSpeaking.find(ws => ws.taskType === "writing");
       const speakingTask = writingSpeaking.find(ws => ws.taskType === "speaking");
+
+      if (session.resultsEmailSentAt) {
+        return res.json({
+          success: true,
+          message: "Already completed",
+          finalLevel: session.finalLevel,
+          mcLevel,
+          writingLevel: writingTask?.aiScore,
+          speakingLevel: speakingTask?.aiScore,
+          sectionResults: sectionResults.map(s => ({
+            sectionName: s.sectionName,
+            cefrLevel: s.cefrLevel,
+            accuracy: s.accuracyPercentage,
+          })),
+          writingFeedback: writingTask?.aiFeedback,
+          speakingFeedback: speakingTask?.aiFeedback,
+          competencyReport: {
+            writing: writingTask ? {
+              grammar: writingTask.aiGrammarScore,
+              vocabulary: writingTask.aiVocabularyScore,
+              coherence: writingTask.aiCoherenceScore,
+              taskCompletion: writingTask.aiTaskCompletionScore,
+            } : null,
+            speaking: speakingTask ? {
+              grammar: speakingTask.aiGrammarScore,
+              vocabulary: speakingTask.aiVocabularyScore,
+              coherence: speakingTask.aiCoherenceScore,
+              taskCompletion: speakingTask.aiTaskCompletionScore,
+            } : null,
+          },
+        });
+      }
+
+      const finalLevel = calculateFinalLevel(mcLevel, session.writingScore, session.speakingScore);
 
       await storage.updateBeTestSession(sessionId, {
         finalLevel,
@@ -2062,18 +2097,38 @@ export async function registerRoutes(
       const session = await storage.getBeTestSession(sessionId);
       if (!session) return res.status(404).json({ success: false, message: "Session not found" });
 
+      const mcLevel = session.currentLevel;
+      const sectionResults = await storage.getBeSectionResultsBySession(sessionId);
+      const writingSpeaking = await storage.getBeWritingSpeakingBySession(sessionId);
+      const writingTask = writingSpeaking.find(ws => ws.taskType === "writing");
+
       if (session.resultsEmailSentAt) {
-        return res.json({ success: true, message: "Already completed", finalLevel: session.finalLevel });
+        return res.json({
+          success: true,
+          message: "Already completed",
+          finalLevel: session.finalLevel,
+          mcLevel,
+          writingLevel: writingTask?.aiScore,
+          sectionResults: sectionResults.map(s => ({
+            sectionName: s.sectionName,
+            cefrLevel: s.cefrLevel,
+            accuracy: s.accuracyPercentage,
+          })),
+          writingFeedback: writingTask?.aiFeedback,
+          competencyReport: {
+            writing: writingTask ? {
+              grammar: writingTask.aiGrammarScore,
+              vocabulary: writingTask.aiVocabularyScore,
+              coherence: writingTask.aiCoherenceScore,
+              taskCompletion: writingTask.aiTaskCompletionScore,
+            } : null,
+          },
+        });
       }
 
       await storage.updateBeTestSession(sessionId, { audioUnavailable: true });
 
-      const mcLevel = session.currentLevel;
       const finalLevel = calculateFinalLevel(mcLevel, session.writingScore, null);
-
-      const sectionResults = await storage.getBeSectionResultsBySession(sessionId);
-      const writingSpeaking = await storage.getBeWritingSpeakingBySession(sessionId);
-      const writingTask = writingSpeaking.find(ws => ws.taskType === "writing");
 
       await storage.updateBeTestSession(sessionId, {
         finalLevel,
@@ -2120,11 +2175,20 @@ export async function registerRoutes(
         finalLevel,
         mcLevel,
         writingLevel: writingTask?.aiScore,
+        writingFeedback: writingTask?.aiFeedback,
         sectionResults: sectionResults.map(s => ({
           sectionName: s.sectionName,
           cefrLevel: s.cefrLevel,
           accuracy: s.accuracyPercentage,
         })),
+        competencyReport: {
+          writing: writingTask ? {
+            grammar: writingTask.aiGrammarScore,
+            vocabulary: writingTask.aiVocabularyScore,
+            coherence: writingTask.aiCoherenceScore,
+            taskCompletion: writingTask.aiTaskCompletionScore,
+          } : null,
+        },
       });
     } catch (error) {
       console.error("Error completing without speaking:", error);

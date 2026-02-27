@@ -169,6 +169,8 @@ export default function BusinessEnglishTestPage() {
         setCurrentSectionIndex(data.currentSectionIndex);
         setQuestionStartTime(Date.now());
         setPhase("mc-questions");
+      } else {
+        toast({ title: "Error", description: data.message || "Failed to start the test", variant: "destructive" });
       }
     } catch (error) {
       toast({ title: "Error", description: "Failed to start the test", variant: "destructive" });
@@ -210,6 +212,8 @@ export default function BusinessEnglishTestPage() {
           setSelectedAnswer(null);
           setQuestionStartTime(Date.now());
         }
+      } else {
+        toast({ title: "Error", description: data.message || "Failed to submit answer", variant: "destructive" });
       }
     } catch (error) {
       toast({ title: "Error", description: "Failed to submit answer", variant: "destructive" });
@@ -231,6 +235,8 @@ export default function BusinessEnglishTestPage() {
         setWritingScores(data.writingScores);
         setSpeakingPrompt(data.speakingPrompt);
         setPhase("speaking");
+      } else {
+        toast({ title: "Error", description: data.message || "Failed to submit writing", variant: "destructive" });
       }
     } catch (error) {
       toast({ title: "Error", description: "Failed to submit writing", variant: "destructive" });
@@ -300,26 +306,40 @@ export default function BusinessEnglishTestPage() {
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
   }, []);
 
+  const [speakingSubmitted, setSpeakingSubmitted] = useState(false);
+
   const handleSpeakingSubmit = async () => {
-    if (!audioBlob || !sessionId) return;
+    if (!sessionId) return;
     setIsSubmitting(true);
     try {
-      const formData = new FormData();
-      formData.append("audio", audioBlob, "recording.webm");
-      formData.append("sessionId", sessionId.toString());
-      formData.append("prompt", speakingPrompt);
+      if (!speakingSubmitted) {
+        if (!audioBlob) { setIsSubmitting(false); return; }
+        const formData = new FormData();
+        formData.append("audio", audioBlob, "recording.webm");
+        formData.append("sessionId", sessionId.toString());
+        formData.append("prompt", speakingPrompt);
 
-      const res = await fetch("/api/english-test/submit-speaking", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.success) {
-        setSpeakingScores(data.speakingScores);
-        await completeTest();
+        const res = await fetch("/api/english-test/submit-speaking", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        if (data.success) {
+          setSpeakingScores(data.speakingScores);
+          setSpeakingSubmitted(true);
+        } else {
+          toast({ title: "Error", description: data.message || "Failed to submit speaking", variant: "destructive" });
+          setIsSubmitting(false);
+          return;
+        }
       }
+      await completeTest();
     } catch (error) {
-      toast({ title: "Error", description: "Failed to submit speaking", variant: "destructive" });
+      if (speakingSubmitted) {
+        toast({ title: "Error", description: "Speaking saved but failed to finalize test. Try again.", variant: "destructive" });
+      } else {
+        toast({ title: "Error", description: "Failed to submit speaking", variant: "destructive" });
+      }
     }
     setIsSubmitting(false);
   };
@@ -336,6 +356,8 @@ export default function BusinessEnglishTestPage() {
           mcLevel: data.mcLevel,
           writingLevel: data.writingLevel,
           sectionResults: data.sectionResults || [],
+          writingFeedback: data.writingFeedback,
+          competencyReport: data.competencyReport,
         });
         setPhase("results");
       }
@@ -362,6 +384,8 @@ export default function BusinessEnglishTestPage() {
           competencyReport: data.competencyReport,
         });
         setPhase("results");
+      } else {
+        toast({ title: "Error", description: data.message || "Failed to complete test", variant: "destructive" });
       }
     } catch (error) {
       toast({ title: "Error", description: "Failed to complete test", variant: "destructive" });
@@ -858,7 +882,7 @@ export default function BusinessEnglishTestPage() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-center gap-2 text-green-600">
                       <CheckCircle className="w-5 h-5" />
-                      <span className="font-medium">Recording complete</span>
+                      <span className="font-medium">{speakingSubmitted ? "Speaking scored successfully" : "Recording complete"}</span>
                     </div>
                     <Button
                       onClick={handleSpeakingSubmit}
@@ -867,9 +891,9 @@ export default function BusinessEnglishTestPage() {
                       data-testid="button-submit-speaking"
                     >
                       {isSubmitting ? (
-                        <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Transcribing and scoring...</>
+                        <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {speakingSubmitted ? "Finalizing..." : "Transcribing and scoring..."}</>
                       ) : (
-                        <>Submit Recording <ArrowRight className="w-4 h-4 ml-2" /></>
+                        <>{speakingSubmitted ? "Complete Test" : "Submit Recording"} <ArrowRight className="w-4 h-4 ml-2" /></>
                       )}
                     </Button>
                   </div>

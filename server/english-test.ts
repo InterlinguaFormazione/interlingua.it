@@ -212,7 +212,13 @@ Respond ONLY with valid JSON:
 
   const content = result.choices[0]?.message?.content;
   if (!content) throw new Error("Empty AI response");
-  const parsed = JSON.parse(content);
+  let parsed: any;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    console.error("Failed to parse writing AI response:", content);
+    return { level: currentLevel, grammar: 50, vocabulary: 50, coherence: 50, taskCompletion: 50, feedback: "AI scoring encountered an issue. Scores are approximate." };
+  }
   const validLevels = ["A0", "A1", "A2", "B1", "B2", "C1"];
   const normalizedLevel = (parsed.level || "").replace(/[^A-C0-2]/g, "").toUpperCase();
   return {
@@ -262,7 +268,13 @@ Respond ONLY with valid JSON:
 
   const content = result.choices[0]?.message?.content;
   if (!content) throw new Error("Empty AI response");
-  const parsed = JSON.parse(content);
+  let parsed: any;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    console.error("Failed to parse speaking AI response:", content);
+    return { level: currentLevel, grammar: 50, vocabulary: 50, coherence: 50, taskCompletion: 50, feedback: "AI scoring encountered an issue. Scores are approximate." };
+  }
   const validLevels = ["A0", "A1", "A2", "B1", "B2", "C1"];
   const normalizedLevel = (parsed.level || "").replace(/[^A-C0-2]/g, "").toUpperCase();
   return {
