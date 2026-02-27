@@ -11,7 +11,7 @@ import { chatWithAI } from "./ai-chat";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalOrder } from "./paypal";
 import { SHOP_PRODUCTS, getProductBySlug, getEffectivePrice } from "@shared/products";
 import { scoreWriting, transcribeAudio, scoreSpeaking, scoreBusinessWriting, scoreBusinessSpeaking } from "./english-test";
-import { getAllQuestions } from "./business-english-questions";
+import { getBusinessEnglishQuestions as getAllQuestions } from "./business-english-questions";
 import {
   calculateProbability, calculateFisherInformation, selectNextQuestion,
   updateTheta, updateStandardError, thetaToCEFR, selfAssessmentToTheta,
@@ -1555,7 +1555,7 @@ export async function registerRoutes(
   app.post("/api/business-english-test/start", async (req, res) => {
     try {
       const { firstName, lastName, email, company, phone, selfAssessedLevel } = req.body;
-      if (!firstName || !lastName || !email || !company || !selfAssessedLevel) {
+      if (!firstName || !lastName || !email || !selfAssessedLevel) {
         return res.status(400).json({ success: false, message: "Missing required fields" });
       }
 
@@ -1572,7 +1572,7 @@ export async function registerRoutes(
         firstName,
         lastName,
         email,
-        company,
+        company: company || "",
         phone: phone || null,
         selfAssessedLevel,
         currentLevel: thetaToCEFR(startingTheta),

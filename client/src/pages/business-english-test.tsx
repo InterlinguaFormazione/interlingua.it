@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Briefcase, CheckCircle, ChevronRight, Loader2, Mic, MicOff, PenTool, Volume2, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight } from "lucide-react";
+import { GraduationCap, CheckCircle, ChevronRight, Loader2, Mic, MicOff, PenTool, Volume2, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 type Phase = "registration" | "self-assessment" | "mc-questions" | "writing" | "speaking" | "results";
@@ -50,16 +50,16 @@ const registrationSchema = z.object({
   firstName: z.string().min(1, "Required"),
   lastName: z.string().min(1, "Required"),
   email: z.string().email("Invalid email"),
-  company: z.string().min(1, "Required"),
+  company: z.string().optional(),
   phone: z.string().optional(),
 });
 
 const CEFR_DESCRIPTIONS: Record<string, { label: string; desc: string }> = {
-  A1: { label: "A1 - Beginner", desc: "I can understand very basic business phrases and introduce myself at work." },
-  A2: { label: "A2 - Elementary", desc: "I can handle simple business conversations and write short emails." },
-  B1: { label: "B1 - Intermediate", desc: "I can participate in meetings and write professional emails on familiar topics." },
-  B2: { label: "B2 - Upper Intermediate", desc: "I can engage in detailed discussions, write reports, and present complex ideas." },
-  C1: { label: "C1 - Advanced", desc: "I can negotiate fluently, write strategic documents, and handle any business situation." },
+  A1: { label: "A1 - Beginner", desc: "I can understand very basic phrases and introduce myself in simple situations." },
+  A2: { label: "A2 - Elementary", desc: "I can handle simple everyday conversations and write short messages." },
+  B1: { label: "B1 - Intermediate", desc: "I can talk about familiar topics, understand the main points of clear texts, and write simple connected texts." },
+  B2: { label: "B2 - Upper Intermediate", desc: "I can engage in detailed discussions, understand complex texts, and write clear essays on a wide range of topics." },
+  C1: { label: "C1 - Advanced", desc: "I can express myself fluently and spontaneously, understand demanding texts, and produce well-structured, detailed writing." },
 };
 
 const SKILL_LABELS: Record<string, string> = {
@@ -381,11 +381,11 @@ export default function BusinessEnglishTestPage() {
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            <Briefcase className="w-4 h-4" />
-            Business English Adaptive Test
+            <GraduationCap className="w-4 h-4" />
+            General English Adaptive Test
           </div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white" data-testid="text-page-title">
-            Business English Proficiency Assessment
+            English Proficiency Assessment
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-2">
             Powered by Computerized Adaptive Testing (CAT) with IRT
@@ -471,8 +471,8 @@ export default function BusinessEnglishTestPage() {
                   )} />
                   <FormField control={form.control} name="company" render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Company *</FormLabel>
-                      <FormControl><Input {...field} data-testid="input-company" placeholder="Company name" /></FormControl>
+                      <FormLabel>Company / School (optional)</FormLabel>
+                      <FormControl><Input {...field} data-testid="input-company" placeholder="Company or school name" /></FormControl>
                       <FormMessage />
                     </FormItem>
                   )} />
@@ -497,7 +497,7 @@ export default function BusinessEnglishTestPage() {
             <CardHeader className="text-center">
               <CardTitle className="text-2xl">Self-Assessment</CardTitle>
               <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
-                How would you rate your current Business English level?
+                How would you rate your current English level?
               </p>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -614,7 +614,7 @@ export default function BusinessEnglishTestPage() {
                 <PenTool className="w-5 h-5 text-blue-600" />
                 <span className="font-medium text-blue-700 dark:text-blue-400">Writing Task</span>
               </div>
-              <CardTitle className="text-xl">Written Business Communication</CardTitle>
+              <CardTitle className="text-xl">Writing Task</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="bg-blue-50 dark:bg-blue-900/30 rounded-xl p-4 border border-blue-200 dark:border-blue-800" data-testid="text-writing-prompt">
@@ -660,7 +660,7 @@ export default function BusinessEnglishTestPage() {
                 <Mic className="w-5 h-5 text-purple-600" />
                 <span className="font-medium text-purple-700 dark:text-purple-400">Speaking Task</span>
               </div>
-              <CardTitle className="text-xl">Spoken Business Communication</CardTitle>
+              <CardTitle className="text-xl">Speaking Task</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="bg-purple-50 dark:bg-purple-900/30 rounded-xl p-4 border border-purple-200 dark:border-purple-800" data-testid="text-speaking-prompt">
@@ -744,7 +744,7 @@ export default function BusinessEnglishTestPage() {
           <div className="space-y-6" data-testid="section-results">
             <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden">
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-10 text-center text-white">
-                <p className="text-blue-100 text-sm mb-3 uppercase tracking-wider">Your Business English Level</p>
+                <p className="text-blue-100 text-sm mb-3 uppercase tracking-wider">Your English Level</p>
                 <div className="text-7xl font-bold mb-2" data-testid="text-final-level">{results.finalLevel}</div>
                 <p className="text-blue-200">CEFR Level</p>
               </div>

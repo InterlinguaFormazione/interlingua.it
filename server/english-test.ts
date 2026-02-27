@@ -178,14 +178,14 @@ export interface BusinessEnglishScore {
 export async function scoreBusinessWriting(prompt: string, response: string, currentLevel: string): Promise<BusinessEnglishScore> {
   const openai = getOpenAI();
 
-  const systemPrompt = `You are an expert Business English examiner. Evaluate a candidate's written response for a Business English placement test.
+  const systemPrompt = `You are an expert English language examiner. Evaluate a candidate's written response for a General English placement test.
 The candidate's estimated CEFR level is ${currentLevel}.
 
 Score these four dimensions from 0-100:
-- grammar: Grammar accuracy — correctness, complexity, and appropriateness for business context
-- vocabulary: Vocabulary range — business terminology, collocations, register
-- coherence: Coherence — organization, logical flow, professional tone
-- taskCompletion: Task completion — effectiveness, relevance, completeness
+- grammar: Grammar accuracy — correctness, complexity, and range of structures used
+- vocabulary: Vocabulary range — variety, appropriateness, collocations
+- coherence: Coherence — organization, logical flow, use of linking words
+- taskCompletion: Task completion — relevance to the prompt, completeness, adequate length
 
 Then assign an overall CEFR level: A0, A1, A2, B1, B2, or C1.
 Provide 2-3 sentences of constructive feedback.
@@ -226,13 +226,13 @@ Respond ONLY with valid JSON:
 export async function scoreBusinessSpeaking(prompt: string, transcript: string, currentLevel: string): Promise<BusinessEnglishScore> {
   const openai = getOpenAI();
 
-  const systemPrompt = `You are an expert Business English examiner. Evaluate a candidate's spoken response (transcribed) for a Business English placement test.
+  const systemPrompt = `You are an expert English language examiner. Evaluate a candidate's spoken response (transcribed) for a General English placement test.
 The candidate's estimated CEFR level is ${currentLevel}.
 
 Score these four dimensions from 0-100:
-- grammar: Grammar accuracy — correctness and complexity in spoken business English
-- vocabulary: Vocabulary range — business terminology, fluency of expression
-- coherence: Coherence — logical flow, clarity of argument, professional register
+- grammar: Grammar accuracy — correctness and complexity in spoken English
+- vocabulary: Vocabulary range — variety, appropriateness, fluency of expression
+- coherence: Coherence — logical flow, clarity of ideas, appropriate register
 - taskCompletion: Task completion — addressing the prompt fully, relevant content
 
 Then assign an overall CEFR level: A0, A1, A2, B1, B2, or C1.

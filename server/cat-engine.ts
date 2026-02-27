@@ -164,24 +164,24 @@ export function calculateFinalLevel(
 
 export function getWritingPrompt(level: string): string {
   const prompts: Record<string, string> = {
-    A0: "Write a very simple email saying hello to a colleague.",
-    A1: "Write a short email to introduce yourself to a new colleague. Include your name, job title, and department.",
-    A2: "Write an email to your manager asking for time off next week for a personal appointment.",
-    B1: "Write an email to a client confirming a meeting next Tuesday at 2 PM.",
-    B2: "Write an email to a supplier expressing concern about a delayed shipment.",
-    C1: "Write an email to your team announcing a strategic reorganization of the department.",
+    A0: "Write 3-4 simple sentences about yourself: your name, where you live, and one thing you like.",
+    A1: "Write a short message to a friend inviting them to a party at your house this Saturday. Include the time and your address.",
+    A2: "Write an email to a hotel to book a room for two nights next month. Ask about the price and breakfast.",
+    B1: "Write a letter to a friend describing a recent holiday you took. Include where you went, what you did, and whether you enjoyed it.",
+    B2: "Write an essay discussing the advantages and disadvantages of social media for young people today.",
+    C1: "Write a well-structured opinion essay on whether governments should invest more in renewable energy. Support your argument with examples.",
   };
   return prompts[level] || prompts.B1;
 }
 
 export function getSpeakingPrompt(level: string): string {
   const prompts: Record<string, string> = {
-    A0: "Tell me your name and what you do at work. Use very simple words.",
-    A1: "Describe your typical workday in simple terms.",
-    A2: "Explain what your company does and what products or services it offers.",
-    B1: "Describe a challenge you faced at work recently and how you resolved it.",
-    B2: "Discuss the advantages and disadvantages of remote work for your industry.",
-    C1: "Analyze how digital transformation is affecting your sector and propose strategies for staying competitive.",
+    A0: "Tell me your name and where you are from. Use very simple words.",
+    A1: "Describe your daily routine. What do you do in the morning, afternoon, and evening?",
+    A2: "Talk about your favourite hobby or free-time activity. Why do you enjoy it?",
+    B1: "Describe an interesting trip or experience you had recently and explain why it was memorable.",
+    B2: "Discuss the advantages and disadvantages of living in a big city compared to a small town.",
+    C1: "Analyse how technology has changed the way people communicate and discuss whether these changes are mostly positive or negative.",
   };
   return prompts[level] || prompts.B1;
 }

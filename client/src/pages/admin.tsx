@@ -193,7 +193,7 @@ interface BeSessionDetail {
   }>;
 }
 
-function BusinessEnglishTab({ token }: { token: string }) {
+function EnglishAdaptiveTab({ token }: { token: string }) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [filterCompany, setFilterCompany] = useState("");
   const [filterLevel, setFilterLevel] = useState("");
@@ -244,7 +244,7 @@ function BusinessEnglishTab({ token }: { token: string }) {
         <Card>
           <CardHeader>
             <CardTitle>{detail.session.firstName} {detail.session.lastName}</CardTitle>
-            <CardDescription>{detail.session.email} - {detail.session.company}</CardDescription>
+            <CardDescription>{detail.session.email}{detail.session.company ? ` - ${detail.session.company}` : ""}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-3 gap-4 text-center">
@@ -1052,7 +1052,7 @@ export default function AdminPage() {
               </TabsTrigger>
               <TabsTrigger value="business-english" data-testid="tab-business-english">
                 <Briefcase className="w-4 h-4 mr-2" />
-                BE Test
+                Adaptive Test
               </TabsTrigger>
               {isAdmin && (
                 <TabsTrigger value="users" data-testid="tab-users">
@@ -1243,11 +1243,11 @@ export default function AdminPage() {
             <TabsContent value="business-english">
               <Card>
                 <CardHeader>
-                  <CardTitle>Business English Test Results</CardTitle>
+                  <CardTitle>English Adaptive Test Results</CardTitle>
                   <CardDescription>Adaptive test results with IRT audit trail</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <BusinessEnglishTab token={token} />
+                  <EnglishAdaptiveTab token={token} />
                 </CardContent>
               </Card>
             </TabsContent>

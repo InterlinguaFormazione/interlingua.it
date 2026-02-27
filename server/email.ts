@@ -549,13 +549,13 @@ export async function sendBusinessEnglishResultEmail(data: {
   sectionResults: Array<{ sectionName: string; cefrLevel: string | null; accuracy: number | null }>;
 }): Promise<void> {
   if (!ses) {
-    console.warn("SES not configured — business English test result email not sent");
+    console.warn("SES not configured — English adaptive test result email not sent");
     return;
   }
 
   const adminEmail = process.env.ADMIN_EMAIL;
   if (!adminEmail) {
-    console.warn("ADMIN_EMAIL not set — business English test result email not sent");
+    console.warn("ADMIN_EMAIL not set — English adaptive test result email not sent");
     return;
   }
 
@@ -580,8 +580,8 @@ export async function sendBusinessEnglishResultEmail(data: {
   const htmlBody = `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;">
       <div style="background:linear-gradient(135deg,#1e40af,#3b82f6);padding:24px;text-align:center;">
-        <h1 style="color:#fff;margin:0;font-size:22px;">Business English Test Result</h1>
-        <p style="color:#dbeafe;margin:8px 0 0;font-size:14px;">${data.candidateName} - ${data.company}</p>
+        <h1 style="color:#fff;margin:0;font-size:22px;">English Adaptive Test Result</h1>
+        <p style="color:#dbeafe;margin:8px 0 0;font-size:14px;">${data.candidateName}${data.company ? " - " + data.company : ""}</p>
       </div>
       <div style="padding:24px;">
         <div style="text-align:center;margin-bottom:24px;">
@@ -590,7 +590,7 @@ export async function sendBusinessEnglishResultEmail(data: {
         </div>
         <table style="width:100%;margin-bottom:16px;">
           <tr><td style="color:#666;">Email:</td><td>${data.candidateEmail}</td></tr>
-          <tr><td style="color:#666;">Company:</td><td>${data.company}</td></tr>
+          ${data.company ? `<tr><td style="color:#666;">Company:</td><td>${data.company}</td></tr>` : ""}
           ${data.phone ? `<tr><td style="color:#666;">Phone:</td><td>${data.phone}</td></tr>` : ""}
           <tr><td style="color:#666;">MC Accuracy:</td><td>${data.mcAccuracy}</td></tr>
         </table>
@@ -611,7 +611,7 @@ export async function sendBusinessEnglishResultEmail(data: {
     Source: FROM_EMAIL,
     Destination: { ToAddresses: [adminEmail] },
     Message: {
-      Subject: { Data: `Business English Test: ${data.candidateName} (${data.company}) - ${data.finalLevel}`, Charset: "UTF-8" },
+      Subject: { Data: `English Test: ${data.candidateName}${data.company ? " (" + data.company + ")" : ""} - ${data.finalLevel}`, Charset: "UTF-8" },
       Body: { Html: { Data: htmlBody, Charset: "UTF-8" } },
     },
     ReplyToAddresses: [data.candidateEmail],
@@ -629,7 +629,7 @@ export async function sendBusinessEnglishConfirmationEmail(email: string, firstN
         <h1 style="color:#fff;margin:0;font-size:20px;">Grazie, ${firstName}!</h1>
       </div>
       <div style="padding:24px;">
-        <p>Thank you for completing the Business English Adaptive Test.</p>
+        <p>Thank you for completing the English Adaptive Test.</p>
         <p>Your results have been submitted and will be reviewed by our team. You will receive detailed feedback from the school shortly.</p>
         <p style="color:#666;font-size:13px;margin-top:24px;">Best regards,<br/>Interlingua / SkillCraft</p>
       </div>
@@ -639,7 +639,7 @@ export async function sendBusinessEnglishConfirmationEmail(email: string, firstN
     Source: FROM_EMAIL,
     Destination: { ToAddresses: [email] },
     Message: {
-      Subject: { Data: "Business English Test - Thank You", Charset: "UTF-8" },
+      Subject: { Data: "English Adaptive Test - Thank You", Charset: "UTF-8" },
       Body: { Html: { Data: htmlBody, Charset: "UTF-8" } },
     },
   });
