@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import { motion } from "framer-motion";
-import { Mail, Loader2, CheckCircle2, ArrowRight } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { Mail, Loader2, CheckCircle2, ArrowRight, Users, Shield, Sparkles } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -17,11 +17,18 @@ const newsletterFormSchema = insertNewsletterSchema.extend({
 
 type NewsletterFormData = InsertNewsletter;
 
+const trustIndicators = [
+  { icon: Users, label: "2.500+ iscritti", testId: "text-newsletter-subscribers" },
+  { icon: Shield, label: "Privacy garantita", testId: "text-newsletter-privacy" },
+  { icon: Sparkles, label: "Contenuti esclusivi", testId: "text-newsletter-exclusive" },
+];
+
 export function NewsletterSection() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const formLoadTime = useRef(Date.now());
   const { toast } = useToast();
+  const prefersReducedMotion = useReducedMotion();
 
   const form = useForm<NewsletterFormData>({
     resolver: zodResolver(newsletterFormSchema),
@@ -61,11 +68,44 @@ export function NewsletterSection() {
   };
 
   return (
-    <section className="py-16 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary to-accent opacity-90" />
+    <section className="py-20 md:py-28 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-accent opacity-90" />
+
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIxIi8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
+
+      {!prefersReducedMotion && (
+        <>
+          <motion.div
+            className="absolute -top-20 -left-20 w-72 h-72 rounded-full bg-white/10 blur-3xl pointer-events-none"
+            animate={{
+              x: [0, 40, 0],
+              y: [0, 30, 0],
+              scale: [1, 1.2, 1],
+            }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute -bottom-16 -right-16 w-96 h-96 rounded-full bg-accent/20 blur-3xl pointer-events-none"
+            animate={{
+              x: [0, -30, 0],
+              y: [0, -20, 0],
+              scale: [1, 1.15, 1],
+            }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-white/5 blur-3xl pointer-events-none"
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.3, 0.6, 0.3],
+            }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </>
+      )}
+
       <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 animate-[shimmer_3s_ease-in-out_infinite]" style={{ backgroundSize: "200% 100%" }} />
-      
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -74,31 +114,58 @@ export function NewsletterSection() {
           transition={{ duration: 0.5 }}
           className="max-w-2xl mx-auto text-center"
         >
-          <div className="inline-flex items-center justify-center p-3 rounded-full bg-white/10 mb-6">
-            <Mail className="h-6 w-6 text-white" />
-          </div>
-          
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
+          <motion.div
+            className="inline-flex items-center justify-center p-4 rounded-full bg-white/10 backdrop-blur-sm mb-6 border border-white/20"
+            animate={{ boxShadow: ["0 0 20px rgba(255,255,255,0.1)", "0 0 40px rgba(255,255,255,0.2)", "0 0 20px rgba(255,255,255,0.1)"] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <Mail className="h-7 w-7 text-white" />
+          </motion.div>
+
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
             Resta Aggiornato
           </h2>
-          <p className="text-white/80 mb-8">
+          <p className="text-white/80 mb-10 text-lg max-w-xl mx-auto leading-relaxed">
             Iscriviti alla newsletter per ricevere novità sui corsi, offerte esclusive e consigli per la tua formazione.
           </p>
 
           {isSubmitted ? (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center justify-center gap-3 p-4 rounded-xl bg-white/10"
+              initial={{ opacity: 0, scale: 0.8, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.6, type: "spring", stiffness: 200 }}
+              className="flex flex-col items-center gap-4 p-8 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20"
             >
-              <CheckCircle2 className="h-6 w-6 text-white" />
-              <span className="text-white font-medium">Grazie per l'iscrizione!</span>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
+                className="p-3 rounded-full bg-white/20"
+              >
+                <CheckCircle2 className="h-8 w-8 text-white" />
+              </motion.div>
+              <motion.span
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="text-white font-semibold text-xl"
+              >
+                Grazie per l'iscrizione!
+              </motion.span>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 }}
+                className="text-white/70 text-sm"
+              >
+                Controlla la tua casella email per confermare.
+              </motion.p>
             </motion.div>
           ) : (
             <>
               <Form {...form}>
-                <form 
-                  onSubmit={form.handleSubmit(onSubmit)} 
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
                   className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto"
                 >
                   <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true" tabIndex={-1}>
@@ -121,7 +188,7 @@ export function NewsletterSection() {
                           <Input
                             type="email"
                             placeholder="La tua email"
-                            className="h-14 text-base rounded-xl bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:bg-white/20"
+                            className="h-14 text-base rounded-xl bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:bg-white/20 backdrop-blur-sm shadow-lg shadow-black/10"
                             {...field}
                             data-testid="input-newsletter-email"
                           />
@@ -134,7 +201,7 @@ export function NewsletterSection() {
                     type="submit"
                     size="lg"
                     variant="secondary"
-                    className="h-14 text-base rounded-xl bg-primary-foreground text-primary"
+                    className="h-14 text-base rounded-xl bg-primary-foreground text-primary shadow-lg shadow-black/10"
                     disabled={mutation.isPending}
                     data-testid="button-newsletter-submit"
                   >
@@ -149,7 +216,31 @@ export function NewsletterSection() {
                   </Button>
                 </form>
               </Form>
-              <p className="mt-4 text-sm text-white/60">Nessuno spam, solo contenuti utili</p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="flex flex-wrap items-center justify-center gap-6 mt-8"
+              >
+                {trustIndicators.map((item, index) => (
+                  <motion.div
+                    key={item.label}
+                    initial={{ opacity: 0, y: 8 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
+                    className="flex items-center gap-2 text-white/70"
+                    data-testid={item.testId}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span className="text-sm font-medium">{item.label}</span>
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              <p className="mt-4 text-sm text-white/50">Nessuno spam, solo contenuti utili</p>
             </>
           )}
         </motion.div>

@@ -20,7 +20,10 @@ import {
   Award,
   BookOpen,
   ExternalLink,
-  ShoppingCart
+  ShoppingCart,
+  Target,
+  Sparkles,
+  GraduationCap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -403,6 +406,24 @@ function slugify(text: string): string {
     .trim();
 }
 
+const categoryGradients: Record<string, string> = {
+  lingue: "from-purple-600/90 via-purple-500/80 to-violet-500/70",
+  "competenze-trasversali": "from-teal-600/90 via-teal-500/80 to-emerald-500/70",
+  management: "from-indigo-600/90 via-indigo-500/80 to-blue-500/70",
+  business: "from-orange-600/90 via-orange-500/80 to-amber-500/70",
+  digitale: "from-blue-600/90 via-blue-500/80 to-cyan-500/70",
+  "formazione-esperienziale": "from-green-600/90 via-green-500/80 to-emerald-500/70",
+};
+
+const sectionVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+  }),
+};
+
 export default function CourseDetailPage() {
   const params = useParams();
   const courseId = params.id as string;
@@ -429,10 +450,11 @@ export default function CourseDetailPage() {
 
   const CategoryIcon = categoryIcons[course.category] || BookOpen;
   const courseImage = categoryImages[course.category];
+  const heroGradient = categoryGradients[course.category] || "from-primary/90 via-primary/80 to-primary/70";
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b">
+      <header className="sticky top-0 z-[999] bg-background/80 backdrop-blur-md border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <Link href="/">
             <Button variant="ghost" className="gap-2" data-testid="button-back-courses">
@@ -447,7 +469,7 @@ export default function CourseDetailPage() {
         </div>
       </header>
 
-      <div className="relative h-64 md:h-80 overflow-hidden">
+      <div className="relative h-80 md:h-[420px] overflow-hidden">
         <img 
           src={courseImage} 
           alt={course.title}
@@ -455,81 +477,157 @@ export default function CourseDetailPage() {
           loading="lazy"
           decoding="async"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+        <div className={`absolute inset-0 bg-gradient-to-br ${heroGradient}`} />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
+        <div className="absolute top-6 right-6 w-32 h-32 md:w-48 md:h-48 rounded-full bg-white/5 blur-2xl pointer-events-none" />
+        <div className="absolute bottom-12 left-12 w-24 h-24 md:w-36 md:h-36 rounded-full bg-white/5 blur-2xl pointer-events-none" />
+
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="absolute bottom-0 left-0 right-0 p-6 md:p-10"
+        >
           <div className="container mx-auto">
-            <Badge className={`bg-gradient-to-r ${course.categoryColor} text-white border-0 mb-3`}>
-              {course.categoryTitle}
-            </Badge>
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">{course.title}</h1>
-            <p className="text-muted-foreground max-w-2xl">{course.description}</p>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+            >
+              <Badge className={`bg-white/20 text-white border border-white/30 backdrop-blur-sm mb-4`}>
+                <CategoryIcon className="w-3.5 h-3.5 mr-1.5" />
+                {course.categoryTitle}
+              </Badge>
+            </motion.div>
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-3 tracking-tight leading-tight">{course.title}</h1>
+            <p className="text-white/80 max-w-2xl text-base md:text-lg leading-relaxed">{course.description}</p>
+
+            <div className="flex flex-wrap items-center gap-4 mt-5">
+              <div className="flex items-center gap-2 text-white/90 text-sm">
+                <Clock className="w-4 h-4" />
+                <span>{course.duration}</span>
+              </div>
+              <div className="flex items-center gap-2 text-white/90 text-sm">
+                <Award className="w-4 h-4" />
+                <span>Certificato incluso</span>
+              </div>
+              <div className="flex items-center gap-2 text-white/90 text-sm">
+                <Users className="w-4 h-4" />
+                <span>Gruppo o individuale</span>
+              </div>
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
+      <main className="container mx-auto px-4 py-10 md:py-14">
+        <div className="grid lg:grid-cols-3 gap-10">
+          <div className="lg:col-span-2 space-y-10">
             <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              custom={0}
+              initial="hidden"
+              animate="visible"
+              variants={sectionVariants}
             >
-              <h2 className="text-2xl font-bold mb-4">Descrizione</h2>
-              <p className="text-muted-foreground leading-relaxed">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex items-center justify-center w-10 h-10 rounded-md bg-primary/10 dark:bg-primary/20">
+                  <BookOpen className="w-5 h-5 text-primary" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight">Descrizione</h2>
+              </div>
+              <p className="text-muted-foreground leading-relaxed text-base">
                 {course.longDescription}
               </p>
             </motion.section>
 
             <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
+              custom={1}
+              initial="hidden"
+              animate="visible"
+              variants={sectionVariants}
             >
-              <h2 className="text-2xl font-bold mb-4">Cosa Include</h2>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex items-center justify-center w-10 h-10 rounded-md bg-primary/10 dark:bg-primary/20">
+                  <CheckCircle className="w-5 h-5 text-primary" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight">Cosa Include</h2>
+              </div>
               <div className="grid sm:grid-cols-2 gap-3">
                 {course.includes.map((item, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-muted-foreground">{item}</span>
-                  </div>
+                  <motion.div
+                    key={index}
+                    custom={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 + index * 0.05, duration: 0.3 }}
+                    className="flex items-start gap-3 p-3 rounded-md bg-muted/50 dark:bg-muted/30"
+                  >
+                    <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-muted-foreground">{item}</span>
+                  </motion.div>
                 ))}
               </div>
             </motion.section>
 
             <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              custom={2}
+              initial="hidden"
+              animate="visible"
+              variants={sectionVariants}
             >
-              <h2 className="text-2xl font-bold mb-4">Metodologia</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                {course.methodology}
-              </p>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex items-center justify-center w-10 h-10 rounded-md bg-primary/10 dark:bg-primary/20">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight">Metodologia</h2>
+              </div>
+              <Card className="p-5">
+                <p className="text-muted-foreground leading-relaxed text-base">
+                  {course.methodology}
+                </p>
+              </Card>
             </motion.section>
 
             <motion.section
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              custom={3}
+              initial="hidden"
+              animate="visible"
+              variants={sectionVariants}
             >
-              <h2 className="text-2xl font-bold mb-4">A Chi è Rivolto</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                {course.targetAudience}
-              </p>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="flex items-center justify-center w-10 h-10 rounded-md bg-primary/10 dark:bg-primary/20">
+                  <Target className="w-5 h-5 text-primary" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight">A Chi è Rivolto</h2>
+              </div>
+              <Card className="p-5">
+                <p className="text-muted-foreground leading-relaxed text-base">
+                  {course.targetAudience}
+                </p>
+              </Card>
             </motion.section>
 
             {course.requirements.length > 0 && (
               <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
+                custom={4}
+                initial="hidden"
+                animate="visible"
+                variants={sectionVariants}
               >
-                <h2 className="text-2xl font-bold mb-4">Requisiti</h2>
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-md bg-primary/10 dark:bg-primary/20">
+                    <GraduationCap className="w-5 h-5 text-primary" />
+                  </div>
+                  <h2 className="text-2xl font-bold tracking-tight">Requisiti</h2>
+                </div>
                 <ul className="space-y-2">
                   {course.requirements.map((req, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span className="text-primary">•</span>
-                      <span className="text-muted-foreground">{req}</span>
+                    <li key={index} className="flex items-start gap-3 p-3 rounded-md bg-muted/50 dark:bg-muted/30">
+                      <span className="flex items-center justify-center w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-semibold flex-shrink-0 mt-0.5">
+                        {index + 1}
+                      </span>
+                      <span className="text-sm text-muted-foreground">{req}</span>
                     </li>
                   ))}
                 </ul>
@@ -539,70 +637,78 @@ export default function CourseDetailPage() {
 
           <div className="lg:col-span-1">
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
               className="sticky top-24"
             >
-              <Card className="p-6">
-                <div className="text-center mb-6">
-                  <div className="text-3xl font-bold text-primary mb-2">
-                    {course.price}
-                  </div>
-                  <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                    <Clock className="w-4 h-4" />
-                    {course.duration}
+              <Card className="overflow-visible">
+                <div className={`p-6 bg-gradient-to-br ${heroGradient} rounded-t-md`}>
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-white mb-1 tracking-tight">
+                      {course.price}
+                    </div>
+                    <div className="flex items-center justify-center gap-2 text-white/80 text-sm">
+                      <Clock className="w-4 h-4" />
+                      {course.duration}
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {course.features.map((feature) => (
-                    <Badge key={feature} variant="secondary" className="text-xs">
-                      {feature}
-                    </Badge>
-                  ))}
-                </div>
+                <div className="p-6">
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {course.features.map((feature) => (
+                      <Badge key={feature} variant="secondary" className="text-xs">
+                        {feature}
+                      </Badge>
+                    ))}
+                  </div>
 
-                <div className="space-y-3">
-                  {course.purchaseUrl && (
-                    <a 
-                      href={course.purchaseUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="block"
-                    >
-                      <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" size="lg" data-testid="button-purchase-course">
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Acquista Online
-                        <ExternalLink className="w-3 h-3 ml-2" />
+                  <div className="space-y-3">
+                    {course.purchaseUrl && (
+                      <a 
+                        href={course.purchaseUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block"
+                      >
+                        <Button className="w-full bg-accent text-accent-foreground border-accent" size="lg" data-testid="button-purchase-course">
+                          <ShoppingCart className="w-4 h-4 mr-2" />
+                          Acquista Online
+                          <ExternalLink className="w-3 h-3 ml-2" />
+                        </Button>
+                      </a>
+                    )}
+                    <Link href="/#contact">
+                      <Button className="w-full" variant={course.purchaseUrl ? "outline" : "default"} size="lg" data-testid="button-request-info">
+                        <Mail className="w-4 h-4 mr-2" />
+                        Richiedi Informazioni
                       </Button>
-                    </a>
-                  )}
-                  <Link href="/#contact">
-                    <Button className="w-full" variant={course.purchaseUrl ? "outline" : "default"} size="lg" data-testid="button-request-info">
-                      <Mail className="w-4 h-4 mr-2" />
-                      Richiedi Informazioni
+                    </Link>
+                    <Button variant="outline" className="w-full" size="lg" data-testid="button-call">
+                      <Phone className="w-4 h-4 mr-2" />
+                      Chiamaci
                     </Button>
-                  </Link>
-                  <Button variant="outline" className="w-full" size="lg" data-testid="button-call">
-                    <Phone className="w-4 h-4 mr-2" />
-                    Chiamaci
-                  </Button>
-                </div>
+                  </div>
 
-                <div className="mt-6 pt-6 border-t">
-                  <h3 className="font-semibold mb-3">Le nostre sedi</h3>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    <div className="flex items-start gap-2">
-                      <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                      <span>Vicenza - Centro Storico</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                      <span>Thiene</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Monitor className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                      <span>Online via Zoom</span>
+                  <div className="mt-6 pt-6 border-t">
+                    <h3 className="font-semibold mb-3 flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-primary" />
+                      Le nostre sedi
+                    </h3>
+                    <div className="space-y-2 text-sm text-muted-foreground">
+                      <div className="flex items-start gap-2">
+                        <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                        <span>Vicenza - Centro Storico</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                        <span>Thiene</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Monitor className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                        <span>Online via Zoom</span>
+                      </div>
                     </div>
                   </div>
                 </div>

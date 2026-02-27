@@ -206,6 +206,16 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - Email suspension feature for holiday periods
 - PayPal integration: uses `@paypal/paypal-server-sdk` with sandbox/production environment switching
 
+## Visual Design System
+- **Premium glassmorphism**: Stat cards, feature cards, and hero elements use backdrop-blur with gradient borders
+- **Animated gradient orbs**: Floating blurred orbs in hero, newsletter, contact, blog, and course detail sections (all respect prefers-reduced-motion)
+- **Dot grid patterns**: Subtle radial-gradient dot overlays on hero, features, courses, and contact sections
+- **Gradient border reveal**: Cards in courses, features, and contact sections reveal gradient borders on hover
+- **Shimmer effects**: CTA buttons and newsletter background use shimmer animations
+- **Framer Motion throughout**: All sections use staggered entrance animations with intersection observer
+- **Brand colors**: Primary HSL `222 67% 40%`, Accent HSL `20 91% 53%`
+- **Accessibility**: All infinite animations gated by `useReducedMotion()` from framer-motion
+
 ## Key Design Decisions
 - Languages are de-emphasized (listed last, being phased out)
 - AI teaching is very prominent (ChatGPT, Copilot, automation explicitly mentioned)
