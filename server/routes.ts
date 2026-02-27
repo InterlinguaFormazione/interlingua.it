@@ -1568,9 +1568,11 @@ export async function registerRoutes(
       const isCorrect = answer === question.correctAnswer;
       const oldTheta = session.currentTheta ?? 0;
       const oldSE = session.standardError ?? 100;
-      const newTheta = updateTheta(oldTheta, isCorrect, oldSE, question.difficulty ?? 0, question.discrimination ?? 100);
-      const newSE = updateStandardError(oldSE, newTheta, question.difficulty ?? 0, question.discrimination ?? 100);
-      const info = calculateFisherInformation(oldTheta, question.difficulty ?? 0, question.discrimination ?? 100);
+      const diff = question.difficulty ?? 0;
+      const disc = question.discrimination ?? 100;
+      const newTheta = updateTheta(oldTheta, isCorrect, oldSE, diff, disc);
+      const newSE = updateStandardError(oldSE, oldTheta, diff, disc);
+      const info = calculateFisherInformation(oldTheta, diff, disc);
 
       await storage.createBeResponse({
         sessionId,

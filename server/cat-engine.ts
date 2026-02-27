@@ -99,46 +99,6 @@ export function selfAssessmentToTheta(level: string): number {
   return SELF_ASSESSMENT_THETA[level] ?? 0;
 }
 
-export function checkPhaseTransitions(
-  totalQuestions: number,
-  correctAnswers: number,
-  currentLevel: string,
-  questionsAtCurrentLevel: number
-): { newLevel: string; phaseComplete: boolean } {
-  const levelIdx = LEVEL_NUMERIC[currentLevel] ?? 1;
-
-  if (totalQuestions <= 9) {
-    if (totalQuestions === 2) {
-      if (correctAnswers === 2 && levelIdx < 5) return { newLevel: NUMERIC_LEVEL[levelIdx + 1], phaseComplete: false };
-      if (correctAnswers === 0 && levelIdx > 0) return { newLevel: NUMERIC_LEVEL[levelIdx - 1], phaseComplete: false };
-    }
-    if (totalQuestions === 3) {
-      if (correctAnswers === 3 && levelIdx < 5) return { newLevel: NUMERIC_LEVEL[levelIdx + 1], phaseComplete: false };
-      if (correctAnswers === 0 && levelIdx > 0) return { newLevel: NUMERIC_LEVEL[levelIdx - 1], phaseComplete: false };
-    }
-    if (totalQuestions === 6) {
-      if (correctAnswers >= 5 && levelIdx < 5) return { newLevel: NUMERIC_LEVEL[levelIdx + 1], phaseComplete: false };
-      if (correctAnswers <= 1 && levelIdx > 0) return { newLevel: NUMERIC_LEVEL[levelIdx - 1], phaseComplete: false };
-    }
-    if (totalQuestions === 9) {
-      if (correctAnswers >= 7 && levelIdx < 5) return { newLevel: NUMERIC_LEVEL[levelIdx + 1], phaseComplete: false };
-      if (correctAnswers <= 3 && levelIdx > 0) return { newLevel: NUMERIC_LEVEL[levelIdx - 1], phaseComplete: false };
-    }
-  } else if (totalQuestions <= 15) {
-    if (totalQuestions >= 14) {
-      const accuracy = correctAnswers / totalQuestions;
-      if (accuracy >= 0.8 && levelIdx < 5) return { newLevel: NUMERIC_LEVEL[levelIdx + 1], phaseComplete: false };
-      if (accuracy <= 0.2 && levelIdx > 0) return { newLevel: NUMERIC_LEVEL[levelIdx - 1], phaseComplete: false };
-    }
-  } else {
-    if (questionsAtCurrentLevel >= 8) {
-      return { newLevel: currentLevel, phaseComplete: true };
-    }
-  }
-
-  return { newLevel: currentLevel, phaseComplete: false };
-}
-
 export function checkA0HardFail(consecutiveIncorrectA1: number, currentLevel: string): boolean {
   return currentLevel === "A1" && consecutiveIncorrectA1 >= 6;
 }
