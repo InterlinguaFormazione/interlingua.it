@@ -498,7 +498,7 @@ function CoachingContactForm({ packageTitle, gradient }: { packageTitle: string;
         {submitted && errors.gdpr && <p className="text-xs text-destructive ml-7">{errors.gdpr}</p>}
       </div>
       <Button type="submit" disabled={mutation.isPending} className={`w-full h-12 text-base rounded-xl bg-gradient-to-r ${gradient} hover:opacity-90 text-white font-bold shadow-lg`} data-testid="button-coaching-submit">
-        {mutation.isPending ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Invio in corso...</>) : (<><Send className="w-4 h-4 mr-2" />Richiedi la Tua Consulenza</>)}
+        {mutation.isPending ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Invio in corso...</>) : (<><Send className="w-4 h-4 mr-2" />Richiedi Informazioni</>)}
       </Button>
     </form>
   );
@@ -594,7 +594,7 @@ function PackageCard({ pkg, index }: { pkg: typeof packages[0]; index: number })
                   data-testid={`button-coaching-toggle-form-${pkg.id}`}
                 >
                   <Mail className="w-4 h-4 mr-2" />
-                  Prenota la Tua Consulenza
+                  Richiedi Informazioni
                   {formOpen ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
                 </Button>
               </div>
@@ -719,7 +719,7 @@ export default function LanguageCoachingPage() {
                 {[
                   { icon: Shield, text: "Coach certificati madrelingua" },
                   { icon: Target, text: "Percorsi 100% personalizzati" },
-                  { icon: Lightbulb, text: "Consulenza iniziale personalizzata" },
+                  { icon: Lightbulb, text: "Percorso su misura per te" },
                 ].map((item, i) => (
                   <div key={i} className="fi-glass-card px-4 py-2.5 rounded-full flex items-center gap-2">
                     <item.icon className="w-4 h-4 text-amber-300" />
@@ -900,7 +900,7 @@ export default function LanguageCoachingPage() {
                   Il fatto che tu sia arrivato fin qui dice qualcosa di importante su di te. Dice che sei pronto per un livello diverso. Che non ti accontenti di 'cavartela'. Che vuoi padroneggiare la lingua con la stessa sicurezza con cui padroneggi il tuo lavoro.
                 </p>
                 <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-2xl mx-auto">
-                  La consulenza iniziale è una conversazione dedicata per capire dove sei, dove vuoi arrivare, e quale percorso può portarti lì nel modo più naturale ed efficace.
+                  Contattaci per scoprire il percorso più adatto a te: ti aiuteremo a capire dove sei, dove vuoi arrivare, e come raggiungerlo nel modo più naturale ed efficace.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button
@@ -910,7 +910,7 @@ export default function LanguageCoachingPage() {
                     data-testid="button-coaching-cta-bottom"
                   >
                     <Sparkles className="w-5 h-5 mr-2" />
-                    Prenota la Tua Consulenza
+                    Richiedi Informazioni
                   </Button>
                   <Link href="/formazione-in-presenza">
                     <Button size="lg" variant="outline" className="text-base px-8 py-6 rounded-xl" data-testid="button-coaching-corsi">
