@@ -31,6 +31,8 @@ import fullImmersionImage from "@assets/Full-Immersion-Workshop-di-Lingua-Ingles
 import managementImage from "@assets/management-leadership_1772143822898.webp";
 import courseItalianImage from "@/assets/images/course-italian.jpg";
 
+const LIVE_SITE = "https://skillcraft.interlingua.it";
+
 const categories = [
   {
     id: "lingua",
@@ -41,6 +43,7 @@ const categories = [
     color: "from-purple-500 to-purple-600",
     courseCount: 4,
     featured: true,
+    href: `${LIVE_SITE}/formazione-in-presenza`,
   },
   {
     id: "coaching",
@@ -50,6 +53,7 @@ const categories = [
     image: languageCoachingImage,
     color: "from-indigo-500 to-indigo-600",
     courseCount: 3,
+    href: `${LIVE_SITE}/language-coaching`,
   },
   {
     id: "online",
@@ -59,6 +63,7 @@ const categories = [
     image: corsoOnlineImage,
     color: "from-teal-500 to-teal-600",
     courseCount: 3,
+    href: `${LIVE_SITE}/corsi-e-learning`,
   },
   {
     id: "speakers",
@@ -68,6 +73,7 @@ const categories = [
     image: speakersCornerCourseImage,
     color: "from-orange-500 to-orange-600",
     courseCount: 3,
+    href: `${LIVE_SITE}/speakers-corner`,
   },
   {
     id: "immersion",
@@ -78,6 +84,7 @@ const categories = [
     color: "from-green-500 to-green-600",
     courseCount: 2,
     featured: true,
+    href: `${LIVE_SITE}/full-immersion`,
   },
   {
     id: "professional",
@@ -88,6 +95,7 @@ const categories = [
     color: "from-blue-500 to-blue-600",
     courseCount: 5,
     featured: true,
+    href: "#contact",
   },
 ];
 
@@ -126,7 +134,7 @@ export function CoursesSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Link href={category.id === "immersion" ? "/full-immersion" : category.id === "lingua" ? "/formazione-in-presenza" : category.id === "online" ? "/corsi-e-learning" : category.id === "coaching" ? "/language-coaching" : category.id === "speakers" ? "/speakers-corner" : "#contact"}>
+                <a href={category.href} {...(category.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
                   <Card 
                     className="h-full hover-elevate group cursor-pointer relative overflow-hidden"
                     data-testid={`card-category-${category.id}`}
@@ -174,7 +182,7 @@ export function CoursesSection() {
                       </div>
                     </CardContent>
                   </Card>
-                </Link>
+                </a>
               </motion.div>
             );
           })}
