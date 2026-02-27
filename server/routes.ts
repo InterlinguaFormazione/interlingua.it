@@ -1149,7 +1149,7 @@ export async function registerRoutes(
 
   app.post("/api/shop/purchase", async (req, res) => {
     try {
-      const { paypalOrderId, productSlug, customerName, customerEmail, customerPhone, billingCodiceFiscale, billingIndirizzo, billingCap, billingCitta, billingProvincia, billingPartitaIva, billingCodiceSdi, billingPec, notes } = req.body;
+      const { paypalOrderId, productSlug, customerFirstName, customerLastName, customerEmail, customerPhone, billingCodiceFiscale, billingIndirizzo, billingCap, billingCitta, billingProvincia, billingPartitaIva, billingCodiceSdi, billingPec, notes } = req.body;
 
       const orderData = {
         productSlug: req.body.productSlug,
@@ -1158,10 +1158,13 @@ export async function registerRoutes(
         currency: "EUR",
         paypalOrderId: req.body.paypalOrderId,
         status: "completed",
-        customerName: req.body.customerName,
+        customerFirstName: req.body.customerFirstName,
+        customerLastName: req.body.customerLastName,
         customerEmail: req.body.customerEmail,
         customerPhone: req.body.customerPhone || null,
-        studentName: req.body.studentName || null,
+        studentFirstName: req.body.studentFirstName || null,
+        studentLastName: req.body.studentLastName || null,
+        studentEmail: req.body.studentEmail || null,
         billingCodiceFiscale: req.body.billingCodiceFiscale || null,
         billingIndirizzo: req.body.billingIndirizzo || null,
         billingCap: req.body.billingCap || null,
@@ -1242,7 +1245,7 @@ export async function registerRoutes(
           const newCustomer = await storage.createShopCustomer({
             email: parsed.data.customerEmail,
             password: hashedPassword,
-            name: parsed.data.customerName,
+            name: `${parsed.data.customerFirstName} ${parsed.data.customerLastName}`,
             phone: parsed.data.customerPhone || null,
           });
           customerId = newCustomer.id;
@@ -1267,7 +1270,7 @@ export async function registerRoutes(
 
       try {
         await sendContactNotification({
-          name: customerName,
+          name: `${customerFirstName} ${customerLastName}`,
           email: customerEmail,
           phone: customerPhone || undefined,
           courseInterest: `Acquisto: ${productNameWithOptions} (${expectedPrice} EUR)`,

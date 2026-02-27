@@ -42,9 +42,13 @@ interface ShopOrder {
   currency: string;
   paypalOrderId: string;
   status: string;
-  customerName: string;
+  customerFirstName: string;
+  customerLastName: string;
   customerEmail: string;
   customerPhone: string | null;
+  studentFirstName: string | null;
+  studentLastName: string | null;
+  studentEmail: string | null;
   createdAt: string | null;
 }
 
@@ -80,7 +84,7 @@ function ShopOrdersTab({ token }: { token: string }) {
                   <th className="text-left py-3 px-2 font-medium">Corso</th>
                   <th className="text-left py-3 px-2 font-medium">Cliente</th>
                   <th className="text-left py-3 px-2 font-medium">Studente</th>
-                  <th className="text-left py-3 px-2 font-medium">Email</th>
+                  <th className="text-left py-3 px-2 font-medium">Email Cliente</th>
                   <th className="text-right py-3 px-2 font-medium">Importo</th>
                   <th className="text-center py-3 px-2 font-medium">Stato</th>
                 </tr>
@@ -92,9 +96,13 @@ function ShopOrdersTab({ token }: { token: string }) {
                       {order.createdAt ? new Date(order.createdAt).toLocaleDateString("it-IT") : "-"}
                     </td>
                     <td className="py-3 px-2 font-medium">{order.productName}</td>
-                    <td className="py-3 px-2">{order.customerName}</td>
+                    <td className="py-3 px-2">{order.customerFirstName} {order.customerLastName}</td>
                     <td className="py-3 px-2 text-muted-foreground">
-                      {order.studentName || <span className="text-xs italic">stesso</span>}
+                      {order.studentFirstName ? (
+                        <span>{order.studentFirstName} {order.studentLastName}{order.studentEmail ? ` (${order.studentEmail})` : ""}</span>
+                      ) : (
+                        <span className="text-xs italic">stesso</span>
+                      )}
                     </td>
                     <td className="py-3 px-2 text-muted-foreground">{order.customerEmail}</td>
                     <td className="py-3 px-2 text-right font-medium">&euro;{parseFloat(order.amount).toFixed(2)}</td>

@@ -83,7 +83,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `sc_email_settings` - Email notification settings (suspend/resume for holidays)
 - `sc_payments` - PayPal payment records (subscriber ID, PayPal order ID, amount, currency, status, payer email)
 - `shop_customers` - Customer accounts created during shop checkout (email, hashed password, name, phone)
-- `shop_orders` - Online shop orders (product slug/name, amount, PayPal order ID, customer info, billing, status, linked to customer account)
+- `shop_orders` - Online shop orders (product slug/name, amount, PayPal order ID, customer first/last name, email, phone, student first/last name + email for third-party purchases, billing info, status, linked to customer account)
 - `course_materials` - Downloadable files per course product (slug, file name, URL, size, description)
 
 ## API Endpoints

@@ -53,12 +53,15 @@ export default function ShopCheckout() {
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
-  const [customerName, setCustomerName] = useState("");
+  const [customerFirstName, setCustomerFirstName] = useState("");
+  const [customerLastName, setCustomerLastName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerPassword, setCustomerPassword] = useState("");
   const [buyingForOther, setBuyingForOther] = useState(false);
-  const [studentName, setStudentName] = useState("");
+  const [studentFirstName, setStudentFirstName] = useState("");
+  const [studentLastName, setStudentLastName] = useState("");
+  const [studentEmail, setStudentEmail] = useState("");
   const [notes, setNotes] = useState("");
 
   const [tipoFatturazione, setTipoFatturazione] = useState<"privato" | "professionista" | "azienda">("privato");
@@ -130,12 +133,16 @@ export default function ShopCheckout() {
       toast({ title: "Opzioni mancanti", description: "Seleziona tutte le opzioni del corso.", variant: "destructive" });
       return;
     }
-    if (!customerName || !customerEmail) {
-      toast({ title: "Campi obbligatori", description: "Inserisci nome e email.", variant: "destructive" });
+    if (!customerFirstName || !customerLastName || !customerEmail) {
+      toast({ title: "Campi obbligatori", description: "Inserisci nome, cognome e email.", variant: "destructive" });
       return;
     }
-    if (buyingForOther && !studentName.trim()) {
-      toast({ title: "Nome studente obbligatorio", description: "Inserisci il nome di chi frequenterà il corso.", variant: "destructive" });
+    if (buyingForOther && (!studentFirstName.trim() || !studentLastName.trim())) {
+      toast({ title: "Dati studente obbligatori", description: "Inserisci nome e cognome dello studente.", variant: "destructive" });
+      return;
+    }
+    if (buyingForOther && studentEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(studentEmail)) {
+      toast({ title: "Email studente non valida", description: "Inserisci un indirizzo email valido per lo studente.", variant: "destructive" });
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
@@ -249,11 +256,14 @@ export default function ShopCheckout() {
                   paypalOrderId: data.orderId,
                   productSlug: product!.slug,
                   selectedOptions: JSON.stringify(selectedOptions),
-                  customerName,
+                  customerFirstName,
+                  customerLastName,
                   customerEmail,
                   customerPhone,
                   customerPassword,
-                  studentName: buyingForOther ? studentName : "",
+                  studentFirstName: buyingForOther ? studentFirstName : "",
+                  studentLastName: buyingForOther ? studentLastName : "",
+                  studentEmail: buyingForOther ? studentEmail : "",
                   codiceFiscale,
                   billingCodiceFiscale: codiceFiscale,
                   billingIndirizzo: indirizzo,
@@ -495,15 +505,27 @@ export default function ShopCheckout() {
                           )}
                         </div>
                       )}
-                      <div>
-                        <Label htmlFor="customerName">Nome e Cognome *</Label>
-                        <Input
-                          id="customerName"
-                          value={customerName}
-                          onChange={(e) => setCustomerName(e.target.value)}
-                          className="mt-1"
-                          data-testid="input-customer-name"
-                        />
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="customerFirstName">Nome *</Label>
+                          <Input
+                            id="customerFirstName"
+                            value={customerFirstName}
+                            onChange={(e) => setCustomerFirstName(e.target.value)}
+                            className="mt-1"
+                            data-testid="input-customer-first-name"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="customerLastName">Cognome *</Label>
+                          <Input
+                            id="customerLastName"
+                            value={customerLastName}
+                            onChange={(e) => setCustomerLastName(e.target.value)}
+                            className="mt-1"
+                            data-testid="input-customer-last-name"
+                          />
+                        </div>
                       </div>
                       <div>
                         <Label htmlFor="customerEmail">Email *</Label>
@@ -533,7 +555,11 @@ export default function ShopCheckout() {
                           checked={buyingForOther}
                           onCheckedChange={(checked) => {
                             setBuyingForOther(checked === true);
-                            if (!checked) setStudentName("");
+                            if (!checked) {
+                              setStudentFirstName("");
+                              setStudentLastName("");
+                              setStudentEmail("");
+                            }
                           }}
                           data-testid="checkbox-buying-for-other"
                         />
@@ -542,16 +568,43 @@ export default function ShopCheckout() {
                         </Label>
                       </div>
                       {buyingForOther && (
-                        <div>
-                          <Label htmlFor="studentName">Nome e Cognome dello studente *</Label>
-                          <Input
-                            id="studentName"
-                            value={studentName}
-                            onChange={(e) => setStudentName(e.target.value)}
-                            placeholder="Nome e cognome di chi frequenterà il corso"
-                            className="mt-1"
-                            data-testid="input-student-name"
-                          />
+                        <div className="space-y-3 pl-4 border-l-2 border-primary/20">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <Label htmlFor="studentFirstName">Nome studente *</Label>
+                              <Input
+                                id="studentFirstName"
+                                value={studentFirstName}
+                                onChange={(e) => setStudentFirstName(e.target.value)}
+                                placeholder="Nome"
+                                className="mt-1"
+                                data-testid="input-student-first-name"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor="studentLastName">Cognome studente *</Label>
+                              <Input
+                                id="studentLastName"
+                                value={studentLastName}
+                                onChange={(e) => setStudentLastName(e.target.value)}
+                                placeholder="Cognome"
+                                className="mt-1"
+                                data-testid="input-student-last-name"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <Label htmlFor="studentEmail">Email studente</Label>
+                            <Input
+                              id="studentEmail"
+                              type="email"
+                              value={studentEmail}
+                              onChange={(e) => setStudentEmail(e.target.value)}
+                              placeholder="Email dello studente"
+                              className="mt-1"
+                              data-testid="input-student-email"
+                            />
+                          </div>
                         </div>
                       )}
                       <div className="border-t pt-4 mt-2">
