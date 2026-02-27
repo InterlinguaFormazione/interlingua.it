@@ -387,3 +387,142 @@ Per qualsiasi domanda contattaci a: infocorsi@skillcraft.interlingua.it
 
   await ses.send(command);
 }
+
+export async function sendTestResultEmail(data: {
+  candidateName: string;
+  candidateEmail: string;
+  candidatePhone?: string | null;
+  grammarScore: number;
+  grammarLevel: string;
+  writingScore: number;
+  writingLevel: string;
+  speakingScore: number;
+  speakingLevel: string;
+  overallScore: number;
+  overallLevel: string;
+  writingResponses?: string;
+  speakingResponses?: string;
+}) {
+  if (!ses) {
+    console.warn("SES not configured — skipping test result email");
+    return;
+  }
+
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) {
+    console.warn("ADMIN_EMAIL not configured — skipping test result email");
+    return;
+  }
+
+  const levelColor: Record<string, string> = {
+    A1: "#e74c3c", A2: "#e67e22", B1: "#f39c12", B2: "#2ecc71", C1: "#3498db", C2: "#9b59b6",
+  };
+
+  const overallColor = levelColor[data.overallLevel] || "#333";
+
+  let writingDetails = "";
+  if (data.writingResponses) {
+    try {
+      const responses = JSON.parse(data.writingResponses);
+      writingDetails = responses.map((r: any, i: number) => `
+        <div style="margin: 12px 0; padding: 12px; background: #f8f9fa; border-radius: 8px; border-left: 3px solid #3498db;">
+          <p style="font-weight: 600; margin: 0 0 4px;">Task ${i + 1}: ${r.prompt || ""}</p>
+          <p style="margin: 4px 0; color: #555; font-size: 13px;"><strong>Score:</strong> ${r.score}/100 (${r.level})</p>
+          <p style="margin: 4px 0; color: #555; font-size: 13px;"><strong>Feedback:</strong> ${r.feedback || ""}</p>
+        </div>
+      `).join("");
+    } catch {}
+  }
+
+  let speakingDetails = "";
+  if (data.speakingResponses) {
+    try {
+      const responses = JSON.parse(data.speakingResponses);
+      speakingDetails = responses.map((r: any, i: number) => `
+        <div style="margin: 12px 0; padding: 12px; background: #f8f9fa; border-radius: 8px; border-left: 3px solid #9b59b6;">
+          <p style="font-weight: 600; margin: 0 0 4px;">Task ${i + 1}: ${r.prompt || ""}</p>
+          <p style="margin: 4px 0; color: #555; font-size: 13px;"><strong>Score:</strong> ${r.score}/100 (${r.level})</p>
+          <p style="margin: 4px 0; color: #555; font-size: 13px;"><strong>Feedback:</strong> ${r.feedback || ""}</p>
+        </div>
+      `).join("");
+    } catch {}
+  }
+
+  const htmlBody = `
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #1e40af, #f97316); padding: 24px; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 22px;">English Placement Test Results</h1>
+        <p style="color: rgba(255,255,255,0.85); margin: 8px 0 0; font-size: 14px;">SkillCraft-Interlingua</p>
+      </div>
+      <div style="background: white; padding: 24px; border-radius: 0 0 12px 12px; border: 1px solid #e5e7eb; border-top: none;">
+        <div style="text-align: center; padding: 20px; margin-bottom: 20px; background: linear-gradient(135deg, ${overallColor}15, ${overallColor}05); border-radius: 12px; border: 2px solid ${overallColor};">
+          <p style="margin: 0; font-size: 14px; color: #666;">Overall Level</p>
+          <h2 style="margin: 8px 0; font-size: 48px; color: ${overallColor}; font-weight: 800;">${data.overallLevel}</h2>
+          <p style="margin: 0; font-size: 18px; color: #333; font-weight: 600;">${data.overallScore}/100</p>
+        </div>
+
+        <h3 style="margin: 20px 0 12px; color: #1e40af;">Candidate Information</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 8px 0; border-bottom: 1px solid #f1f3f5; font-weight: 600; color: #374151; width: 140px;">Name</td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #f1f3f5; color: #4b5563;">${data.candidateName}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px 0; border-bottom: 1px solid #f1f3f5; font-weight: 600; color: #374151;">Email</td>
+            <td style="padding: 8px 0; border-bottom: 1px solid #f1f3f5;"><a href="mailto:${data.candidateEmail}" style="color: #1e40af;">${data.candidateEmail}</a></td>
+          </tr>
+          ${data.candidatePhone ? `<tr><td style="padding: 8px 0; border-bottom: 1px solid #f1f3f5; font-weight: 600; color: #374151;">Phone</td><td style="padding: 8px 0; border-bottom: 1px solid #f1f3f5; color: #4b5563;">${data.candidatePhone}</td></tr>` : ""}
+        </table>
+
+        <h3 style="margin: 20px 0 12px; color: #1e40af;">Section Scores</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <tr style="background: #f8f9fa;">
+            <th style="padding: 10px; text-align: left; color: #374151;">Section</th>
+            <th style="padding: 10px; text-align: center; color: #374151;">Score</th>
+            <th style="padding: 10px; text-align: center; color: #374151;">Level</th>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #f1f3f5;">Grammar</td>
+            <td style="padding: 10px; text-align: center; border-bottom: 1px solid #f1f3f5;">${data.grammarScore}/100</td>
+            <td style="padding: 10px; text-align: center; border-bottom: 1px solid #f1f3f5;"><span style="background: ${levelColor[data.grammarLevel] || "#333"}; color: white; padding: 2px 10px; border-radius: 12px; font-size: 13px;">${data.grammarLevel}</span></td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #f1f3f5;">Writing</td>
+            <td style="padding: 10px; text-align: center; border-bottom: 1px solid #f1f3f5;">${data.writingScore}/100</td>
+            <td style="padding: 10px; text-align: center; border-bottom: 1px solid #f1f3f5;"><span style="background: ${levelColor[data.writingLevel] || "#333"}; color: white; padding: 2px 10px; border-radius: 12px; font-size: 13px;">${data.writingLevel}</span></td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #f1f3f5;">Speaking</td>
+            <td style="padding: 10px; text-align: center; border-bottom: 1px solid #f1f3f5;">${data.speakingScore}/100</td>
+            <td style="padding: 10px; text-align: center; border-bottom: 1px solid #f1f3f5;"><span style="background: ${levelColor[data.speakingLevel] || "#333"}; color: white; padding: 2px 10px; border-radius: 12px; font-size: 13px;">${data.speakingLevel}</span></td>
+          </tr>
+        </table>
+
+        ${writingDetails ? `<h3 style="margin: 20px 0 12px; color: #3498db;">Writing Details</h3>${writingDetails}` : ""}
+        ${speakingDetails ? `<h3 style="margin: 20px 0 12px; color: #9b59b6;">Speaking Details</h3>${speakingDetails}` : ""}
+
+        <div style="margin-top: 24px; padding: 16px; background: #f0f9ff; border-radius: 8px; text-align: center;">
+          <p style="margin: 0; color: #555; font-size: 13px;">Test completed on ${new Date().toLocaleDateString("it-IT", { day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
+        </div>
+      </div>
+    </div>`;
+
+  const command = new SendEmailCommand({
+    Source: FROM_EMAIL,
+    Destination: {
+      ToAddresses: [adminEmail],
+    },
+    Message: {
+      Subject: {
+        Data: `English Test Result: ${data.candidateName} - Level ${data.overallLevel} (${data.overallScore}/100)`,
+        Charset: "UTF-8",
+      },
+      Body: {
+        Html: { Data: htmlBody, Charset: "UTF-8" },
+      },
+    },
+    ReplyToAddresses: [data.candidateEmail],
+  });
+
+  await ses.send(command);
+}

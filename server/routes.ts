@@ -4,14 +4,18 @@ import { storage } from "./storage";
 import { insertContactSchema, insertNewsletterSchema, insertCookieConsentSchema, insertShopOrderSchema, insertCourseMaterialSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendSubscriptionConfirmation, sendBookingConfirmation } from "./email";
+import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendSubscriptionConfirmation, sendBookingConfirmation, sendTestResultEmail } from "./email";
 import { forwardToCRM } from "./crm";
 import { generateBlogPost } from "./blog-generator";
 import { chatWithAI } from "./ai-chat";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalOrder } from "./paypal";
 import { SHOP_PRODUCTS, getProductBySlug, getEffectivePrice } from "@shared/products";
+import { scoreWriting, transcribeAudio, scoreSpeaking } from "./english-test";
+import multer from "multer";
 import cron from "node-cron";
 import crypto from "crypto";
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
 
 function isStrongPassword(password: string): boolean {
   return password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password);
@@ -1424,6 +1428,94 @@ export async function registerRoutes(
       res.json(payments);
     } catch (error) {
       console.error("Error fetching SC payments:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/english-test/score-writing", async (req, res) => {
+    try {
+      const { prompt, response, targetLevel } = req.body;
+      if (!prompt || !response || !targetLevel) {
+        return res.status(400).json({ success: false, message: "Missing prompt, response, or targetLevel" });
+      }
+      const result = await scoreWriting(prompt, response, targetLevel);
+      res.json({ success: true, ...result });
+    } catch (error) {
+      console.error("Error scoring writing:", error);
+      res.status(500).json({ success: false, message: "Error scoring writing response" });
+    }
+  });
+
+  app.post("/api/english-test/transcribe", upload.single("audio"), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ success: false, message: "No audio file provided" });
+      }
+      const mimeType = req.file.mimetype || "audio/webm";
+      const text = await transcribeAudio(req.file.buffer, mimeType);
+      res.json({ success: true, text });
+    } catch (error) {
+      console.error("Error transcribing audio:", error);
+      res.status(500).json({ success: false, message: "Error transcribing audio" });
+    }
+  });
+
+  app.post("/api/english-test/score-speaking", async (req, res) => {
+    try {
+      const { prompt, transcription, targetLevel } = req.body;
+      if (!prompt || !transcription || !targetLevel) {
+        return res.status(400).json({ success: false, message: "Missing prompt, transcription, or targetLevel" });
+      }
+      const result = await scoreSpeaking(prompt, transcription, targetLevel);
+      res.json({ success: true, ...result });
+    } catch (error) {
+      console.error("Error scoring speaking:", error);
+      res.status(500).json({ success: false, message: "Error scoring speaking response" });
+    }
+  });
+
+  app.post("/api/english-test/submit", async (req, res) => {
+    try {
+      const { candidateName, candidateEmail, candidatePhone, grammarScore, grammarLevel, writingScore, writingLevel, writingResponses, speakingScore, speakingLevel, speakingResponses, overallLevel, overallScore } = req.body;
+
+      if (!candidateName || !candidateEmail) {
+        return res.status(400).json({ success: false, message: "Missing candidate name or email" });
+      }
+
+      const saved = await storage.createEnglishTestResult({
+        candidateName, candidateEmail, candidatePhone: candidatePhone || null,
+        grammarScore, grammarLevel,
+        writingScore, writingLevel, writingResponses: writingResponses || null,
+        speakingScore, speakingLevel, speakingResponses: speakingResponses || null,
+        overallLevel, overallScore,
+      });
+
+      try {
+        await sendTestResultEmail({
+          candidateName, candidateEmail, candidatePhone,
+          grammarScore, grammarLevel,
+          writingScore, writingLevel,
+          speakingScore, speakingLevel,
+          overallScore, overallLevel,
+          writingResponses, speakingResponses,
+        });
+      } catch (emailError) {
+        console.error("Error sending test result email:", emailError);
+      }
+
+      res.json({ success: true, id: saved.id });
+    } catch (error) {
+      console.error("Error submitting test result:", error);
+      res.status(500).json({ success: false, message: "Error saving test result" });
+    }
+  });
+
+  app.get("/api/admin/english-test-results", requireAuth, async (_req, res) => {
+    try {
+      const results = await storage.getEnglishTestResults();
+      res.json(results);
+    } catch (error) {
+      console.error("Error fetching test results:", error);
       res.status(500).json({ success: false, message: "Errore del server" });
     }
   });

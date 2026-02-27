@@ -275,6 +275,32 @@ export const insertCourseMaterialSchema = createInsertSchema(courseMaterials).om
 export type InsertCourseMaterial = z.infer<typeof insertCourseMaterialSchema>;
 export type CourseMaterial = typeof courseMaterials.$inferSelect;
 
+export const englishTestResults = pgTable("english_test_results", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  candidateName: text("candidate_name").notNull(),
+  candidateEmail: text("candidate_email").notNull(),
+  candidatePhone: text("candidate_phone"),
+  grammarScore: integer("grammar_score"),
+  grammarLevel: text("grammar_level"),
+  writingScore: integer("writing_score"),
+  writingLevel: text("writing_level"),
+  writingResponses: text("writing_responses"),
+  speakingScore: integer("speaking_score"),
+  speakingLevel: text("speaking_level"),
+  speakingResponses: text("speaking_responses"),
+  overallLevel: text("overall_level"),
+  overallScore: integer("overall_score"),
+  completedAt: timestamp("completed_at").defaultNow(),
+});
+
+export const insertEnglishTestResultSchema = createInsertSchema(englishTestResults).omit({
+  id: true,
+  completedAt: true,
+});
+
+export type InsertEnglishTestResult = z.infer<typeof insertEnglishTestResultSchema>;
+export type EnglishTestResult = typeof englishTestResults.$inferSelect;
+
 export interface Course {
   id: string;
   title: string;

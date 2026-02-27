@@ -24,6 +24,8 @@ import {
   type InsertShopOrder,
   type CourseMaterial,
   type InsertCourseMaterial,
+  type EnglishTestResult,
+  type InsertEnglishTestResult,
   users,
   contactSubmissions,
   newsletterSubscriptions,
@@ -37,6 +39,7 @@ import {
   shopCustomers,
   shopOrders,
   courseMaterials,
+  englishTestResults,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte, desc } from "drizzle-orm";
@@ -107,6 +110,10 @@ export interface IStorage {
   getCourseMaterialsBySlug(productSlug: string): Promise<CourseMaterial[]>;
   getAllCourseMaterials(): Promise<CourseMaterial[]>;
   deleteCourseMaterial(id: string): Promise<void>;
+
+  createEnglishTestResult(result: InsertEnglishTestResult): Promise<EnglishTestResult>;
+  getEnglishTestResults(): Promise<EnglishTestResult[]>;
+  getEnglishTestResultById(id: string): Promise<EnglishTestResult | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -390,6 +397,20 @@ export class DatabaseStorage implements IStorage {
 
   async deleteCourseMaterial(id: string): Promise<void> {
     await db.delete(courseMaterials).where(eq(courseMaterials.id, id));
+  }
+
+  async createEnglishTestResult(data: InsertEnglishTestResult): Promise<EnglishTestResult> {
+    const [result] = await db.insert(englishTestResults).values(data).returning();
+    return result;
+  }
+
+  async getEnglishTestResults(): Promise<EnglishTestResult[]> {
+    return db.select().from(englishTestResults).orderBy(desc(englishTestResults.completedAt));
+  }
+
+  async getEnglishTestResultById(id: string): Promise<EnglishTestResult | undefined> {
+    const [result] = await db.select().from(englishTestResults).where(eq(englishTestResults.id, id));
+    return result;
   }
 }
 
