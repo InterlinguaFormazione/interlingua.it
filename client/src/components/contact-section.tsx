@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { Link } from "wouter";
 import { Send, Loader2, CheckCircle2, MessageSquare, Calendar, Headphones, Sparkles, ArrowRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -404,13 +405,15 @@ export function ContactSection() {
                   <p className="text-white/80 mb-4">
                     Scopri il tuo livello attuale con un test gratuito e ricevi consigli personalizzati.
                   </p>
-                  <Button 
-                    variant="secondary" 
-                    className="w-full bg-primary-foreground text-primary"
-                    data-testid="button-free-test"
-                  >
-                    Fai il Test Ora
-                  </Button>
+                  <Link href="/test-inglese">
+                    <Button 
+                      variant="secondary" 
+                      className="w-full bg-primary-foreground text-primary"
+                      data-testid="button-free-test"
+                    >
+                      Fai il Test Ora
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             </motion.div>

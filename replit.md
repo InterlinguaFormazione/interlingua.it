@@ -184,6 +184,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `/shop` - Online course shop (all fixed-price courses)
 - `/shop/checkout/:slug` - Checkout page with billing, account creation, and PayPal payment
 - `/shop/dashboard` - Customer area (login, purchased courses, downloadable materials)
+- `/test-inglese` - Free English placement test (CEFR A1-C2, 50 questions)
 - `/admin` - General admin panel (contacts, newsletter, orders, blog management)
 - `/speakers-corner/admin` - Speaker's Corner admin (manage subscribers, sessions, email settings)
 - `/blog` - Blog listing
