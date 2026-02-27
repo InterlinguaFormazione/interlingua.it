@@ -47,7 +47,7 @@ import {
   Zap,
   Shield,
 } from "lucide-react";
-import courseItalianImage from "@/assets/images/course-italian.jpg";
+import courseItalianImage from "@assets/Learn_Italin_in_Vicenza_1772214851188.png";
 import aboutVicenzaImage from "@assets/vicenza_1772179633305.jpg";
 
 function usePrefersReducedMotion() {
