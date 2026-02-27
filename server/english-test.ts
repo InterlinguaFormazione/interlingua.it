@@ -165,3 +165,108 @@ Respond ONLY with valid JSON in this exact format:
     coherence: parsed.coherence || "",
   };
 }
+
+export interface BusinessEnglishScore {
+  level: string;
+  grammar: number;
+  vocabulary: number;
+  coherence: number;
+  taskCompletion: number;
+  feedback: string;
+}
+
+export async function scoreBusinessWriting(prompt: string, response: string, currentLevel: string): Promise<BusinessEnglishScore> {
+  const openai = getOpenAI();
+
+  const systemPrompt = `You are an expert Business English examiner. Evaluate a candidate's written response for a Business English placement test.
+The candidate's estimated CEFR level is ${currentLevel}.
+
+Score these four dimensions from 0-100:
+- grammar: Grammar accuracy — correctness, complexity, and appropriateness for business context
+- vocabulary: Vocabulary range — business terminology, collocations, register
+- coherence: Coherence — organization, logical flow, professional tone
+- taskCompletion: Task completion — effectiveness, relevance, completeness
+
+Then assign an overall CEFR level: A0, A1, A2, B1, B2, or C1.
+Provide 2-3 sentences of constructive feedback.
+
+Respond ONLY with valid JSON:
+{
+  "level": "<CEFR level A0-C1>",
+  "grammar": <number 0-100>,
+  "vocabulary": <number 0-100>,
+  "coherence": <number 0-100>,
+  "taskCompletion": <number 0-100>,
+  "feedback": "<2-3 sentences>"
+}`;
+
+  const result = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: `Prompt: "${prompt}"\n\nCandidate's response:\n"${response}"` },
+    ],
+    temperature: 0.3,
+    response_format: { type: "json_object" },
+  });
+
+  const content = result.choices[0]?.message?.content;
+  if (!content) throw new Error("Empty AI response");
+  const parsed = JSON.parse(content);
+  return {
+    level: parsed.level || "A1",
+    grammar: Math.min(100, Math.max(0, parsed.grammar || 0)),
+    vocabulary: Math.min(100, Math.max(0, parsed.vocabulary || 0)),
+    coherence: Math.min(100, Math.max(0, parsed.coherence || 0)),
+    taskCompletion: Math.min(100, Math.max(0, parsed.taskCompletion || 0)),
+    feedback: parsed.feedback || "",
+  };
+}
+
+export async function scoreBusinessSpeaking(prompt: string, transcript: string, currentLevel: string): Promise<BusinessEnglishScore> {
+  const openai = getOpenAI();
+
+  const systemPrompt = `You are an expert Business English examiner. Evaluate a candidate's spoken response (transcribed) for a Business English placement test.
+The candidate's estimated CEFR level is ${currentLevel}.
+
+Score these four dimensions from 0-100:
+- grammar: Grammar accuracy — correctness and complexity in spoken business English
+- vocabulary: Vocabulary range — business terminology, fluency of expression
+- coherence: Coherence — logical flow, clarity of argument, professional register
+- taskCompletion: Task completion — addressing the prompt fully, relevant content
+
+Then assign an overall CEFR level: A0, A1, A2, B1, B2, or C1.
+Provide 2-3 sentences of constructive feedback.
+
+Respond ONLY with valid JSON:
+{
+  "level": "<CEFR level A0-C1>",
+  "grammar": <number 0-100>,
+  "vocabulary": <number 0-100>,
+  "coherence": <number 0-100>,
+  "taskCompletion": <number 0-100>,
+  "feedback": "<2-3 sentences>"
+}`;
+
+  const result = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: `Prompt: "${prompt}"\n\nCandidate's spoken response (transcript):\n"${transcript}"` },
+    ],
+    temperature: 0.3,
+    response_format: { type: "json_object" },
+  });
+
+  const content = result.choices[0]?.message?.content;
+  if (!content) throw new Error("Empty AI response");
+  const parsed = JSON.parse(content);
+  return {
+    level: parsed.level || "A1",
+    grammar: Math.min(100, Math.max(0, parsed.grammar || 0)),
+    vocabulary: Math.min(100, Math.max(0, parsed.vocabulary || 0)),
+    coherence: Math.min(100, Math.max(0, parsed.coherence || 0)),
+    taskCompletion: Math.min(100, Math.max(0, parsed.taskCompletion || 0)),
+    feedback: parsed.feedback || "",
+  };
+}

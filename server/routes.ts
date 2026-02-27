@@ -10,7 +10,15 @@ import { generateBlogPost } from "./blog-generator";
 import { chatWithAI } from "./ai-chat";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalOrder } from "./paypal";
 import { SHOP_PRODUCTS, getProductBySlug, getEffectivePrice } from "@shared/products";
-import { scoreWriting, transcribeAudio, scoreSpeaking } from "./english-test";
+import { scoreWriting, transcribeAudio, scoreSpeaking, scoreBusinessWriting, scoreBusinessSpeaking } from "./english-test";
+import { getAllQuestions } from "./business-english-questions";
+import {
+  calculateProbability, calculateFisherInformation, selectNextQuestion,
+  updateTheta, updateStandardError, thetaToCEFR, selfAssessmentToTheta,
+  checkPhaseTransitions, checkA0HardFail, calculateFinalLevel,
+  getWritingPrompt, getSpeakingPrompt, SECTION_SKILLS, MAX_QUESTIONS_PER_SECTION
+} from "./cat-engine";
+import { sendBusinessEnglishResultEmail, sendBusinessEnglishConfirmationEmail } from "./email";
 import multer from "multer";
 import cron from "node-cron";
 import crypto from "crypto";
@@ -1524,6 +1532,632 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching test results:", error);
       res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/admin/seed-business-english-questions", requireAdmin, async (_req, res) => {
+    try {
+      const existing = await storage.getBeQuestionCount();
+      if (existing > 0) {
+        return res.json({ success: true, message: `Questions already seeded (${existing} questions)` });
+      }
+      const questions = getAllQuestions();
+      for (const q of questions) {
+        await storage.createBeQuestion(q);
+      }
+      res.json({ success: true, message: `Seeded ${questions.length} questions` });
+    } catch (error) {
+      console.error("Error seeding questions:", error);
+      res.status(500).json({ success: false, message: "Failed to seed questions" });
+    }
+  });
+
+  app.post("/api/business-english-test/start", async (req, res) => {
+    try {
+      const { firstName, lastName, email, company, phone, selfAssessedLevel } = req.body;
+      if (!firstName || !lastName || !email || !company || !selfAssessedLevel) {
+        return res.status(400).json({ success: false, message: "Missing required fields" });
+      }
+
+      const questionCount = await storage.getBeQuestionCount();
+      if (questionCount === 0) {
+        const questions = getAllQuestions();
+        for (const q of questions) {
+          await storage.createBeQuestion(q);
+        }
+      }
+
+      const startingTheta = selfAssessmentToTheta(selfAssessedLevel);
+      const session = await storage.createBeTestSession({
+        firstName,
+        lastName,
+        email,
+        company,
+        phone: phone || null,
+        selfAssessedLevel,
+        currentLevel: thetaToCEFR(startingTheta),
+        currentTheta: startingTheta,
+        standardError: 100,
+        confidenceLevel: 0,
+        previousQuestions: "[]",
+        currentSectionIndex: 1,
+        totalSections: 8,
+        levelHistory: "[]",
+        questionsAtCurrentLevel: 0,
+        consecutiveIncorrectA1: 0,
+      });
+
+      const firstSkill = SECTION_SKILLS[0];
+      const allQuestions = await storage.getBeQuestions();
+      const firstQuestion = selectNextQuestion(startingTheta, [], firstSkill, allQuestions);
+
+      res.json({
+        success: true,
+        sessionId: session.id,
+        currentTheta: startingTheta,
+        currentLevel: session.currentLevel,
+        currentSectionIndex: 1,
+        currentSkill: firstSkill,
+        question: firstQuestion ? {
+          id: firstQuestion.id,
+          question: firstQuestion.question,
+          options: JSON.parse(firstQuestion.options),
+          skillType: firstQuestion.skillType,
+          level: firstQuestion.level,
+          passage: firstQuestion.passage,
+          audioUrl: firstQuestion.audioUrl,
+        } : null,
+      });
+    } catch (error) {
+      console.error("Error starting business English test:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  });
+
+  app.post("/api/business-english-test/answer", async (req, res) => {
+    try {
+      const { sessionId, questionId, answer, timeSpent } = req.body;
+      if (!sessionId || !questionId || !answer) {
+        return res.status(400).json({ success: false, message: "Missing required fields" });
+      }
+
+      const session = await storage.getBeTestSession(sessionId);
+      if (!session) return res.status(404).json({ success: false, message: "Session not found" });
+
+      const question = await storage.getBeQuestionById(questionId);
+      if (!question) return res.status(404).json({ success: false, message: "Question not found" });
+
+      const isCorrect = answer === question.correctAnswer;
+      const oldTheta = session.currentTheta ?? 0;
+      const oldSE = session.standardError ?? 100;
+      const newTheta = updateTheta(oldTheta, isCorrect, oldSE);
+      const newSE = updateStandardError(oldSE);
+      const info = calculateFisherInformation(oldTheta, question.difficulty ?? 0, question.discrimination ?? 100);
+
+      await storage.createBeResponse({
+        sessionId,
+        questionId,
+        userAnswer: answer,
+        isCorrect,
+        timeSpent: timeSpent || null,
+        thetaBefore: oldTheta,
+        thetaAfter: newTheta,
+        standardErrorBefore: oldSE,
+        standardErrorAfter: newSE,
+        informationGain: Math.round(info * 100),
+      });
+
+      const newTotalQ = (session.totalQuestions ?? 0) + 1;
+      const newCorrect = (session.correctAnswers ?? 0) + (isCorrect ? 1 : 0);
+      const newLevel = thetaToCEFR(newTheta);
+      const prevQuestions: number[] = JSON.parse(session.previousQuestions || "[]");
+      prevQuestions.push(questionId);
+
+      let questionsAtCurrentLevel = session.questionsAtCurrentLevel ?? 0;
+      if (newLevel === session.currentLevel) {
+        questionsAtCurrentLevel++;
+      } else {
+        questionsAtCurrentLevel = 1;
+      }
+
+      let consecutiveIncorrectA1 = session.consecutiveIncorrectA1 ?? 0;
+      if (newLevel === "A1" && !isCorrect) {
+        consecutiveIncorrectA1++;
+      } else if (isCorrect) {
+        consecutiveIncorrectA1 = 0;
+      }
+
+      const levelHistory: string[] = JSON.parse(session.levelHistory || "[]");
+      levelHistory.push(newLevel);
+
+      const confidence = Math.max(0, Math.min(100, Math.round((1 - newSE / 100) * 100)));
+
+      const currentSectionIndex = session.currentSectionIndex ?? 1;
+      const currentSkillIdx = currentSectionIndex - 1;
+      const currentSkill = SECTION_SKILLS[currentSkillIdx];
+
+      const sectionResponses = await storage.getBeResponsesBySession(sessionId);
+      const allQs = await storage.getBeQuestions();
+
+      let questionsInCurrentSection = 0;
+      let correctInCurrentSection = 0;
+      for (const resp of sectionResponses) {
+        const rq = allQs.find(q => q.id === resp.questionId);
+        if (rq && rq.skillType === currentSkill) {
+          questionsInCurrentSection++;
+          if (resp.isCorrect) correctInCurrentSection++;
+        }
+      }
+
+      let a0HardFail = false;
+      if (checkA0HardFail(consecutiveIncorrectA1, newLevel)) {
+        a0HardFail = true;
+      }
+
+      const phaseResult = checkPhaseTransitions(newTotalQ, newCorrect, newLevel, questionsAtCurrentLevel);
+      const adaptedLevel = a0HardFail ? "A0" : phaseResult.newLevel;
+
+      let nextSectionIndex = currentSectionIndex;
+      let advanceSection = false;
+      if (a0HardFail || questionsInCurrentSection >= MAX_QUESTIONS_PER_SECTION || (newSE <= 35 && questionsInCurrentSection >= 3)) {
+        await storage.createBeSectionResult({
+          sessionId,
+          sectionName: currentSkill,
+          sectionIndex: currentSectionIndex,
+          questionsAttempted: questionsInCurrentSection,
+          questionsCorrect: correctInCurrentSection,
+          accuracyPercentage: questionsInCurrentSection > 0 ? Math.round((correctInCurrentSection / questionsInCurrentSection) * 100) : 0,
+          cefrLevel: adaptedLevel,
+          finalTheta: newTheta,
+          finalStandardError: newSE,
+          sectionConfidence: confidence,
+        });
+
+        nextSectionIndex = currentSectionIndex + 1;
+        advanceSection = true;
+      }
+
+      await storage.updateBeTestSession(sessionId, {
+        currentTheta: newTheta,
+        standardError: newSE,
+        currentLevel: adaptedLevel,
+        totalQuestions: newTotalQ,
+        correctAnswers: newCorrect,
+        previousQuestions: JSON.stringify(prevQuestions),
+        questionsAtCurrentLevel,
+        consecutiveIncorrectA1,
+        levelHistory: JSON.stringify(levelHistory),
+        confidenceLevel: confidence,
+        currentSectionIndex: nextSectionIndex,
+      });
+
+      if (a0HardFail) {
+        const mcLevel = "A0";
+        const writingPrompt = getWritingPrompt(mcLevel);
+        return res.json({
+          success: true,
+          isCorrect,
+          newTheta,
+          newLevel: mcLevel,
+          confidence,
+          mcPhaseComplete: true,
+          mcLevel,
+          writingPrompt,
+          a0HardFail: true,
+        });
+      }
+
+      if (nextSectionIndex > SECTION_SKILLS.length) {
+        const writingPrompt = getWritingPrompt(adaptedLevel);
+        return res.json({
+          success: true,
+          isCorrect,
+          newTheta,
+          newLevel: adaptedLevel,
+          confidence,
+          mcPhaseComplete: true,
+          mcLevel: adaptedLevel,
+          writingPrompt,
+        });
+      }
+
+      const nextSkill = SECTION_SKILLS[nextSectionIndex - 1];
+      const nextQuestion = selectNextQuestion(newTheta, prevQuestions, nextSkill, allQs);
+
+      res.json({
+        success: true,
+        isCorrect,
+        newTheta,
+        newLevel: adaptedLevel,
+        confidence,
+        mcPhaseComplete: false,
+        currentSectionIndex: nextSectionIndex,
+        currentSkill: nextSkill,
+        sectionAdvanced: advanceSection,
+        question: nextQuestion ? {
+          id: nextQuestion.id,
+          question: nextQuestion.question,
+          options: JSON.parse(nextQuestion.options),
+          skillType: nextQuestion.skillType,
+          level: nextQuestion.level,
+          passage: nextQuestion.passage,
+          audioUrl: nextQuestion.audioUrl,
+        } : null,
+      });
+    } catch (error) {
+      console.error("Error answering business English question:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  });
+
+  app.get("/api/business-english-test/session/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const session = await storage.getBeTestSession(id);
+      if (!session) return res.status(404).json({ success: false, message: "Session not found" });
+      res.json(session);
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  });
+
+  app.post("/api/business-english-test/submit-writing", async (req, res) => {
+    try {
+      const { sessionId, response: writtenResponse, prompt } = req.body;
+      if (!sessionId || !writtenResponse) {
+        return res.status(400).json({ success: false, message: "Missing fields" });
+      }
+
+      const session = await storage.getBeTestSession(sessionId);
+      if (!session) return res.status(404).json({ success: false, message: "Session not found" });
+
+      const aiResult = await scoreBusinessWriting(
+        prompt || getWritingPrompt(session.currentLevel),
+        writtenResponse,
+        session.currentLevel
+      );
+
+      await storage.createBeWritingSpeaking({
+        sessionId,
+        taskType: "writing",
+        prompt: prompt || getWritingPrompt(session.currentLevel),
+        response: writtenResponse,
+        aiScore: aiResult.level,
+        aiGrammarScore: aiResult.grammar,
+        aiVocabularyScore: aiResult.vocabulary,
+        aiCoherenceScore: aiResult.coherence,
+        aiTaskCompletionScore: aiResult.taskCompletion,
+        aiFeedback: aiResult.feedback,
+      });
+
+      await storage.createBeSectionResult({
+        sessionId,
+        sectionName: "writing",
+        sectionIndex: 6,
+        questionsAttempted: 1,
+        questionsCorrect: 1,
+        accuracyPercentage: Math.round((aiResult.grammar + aiResult.vocabulary + aiResult.coherence + aiResult.taskCompletion) / 4),
+        cefrLevel: aiResult.level,
+        finalTheta: session.currentTheta,
+        finalStandardError: session.standardError,
+        sectionConfidence: session.confidenceLevel,
+      });
+
+      await storage.updateBeTestSession(sessionId, {
+        writingScore: aiResult.level,
+        currentSectionIndex: 7,
+      });
+
+      const speakingPrompt = getSpeakingPrompt(session.currentLevel);
+
+      res.json({
+        success: true,
+        writingLevel: aiResult.level,
+        writingFeedback: aiResult.feedback,
+        writingScores: {
+          grammar: aiResult.grammar,
+          vocabulary: aiResult.vocabulary,
+          coherence: aiResult.coherence,
+          taskCompletion: aiResult.taskCompletion,
+        },
+        speakingPrompt,
+      });
+    } catch (error) {
+      console.error("Error scoring writing:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  });
+
+  app.post("/api/business-english-test/submit-speaking", upload.single("audio"), async (req: any, res) => {
+    try {
+      const { sessionId, prompt } = req.body;
+      if (!sessionId || !req.file) {
+        return res.status(400).json({ success: false, message: "Missing audio or session" });
+      }
+
+      const session = await storage.getBeTestSession(sessionId);
+      if (!session) return res.status(404).json({ success: false, message: "Session not found" });
+
+      const transcript = await transcribeAudio(req.file.buffer, req.file.originalname || "audio.webm");
+
+      const aiResult = await scoreBusinessSpeaking(
+        prompt || getSpeakingPrompt(session.currentLevel),
+        transcript,
+        session.currentLevel
+      );
+
+      await storage.createBeWritingSpeaking({
+        sessionId: parseInt(sessionId),
+        taskType: "speaking",
+        prompt: prompt || getSpeakingPrompt(session.currentLevel),
+        response: transcript,
+        aiScore: aiResult.level,
+        aiGrammarScore: aiResult.grammar,
+        aiVocabularyScore: aiResult.vocabulary,
+        aiCoherenceScore: aiResult.coherence,
+        aiTaskCompletionScore: aiResult.taskCompletion,
+        aiFeedback: aiResult.feedback,
+      });
+
+      await storage.createBeSectionResult({
+        sessionId: parseInt(sessionId),
+        sectionName: "speaking",
+        sectionIndex: 7,
+        questionsAttempted: 1,
+        questionsCorrect: 1,
+        accuracyPercentage: Math.round((aiResult.grammar + aiResult.vocabulary + aiResult.coherence + aiResult.taskCompletion) / 4),
+        cefrLevel: aiResult.level,
+        finalTheta: session.currentTheta,
+        finalStandardError: session.standardError,
+        sectionConfidence: session.confidenceLevel,
+      });
+
+      await storage.updateBeTestSession(parseInt(sessionId), {
+        speakingScore: aiResult.level,
+        currentSectionIndex: 8,
+      });
+
+      res.json({
+        success: true,
+        transcript,
+        speakingLevel: aiResult.level,
+        speakingFeedback: aiResult.feedback,
+        speakingScores: {
+          grammar: aiResult.grammar,
+          vocabulary: aiResult.vocabulary,
+          coherence: aiResult.coherence,
+          taskCompletion: aiResult.taskCompletion,
+        },
+      });
+    } catch (error) {
+      console.error("Error scoring speaking:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  });
+
+  app.post("/api/business-english-test/complete", async (req, res) => {
+    try {
+      const { sessionId } = req.body;
+      if (!sessionId) return res.status(400).json({ success: false, message: "Missing sessionId" });
+
+      const session = await storage.getBeTestSession(sessionId);
+      if (!session) return res.status(404).json({ success: false, message: "Session not found" });
+
+      if (session.resultsEmailSentAt) {
+        return res.json({ success: true, message: "Already completed", finalLevel: session.finalLevel });
+      }
+
+      const mcLevel = session.currentLevel;
+      const finalLevel = calculateFinalLevel(mcLevel, session.writingScore, session.speakingScore);
+
+      const sectionResults = await storage.getBeSectionResultsBySession(sessionId);
+      const writingSpeaking = await storage.getBeWritingSpeakingBySession(sessionId);
+      const writingTask = writingSpeaking.find(ws => ws.taskType === "writing");
+      const speakingTask = writingSpeaking.find(ws => ws.taskType === "speaking");
+
+      await storage.updateBeTestSession(sessionId, {
+        finalLevel,
+        overallScore: finalLevel,
+        status: "completed",
+        completedAt: new Date(),
+        resultsEmailSentAt: new Date(),
+        competencyReport: JSON.stringify({
+          sections: sectionResults.map(s => ({ name: s.sectionName, level: s.cefrLevel, accuracy: s.accuracyPercentage })),
+          writing: writingTask ? { level: writingTask.aiScore, feedback: writingTask.aiFeedback } : null,
+          speaking: speakingTask ? { level: speakingTask.aiScore, feedback: speakingTask.aiFeedback } : null,
+        }),
+      });
+
+      try {
+        await sendBusinessEnglishConfirmationEmail(session.email, session.firstName);
+      } catch (e) {
+        console.error("Failed to send confirmation email:", e);
+      }
+
+      try {
+        await sendBusinessEnglishResultEmail({
+          candidateName: `${session.firstName} ${session.lastName}`,
+          candidateEmail: session.email,
+          company: session.company,
+          phone: session.phone,
+          finalLevel,
+          overallScore: finalLevel,
+          mcAccuracy: `${session.correctAnswers}/${session.totalQuestions}`,
+          writingLevel: writingTask?.aiScore || null,
+          writingFeedback: writingTask?.aiFeedback || null,
+          writingScores: writingTask ? {
+            grammar: writingTask.aiGrammarScore ?? 0,
+            vocabulary: writingTask.aiVocabularyScore ?? 0,
+            coherence: writingTask.aiCoherenceScore ?? 0,
+            taskCompletion: writingTask.aiTaskCompletionScore ?? 0,
+          } : null,
+          speakingLevel: speakingTask?.aiScore || null,
+          speakingFeedback: speakingTask?.aiFeedback || null,
+          speakingScores: speakingTask ? {
+            grammar: speakingTask.aiGrammarScore ?? 0,
+            vocabulary: speakingTask.aiVocabularyScore ?? 0,
+            coherence: speakingTask.aiCoherenceScore ?? 0,
+            taskCompletion: speakingTask.aiTaskCompletionScore ?? 0,
+          } : null,
+          sectionResults: sectionResults.map(s => ({
+            sectionName: s.sectionName,
+            cefrLevel: s.cefrLevel,
+            accuracy: s.accuracyPercentage,
+          })),
+        });
+      } catch (e) {
+        console.error("Failed to send admin result email:", e);
+      }
+
+      res.json({
+        success: true,
+        finalLevel,
+        mcLevel,
+        writingLevel: writingTask?.aiScore,
+        speakingLevel: speakingTask?.aiScore,
+        sectionResults: sectionResults.map(s => ({
+          sectionName: s.sectionName,
+          cefrLevel: s.cefrLevel,
+          accuracy: s.accuracyPercentage,
+        })),
+        writingFeedback: writingTask?.aiFeedback,
+        speakingFeedback: speakingTask?.aiFeedback,
+        competencyReport: {
+          writing: writingTask ? {
+            grammar: writingTask.aiGrammarScore,
+            vocabulary: writingTask.aiVocabularyScore,
+            coherence: writingTask.aiCoherenceScore,
+            taskCompletion: writingTask.aiTaskCompletionScore,
+          } : null,
+          speaking: speakingTask ? {
+            grammar: speakingTask.aiGrammarScore,
+            vocabulary: speakingTask.aiVocabularyScore,
+            coherence: speakingTask.aiCoherenceScore,
+            taskCompletion: speakingTask.aiTaskCompletionScore,
+          } : null,
+        },
+      });
+    } catch (error) {
+      console.error("Error completing test:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  });
+
+  app.post("/api/business-english-test/complete-without-speaking", async (req, res) => {
+    try {
+      const { sessionId } = req.body;
+      if (!sessionId) return res.status(400).json({ success: false, message: "Missing sessionId" });
+
+      const session = await storage.getBeTestSession(sessionId);
+      if (!session) return res.status(404).json({ success: false, message: "Session not found" });
+
+      await storage.updateBeTestSession(sessionId, { audioUnavailable: true });
+
+      const mcLevel = session.currentLevel;
+      const finalLevel = calculateFinalLevel(mcLevel, session.writingScore, null);
+
+      const sectionResults = await storage.getBeSectionResultsBySession(sessionId);
+      const writingSpeaking = await storage.getBeWritingSpeakingBySession(sessionId);
+      const writingTask = writingSpeaking.find(ws => ws.taskType === "writing");
+
+      await storage.updateBeTestSession(sessionId, {
+        finalLevel,
+        overallScore: finalLevel,
+        status: "completed",
+        completedAt: new Date(),
+        resultsEmailSentAt: new Date(),
+        audioUnavailable: true,
+      });
+
+      try {
+        await sendBusinessEnglishConfirmationEmail(session.email, session.firstName);
+        await sendBusinessEnglishResultEmail({
+          candidateName: `${session.firstName} ${session.lastName}`,
+          candidateEmail: session.email,
+          company: session.company,
+          phone: session.phone,
+          finalLevel,
+          overallScore: finalLevel,
+          mcAccuracy: `${session.correctAnswers}/${session.totalQuestions}`,
+          writingLevel: writingTask?.aiScore || null,
+          writingFeedback: writingTask?.aiFeedback || null,
+          writingScores: writingTask ? {
+            grammar: writingTask.aiGrammarScore ?? 0,
+            vocabulary: writingTask.aiVocabularyScore ?? 0,
+            coherence: writingTask.aiCoherenceScore ?? 0,
+            taskCompletion: writingTask.aiTaskCompletionScore ?? 0,
+          } : null,
+          speakingLevel: null,
+          speakingFeedback: null,
+          speakingScores: null,
+          sectionResults: sectionResults.map(s => ({
+            sectionName: s.sectionName,
+            cefrLevel: s.cefrLevel,
+            accuracy: s.accuracyPercentage,
+          })),
+        });
+      } catch (e) {
+        console.error("Failed to send emails:", e);
+      }
+
+      res.json({
+        success: true,
+        finalLevel,
+        mcLevel,
+        writingLevel: writingTask?.aiScore,
+        sectionResults: sectionResults.map(s => ({
+          sectionName: s.sectionName,
+          cefrLevel: s.cefrLevel,
+          accuracy: s.accuracyPercentage,
+        })),
+      });
+    } catch (error) {
+      console.error("Error completing without speaking:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  });
+
+  app.get("/api/admin/business-english-results", requireAdmin, async (_req, res) => {
+    try {
+      const sessions = await storage.getBeTestSessions();
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching BE results:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  });
+
+  app.get("/api/admin/business-english-results/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const session = await storage.getBeTestSession(id);
+      if (!session) return res.status(404).json({ success: false, message: "Session not found" });
+
+      const responses = await storage.getBeResponsesBySession(id);
+      const sectionResults = await storage.getBeSectionResultsBySession(id);
+      const writingSpeaking = await storage.getBeWritingSpeakingBySession(id);
+
+      const allQuestions = await storage.getBeQuestions();
+      const enrichedResponses = responses.map(r => {
+        const q = allQuestions.find(qq => qq.id === r.questionId);
+        return {
+          ...r,
+          question: q?.question,
+          correctAnswer: q?.correctAnswer,
+          skillType: q?.skillType,
+          level: q?.level,
+        };
+      });
+
+      res.json({
+        session,
+        responses: enrichedResponses,
+        sectionResults,
+        writingSpeaking,
+      });
+    } catch (error) {
+      console.error("Error fetching BE result detail:", error);
+      res.status(500).json({ success: false, message: "Server error" });
     }
   });
 

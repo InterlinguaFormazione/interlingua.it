@@ -42,6 +42,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/language-coaching.tsx` - Premium language coaching page (1-to-1, 30% premium pricing, Milton Method copy)
 - `src/pages/corsi-italiano.tsx` - Italian for Foreigners page with IT/EN bilingual toggle, course pricing, Vicenza info, contact form
 - `src/pages/english-test.tsx` - Full English placement test at `/test-inglese` with 3 sections: grammar (50 MCQ), writing (3 AI-scored tasks via GPT-4o), speaking (3 tasks with Whisper transcription + GPT-4o scoring)
+- `src/pages/business-english-test.tsx` - Business English Adaptive Test at `/business-english-test` with CAT/IRT engine, 5 MC sections (grammar, vocabulary, use of English, reading, listening), writing + speaking AI-scored tasks, anti-cheating measures
 - `src/pages/cookie-policy.tsx` - GDPR cookie policy
 - `src/pages/privacy-policy.tsx` - GDPR privacy policy
 - `src/components/` - Reusable UI components
@@ -64,8 +65,10 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `routes.ts` - API endpoints with bot protection (honeypot, timestamp check, rate limiting)
 - `storage.ts` - PostgreSQL database storage (Drizzle ORM)
 - `ai-chat.ts` - AI chat endpoint (OpenAI GPT-4o-mini with full site context)
-- `english-test.ts` - AI scoring for English test (GPT-4o writing/speaking scoring, Whisper transcription)
-- `email.ts` - AWS SES email notifications (contact, newsletter, subscription payment, booking confirmation)
+- `english-test.ts` - AI scoring for English test (GPT-4o writing/speaking scoring, Whisper transcription) + business English scoring functions
+- `cat-engine.ts` - CAT/IRT engine for Business English test (2PL model, Fisher information, theta updates, CEFR mapping)
+- `business-english-questions.ts` - Question bank (300 questions, 5 skills x 6 levels x 10 topics)
+- `email.ts` - AWS SES email notifications (contact, newsletter, subscription payment, booking confirmation, business English results)
 - `crm.ts` - CRM webhook integration (forwards contact submissions)
 - `blog-generator.ts` - Automated blog generation
 

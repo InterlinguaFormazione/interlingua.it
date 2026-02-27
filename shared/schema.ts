@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, date, integer, unique } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, date, integer, unique, serial } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -305,6 +305,123 @@ export const insertEnglishTestResultSchema = createInsertSchema(englishTestResul
 
 export type InsertEnglishTestResult = z.infer<typeof insertEnglishTestResultSchema>;
 export type EnglishTestResult = typeof englishTestResults.$inferSelect;
+
+export const beTestSessions = pgTable("be_test_sessions", {
+  id: serial("id").primaryKey(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email").notNull(),
+  company: text("company").notNull(),
+  phone: text("phone"),
+  selfAssessedLevel: text("self_assessed_level").notNull(),
+  currentLevel: text("current_level").notNull(),
+  finalLevel: text("final_level"),
+  totalQuestions: integer("total_questions").default(0),
+  correctAnswers: integer("correct_answers").default(0),
+  writingScore: text("writing_score"),
+  speakingScore: text("speaking_score"),
+  overallScore: text("overall_score"),
+  audioUnavailable: boolean("audio_unavailable").default(false),
+  currentTheta: integer("current_theta"),
+  standardError: integer("standard_error"),
+  confidenceLevel: integer("confidence_level"),
+  testingMode: text("testing_mode").default("cat"),
+  status: text("status").default("in_progress"),
+  startedAt: timestamp("started_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+  resultsEmailSentAt: timestamp("results_email_sent_at"),
+  previousQuestions: text("previous_questions").default("[]"),
+  currentSectionIndex: integer("current_section_index").default(0),
+  totalSections: integer("total_sections").default(8),
+  competencyReport: text("competency_report"),
+  levelHistory: text("level_history").default("[]"),
+  questionsAtCurrentLevel: integer("questions_at_current_level").default(0),
+  consecutiveIncorrectA1: integer("consecutive_incorrect_a1").default(0),
+});
+
+export const insertBeTestSessionSchema = createInsertSchema(beTestSessions).omit({ id: true, startedAt: true });
+export type InsertBeTestSession = z.infer<typeof insertBeTestSessionSchema>;
+export type BeTestSession = typeof beTestSessions.$inferSelect;
+
+export const beQuestions = pgTable("be_questions", {
+  id: serial("id").primaryKey(),
+  level: text("level").notNull(),
+  skillType: text("skill_type").notNull(),
+  section: text("section").notNull(),
+  topic: text("topic").notNull(),
+  question: text("question").notNull(),
+  options: text("options").notNull(),
+  correctAnswer: text("correct_answer").notNull(),
+  audioUrl: text("audio_url"),
+  passage: text("passage"),
+  explanation: text("explanation"),
+  difficulty: integer("difficulty"),
+  discrimination: integer("discrimination"),
+  calibrationStatus: text("calibration_status").default("pending"),
+  calibrationNotes: text("calibration_notes"),
+});
+
+export const insertBeQuestionSchema = createInsertSchema(beQuestions).omit({ id: true });
+export type InsertBeQuestion = z.infer<typeof insertBeQuestionSchema>;
+export type BeQuestion = typeof beQuestions.$inferSelect;
+
+export const beResponses = pgTable("be_responses", {
+  id: serial("id").primaryKey(),
+  sessionId: integer("session_id").notNull(),
+  questionId: integer("question_id").notNull(),
+  userAnswer: text("user_answer").notNull(),
+  isCorrect: boolean("is_correct").notNull(),
+  timeSpent: integer("time_spent"),
+  answeredAt: timestamp("answered_at").defaultNow(),
+  thetaBefore: integer("theta_before"),
+  thetaAfter: integer("theta_after"),
+  standardErrorBefore: integer("standard_error_before"),
+  standardErrorAfter: integer("standard_error_after"),
+  informationGain: integer("information_gain"),
+});
+
+export const insertBeResponseSchema = createInsertSchema(beResponses).omit({ id: true, answeredAt: true });
+export type InsertBeResponse = z.infer<typeof insertBeResponseSchema>;
+export type BeResponse = typeof beResponses.$inferSelect;
+
+export const beWritingSpeaking = pgTable("be_writing_speaking", {
+  id: serial("id").primaryKey(),
+  sessionId: integer("session_id").notNull(),
+  taskType: text("task_type").notNull(),
+  prompt: text("prompt").notNull(),
+  response: text("response").notNull(),
+  audioUrl: text("audio_url"),
+  aiScore: text("ai_score"),
+  aiGrammarScore: integer("ai_grammar_score"),
+  aiVocabularyScore: integer("ai_vocabulary_score"),
+  aiCoherenceScore: integer("ai_coherence_score"),
+  aiTaskCompletionScore: integer("ai_task_completion_score"),
+  aiFeedback: text("ai_feedback"),
+  submittedAt: timestamp("submitted_at").defaultNow(),
+});
+
+export const insertBeWritingSpeakingSchema = createInsertSchema(beWritingSpeaking).omit({ id: true, submittedAt: true });
+export type InsertBeWritingSpeaking = z.infer<typeof insertBeWritingSpeakingSchema>;
+export type BeWritingSpeaking = typeof beWritingSpeaking.$inferSelect;
+
+export const beSectionResults = pgTable("be_section_results", {
+  id: serial("id").primaryKey(),
+  sessionId: integer("session_id").notNull(),
+  sectionName: text("section_name").notNull(),
+  sectionIndex: integer("section_index").notNull(),
+  questionsAttempted: integer("questions_attempted").default(0),
+  questionsCorrect: integer("questions_correct").default(0),
+  accuracyPercentage: integer("accuracy_percentage"),
+  cefrLevel: text("cefr_level"),
+  completedAt: timestamp("completed_at").defaultNow(),
+  finalTheta: integer("final_theta"),
+  finalStandardError: integer("final_standard_error"),
+  sectionConfidence: integer("section_confidence"),
+});
+
+export const insertBeSectionResultSchema = createInsertSchema(beSectionResults).omit({ id: true, completedAt: true });
+export type InsertBeSectionResult = z.infer<typeof insertBeSectionResultSchema>;
+export type BeSectionResult = typeof beSectionResults.$inferSelect;
 
 export interface Course {
   id: string;

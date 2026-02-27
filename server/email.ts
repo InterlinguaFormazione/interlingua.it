@@ -531,3 +531,118 @@ export async function sendTestResultEmail(data: {
 
   await ses.send(command);
 }
+
+export async function sendBusinessEnglishResultEmail(data: {
+  candidateName: string;
+  candidateEmail: string;
+  company: string;
+  phone: string | null;
+  finalLevel: string;
+  overallScore: string;
+  mcAccuracy: string;
+  writingLevel: string | null;
+  writingFeedback: string | null;
+  writingScores: { grammar: number; vocabulary: number; coherence: number; taskCompletion: number } | null;
+  speakingLevel: string | null;
+  speakingFeedback: string | null;
+  speakingScores: { grammar: number; vocabulary: number; coherence: number; taskCompletion: number } | null;
+  sectionResults: Array<{ sectionName: string; cefrLevel: string | null; accuracy: number | null }>;
+}): Promise<void> {
+  if (!ses) {
+    console.warn("SES not configured — business English test result email not sent");
+    return;
+  }
+
+  const adminEmail = process.env.ADMIN_EMAIL;
+  if (!adminEmail) {
+    console.warn("ADMIN_EMAIL not set — business English test result email not sent");
+    return;
+  }
+
+  const sectionRows = data.sectionResults.map(s =>
+    `<tr><td style="padding:8px;border-bottom:1px solid #eee;">${s.sectionName}</td><td style="padding:8px;text-align:center;border-bottom:1px solid #eee;">${s.cefrLevel || "N/A"}</td><td style="padding:8px;text-align:center;border-bottom:1px solid #eee;">${s.accuracy !== null ? s.accuracy + "%" : "N/A"}</td></tr>`
+  ).join("");
+
+  const writingBlock = data.writingLevel && data.writingScores ? `
+    <h3 style="margin:20px 0 8px;color:#2563eb;">Writing Assessment</h3>
+    <p><strong>Level:</strong> ${data.writingLevel}</p>
+    <p>Grammar: ${data.writingScores.grammar}/100 | Vocabulary: ${data.writingScores.vocabulary}/100 | Coherence: ${data.writingScores.coherence}/100 | Task: ${data.writingScores.taskCompletion}/100</p>
+    ${data.writingFeedback ? `<p style="color:#555;font-style:italic;">${data.writingFeedback}</p>` : ""}
+  ` : "";
+
+  const speakingBlock = data.speakingLevel && data.speakingScores ? `
+    <h3 style="margin:20px 0 8px;color:#7c3aed;">Speaking Assessment</h3>
+    <p><strong>Level:</strong> ${data.speakingLevel}</p>
+    <p>Grammar: ${data.speakingScores.grammar}/100 | Vocabulary: ${data.speakingScores.vocabulary}/100 | Coherence: ${data.speakingScores.coherence}/100 | Task: ${data.speakingScores.taskCompletion}/100</p>
+    ${data.speakingFeedback ? `<p style="color:#555;font-style:italic;">${data.speakingFeedback}</p>` : ""}
+  ` : "";
+
+  const htmlBody = `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#1e40af,#3b82f6);padding:24px;text-align:center;">
+        <h1 style="color:#fff;margin:0;font-size:22px;">Business English Test Result</h1>
+        <p style="color:#dbeafe;margin:8px 0 0;font-size:14px;">${data.candidateName} - ${data.company}</p>
+      </div>
+      <div style="padding:24px;">
+        <div style="text-align:center;margin-bottom:24px;">
+          <div style="display:inline-block;background:#1e40af;color:#fff;padding:12px 32px;border-radius:8px;font-size:28px;font-weight:bold;">${data.finalLevel}</div>
+          <p style="color:#666;margin:8px 0 0;">Overall Level</p>
+        </div>
+        <table style="width:100%;margin-bottom:16px;">
+          <tr><td style="color:#666;">Email:</td><td>${data.candidateEmail}</td></tr>
+          <tr><td style="color:#666;">Company:</td><td>${data.company}</td></tr>
+          ${data.phone ? `<tr><td style="color:#666;">Phone:</td><td>${data.phone}</td></tr>` : ""}
+          <tr><td style="color:#666;">MC Accuracy:</td><td>${data.mcAccuracy}</td></tr>
+        </table>
+        <h3 style="margin:20px 0 8px;color:#333;">Section Breakdown</h3>
+        <table style="width:100%;border-collapse:collapse;">
+          <tr style="background:#f8fafc;"><th style="padding:8px;text-align:left;">Section</th><th style="padding:8px;text-align:center;">Level</th><th style="padding:8px;text-align:center;">Accuracy</th></tr>
+          ${sectionRows}
+        </table>
+        ${writingBlock}
+        ${speakingBlock}
+        <div style="margin-top:24px;padding:12px;background:#f0f9ff;border-radius:8px;text-align:center;">
+          <p style="margin:0;color:#555;font-size:12px;">Test completed: ${new Date().toLocaleDateString("it-IT", { day:"2-digit", month:"long", year:"numeric", hour:"2-digit", minute:"2-digit" })}</p>
+        </div>
+      </div>
+    </div>`;
+
+  const command = new SendEmailCommand({
+    Source: FROM_EMAIL,
+    Destination: { ToAddresses: [adminEmail] },
+    Message: {
+      Subject: { Data: `Business English Test: ${data.candidateName} (${data.company}) - ${data.finalLevel}`, Charset: "UTF-8" },
+      Body: { Html: { Data: htmlBody, Charset: "UTF-8" } },
+    },
+    ReplyToAddresses: [data.candidateEmail],
+  });
+
+  await ses.send(command);
+}
+
+export async function sendBusinessEnglishConfirmationEmail(email: string, firstName: string): Promise<void> {
+  if (!ses) return;
+
+  const htmlBody = `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#1e40af,#3b82f6);padding:24px;text-align:center;">
+        <h1 style="color:#fff;margin:0;font-size:20px;">Grazie, ${firstName}!</h1>
+      </div>
+      <div style="padding:24px;">
+        <p>Thank you for completing the Business English Adaptive Test.</p>
+        <p>Your results have been submitted and will be reviewed by our team. You will receive detailed feedback from the school shortly.</p>
+        <p style="color:#666;font-size:13px;margin-top:24px;">Best regards,<br/>Interlingua / SkillCraft</p>
+      </div>
+    </div>`;
+
+  const command = new SendEmailCommand({
+    Source: FROM_EMAIL,
+    Destination: { ToAddresses: [email] },
+    Message: {
+      Subject: { Data: "Business English Test - Thank You", Charset: "UTF-8" },
+      Body: { Html: { Data: htmlBody, Charset: "UTF-8" } },
+    },
+  });
+
+  await ses.send(command);
+}

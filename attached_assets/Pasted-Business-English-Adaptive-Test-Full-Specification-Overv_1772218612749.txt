@@ -1,0 +1,285 @@
+Business English Adaptive Test — Full Specification
+Overview
+Build a Business English proficiency assessment tool that uses Computerized Adaptive Testing (CAT) and Item Response Theory (IRT) to determine a candidate's CEFR level from A0 (complete beginner) to C1 (advanced). The test has three phases: multiple choice (adaptive), written production, and spoken production. Results are scored by GPT-4o and emailed to an admin.
+
+Tech Stack
+Frontend: React + TypeScript + Tailwind CSS + shadcn/ui + TanStack Query
+Backend: Express.js + TypeScript
+Database: PostgreSQL with Drizzle ORM
+AI: OpenAI GPT-4o (scoring), OpenAI Whisper (audio transcription), OpenAI TTS (optional listening audio)
+Email: AWS SES (or any transactional email provider)
+Audio recording: Browser MediaRecorder API (audio/webm format)
+Database Schema
+Table: business_english_test_sessions
+id                        SERIAL PRIMARY KEY
+first_name                TEXT NOT NULL
+last_name                 TEXT NOT NULL
+email                     TEXT NOT NULL
+company                   TEXT NOT NULL
+phone                     TEXT
+self_assessed_level       TEXT NOT NULL          -- A1, A2, B1, B2, C1
+current_level             TEXT NOT NULL          -- Live adaptive level during test
+final_level               TEXT                   -- Final CEFR result
+total_questions           INTEGER DEFAULT 0
+correct_answers           INTEGER DEFAULT 0
+writing_score             TEXT                   -- CEFR level from AI
+speaking_score            TEXT                   -- CEFR level from AI
+overall_score             TEXT                   -- Combined final CEFR level
+audio_unavailable         BOOLEAN DEFAULT false
+current_theta             INTEGER                -- Ability estimate ×100 (range -300 to +300)
+standard_error            INTEGER                -- SE of theta ×100
+confidence_level          INTEGER                -- 0-100
+testing_mode              TEXT DEFAULT 'cat'
+status                    TEXT DEFAULT 'in_progress'  -- in_progress, completed, abandoned
+started_at                TIMESTAMP DEFAULT NOW()
+completed_at              TIMESTAMP
+results_email_sent_at     TIMESTAMP              -- Prevents duplicate emails
+previous_questions        TEXT DEFAULT '[]'      -- JSON array of used question IDs
+current_section_index     INTEGER DEFAULT 0      -- 0=self-assessment, 1-5=skills, 6=writing, 7=speaking
+total_sections            INTEGER DEFAULT 8
+competency_report         TEXT                   -- JSON competency breakdown
+level_history             TEXT DEFAULT '[]'      -- JSON array of level at each question
+questions_at_current_level INTEGER DEFAULT 0
+consecutive_incorrect_a1  INTEGER DEFAULT 0      -- Tracks A0 hard-fail condition
+Table: business_english_questions
+id                  SERIAL PRIMARY KEY
+level               TEXT NOT NULL          -- A0, A1, A2, B1, B2, C1
+skill_type          TEXT NOT NULL          -- grammar, vocabulary, use_of_english, listening, reading
+section             TEXT NOT NULL          -- same values as skill_type (used for section routing)
+topic               TEXT NOT NULL          -- business_email, meetings, presentations, negotiations, etc.
+question            TEXT NOT NULL
+options             TEXT NOT NULL          -- JSON array of 4 answer options
+correct_answer      TEXT NOT NULL
+audio_url           TEXT                   -- For listening questions (MP3 URL or TTS route)
+passage             TEXT                   -- For reading comprehension questions
+explanation         TEXT
+difficulty          INTEGER                -- IRT b-parameter ×100 (-300 to +300)
+discrimination      INTEGER                -- IRT a-parameter ×100 (0 to 300)
+calibration_status  TEXT DEFAULT 'pending' -- pending, expert_judged, pilot_tested, validated
+calibration_notes   TEXT
+Table: business_english_responses
+id                    SERIAL PRIMARY KEY
+session_id            INTEGER REFERENCES business_english_test_sessions(id)
+question_id           INTEGER REFERENCES business_english_questions(id)
+user_answer           TEXT NOT NULL
+is_correct            BOOLEAN NOT NULL
+time_spent            INTEGER                -- seconds
+answered_at           TIMESTAMP DEFAULT NOW()
+theta_before          INTEGER                -- IRT audit: ability before this answer ×100
+theta_after           INTEGER                -- IRT audit: ability after this answer ×100
+standard_error_before INTEGER
+standard_error_after  INTEGER
+information_gain      INTEGER                -- Fisher information ×100
+Table: business_english_writing_speaking
+id                        SERIAL PRIMARY KEY
+session_id                INTEGER REFERENCES business_english_test_sessions(id)
+task_type                 TEXT NOT NULL          -- 'writing' or 'speaking'
+prompt                    TEXT NOT NULL
+response                  TEXT NOT NULL          -- Written text OR Whisper transcript
+audio_url                 TEXT                   -- Temporary; deleted after transcription
+ai_score                  TEXT                   -- CEFR level: A0-C1
+ai_grammar_score          INTEGER                -- 0-100
+ai_vocabulary_score       INTEGER                -- 0-100
+ai_coherence_score        INTEGER                -- 0-100
+ai_task_completion_score  INTEGER                -- 0-100
+ai_feedback               TEXT
+submitted_at              TIMESTAMP DEFAULT NOW()
+Table: business_english_section_results
+id                    SERIAL PRIMARY KEY
+session_id            INTEGER REFERENCES business_english_test_sessions(id)
+section_name          TEXT NOT NULL      -- grammar, vocabulary, use_of_english, reading, listening, writing, speaking
+section_index         INTEGER NOT NULL   -- 1-7
+questions_attempted   INTEGER DEFAULT 0
+questions_correct     INTEGER DEFAULT 0
+accuracy_percentage   INTEGER            -- 0-100
+cefr_level            TEXT               -- A0-C1
+completed_at          TIMESTAMP DEFAULT NOW()
+final_theta           INTEGER            -- IRT ability for this section ×100
+final_standard_error  INTEGER
+section_confidence    INTEGER            -- 0-100
+CAT/IRT Engine
+2-Parameter Logistic (2PL) Model
+The probability of a correct answer is:
+
+P(θ) = 1 / (1 + exp(-a × (θ - b)))
+Where:
+
+θ = candidate ability estimate (stored ×100 as integer)
+a = item discrimination parameter (stored ×100)
+b = item difficulty parameter (stored ×100)
+Fisher Information
+Used to select the best next question:
+
+I(θ) = a² × P(θ) × (1 - P(θ))
+Select the unused question that maximizes information at the current θ.
+
+CEFR θ Thresholds (scaled ×100)
+CEFR	θ threshold
+C1	≥ 225
+B2	≥ 125
+B1	≥ 25
+A2	≥ -75
+A1	≥ -175
+A0	< -175
+Starting θ from Self-Assessment
+Self-assessed	Starting θ
+A1	-200
+A2	-100
+B1	0
+B2	100
+C1	200
+θ Update (EAP-style)
+After each answer, update theta using:
+
+newTheta = oldTheta + (isCorrect ? 0.3 : -0.3) × (1 / standardError)
+Clamp θ to [-300, 300]. Update SE using:
+
+newSE = oldSE × 0.9 (reduce by 10% per question, minimum 20)
+Test Flow
+Section Sequence
+Section 0: Self-assessment (choose perceived level)
+Section 1: Grammar        (adaptive, up to 5 questions)
+Section 2: Vocabulary     (adaptive, up to 5 questions)
+Section 3: Use of English (adaptive, up to 5 questions)
+Section 4: Reading        (adaptive, up to 5 questions)
+Section 5: Listening      (adaptive, up to 5 questions)
+Section 6: Writing task   (one prompt, free text)
+Section 7: Speaking task  (one prompt, audio recording)
+Total: 25 MC questions + 1 writing + 1 speaking
+
+Adaptive Logic — 3 Phases
+Phase 1 (Q1–9): Rapid Detection
+
+Q2 checkpoint: if 2/2 correct → move up 1 level; if 0/2 correct → move down 1 level
+Q3 checkpoint: if 3/3 correct → move up; if 0/3 wrong → move down
+Q6 checkpoint: if 5/6 correct → move up; if 1/6 correct → move down
+Q9 checkpoint: if 7/9 correct → move up; if 3/9 correct → move down
+Phase 2 (Q10–15): Refinement
+
+Track a 5-question sliding window
+4/5 correct → consider moving up; 1/5 correct → consider moving down
+Track questionsAtCurrentLevel — start stability tracking
+Phase 3 (Q16–25): Confirmation
+
+Require 8 questions at the same level to confirm final CEFR
+SE target ≤ 35 (scaled) or 85% confidence to stop early
+Hard Failure (A0 Assignment)
+If the candidate gets 6 consecutive wrong answers while already at A1 level, immediately end the MC phase and assign A0.
+
+Section Completion
+When each section ends (max questions reached or SE target met):
+
+Record section results in business_english_section_results
+Move to next section index
+After all 5 MC sections: calculate average θ → determine writing/speaking prompt level
+Writing Phase
+Prompts by Level
+A0: "Write a very simple email saying hello to a colleague."
+A1: "Write a short email to introduce yourself to a new colleague. Include your name, job title, and department."
+A2: "Write an email to your manager asking for time off next week for a personal appointment."
+B1: "Write an email to a client confirming a meeting next Tuesday at 2 PM."
+B2: "Write an email to a supplier expressing concern about a delayed shipment."
+C1: "Write an email to your team announcing a strategic reorganization of the department."
+AI Scoring (GPT-4o)
+Send the prompt + response to GPT-4o with this scoring instruction:
+
+Grammar accuracy (0–100): correctness and complexity
+Vocabulary range (0–100): business appropriateness
+Coherence (0–100): organization and flow
+Task completion (0–100): effectiveness
+Overall CEFR level: A0, A1, A2, B1, B2, or C1
+Feedback: 2-3 sentence comment
+Speaking Phase
+Prompts by Level
+A0: "Tell me your name and what you do at work. Use very simple words."
+A1: "Describe your typical workday in simple terms."
+A2: "Explain what your company does and what products or services it offers."
+B1: "Describe a challenge you faced at work recently and how you resolved it."
+B2: "Discuss the advantages and disadvantages of remote work for your industry."
+C1: "Analyze how digital transformation is affecting your sector and propose strategies for staying competitive."
+Recording
+Use browser MediaRecorder API with mimeType: 'audio/webm'
+Maximum 60 seconds — auto-stop at 60s
+Show countdown timer (not elapsed time)
+Pulse animation when ≤ 10 seconds remain
+Show audio level VU meter during recording
+Transcription & Cleanup
+Upload audio to server as multipart/form-data
+Save file (to cloud or local disk as fallback)
+On submit-speaking: read file → send to OpenAI Whisper API → get transcript
+Immediately delete the audio file after transcription (it is never needed again)
+Store only the transcript text in the database
+Whisper API Call
+const transcription = await openai.audio.transcriptions.create({
+  file: audioFile,
+  model: 'whisper-1',
+  language: 'en',
+  response_format: 'text',
+});
+Final Score Calculation
+Weighted Average
+finalLevel = weightedAverage([
+  { level: mcLevel,       weight: 0.4 },
+  { level: writingLevel,  weight: 0.3 },
+  { level: speakingLevel, weight: 0.3 },
+])
+Convert levels to numeric: A0=0, A1=1, A2=2, B1=3, B2=4, C1=5 Round to nearest integer → convert back to CEFR string.
+
+Anti-Cheating Measures
+Block copy, paste, cut events on all MC question elements
+Disable right-click context menu on question cards
+Listening questions: max 2 plays per audio clip
+Tab-switching detection: log visibilitychange events (optional warning)
+Email Notifications
+Admin Results Email
+Send to admin email when both writing and speaking AI scores are complete. Use results_email_sent_at field to prevent duplicate sends (check before sending, set after).
+
+Contents:
+
+Candidate name, email, company, phone
+Final CEFR level + overall score
+MC accuracy (correct/total)
+Writing: CEFR level + grammar/vocabulary/coherence/task scores + feedback
+Speaking: CEFR level + same 4 scores + feedback
+Section-by-section breakdown (grammar, vocabulary, use of English, reading, listening)
+Date/time of test
+Candidate Confirmation Email
+Send immediately after test completion (before AI scoring finishes). Contents: thank you message, note that detailed results will be reviewed by the school.
+
+Admin Dashboard (/admin/business-english-results)
+Display a table of all completed sessions with:
+
+Candidate info (name, email, company)
+Final CEFR level
+MC score, writing score, speaking score
+Date completed
+Filter by date range, level, company
+Export to Word document (individual competency report)
+IRT audit trail per session (theta progression, information gain per question)
+Cleanup Job
+Run daily at 3:00 AM server time:
+
+DELETE FROM business_english_test_sessions
+WHERE status = 'in_progress'
+AND started_at < NOW() - INTERVAL '7 days'
+Also delete associated responses, writing/speaking tasks, and section results.
+
+API Routes Required
+Method	Route	Description
+POST	/api/business-english/start	Create session, return sessionId + first question
+POST	/api/business-english/answer	Submit MC answer, get next question or advance to writing
+GET	/api/business-english/writing-prompt/:sessionId	Get writing prompt for session level
+POST	/api/business-english/submit-writing	Submit writing response, advance to speaking
+GET	/api/business-english/speaking-prompt/:sessionId	Get speaking prompt
+POST	/api/business-english/upload-audio	Upload audio file (multipart)
+POST	/api/business-english/submit-speaking	Submit speaking (triggers transcription + scoring)
+POST	/api/business-english/complete-without-speaking	Complete if audio unavailable
+POST	/api/business-english/update-audio-availability	Flag if mic not available
+GET	/api/admin/business-english-results	List all results (admin auth required)
+GET	/api/admin/business-english-results/:id	Single result detail
+Question Bank Minimum Requirements
+At least 20 questions per CEFR level (A0–C1) per skill type (grammar, vocabulary, use_of_english, reading, listening)
+That is: 6 levels × 5 skills × 20 questions = 600 questions minimum
+Each question needs IRT parameters: difficulty (b) and discrimination (a)
+Assign difficulty based on level: A0 → b≈-250, A1 → b≈-150, A2 → b≈-50, B1 → b≈50, B2 → b≈150, C1 → b≈250
+Default discrimination (a) = 100 (scaled) for all questions initially

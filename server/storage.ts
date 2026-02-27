@@ -26,6 +26,16 @@ import {
   type InsertCourseMaterial,
   type EnglishTestResult,
   type InsertEnglishTestResult,
+  type BeTestSession,
+  type InsertBeTestSession,
+  type BeQuestion,
+  type InsertBeQuestion,
+  type BeResponse,
+  type InsertBeResponse,
+  type BeWritingSpeaking,
+  type InsertBeWritingSpeaking,
+  type BeSectionResult,
+  type InsertBeSectionResult,
   users,
   contactSubmissions,
   newsletterSubscriptions,
@@ -40,6 +50,11 @@ import {
   shopOrders,
   courseMaterials,
   englishTestResults,
+  beTestSessions,
+  beQuestions,
+  beResponses,
+  beWritingSpeaking,
+  beSectionResults,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte, desc } from "drizzle-orm";
@@ -114,6 +129,26 @@ export interface IStorage {
   createEnglishTestResult(result: InsertEnglishTestResult): Promise<EnglishTestResult>;
   getEnglishTestResults(): Promise<EnglishTestResult[]>;
   getEnglishTestResultById(id: string): Promise<EnglishTestResult | undefined>;
+
+  createBeTestSession(session: InsertBeTestSession): Promise<BeTestSession>;
+  getBeTestSession(id: number): Promise<BeTestSession | undefined>;
+  updateBeTestSession(id: number, data: Partial<BeTestSession>): Promise<BeTestSession | undefined>;
+  getBeTestSessions(): Promise<BeTestSession[]>;
+
+  createBeQuestion(question: InsertBeQuestion): Promise<BeQuestion>;
+  getBeQuestions(): Promise<BeQuestion[]>;
+  getBeQuestionsBySkillAndLevel(skillType: string, level: string): Promise<BeQuestion[]>;
+  getBeQuestionById(id: number): Promise<BeQuestion | undefined>;
+  getBeQuestionCount(): Promise<number>;
+
+  createBeResponse(response: InsertBeResponse): Promise<BeResponse>;
+  getBeResponsesBySession(sessionId: number): Promise<BeResponse[]>;
+
+  createBeWritingSpeaking(ws: InsertBeWritingSpeaking): Promise<BeWritingSpeaking>;
+  getBeWritingSpeakingBySession(sessionId: number): Promise<BeWritingSpeaking[]>;
+
+  createBeSectionResult(result: InsertBeSectionResult): Promise<BeSectionResult>;
+  getBeSectionResultsBySession(sessionId: number): Promise<BeSectionResult[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -411,6 +446,75 @@ export class DatabaseStorage implements IStorage {
   async getEnglishTestResultById(id: string): Promise<EnglishTestResult | undefined> {
     const [result] = await db.select().from(englishTestResults).where(eq(englishTestResults.id, id));
     return result;
+  }
+
+  async createBeTestSession(session: InsertBeTestSession): Promise<BeTestSession> {
+    const [result] = await db.insert(beTestSessions).values(session).returning();
+    return result;
+  }
+
+  async getBeTestSession(id: number): Promise<BeTestSession | undefined> {
+    const [result] = await db.select().from(beTestSessions).where(eq(beTestSessions.id, id));
+    return result;
+  }
+
+  async updateBeTestSession(id: number, data: Partial<BeTestSession>): Promise<BeTestSession | undefined> {
+    const [result] = await db.update(beTestSessions).set(data).where(eq(beTestSessions.id, id)).returning();
+    return result;
+  }
+
+  async getBeTestSessions(): Promise<BeTestSession[]> {
+    return db.select().from(beTestSessions).orderBy(desc(beTestSessions.startedAt));
+  }
+
+  async createBeQuestion(question: InsertBeQuestion): Promise<BeQuestion> {
+    const [result] = await db.insert(beQuestions).values(question).returning();
+    return result;
+  }
+
+  async getBeQuestions(): Promise<BeQuestion[]> {
+    return db.select().from(beQuestions);
+  }
+
+  async getBeQuestionsBySkillAndLevel(skillType: string, level: string): Promise<BeQuestion[]> {
+    return db.select().from(beQuestions).where(and(eq(beQuestions.skillType, skillType), eq(beQuestions.level, level)));
+  }
+
+  async getBeQuestionById(id: number): Promise<BeQuestion | undefined> {
+    const [result] = await db.select().from(beQuestions).where(eq(beQuestions.id, id));
+    return result;
+  }
+
+  async getBeQuestionCount(): Promise<number> {
+    const results = await db.select().from(beQuestions);
+    return results.length;
+  }
+
+  async createBeResponse(response: InsertBeResponse): Promise<BeResponse> {
+    const [result] = await db.insert(beResponses).values(response).returning();
+    return result;
+  }
+
+  async getBeResponsesBySession(sessionId: number): Promise<BeResponse[]> {
+    return db.select().from(beResponses).where(eq(beResponses.sessionId, sessionId)).orderBy(beResponses.answeredAt);
+  }
+
+  async createBeWritingSpeaking(ws: InsertBeWritingSpeaking): Promise<BeWritingSpeaking> {
+    const [result] = await db.insert(beWritingSpeaking).values(ws).returning();
+    return result;
+  }
+
+  async getBeWritingSpeakingBySession(sessionId: number): Promise<BeWritingSpeaking[]> {
+    return db.select().from(beWritingSpeaking).where(eq(beWritingSpeaking.sessionId, sessionId));
+  }
+
+  async createBeSectionResult(result: InsertBeSectionResult): Promise<BeSectionResult> {
+    const [r] = await db.insert(beSectionResults).values(result).returning();
+    return r;
+  }
+
+  async getBeSectionResultsBySession(sessionId: number): Promise<BeSectionResult[]> {
+    return db.select().from(beSectionResults).where(eq(beSectionResults.sessionId, sessionId)).orderBy(beSectionResults.sectionIndex);
   }
 }
 
