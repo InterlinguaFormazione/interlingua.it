@@ -65,9 +65,11 @@ export function selectNextQuestion(
   return bestQuestion;
 }
 
-export function updateTheta(oldTheta: number, isCorrect: boolean, standardError: number): number {
+export function updateTheta(oldTheta: number, isCorrect: boolean, standardError: number, difficulty: number = 0, discrimination: number = 100): number {
   const se = standardError / 100;
-  const step = (isCorrect ? 0.4 : -0.4) * (1 / se);
+  const p = calculateProbability(oldTheta, difficulty, discrimination);
+  const residual = (isCorrect ? 1 : 0) - p;
+  const step = 0.8 * residual * (1 / se);
   const newTheta = oldTheta + Math.round(step * 100);
   return Math.max(-300, Math.min(300, newTheta));
 }
