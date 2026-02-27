@@ -29,6 +29,7 @@ import corsoOnlineImage from "@assets/corso-lingua-online_1772143586662.jpg";
 import speakersCornerCourseImage from "@assets/Speakers-Corner-Conversazione-in-lingua-Inglese_1772143640698.jpg";
 import fullImmersionImage from "@assets/Full-Immersion-Workshop-di-Lingua-Inglese_1772143747179.jpg";
 import managementImage from "@assets/management-leadership_1772143822898.webp";
+import courseItalianImage from "@/assets/images/course-italian.jpg";
 
 const categories = [
   {
@@ -188,19 +189,33 @@ export function CoursesSection() {
         >
           <Link href="/corsi-italiano">
             <Card className="hover-elevate cursor-pointer group overflow-hidden" data-testid="card-italian-courses">
-              <div className="flex flex-col sm:flex-row items-center gap-4 p-5">
-                <div className="flex items-center gap-3 shrink-0">
-                  <div className="p-2.5 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 shadow-lg">
-                    <Languages className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="font-bold group-hover:text-primary transition-colors">Italiano per Stranieri / Italian for Foreigners</h3>
-                    <p className="text-sm text-muted-foreground">Corsi intensivi di lingua italiana a Vicenza - Intensive Italian courses in Vicenza</p>
+              <div className="flex flex-col sm:flex-row items-stretch">
+                <div className="relative sm:w-48 h-32 sm:h-auto shrink-0 overflow-hidden">
+                  <img
+                    src={courseItalianImage}
+                    alt="Corsi di Italiano a Vicenza"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                    decoding="async"
+                    width={192}
+                    height={128}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent to-card/60 hidden sm:block" />
+                  <div className="absolute bottom-2 left-2 sm:bottom-auto sm:top-2 sm:left-2">
+                    <div className="p-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 shadow-lg">
+                      <Languages className="h-4 w-4 text-white" />
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-primary font-medium text-sm shrink-0 sm:ml-auto">
-                  Scopri / Discover
-                  <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-5 flex-1">
+                  <div className="text-left flex-1">
+                    <h3 className="font-bold group-hover:text-primary transition-colors">Italiano per Stranieri / Italian for Foreigners</h3>
+                    <p className="text-sm text-muted-foreground mt-1">Corsi intensivi di lingua italiana a Vicenza - Intensive Italian courses in Vicenza</p>
+                  </div>
+                  <div className="flex items-center gap-2 text-primary font-medium text-sm shrink-0">
+                    Scopri / Discover
+                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
               </div>
             </Card>
