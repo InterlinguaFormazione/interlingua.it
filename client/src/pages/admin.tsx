@@ -194,15 +194,15 @@ interface BeSessionDetail {
   }>;
 }
 
-function EnglishAdaptiveTab({ token, endpoint = "english-test-results" }: { token: string; endpoint?: string }) {
+function EnglishAdaptiveTab({ token }: { token: string }) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [filterCompany, setFilterCompany] = useState("");
   const [filterLevel, setFilterLevel] = useState("");
 
   const { data: sessions = [], isLoading } = useQuery<BeSession[]>({
-    queryKey: [`/api/admin/${endpoint}`],
+    queryKey: ["/api/admin/english-test-results"],
     queryFn: async () => {
-      const res = await fetch(`/api/admin/${endpoint}`, {
+      const res = await fetch("/api/admin/english-test-results", {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.json();
@@ -210,9 +210,9 @@ function EnglishAdaptiveTab({ token, endpoint = "english-test-results" }: { toke
   });
 
   const { data: detail } = useQuery<BeSessionDetail>({
-    queryKey: [`/api/admin/${endpoint}`, selectedId],
+    queryKey: ["/api/admin/english-test-results", selectedId],
     queryFn: async () => {
-      const res = await fetch(`/api/admin/${endpoint}/${selectedId}`, {
+      const res = await fetch(`/api/admin/english-test-results/${selectedId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.json();
@@ -1030,7 +1030,7 @@ export default function AdminPage() {
           </div>
 
           <Tabs defaultValue="contacts" className="space-y-6">
-            <TabsList className={`grid w-full ${isAdmin ? "grid-cols-8" : "grid-cols-7"}`}>
+            <TabsList className={`grid w-full ${isAdmin ? "grid-cols-7" : "grid-cols-6"}`}>
               <TabsTrigger value="contacts" data-testid="tab-contacts">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Messaggi
@@ -1051,13 +1051,9 @@ export default function AdminPage() {
                 <Newspaper className="w-4 h-4 mr-2" />
                 Blog
               </TabsTrigger>
-              <TabsTrigger value="general-english" data-testid="tab-general-english">
+              <TabsTrigger value="english-test" data-testid="tab-english-test">
                 <GraduationCap className="w-4 h-4 mr-2" />
-                General Test
-              </TabsTrigger>
-              <TabsTrigger value="business-english" data-testid="tab-business-english">
-                <Briefcase className="w-4 h-4 mr-2" />
-                Business Test
+                Adaptive Test
               </TabsTrigger>
               {isAdmin && (
                 <TabsTrigger value="users" data-testid="tab-users">
@@ -1245,26 +1241,14 @@ export default function AdminPage() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="general-english">
+            <TabsContent value="english-test">
               <Card>
                 <CardHeader>
-                  <CardTitle>General English Test Results</CardTitle>
+                  <CardTitle>English Adaptive Test Results</CardTitle>
                   <CardDescription>Adaptive test results with IRT audit trail</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <EnglishAdaptiveTab token={token} endpoint="english-test-results" />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="business-english">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Business English Test Results</CardTitle>
-                  <CardDescription>Business English adaptive test results (max 5 questions per section)</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <EnglishAdaptiveTab token={token} endpoint="business-english-results" />
+                  <EnglishAdaptiveTab token={token} />
                 </CardContent>
               </Card>
             </TabsContent>

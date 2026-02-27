@@ -1537,12 +1537,12 @@ export async function registerRoutes(
         },
       });
     } catch (error) {
-      console.error("Error starting business English test:", error);
+      console.error("Error starting English test:", error);
       res.status(500).json({ success: false, message: "Server error" });
     }
   });
 
-  app.post(["/api/english-test/answer", "/api/business-english-test/answer"], async (req, res) => {
+  app.post("/api/english-test/answer", async (req, res) => {
     try {
       const { sessionId, questionId, answer, timeSpent } = req.body;
       if (!sessionId || !questionId || !answer) {
@@ -1650,8 +1650,7 @@ export async function registerRoutes(
       const wouldHaveQuestion = selectNextQuestion(newTheta, prevQuestions, currentSkill, allQs);
       const outOfQuestions = !wouldHaveQuestion;
 
-      const maxQ = session.testType === 'business' ? 5 : MAX_QUESTIONS_PER_SECTION;
-      if (a0HardFail || outOfQuestions || shouldEndSection(questionsInCurrentSection, newSE, recentSectionLevels, maxQ)) {
+      if (a0HardFail || outOfQuestions || shouldEndSection(questionsInCurrentSection, newSE, recentSectionLevels)) {
         await storage.createBeSectionResult({
           sessionId,
           sectionName: currentSkill,
@@ -1772,12 +1771,12 @@ export async function registerRoutes(
         },
       });
     } catch (error) {
-      console.error("Error answering business English question:", error);
+      console.error("Error answering English test question:", error);
       res.status(500).json({ success: false, message: "Server error" });
     }
   });
 
-  app.get(["/api/english-test/session/:id", "/api/business-english-test/session/:id"], async (req, res) => {
+  app.get("/api/english-test/session/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const session = await storage.getBeTestSession(id);
@@ -1788,7 +1787,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post(["/api/english-test/submit-writing", "/api/business-english-test/submit-writing"], async (req, res) => {
+  app.post("/api/english-test/submit-writing", async (req, res) => {
     try {
       const { sessionId, response: writtenResponse, prompt } = req.body;
       if (!sessionId) {
@@ -1862,7 +1861,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post(["/api/english-test/submit-speaking", "/api/business-english-test/submit-speaking"], upload.single("audio"), async (req: any, res) => {
+  app.post("/api/english-test/submit-speaking", upload.single("audio"), async (req: any, res) => {
     try {
       const { sessionId: rawSessionId, prompt } = req.body;
       if (!rawSessionId || !req.file) {
@@ -1945,7 +1944,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post(["/api/english-test/complete", "/api/business-english-test/complete"], async (req, res) => {
+  app.post("/api/english-test/complete", async (req, res) => {
     try {
       const { sessionId } = req.body;
       if (!sessionId) return res.status(400).json({ success: false, message: "Missing sessionId" });
@@ -2088,7 +2087,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post(["/api/english-test/complete-without-speaking", "/api/business-english-test/complete-without-speaking"], async (req, res) => {
+  app.post("/api/english-test/complete-without-speaking", async (req, res) => {
     try {
       const { sessionId } = req.body;
       if (!sessionId) return res.status(400).json({ success: false, message: "Missing sessionId" });
@@ -2198,8 +2197,7 @@ export async function registerRoutes(
   app.get("/api/admin/english-test-results", requireAdmin, async (_req, res) => {
     try {
       const sessions = await storage.getBeTestSessions();
-      const generalSessions = sessions.filter((s: any) => !s.testType || s.testType === 'general');
-      res.json(generalSessions);
+      res.json(sessions);
     } catch (error) {
       console.error("Error fetching BE results:", error);
       res.status(500).json({ success: false, message: "Server error" });
@@ -2236,137 +2234,6 @@ export async function registerRoutes(
       });
     } catch (error) {
       console.error("Error fetching BE result detail:", error);
-      res.status(500).json({ success: false, message: "Server error" });
-    }
-  });
-
-  app.post("/api/business-english-test/start", async (req, res) => {
-    try {
-      const { firstName, lastName, email, company, phone, city, province, selfAssessedLevel } = req.body;
-      if (!firstName || !lastName || !email || !company || !selfAssessedLevel) {
-        return res.status(400).json({ success: false, message: "Missing required fields (company is required for Business English test)" });
-      }
-
-      const questionCount = await storage.getBeQuestionCount();
-      if (questionCount === 0) {
-        const questions = getAllQuestions();
-        for (const q of questions) {
-          await storage.createBeQuestion(q);
-        }
-      }
-
-      const startingTheta = selfAssessmentToTheta(selfAssessedLevel);
-      const session = await storage.createBeTestSession({
-        firstName,
-        lastName,
-        email,
-        company: company || null,
-        phone: phone || null,
-        city: city || null,
-        province: province || null,
-        selfAssessedLevel,
-        currentLevel: thetaToCEFR(startingTheta),
-        currentTheta: startingTheta,
-        standardError: 100,
-        confidenceLevel: 0,
-        previousQuestions: "[]",
-        currentSectionIndex: 1,
-        totalSections: 8,
-        levelHistory: "[]",
-        questionsAtCurrentLevel: 0,
-        consecutiveIncorrectA1: 0,
-        testType: "business",
-      });
-
-      const allQuestions = await storage.getBeQuestions();
-      let firstQuestion = null;
-      let startSectionIndex = 1;
-      let startSkill = SECTION_SKILLS[0];
-
-      for (let si = 0; si < SECTION_SKILLS.length; si++) {
-        const skill = SECTION_SKILLS[si];
-        const q = selectNextQuestion(startingTheta, [], skill, allQuestions);
-        if (q) {
-          firstQuestion = q;
-          startSectionIndex = si + 1;
-          startSkill = skill;
-          break;
-        }
-      }
-
-      if (!firstQuestion) {
-        return res.status(500).json({ success: false, message: "No questions available. Please contact the administrator." });
-      }
-
-      if (startSectionIndex !== 1) {
-        await storage.updateBeTestSession(session.id, { currentSectionIndex: startSectionIndex });
-      }
-
-      res.json({
-        success: true,
-        sessionId: session.id,
-        currentTheta: startingTheta,
-        currentLevel: session.currentLevel,
-        currentSectionIndex: startSectionIndex,
-        currentSkill: startSkill,
-        question: {
-          id: firstQuestion.id,
-          question: firstQuestion.question,
-          options: JSON.parse(firstQuestion.options),
-          skillType: firstQuestion.skillType,
-          level: firstQuestion.level,
-          passage: firstQuestion.passage,
-          audioUrl: firstQuestion.audioUrl,
-        },
-      });
-    } catch (error) {
-      console.error("Error starting business English test:", error);
-      res.status(500).json({ success: false, message: "Server error" });
-    }
-  });
-
-
-  app.get("/api/admin/business-english-results", requireAdmin, async (_req, res) => {
-    try {
-      const sessions = await storage.getBeTestSessions();
-      const businessSessions = sessions.filter((s: any) => s.testType === 'business');
-      res.json(businessSessions);
-    } catch (error) {
-      console.error("Error fetching business English results:", error);
-      res.status(500).json({ success: false, message: "Server error" });
-    }
-  });
-
-  app.get("/api/admin/business-english-results/:id", requireAdmin, async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const session = await storage.getBeTestSession(id);
-      if (!session) return res.status(404).json({ success: false, message: "Session not found" });
-
-      const responses = await storage.getBeResponsesBySession(id);
-      const sectionResults = await storage.getBeSectionResultsBySession(id);
-      const writingSpeaking = await storage.getBeWritingSpeakingBySession(id);
-
-      const allQuestions = await storage.getBeQuestions();
-      const enrichedResponses = responses.map(r => {
-        const q = allQuestions.find(qq => qq.id === r.questionId);
-        return {
-          ...r,
-          question: q?.question,
-          correctAnswer: q?.correctAnswer,
-          skillType: q?.skillType,
-          level: q?.level,
-        };
-      });
-
-      res.json({
-        session,
-        responses: enrichedResponses,
-        sectionResults,
-        writingSpeaking,
-      });
-    } catch (error) {
-      console.error("Error fetching business English result detail:", error);
       res.status(500).json({ success: false, message: "Server error" });
     }
   });

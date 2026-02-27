@@ -32,7 +32,6 @@ import ShopPage from "@/pages/shop";
 import ShopCheckoutPage from "@/pages/shop-checkout";
 import ShopDashboardPage from "@/pages/shop-dashboard";
 import EnglishTestPage from "@/pages/english-test";
-import BusinessEnglishTestPage from "@/pages/business-english-test";
 import NotFound from "@/pages/not-found";
 
 function ScrollToTop() {
@@ -64,7 +63,6 @@ function Router() {
       <Route path="/shop/checkout/:slug" component={ShopCheckoutPage} />
       <Route path="/shop/dashboard" component={ShopDashboardPage} />
       <Route path="/english-test" component={EnglishTestPage} />
-      <Route path="/business-english-test" component={BusinessEnglishTestPage} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={BlogPostPage} />
