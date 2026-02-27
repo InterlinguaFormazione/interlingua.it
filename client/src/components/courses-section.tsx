@@ -134,7 +134,11 @@ export function CoursesSection() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <a href={category.href} {...(category.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
+                <a
+                  href={category.href}
+                  target={category.href.startsWith("http") ? "_blank" : undefined}
+                  rel={category.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                >
                   <Card 
                     className="h-full hover-elevate group cursor-pointer relative overflow-hidden"
                     data-testid={`card-category-${category.id}`}
