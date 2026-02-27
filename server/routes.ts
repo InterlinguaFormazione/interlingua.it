@@ -1634,8 +1634,7 @@ export async function registerRoutes(
         a0HardFail = true;
       }
 
-      const phaseResult = checkPhaseTransitions(newTotalQ, newCorrect, newLevel, questionsAtCurrentLevel);
-      const adaptedLevel = a0HardFail ? "A0" : phaseResult.newLevel;
+      const adaptedLevel = a0HardFail ? "A0" : newLevel;
 
       const recentSectionLevels: string[] = [];
       for (const resp of sectionResponses) {
