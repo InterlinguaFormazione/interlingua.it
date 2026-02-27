@@ -68,15 +68,21 @@ export function selectNextQuestion(
 export function updateTheta(oldTheta: number, isCorrect: boolean, standardError: number, difficulty: number = 0, discrimination: number = 100): number {
   const safeSE = Math.max(standardError, 20);
   const se = safeSE / 100;
+  const a = discrimination / 100;
   const p = calculateProbability(oldTheta, difficulty, discrimination);
   const residual = (isCorrect ? 1 : 0) - p;
-  const step = 0.8 * residual * se;
+  const step = se * se * a * residual;
   const newTheta = oldTheta + Math.round(step * 100);
   return Math.max(-300, Math.min(300, newTheta));
 }
 
-export function updateStandardError(oldSE: number): number {
-  const newSE = Math.round(oldSE * 0.9);
+export function updateStandardError(oldSE: number, theta: number, difficulty: number = 0, discrimination: number = 100): number {
+  const se = Math.max(oldSE, 20) / 100;
+  const a = discrimination / 100;
+  const p = calculateProbability(theta, difficulty, discrimination);
+  const info = a * a * p * (1 - p);
+  const newVariance = 1 / (1 / (se * se) + info);
+  const newSE = Math.round(Math.sqrt(newVariance) * 100);
   return Math.max(20, newSE);
 }
 
@@ -196,16 +202,18 @@ export const TOTAL_MC_SECTIONS = 5;
 export function shouldEndSection(
   questionsInSection: number,
   standardError: number,
-  recentSectionLevels: string[]
+  recentSectionLevels: string[],
+  maxQuestions: number = MAX_QUESTIONS_PER_SECTION
 ): boolean {
-  if (questionsInSection >= MAX_QUESTIONS_PER_SECTION) return true;
-  if (questionsInSection < MIN_QUESTIONS_PER_SECTION) return false;
+  if (questionsInSection >= maxQuestions) return true;
+  if (questionsInSection < Math.min(MIN_QUESTIONS_PER_SECTION, maxQuestions)) return false;
 
-  if (standardError <= 35) return true;
+  if (standardError <= 40) return true;
 
-  if (recentSectionLevels.length >= 3) {
-    const last3 = recentSectionLevels.slice(-3);
-    if (last3[0] === last3[1] && last3[1] === last3[2]) return true;
+  const minForLevelRule = Math.min(8, maxQuestions);
+  if (questionsInSection >= minForLevelRule && recentSectionLevels.length >= 4) {
+    const last4 = recentSectionLevels.slice(-4);
+    if (last4[0] === last4[1] && last4[1] === last4[2] && last4[2] === last4[3]) return true;
   }
 
   return false;

@@ -339,6 +339,7 @@ export const beTestSessions = pgTable("be_test_sessions", {
   levelHistory: text("level_history").default("[]"),
   questionsAtCurrentLevel: integer("questions_at_current_level").default(0),
   consecutiveIncorrectA1: integer("consecutive_incorrect_a1").default(0),
+  testType: text("test_type").default("general"),
 });
 
 export const insertBeTestSessionSchema = createInsertSchema(beTestSessions).omit({ id: true, startedAt: true });
