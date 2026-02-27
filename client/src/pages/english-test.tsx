@@ -379,20 +379,34 @@ export default function BusinessEnglishTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            <GraduationCap className="w-4 h-4" />
-            General English Adaptive Test
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50/50 to-violet-50 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950 relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-200/30 dark:bg-blue-800/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 -left-32 w-80 h-80 bg-indigo-200/25 dark:bg-indigo-800/10 rounded-full blur-3xl" />
+        <div className="absolute -bottom-20 right-1/4 w-72 h-72 bg-violet-200/20 dark:bg-violet-800/10 rounded-full blur-3xl" />
+      </div>
+      <div className="relative container mx-auto px-4 py-10 max-w-4xl">
+        {(phase === "registration" || phase === "self-assessment") && (
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-blue-700 dark:text-blue-300 px-5 py-2 rounded-full text-sm font-medium mb-5 border border-blue-100 dark:border-blue-800/40 shadow-sm">
+              <GraduationCap className="w-4 h-4" />
+              Test Adattivo di Inglese
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-white dark:via-blue-100 dark:to-indigo-200 bg-clip-text text-transparent leading-tight" data-testid="text-page-title">
+              Scopri il Tuo Livello<br className="hidden md:block" /> di Inglese
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-3 text-base max-w-lg mx-auto">
+              Un test gratuito e intelligente che si adatta alle tue risposte per valutare con precisione le tue competenze linguistiche.
+            </p>
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white" data-testid="text-page-title">
-            English Proficiency Assessment
-          </h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-2">
-            Powered by Computerized Adaptive Testing (CAT) with IRT
-          </p>
-        </div>
+        )}
+        {phase !== "registration" && phase !== "self-assessment" && (
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white" data-testid="text-page-title">
+              Test di Inglese
+            </h1>
+          </div>
+        )}
 
         {phase !== "registration" && phase !== "self-assessment" && phase !== "results" && (
           <div className="mb-6 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-xl p-4 border border-slate-200 dark:border-slate-700">
@@ -438,30 +452,44 @@ export default function BusinessEnglishTestPage() {
         )}
 
         {phase === "registration" && (
-          <div className="max-w-2xl mx-auto" data-testid="card-registration">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
-                <GraduationCap className="w-8 h-8 text-white" />
+          <div className="max-w-xl mx-auto" data-testid="card-registration">
+            <div className="grid grid-cols-3 gap-4 mb-8 max-w-sm mx-auto">
+              <div className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/50 dark:bg-slate-800/40 backdrop-blur-sm border border-white/80 dark:border-slate-700/50">
+                <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+                  <Brain className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <span className="text-xs text-slate-500 dark:text-slate-400 text-center">Adattivo</span>
               </div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Benvenuto al Test di Inglese</h2>
-              <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm max-w-md mx-auto">
-                Compila i tuoi dati per iniziare la valutazione. Il test si adatta al tuo livello in tempo reale.
-              </p>
+              <div className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/50 dark:bg-slate-800/40 backdrop-blur-sm border border-white/80 dark:border-slate-700/50">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <span className="text-xs text-slate-500 dark:text-slate-400 text-center">Gratuito</span>
+              </div>
+              <div className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/50 dark:bg-slate-800/40 backdrop-blur-sm border border-white/80 dark:border-slate-700/50">
+                <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+                </div>
+                <span className="text-xs text-slate-500 dark:text-slate-400 text-center">~20 min</span>
+              </div>
             </div>
 
-            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/80 dark:border-slate-700/80 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 overflow-hidden">
-              <div className="h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
-              <CardContent className="p-6 pt-6">
+            <div className="rounded-3xl bg-white/80 dark:bg-slate-800/70 backdrop-blur-xl border border-white/90 dark:border-slate-700/60 shadow-2xl shadow-blue-900/5 dark:shadow-black/20 overflow-hidden">
+              <div className="px-8 pt-8 pb-2">
+                <h2 className="text-xl font-bold text-slate-800 dark:text-white">Inserisci i tuoi dati</h2>
+                <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">I campi contrassegnati con * sono obbligatori</p>
+              </div>
+              <div className="px-8 pb-8 pt-4">
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit(handleRegistration)} className="space-y-5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <form onSubmit={form.handleSubmit(handleRegistration)} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <FormField control={form.control} name="firstName" render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Nome *</FormLabel>
+                          <FormLabel className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">Nome *</FormLabel>
                           <FormControl>
-                            <div className="relative">
-                              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                              <Input {...field} data-testid="input-first-name" placeholder="Il tuo nome" className="pl-10 h-11 border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-500 rounded-lg" />
+                            <div className="relative group">
+                              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-600 group-focus-within:text-blue-500 transition-colors" />
+                              <Input {...field} data-testid="input-first-name" placeholder="Il tuo nome" className="pl-11 h-12 bg-slate-50/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-600/60 focus:border-blue-400 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-blue-500/10" />
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -469,11 +497,11 @@ export default function BusinessEnglishTestPage() {
                       )} />
                       <FormField control={form.control} name="lastName" render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Cognome *</FormLabel>
+                          <FormLabel className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">Cognome *</FormLabel>
                           <FormControl>
-                            <div className="relative">
-                              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                              <Input {...field} data-testid="input-last-name" placeholder="Il tuo cognome" className="pl-10 h-11 border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-500 rounded-lg" />
+                            <div className="relative group">
+                              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-600 group-focus-within:text-blue-500 transition-colors" />
+                              <Input {...field} data-testid="input-last-name" placeholder="Il tuo cognome" className="pl-11 h-12 bg-slate-50/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-600/60 focus:border-blue-400 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-blue-500/10" />
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -483,25 +511,25 @@ export default function BusinessEnglishTestPage() {
 
                     <FormField control={form.control} name="email" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Email *</FormLabel>
+                        <FormLabel className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">Email *</FormLabel>
                         <FormControl>
-                          <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <Input type="email" {...field} data-testid="input-email" placeholder="la-tua@email.com" className="pl-10 h-11 border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-500 rounded-lg" />
+                          <div className="relative group">
+                            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-600 group-focus-within:text-blue-500 transition-colors" />
+                            <Input type="email" {...field} data-testid="input-email" placeholder="la-tua@email.com" className="pl-11 h-12 bg-slate-50/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-600/60 focus:border-blue-400 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-blue-500/10" />
                           </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <FormField control={form.control} name="phone" render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Telefono</FormLabel>
+                          <FormLabel className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">Telefono</FormLabel>
                           <FormControl>
-                            <div className="relative">
-                              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                              <Input {...field} data-testid="input-phone" placeholder="Numero di telefono" className="pl-10 h-11 border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-500 rounded-lg" />
+                            <div className="relative group">
+                              <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-600 group-focus-within:text-blue-500 transition-colors" />
+                              <Input {...field} data-testid="input-phone" placeholder="Numero di telefono" className="pl-11 h-12 bg-slate-50/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-600/60 focus:border-blue-400 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-blue-500/10" />
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -509,11 +537,11 @@ export default function BusinessEnglishTestPage() {
                       )} />
                       <FormField control={form.control} name="company" render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Azienda</FormLabel>
+                          <FormLabel className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">Azienda</FormLabel>
                           <FormControl>
-                            <div className="relative">
-                              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                              <Input {...field} data-testid="input-company" placeholder="Nome azienda" className="pl-10 h-11 border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-500 rounded-lg" />
+                            <div className="relative group">
+                              <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-600 group-focus-within:text-blue-500 transition-colors" />
+                              <Input {...field} data-testid="input-company" placeholder="Nome azienda" className="pl-11 h-12 bg-slate-50/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-600/60 focus:border-blue-400 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-blue-500/10" />
                             </div>
                           </FormControl>
                           <FormMessage />
@@ -521,83 +549,110 @@ export default function BusinessEnglishTestPage() {
                       )} />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField control={form.control} name="city" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Citta</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                              <Input {...field} data-testid="input-city" placeholder="La tua citta" className="pl-10 h-11 border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-500 rounded-lg" />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
-                      <FormField control={form.control} name="province" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Provincia (sigla)</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Map className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                              <Input {...field} data-testid="input-province" placeholder="es. VI" maxLength={2} className="pl-10 h-11 uppercase border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-500 rounded-lg" />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )} />
+                    <div className="grid grid-cols-5 gap-3">
+                      <div className="col-span-3">
+                        <FormField control={form.control} name="city" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">Citta</FormLabel>
+                            <FormControl>
+                              <div className="relative group">
+                                <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-600 group-focus-within:text-blue-500 transition-colors" />
+                                <Input {...field} data-testid="input-city" placeholder="La tua citta" className="pl-11 h-12 bg-slate-50/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-600/60 focus:border-blue-400 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-blue-500/10" />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                      </div>
+                      <div className="col-span-2">
+                        <FormField control={form.control} name="province" render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">Provincia</FormLabel>
+                            <FormControl>
+                              <div className="relative group">
+                                <Map className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-600 group-focus-within:text-blue-500 transition-colors" />
+                                <Input {...field} data-testid="input-province" placeholder="es. VI" maxLength={2} className="pl-11 h-12 uppercase bg-slate-50/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-600/60 focus:border-blue-400 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-blue-500/10" />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )} />
+                      </div>
                     </div>
 
-                    <div className="pt-2">
-                      <Button type="submit" className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-200" data-testid="button-start-test">
-                        Inizia il Test <ArrowRight className="w-5 h-5 ml-2" />
+                    <div className="pt-3">
+                      <Button type="submit" className="w-full h-13 text-base bg-gradient-to-r from-blue-600 via-blue-600 to-indigo-600 hover:from-blue-700 hover:via-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200" data-testid="button-start-test">
+                        Inizia il Test
+                        <ArrowRight className="w-5 h-5 ml-2" />
                       </Button>
                     </div>
 
-                    <div className="flex items-center justify-center gap-4 pt-1 text-xs text-slate-400 dark:text-slate-500">
-                      <span className="flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> Dati protetti</span>
-                      <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> ~20 minuti</span>
-                      <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Gratuito</span>
-                    </div>
+                    <p className="text-center text-xs text-slate-400 dark:text-slate-500 pt-1">
+                      I tuoi dati sono trattati in conformita con il GDPR.
+                    </p>
                   </form>
                 </Form>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         )}
 
         {phase === "self-assessment" && (
-          <div className="max-w-2xl mx-auto" data-testid="card-self-assessment">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Come valuti il tuo inglese?</h2>
-              <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">
-                Seleziona il livello che meglio descrive le tue competenze attuali.
-              </p>
-            </div>
-            <div className="space-y-3">
-              {Object.entries(CEFR_DESCRIPTIONS).map(([level, { label, desc }]) => (
-                <button
-                  key={level}
-                  onClick={() => handleSelfAssessment(level)}
-                  disabled={isSubmitting}
-                  className="w-full text-left p-5 rounded-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-2 border-slate-200/80 dark:border-slate-600/80 hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-200 hover:bg-blue-50/80 dark:hover:bg-blue-900/20 hover:shadow-md hover:shadow-blue-100/50 dark:hover:shadow-blue-900/20 disabled:opacity-50 group"
-                  data-testid={`button-level-${level}`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-slate-800 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">{label}</div>
-                      <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">{desc}</div>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-slate-300 dark:text-slate-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors flex-shrink-0 ml-4" />
-                  </div>
-                </button>
-              ))}
-              {isSubmitting && (
-                <div className="flex items-center justify-center py-6">
-                  <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
-                  <span className="ml-2 text-slate-600 dark:text-slate-400">Preparazione del test...</span>
+          <div className="max-w-xl mx-auto" data-testid="card-self-assessment">
+            <div className="rounded-3xl bg-white/80 dark:bg-slate-800/70 backdrop-blur-xl border border-white/90 dark:border-slate-700/60 shadow-2xl shadow-blue-900/5 dark:shadow-black/20 overflow-hidden">
+              <div className="px-8 pt-8 pb-4 text-center">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-100 to-blue-100 dark:from-indigo-900/50 dark:to-blue-900/50 flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
                 </div>
-              )}
+                <h2 className="text-xl font-bold text-slate-800 dark:text-white">Come valuti il tuo inglese?</h2>
+                <p className="text-slate-400 dark:text-slate-500 text-sm mt-2">
+                  Questo ci aiuta a calibrare il test sul tuo livello.
+                </p>
+              </div>
+              <div className="px-6 pb-8 space-y-2.5">
+                {Object.entries(CEFR_DESCRIPTIONS).map(([level, { label, desc }]) => {
+                  const levelColors: Record<string, string> = {
+                    A1: "from-emerald-500 to-green-600",
+                    A2: "from-teal-500 to-cyan-600",
+                    B1: "from-blue-500 to-indigo-600",
+                    B2: "from-violet-500 to-purple-600",
+                    C1: "from-amber-500 to-orange-600",
+                  };
+                  const dotColors: Record<string, string> = {
+                    A1: "bg-emerald-500",
+                    A2: "bg-teal-500",
+                    B1: "bg-blue-500",
+                    B2: "bg-violet-500",
+                    C1: "bg-amber-500",
+                  };
+                  return (
+                    <button
+                      key={level}
+                      onClick={() => handleSelfAssessment(level)}
+                      disabled={isSubmitting}
+                      className="w-full text-left px-5 py-4 rounded-2xl bg-slate-50/80 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-600/40 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-200 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg hover:shadow-blue-100/40 dark:hover:shadow-blue-900/20 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:hover:scale-100 group"
+                      data-testid={`button-level-${level}`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`w-3 h-3 rounded-full ${dotColors[level] || "bg-gray-500"} flex-shrink-0 group-hover:scale-125 transition-transform`} />
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-slate-700 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white transition-colors text-sm">{label}</div>
+                          <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 leading-relaxed">{desc}</div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                      </div>
+                    </button>
+                  );
+                })}
+                {isSubmitting && (
+                  <div className="flex flex-col items-center justify-center py-8 gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+                      <Loader2 className="w-5 h-5 animate-spin text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <span className="text-sm text-slate-500 dark:text-slate-400">Preparazione del test...</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
