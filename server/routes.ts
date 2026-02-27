@@ -1616,7 +1616,11 @@ export async function registerRoutes(
 
       let nextSectionIndex = currentSectionIndex;
       let advanceSection = false;
-      if (a0HardFail || shouldEndSection(questionsInCurrentSection, newSE, recentSectionLevels)) {
+      const nextSkillForCheck = advanceSection ? SECTION_SKILLS[nextSectionIndex - 1] : currentSkill;
+      const wouldHaveQuestion = selectNextQuestion(newTheta, prevQuestions, nextSkillForCheck ?? currentSkill, allQs);
+      const outOfQuestions = !wouldHaveQuestion && !advanceSection;
+
+      if (a0HardFail || outOfQuestions || shouldEndSection(questionsInCurrentSection, newSE, recentSectionLevels)) {
         await storage.createBeSectionResult({
           sessionId,
           sectionName: currentSkill,
