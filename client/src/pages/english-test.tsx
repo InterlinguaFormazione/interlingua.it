@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { GraduationCap, CheckCircle, ChevronRight, Loader2, Mic, MicOff, PenTool, Volume2, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight } from "lucide-react";
+import { GraduationCap, CheckCircle, ChevronRight, Loader2, Mic, MicOff, PenTool, Volume2, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight, User, Mail, Phone, Building2, MapPin, Map } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 type Phase = "registration" | "self-assessment" | "mc-questions" | "writing" | "speaking" | "results";
@@ -438,107 +438,168 @@ export default function BusinessEnglishTestPage() {
         )}
 
         {phase === "registration" && (
-          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-xl" data-testid="card-registration">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl">Candidate Information</CardTitle>
-              <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
-                Please provide your details to begin the assessment
+          <div className="max-w-2xl mx-auto" data-testid="card-registration">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
+                <GraduationCap className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Benvenuto al Test di Inglese</h2>
+              <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm max-w-md mx-auto">
+                Compila i tuoi dati per iniziare la valutazione. Il test si adatta al tuo livello in tempo reale.
               </p>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleRegistration)} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField control={form.control} name="firstName" render={({ field }) => (
+            </div>
+
+            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/80 dark:border-slate-700/80 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 overflow-hidden">
+              <div className="h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500" />
+              <CardContent className="p-6 pt-6">
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleRegistration)} className="space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="firstName" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Nome *</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                              <Input {...field} data-testid="input-first-name" placeholder="Il tuo nome" className="pl-10 h-11 border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-500 rounded-lg" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="lastName" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Cognome *</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                              <Input {...field} data-testid="input-last-name" placeholder="Il tuo cognome" className="pl-10 h-11 border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-500 rounded-lg" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+
+                    <FormField control={form.control} name="email" render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nome *</FormLabel>
-                        <FormControl><Input {...field} data-testid="input-first-name" placeholder="Nome" /></FormControl>
+                        <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Email *</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <Input type="email" {...field} data-testid="input-email" placeholder="la-tua@email.com" className="pl-10 h-11 border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-500 rounded-lg" />
+                          </div>
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
-                    <FormField control={form.control} name="lastName" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Cognome *</FormLabel>
-                        <FormControl><Input {...field} data-testid="input-last-name" placeholder="Cognome" /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )} />
-                  </div>
-                  <FormField control={form.control} name="email" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email *</FormLabel>
-                      <FormControl><Input type="email" {...field} data-testid="input-email" placeholder="la-tua@email.com" /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                  <FormField control={form.control} name="phone" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Telefono</FormLabel>
-                      <FormControl><Input {...field} data-testid="input-phone" placeholder="Numero di telefono" /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                  <FormField control={form.control} name="company" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Azienda</FormLabel>
-                      <FormControl><Input {...field} data-testid="input-company" placeholder="Nome azienda" /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField control={form.control} name="city" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Citta</FormLabel>
-                        <FormControl><Input {...field} data-testid="input-city" placeholder="Citta" /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )} />
-                    <FormField control={form.control} name="province" render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Provincia (sigla)</FormLabel>
-                        <FormControl><Input {...field} data-testid="input-province" placeholder="es. VI" maxLength={2} className="uppercase" /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )} />
-                  </div>
-                  <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" data-testid="button-start-test">
-                    Continue <ChevronRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="phone" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Telefono</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                              <Input {...field} data-testid="input-phone" placeholder="Numero di telefono" className="pl-10 h-11 border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-500 rounded-lg" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="company" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Azienda</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                              <Input {...field} data-testid="input-company" placeholder="Nome azienda" className="pl-10 h-11 border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-500 rounded-lg" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField control={form.control} name="city" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Citta</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                              <Input {...field} data-testid="input-city" placeholder="La tua citta" className="pl-10 h-11 border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-500 rounded-lg" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="province" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-slate-700 dark:text-slate-300 font-medium">Provincia (sigla)</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Map className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                              <Input {...field} data-testid="input-province" placeholder="es. VI" maxLength={2} className="pl-10 h-11 uppercase border-slate-200 dark:border-slate-600 focus:border-blue-400 dark:focus:border-blue-500 rounded-lg" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </div>
+
+                    <div className="pt-2">
+                      <Button type="submit" className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-200" data-testid="button-start-test">
+                        Inizia il Test <ArrowRight className="w-5 h-5 ml-2" />
+                      </Button>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-4 pt-1 text-xs text-slate-400 dark:text-slate-500">
+                      <span className="flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> Dati protetti</span>
+                      <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> ~20 minuti</span>
+                      <span className="flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Gratuito</span>
+                    </div>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {phase === "self-assessment" && (
-          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700 shadow-xl" data-testid="card-self-assessment">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl">Self-Assessment</CardTitle>
-              <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">
-                How would you rate your current English level?
+          <div className="max-w-2xl mx-auto" data-testid="card-self-assessment">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Come valuti il tuo inglese?</h2>
+              <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">
+                Seleziona il livello che meglio descrive le tue competenze attuali.
               </p>
-            </CardHeader>
-            <CardContent className="space-y-3">
+            </div>
+            <div className="space-y-3">
               {Object.entries(CEFR_DESCRIPTIONS).map(([level, { label, desc }]) => (
                 <button
                   key={level}
                   onClick={() => handleSelfAssessment(level)}
                   disabled={isSubmitting}
-                  className="w-full text-left p-4 rounded-xl border-2 border-slate-200 dark:border-slate-600 hover:border-blue-400 dark:hover:border-blue-500 transition-all hover:bg-blue-50 dark:hover:bg-blue-900/20 disabled:opacity-50"
+                  className="w-full text-left p-5 rounded-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-2 border-slate-200/80 dark:border-slate-600/80 hover:border-blue-400 dark:hover:border-blue-500 transition-all duration-200 hover:bg-blue-50/80 dark:hover:bg-blue-900/20 hover:shadow-md hover:shadow-blue-100/50 dark:hover:shadow-blue-900/20 disabled:opacity-50 group"
                   data-testid={`button-level-${level}`}
                 >
-                  <div className="font-semibold text-slate-800 dark:text-white">{label}</div>
-                  <div className="text-sm text-slate-600 dark:text-slate-400 mt-1">{desc}</div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold text-slate-800 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">{label}</div>
+                      <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">{desc}</div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-slate-300 dark:text-slate-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors flex-shrink-0 ml-4" />
+                  </div>
                 </button>
               ))}
               {isSubmitting && (
-                <div className="flex items-center justify-center py-4">
+                <div className="flex items-center justify-center py-6">
                   <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
-                  <span className="ml-2 text-slate-600">Starting test...</span>
+                  <span className="ml-2 text-slate-600 dark:text-slate-400">Preparazione del test...</span>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         {phase === "mc-questions" && (
