@@ -87,28 +87,28 @@ function AnimatedCounter({ target, suffix = "", duration = 2 }: { target: number
 const programTopics = [
   {
     title: "Language Studies",
-    description: "Approccio attivo alla lingua e alla grammatica orientato all'uso reale, con Task-Based Learning personalizzato e interattivo — dalla scrittura di email alla gestione di dialoghi professionali.",
+    description: "Grammatica, lessico e strutture linguistiche attraverso un approccio attivo orientato all'uso reale. Non studi la lingua: la usi. Dalla scrittura di email professionali alla gestione di conference call, ogni attività replica situazioni autentiche che affronterai nel mondo reale. Metodologia Task-Based Learning personalizzata e interattiva.",
     icon: Languages,
     gradient: "from-primary to-blue-600",
     bgLight: "bg-blue-50 dark:bg-blue-950/30",
   },
   {
     title: "Small Talk & Ear Training",
-    description: "Conversazione, comprensione orale e pronuncia attraverso roleplay, giochi d'aula, mirroring e imitation learning. Si lavora su scioltezza e spontaneità, superando blocchi linguistici.",
+    description: "Conversazione libera, comprensione orale e pronuncia attraverso roleplay, giochi d'aula, mirroring e imitation learning. Si lavora sulla scioltezza e la spontaneità, superando i blocchi linguistici che frenano la comunicazione. Impari a sostenere conversazioni informali, a cogliere sfumature e a reagire con naturalezza anche nelle situazioni più inaspettate.",
     icon: Mic2,
     gradient: "from-amber-500 to-orange-600",
     bgLight: "bg-amber-50 dark:bg-amber-950/30",
   },
   {
     title: "Specialist & Executive Language",
-    description: "Linguaggio specifico del proprio contesto: business, tecnico, accademico. Contenuti adattati al profilo dei partecipanti con Experiential Learning e Design Thinking.",
+    description: "Linguaggio tecnico e specialistico del tuo settore: business, finance, engineering, legal, medical, IT, accademico. I contenuti vengono adattati al profilo reale dei partecipanti con metodologie Experiential Learning e Design Thinking. Impari a negoziare, presentare, convincere e gestire riunioni nella lingua straniera con la stessa sicurezza che hai nella tua lingua madre.",
     icon: Briefcase,
     gradient: "from-emerald-500 to-teal-600",
     bgLight: "bg-emerald-50 dark:bg-emerald-950/30",
   },
   {
     title: "Specialist & Executive Mindset",
-    description: "Comunicazione efficace, intelligenza emotiva e crescita personale. Public speaking, leadership, team-working e creatività attraverso metodologie esperienziali e game-based learning.",
+    description: "Comunicazione efficace, intelligenza emotiva e crescita personale: tutto in lingua inglese. Public speaking, leadership, team-working, problem solving e creatività attraverso metodologie esperienziali e game-based learning. Non è solo un corso di lingua: è un percorso che trasforma il modo in cui comunichi, pensi e ti presenti al mondo.",
     icon: Brain,
     gradient: "from-violet-500 to-purple-600",
     bgLight: "bg-violet-50 dark:bg-violet-950/30",
@@ -134,7 +134,7 @@ const formats = [
   {
     title: "FIW Collettivo",
     subtitle: "5-8 partecipanti",
-    description: "Il formato più amato: un piccolo gruppo di persone motivate che condividono la stessa settimana di immersione totale. L'energia del gruppo diventa il motore del tuo apprendimento.",
+    description: "Il formato più amato: un piccolo gruppo di persone motivate che condividono la stessa settimana di immersione totale nella nostra sede di Vicenza. L'energia del gruppo diventa il motore dell'apprendimento. Ogni giornata è un mix calibrato di language studies, conversazione, business English e soft skills, guidato da un team di coach madrelingua che si alternano per offrirti stili e stimoli diversi.",
     features: ["5 giorni intensivi (lun-ven)", "30+ ore frontali, dalle 9:00 alle 16:30", "Team di coach madrelingua", "Livelli da A2 a C1", "Convenzioni B&B e hotel a Vicenza"],
     color: "from-primary to-blue-600",
     icon: Users,
@@ -143,7 +143,7 @@ const formats = [
   {
     title: "FIW Semi-Individuale",
     subtitle: "2-4 partecipanti",
-    description: "Un'attenzione più mirata in un gruppo ristretto, dove ogni conversazione diventa un'opportunità su misura e i tuoi obiettivi specifici guidano il percorso fin dal primo giorno.",
+    description: "Un'attenzione più mirata in un gruppo ristretto di 2-4 partecipanti, dove ogni conversazione diventa un'opportunità su misura. I tuoi obiettivi specifici guidano il percorso fin dal primo giorno: il programma viene adattato alle esigenze reali del gruppo, con ampio spazio per la pratica orale e il feedback personalizzato da parte del team di coach.",
     features: ["5 giorni intensivi (lun-ven)", "Percorso personalizzato e mirato", "Conversazioni reali e sfide pratiche", "Team di coach madrelingua dedicato", "Convenzioni B&B e hotel a Vicenza"],
     color: "from-emerald-500 to-teal-600",
     icon: UserCheck,
@@ -152,7 +152,7 @@ const formats = [
   {
     title: "FIW Individuale",
     subtitle: "1 partecipante",
-    description: "Un'esperienza esclusiva costruita interamente intorno a te: i tuoi obiettivi, il tuo stile, il tuo ritmo. Un team di 3-4 coach madrelingua dedicati lavora con te per una settimana.",
+    description: "Un'esperienza esclusiva costruita interamente intorno a te: i tuoi obiettivi, il tuo stile, il tuo ritmo. Un team di 3-4 coach madrelingua dedicati lavora con te per un'intera settimana, alternandosi per offrirti prospettive e competenze diverse. Ideale per manager, professionisti e imprenditori che vogliono fare un salto di qualità decisivo in tempi rapidi.",
     features: ["5 giorni intensivi (lun-ven)", "3-4 coach madrelingua dedicati", "Programma 100% personalizzato", "Obiettivi specifici professionali", "Convenzioni B&B e hotel a Vicenza"],
     color: "from-violet-500 to-purple-600",
     icon: GraduationCap,
@@ -161,7 +161,7 @@ const formats = [
   {
     title: "Experiential Weekend",
     subtitle: "The Spirit of Leadership",
-    description: "Un weekend sui Colli Berici tra cavalli, natura e sfide di leadership, tutto in inglese. Torni a casa con un inglese migliore e una nuova consapevolezza di quello che sei capace di fare.",
+    description: "Un weekend trasformativo sui Colli Berici tra cavalli, natura e sfide di leadership, interamente in inglese. Un'esperienza che unisce equitazione, team building e attività outdoor per lavorare su leadership, comunicazione e consapevolezza di sé. Torni a casa con un inglese più fluido e una nuova percezione di quello che sei capace di fare quando esci dalla tua comfort zone.",
     features: ["2 giorni immersivi (sab-dom)", "Equitazione, leadership e team building", "Attività outdoor ed esperienziali", "Colli Berici, provincia di Vicenza"],
     color: "from-amber-500 to-orange-600",
     icon: Mountain,

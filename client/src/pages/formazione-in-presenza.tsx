@@ -150,7 +150,12 @@ const courses = [
     id: "corsi-gruppo",
     title: "Corsi di Gruppo",
     subtitle: "Lingue straniere per tutti i livelli",
-    description: "Formazione linguistica strutturata, efficace e certificata per inglese, francese, tedesco, spagnolo, russo e italiano per stranieri, suddivisa per livello QCER.",
+    description: "Corsi collettivi serali e diurni nelle nostre sedi di Vicenza e Thiene, con docenti madrelingua qualificati. Formazione strutturata e certificata per tutti i livelli QCER, dal principiante all'avanzato.",
+    fullDescription: [
+      "I corsi di gruppo di Interlingua offrono un ambiente stimolante dove imparare insieme ad altri studenti motivati, con classi omogenee per livello. Ogni modulo dura 6 settimane con 1 incontro settimanale in sede, e può essere rinnovato per un percorso progressivo e continuo.",
+      "Il Metodo Interlingua combina l'approccio comunicativo con Task-Based Learning e Content and Language Integrated Learning (CLIL): si impara la lingua usandola attivamente in contesti reali, non studiandola a memoria. Ogni lezione è progettata per sviluppare tutte e 4 le competenze: comprensione, produzione orale, lettura e scrittura.",
+      "Il corso include l'accesso alla piattaforma e-learning attiva 24/7, con esercizi interattivi, riconoscimento vocale e una community globale di oltre 4 milioni di studenti. Acquistando il corso completo (due moduli da 6 settimane) risparmi 50 euro sul totale.",
+    ],
     image: lingueStraniereImage,
     price: "340",
     duration: "12 settimane",
@@ -173,7 +178,12 @@ const courses = [
     id: "corsi-individuali",
     title: "Corsi Individuali o Semi-Individuali",
     subtitle: "1 o 2 partecipanti, massima personalizzazione",
-    description: "Formazione linguistica modulare per 1 o 2 partecipanti in inglese, francese, tedesco, spagnolo, russo o italiano, per la massima personalizzazione del percorso.",
+    description: "Apprendimento personalizzato con docenti madrelingua, lezioni su misura e massima flessibilità. Un percorso efficace per un progresso rapido in un ambiente motivante.",
+    fullDescription: [
+      "Il corso individuale è la soluzione ideale per chi ha obiettivi specifici, tempistiche precise o esigenze professionali particolari. Il programma viene costruito interamente attorno alle tue necessità: preparazione a colloqui, presentazioni aziendali, negoziazioni internazionali, o miglioramento delle competenze comunicative generali.",
+      "Con il formato semi-individuale (2 partecipanti) puoi condividere il percorso con un collega o un amico allo stesso livello, dimezzando il costo senza rinunciare all'attenzione personalizzata del docente. Gli orari sono completamente flessibili e concordati direttamente con il tuo insegnante.",
+      "Ogni lezione si svolge nella nostra sede con materiale didattico personalizzato. Il docente madrelingua monitora i tuoi progressi e adatta costantemente il percorso per garantirti il massimo risultato nel minor tempo possibile.",
+    ],
     image: courseIndividual,
     price: "da 300",
     duration: "Modulare",
@@ -197,7 +207,12 @@ const courses = [
     id: "corso-blended",
     title: "Corso Individuale Blended",
     subtitle: "In sede + piattaforma online",
-    description: "Formazione linguistica modulare per 1 partecipante in inglese, francese, tedesco o spagnolo. Un percorso ibrido che combina lezioni in sede con la piattaforma e-learning 24/7.",
+    description: "Il meglio dei due mondi: lezioni individuali in sede con docente madrelingua, integrate dalla piattaforma e-learning attiva 24/7 per uno studio continuo e autonomo tra una lezione e l'altra.",
+    fullDescription: [
+      "Il corso blended combina il contatto diretto con il docente madrelingua in aula con la flessibilità dello studio autonomo sulla piattaforma digitale. Ogni settimana avrai una lezione in sede focalizzata sulla produzione orale, la correzione personalizzata e il potenziamento delle competenze comunicative.",
+      "Tra una lezione e l'altra, la piattaforma e-learning ti accompagna con un programma strutturato: esercizi interattivi, riconoscimento vocale per migliorare la pronuncia, video-lezioni e test di autovalutazione. Puoi studiare quando e dove vuoi, 24 ore su 24, 7 giorni su 7.",
+      "Questo formato è particolarmente efficace per chi vuole massimizzare i risultati combinando pratica guidata e studio indipendente. Il docente monitora i tuoi progressi sia in aula che sulla piattaforma, adattando il percorso in tempo reale alle tue esigenze.",
+    ],
     image: languageCoachingImage,
     price: "645",
     duration: "12 settimane",
@@ -221,7 +236,12 @@ const courses = [
     id: "office",
     title: "Office senza segreti",
     subtitle: "Excel, Word, PowerPoint e Copilot",
-    description: "Impara a utilizzare Office in modo efficace, a gestire dati, report e formule con Excel, e a sfruttare l'intero pacchetto incluso Copilot per velocizzare e semplificare il lavoro quotidiano.",
+    description: "Un corso pratico e diretto per padroneggiare gli strumenti Office che usi ogni giorno. Dalle formule di Excel alle presentazioni PowerPoint, fino alle funzionalità AI di Copilot per lavorare il doppio in metà tempo.",
+    fullDescription: [
+      "Il corso copre in modo approfondito l'intero ecosistema Microsoft Office: Excel per la gestione di dati, tabelle pivot, formule avanzate e grafici; Word per documenti professionali, formattazione avanzata e collaborazione; PowerPoint per presentazioni d'impatto con animazioni, template e design efficace.",
+      "La grande novità è il modulo dedicato a Microsoft Copilot, l'assistente AI integrato in Office 365: imparerai a usarlo per generare testi, riassumere documenti, creare formule automaticamente, analizzare dati e produrre presentazioni in pochi minuti. Un vantaggio competitivo concreto per il tuo lavoro quotidiano.",
+      "Le lezioni si svolgono in sede con un docente qualificato, in un formato pratico e interattivo dove impari facendo. Ogni partecipante lavora al proprio computer con esercitazioni guidate su casi reali. Al termine del corso ricevi un certificato di competenza.",
+    ],
     image: courseExcel,
     price: "340",
     duration: "Corso completo",
@@ -242,7 +262,12 @@ const courses = [
     id: "ai",
     title: "AI senza segreti",
     subtitle: "Creatività, produttività e soluzioni per tutti",
-    description: "Impara a utilizzare strumenti e applicazioni di AI per aumentare la produttività, scrivere testi più efficaci, velocizzare e automatizzare il lavoro e stimolare la creatività.",
+    description: "Scopri come l'Intelligenza Artificiale può diventare il tuo alleato quotidiano: dalla scrittura alla creatività, dall'analisi dei dati all'automazione. Un corso accessibile a tutti, anche senza competenze tecniche.",
+    fullDescription: [
+      "Il corso parte dalle basi per portarti a un utilizzo consapevole e produttivo degli strumenti AI più avanzati: ChatGPT, Claude, Gemini, DALL-E, Midjourney e molto altro. Imparerai a scrivere prompt efficaci, a generare testi professionali, a creare immagini e a risolvere problemi complessi con l'aiuto dell'intelligenza artificiale.",
+      "Dalla redazione di email e report alla creazione di contenuti per i social media, dalla traduzione e revisione di documenti all'analisi e sintesi di informazioni complesse: ogni lezione ti fornisce competenze immediatamente applicabili nel lavoro e nella vita quotidiana.",
+      "Non servono competenze tecniche pregresse. Il corso è pensato per professionisti, imprenditori, studenti e chiunque voglia restare al passo con la trasformazione digitale. Le lezioni in sede sono pratiche e interattive, con esercitazioni su casi reali e il supporto continuo del docente.",
+    ],
     image: courseAi,
     price: "340",
     duration: "Corso completo",
@@ -329,13 +354,13 @@ function CourseInfoForm({ courseTitle, showLingua, gradient }: { courseTitle: st
     onSuccess: () => {
       toast({
         title: "Richiesta inviata",
-        description: "Ti contatteremo al piu presto con tutte le informazioni.",
+        description: "Ti contatteremo al più presto con tutte le informazioni.",
       });
     },
     onError: () => {
       toast({
         title: "Errore",
-        description: "Si è verificato un errore. Riprova piu tardi.",
+        description: "Si è verificato un errore. Riprova più tardi.",
         variant: "destructive",
       });
     },
@@ -358,7 +383,7 @@ function CourseInfoForm({ courseTitle, showLingua, gradient }: { courseTitle: st
           <CheckCircle className="w-10 h-10 text-white" />
         </div>
         <h4 className="text-xl font-bold text-foreground mb-3">Richiesta inviata con successo</h4>
-        <p className="text-muted-foreground max-w-md mx-auto">Ti contatteremo al piu presto con tutte le informazioni sul corso.</p>
+        <p className="text-muted-foreground max-w-md mx-auto">Ti contatteremo al più presto con tutte le informazioni sul corso.</p>
       </div>
     );
   }
@@ -547,6 +572,7 @@ function CourseInfoForm({ courseTitle, showLingua, gradient }: { courseTitle: st
 
 function CourseCard({ course, index }: { course: typeof courses[0]; index: number }) {
   const [formOpen, setFormOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   return (
     <AnimatedSection delay={index * 0.08}>
@@ -587,7 +613,36 @@ function CourseCard({ course, index }: { course: typeof courses[0]; index: numbe
                 <h3 className="text-2xl lg:text-3xl font-bold text-foreground mb-1.5 tracking-tight">{course.title}</h3>
                 <p className={`text-sm font-semibold bg-gradient-to-r ${course.gradient} bg-clip-text text-transparent`}>{course.subtitle}</p>
               </div>
-              <p className="text-muted-foreground leading-relaxed mb-5">{course.description}</p>
+              <p className="text-muted-foreground leading-relaxed mb-3">{course.description}</p>
+              <button
+                type="button"
+                onClick={() => setDetailsOpen(!detailsOpen)}
+                className={`inline-flex items-center gap-1.5 text-sm font-medium mb-5 transition-colors ${detailsOpen ? "text-muted-foreground" : "text-primary hover:text-primary/80"}`}
+                data-testid={`button-fip-details-${course.id}`}
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                {detailsOpen ? "Chiudi dettagli" : "Leggi di più"}
+                {detailsOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </button>
+              <AnimatePresence>
+                {detailsOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+                    className="overflow-hidden"
+                  >
+                    <div className={`rounded-xl p-5 mb-5 ${course.accentBg} border border-border/30`}>
+                      <div className="space-y-3">
+                        {course.fullDescription.map((paragraph, i) => (
+                          <p key={i} className="text-sm text-foreground/80 leading-relaxed">{paragraph}</p>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               {course.highlight && (
                 <div className="flex items-center gap-3 mb-5 px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200/60 dark:border-amber-800/30">
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">

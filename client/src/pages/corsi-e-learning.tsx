@@ -237,7 +237,7 @@ const courses = [
     fullDescription: [
       "Corso di preparazione agli esami di certificazione linguistica riconosciuti dal MIUR: LanguageCert, IELTS, TOEFL, Cambridge English, Trinity, DELF, DELE, Goethe-Zertifikat. Lezioni online con tutor madrelingua specializzato e percorso personalizzato.",
       "Puoi scegliere tra intero percorso (preparazione + esame), solo il percorso di preparazione, oppure acquistare solo l'iscrizione all'esame (solo lingua inglese). Il percorso include 12 lezioni live su Zoom con simulazioni di esame, oltre a 60 ore di e-learning interattivo con esercitazioni mirate sulle 4 skills.",
-      "Il percorso di preparazione puo essere svolto, a scelta, solo in aula virtuale con tutor madrelingua specializzato, oppure attraverso un corso blended con lezioni live + piattaforma e-learning con programma completo mirato al superamento dell'esame.",
+      "Il percorso di preparazione può essere svolto, a scelta, solo in aula virtuale con tutor madrelingua specializzato, oppure attraverso un corso blended con lezioni live + piattaforma e-learning con programma completo mirato al superamento dell'esame.",
     ],
     image: managementImage,
     price: "da 230",
@@ -406,10 +406,10 @@ function CourseInfoForm({ courseTitle, gradient }: { courseTitle: string; gradie
       await apiRequest("POST", "/api/contact", body);
     },
     onSuccess: () => {
-      toast({ title: "Richiesta inviata", description: "Ti contatteremo al piu presto con tutte le informazioni." });
+      toast({ title: "Richiesta inviata", description: "Ti contatteremo al più presto con tutte le informazioni." });
     },
     onError: () => {
-      toast({ title: "Errore", description: "Si è verificato un errore. Riprova piu tardi.", variant: "destructive" });
+      toast({ title: "Errore", description: "Si è verificato un errore. Riprova più tardi.", variant: "destructive" });
     },
   });
 
@@ -430,7 +430,7 @@ function CourseInfoForm({ courseTitle, gradient }: { courseTitle: string; gradie
           <CheckCircle className="w-10 h-10 text-white" />
         </div>
         <h4 className="text-xl font-bold text-foreground mb-3">Richiesta inviata con successo</h4>
-        <p className="text-muted-foreground max-w-md mx-auto">Ti contatteremo al piu presto con tutte le informazioni sul corso.</p>
+        <p className="text-muted-foreground max-w-md mx-auto">Ti contatteremo al più presto con tutte le informazioni sul corso.</p>
       </div>
     );
   }
