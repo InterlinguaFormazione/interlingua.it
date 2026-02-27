@@ -195,6 +195,7 @@ interface CandidateInfo {
   azienda: string;
   citta: string;
   provincia: string;
+  selfAssessedLevel: string;
 }
 
 function determineGrammarLevel(answers: Record<number, number>): { level: string; scores: Record<string, { correct: number; total: number }>; totalCorrect: number } {
@@ -229,8 +230,9 @@ function countWords(text: string): number {
 
 export default function EnglishTestPage() {
   const [phase, setPhase] = useState<Phase>("intro");
-  const [candidateInfo, setCandidateInfo] = useState<CandidateInfo>({ nome: "", cognome: "", email: "", phone: "", azienda: "", citta: "", provincia: "" });
+  const [candidateInfo, setCandidateInfo] = useState<CandidateInfo>({ nome: "", cognome: "", email: "", phone: "", azienda: "", citta: "", provincia: "", selfAssessedLevel: "A1" });
 
+  const [orderedQuestions, setOrderedQuestions] = useState<Question[]>(questions);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [grammarAnswers, setGrammarAnswers] = useState<Record<number, number>>({});
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
@@ -251,12 +253,12 @@ export default function EnglishTestPage() {
 
   const grammarResult = useMemo(() => {
     if (phase === "intro") return null;
-    if (Object.keys(grammarAnswers).length < questions.length) return null;
+    if (Object.keys(grammarAnswers).length < orderedQuestions.length) return null;
     return determineGrammarLevel(grammarAnswers);
-  }, [grammarAnswers, phase]);
+  }, [grammarAnswers, phase, orderedQuestions]);
 
-  const grammarProgress = (currentQuestion / questions.length) * 100;
-  const currentQ = questions[currentQuestion];
+  const grammarProgress = (currentQuestion / orderedQuestions.length) * 100;
+  const currentQ = orderedQuestions[currentQuestion];
   const currentLevel = currentQ?.level || "A1";
 
   const handleGrammarAnswer = useCallback((optionIndex: number) => {
@@ -264,7 +266,7 @@ export default function EnglishTestPage() {
     setTimeout(() => {
       setGrammarAnswers(prev => ({ ...prev, [currentQ.id]: optionIndex }));
       setSelectedOption(null);
-      if (currentQuestion < questions.length - 1) {
+      if (currentQuestion < orderedQuestions.length - 1) {
         setCurrentQuestion(prev => prev + 1);
       } else {
         setPhase("writing");
@@ -390,6 +392,7 @@ export default function EnglishTestPage() {
         candidateAzienda: candidateInfo.azienda || null,
         candidateCitta: candidateInfo.citta || null,
         candidateProvincia: candidateInfo.provincia || null,
+        selfAssessedLevel: candidateInfo.selfAssessedLevel,
         grammarScore: overallResults.grammarScore,
         grammarLevel: overallResults.grammarLevel,
         writingScore: overallResults.writingScore,
@@ -429,7 +432,7 @@ export default function EnglishTestPage() {
 
   const handleRestart = useCallback(() => {
     setPhase("intro");
-    setCandidateInfo({ nome: "", cognome: "", email: "", phone: "", azienda: "", citta: "", provincia: "" });
+    setCandidateInfo({ nome: "", cognome: "", email: "", phone: "", azienda: "", citta: "", provincia: "", selfAssessedLevel: "A1" });
     setCurrentQuestion(0);
     setGrammarAnswers({});
     setSelectedOption(null);
@@ -451,7 +454,18 @@ export default function EnglishTestPage() {
         <IntroSection
           candidateInfo={candidateInfo}
           onCandidateChange={setCandidateInfo}
-          onStart={() => setPhase("grammar")}
+          onStart={() => {
+            const startIdx = levels.indexOf(candidateInfo.selfAssessedLevel);
+            const reordered: Question[] = [];
+            for (let i = startIdx; i < levels.length; i++) {
+              reordered.push(...questions.filter(q => q.level === levels[i]));
+            }
+            for (let i = 0; i < startIdx; i++) {
+              reordered.push(...questions.filter(q => q.level === levels[i]));
+            }
+            setOrderedQuestions(reordered);
+            setPhase("grammar");
+          }}
         />
       )}
 
@@ -459,7 +473,7 @@ export default function EnglishTestPage() {
         <GrammarSection
           question={currentQ}
           currentIndex={currentQuestion}
-          total={questions.length}
+          total={orderedQuestions.length}
           progress={grammarProgress}
           level={currentLevel}
           selectedOption={selectedOption}
@@ -573,7 +587,7 @@ function IntroSection({
             ))}
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }} className="max-w-md mx-auto">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.5 }} className="max-w-lg mx-auto">
             <Card data-testid="card-candidate-form">
               <CardContent className="p-6">
                 <h2 className="text-xl font-bold mb-6 text-center">I Tuoi Dati</h2>
@@ -681,6 +695,41 @@ function IntroSection({
                       />
                     </div>
                   </div>
+                  <div>
+                    <Label className="flex items-center gap-2 mb-3">
+                      <Target className="w-4 h-4 text-muted-foreground" />
+                      Qual e il tuo livello attuale di inglese? *
+                    </Label>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Seleziona il livello che pensi corrisponda alle tue competenze. Il test iniziera da questo livello per risparmiare tempo.
+                    </p>
+                    <div className="grid grid-cols-1 gap-2">
+                      {levels.map((level) => {
+                        const info = levelInfo[level];
+                        const isSelected = candidateInfo.selfAssessedLevel === level;
+                        return (
+                          <button
+                            key={level}
+                            type="button"
+                            onClick={() => onCandidateChange({ ...candidateInfo, selfAssessedLevel: level })}
+                            className={`flex items-start gap-3 p-3 rounded-lg border-2 text-left transition-all ${
+                              isSelected
+                                ? "border-primary bg-primary/5 dark:bg-primary/10 shadow-sm"
+                                : "border-border hover:border-primary/40 hover:bg-muted/50"
+                            }`}
+                            data-testid={`button-level-${level}`}
+                          >
+                            <Badge className={`bg-gradient-to-r ${info.bgColor} text-white border-0 shrink-0 mt-0.5`}>{level}</Badge>
+                            <div className="min-w-0">
+                              <div className="font-semibold text-sm">{info.name}</div>
+                              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{info.description}</p>
+                            </div>
+                            {isSelected && <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                   <Button className="w-full mt-2" size="lg" onClick={handleStart} data-testid="button-start-test">
                     Inizia il Test
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -688,26 +737,6 @@ function IntroSection({
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4, duration: 0.5 }} className="max-w-3xl mx-auto mt-12">
-            <h2 className="text-xl font-bold mb-6 text-center">I Livelli CEFR</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {levels.map((level, i) => {
-                const info = levelInfo[level];
-                return (
-                  <motion.div key={level} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.05, duration: 0.3 }}>
-                    <Card className="hover-elevate h-full" data-testid={`card-level-${level}`}>
-                      <CardContent className="p-4">
-                        <Badge className={`bg-gradient-to-r ${info.bgColor} text-white border-0 mb-2`}>{level}</Badge>
-                        <div className="font-semibold text-sm mb-1">{info.name}</div>
-                        <p className="text-xs text-muted-foreground line-clamp-2">{info.description}</p>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                );
-              })}
-            </div>
           </motion.div>
         </div>
       </section>

@@ -284,6 +284,7 @@ export const englishTestResults = pgTable("english_test_results", {
   candidateAzienda: text("candidate_azienda"),
   candidateCitta: text("candidate_citta"),
   candidateProvincia: text("candidate_provincia"),
+  selfAssessedLevel: text("self_assessed_level"),
   grammarScore: integer("grammar_score"),
   grammarLevel: text("grammar_level"),
   writingScore: integer("writing_score"),

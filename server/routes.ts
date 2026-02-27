@@ -1476,7 +1476,7 @@ export async function registerRoutes(
 
   app.post("/api/english-test/submit", async (req, res) => {
     try {
-      const { candidateNome, candidateCognome, candidateEmail, candidatePhone, candidateAzienda, candidateCitta, candidateProvincia, grammarScore, grammarLevel, writingScore, writingLevel, writingResponses, speakingScore, speakingLevel, speakingResponses, overallLevel, overallScore } = req.body;
+      const { candidateNome, candidateCognome, candidateEmail, candidatePhone, candidateAzienda, candidateCitta, candidateProvincia, selfAssessedLevel, grammarScore, grammarLevel, writingScore, writingLevel, writingResponses, speakingScore, speakingLevel, speakingResponses, overallLevel, overallScore } = req.body;
 
       if (!candidateNome || !candidateCognome || !candidateEmail) {
         return res.status(400).json({ success: false, message: "Missing candidate nome, cognome, or email" });
@@ -1488,6 +1488,7 @@ export async function registerRoutes(
         candidateAzienda: candidateAzienda || null,
         candidateCitta: candidateCitta || null,
         candidateProvincia: candidateProvincia || null,
+        selfAssessedLevel: selfAssessedLevel || null,
         grammarScore, grammarLevel,
         writingScore, writingLevel, writingResponses: writingResponses || null,
         speakingScore, speakingLevel, speakingResponses: speakingResponses || null,
