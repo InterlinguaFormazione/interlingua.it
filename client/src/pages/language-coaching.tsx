@@ -385,7 +385,7 @@ function CoachingContactForm({ packageTitle, gradient }: { packageTitle: string;
           <CheckCircle className="w-8 h-8 text-white" />
         </div>
         <h4 className="text-xl font-bold mb-2">Richiesta inviata</h4>
-        <p className="text-muted-foreground max-w-md mx-auto">Il tuo percorso di coaching sta per iniziare. Ti contatteremo entro 24 ore per una consulenza gratuita.</p>
+        <p className="text-muted-foreground max-w-md mx-auto">Il tuo percorso di coaching sta per iniziare. Ti contatteremo entro 24 ore per definire il tuo percorso personalizzato.</p>
       </div>
     );
   }
@@ -394,7 +394,7 @@ function CoachingContactForm({ packageTitle, gradient }: { packageTitle: string;
     <form onSubmit={handleSubmit} className="p-8 space-y-5" data-testid={`form-coaching-${packageTitle}`}>
       <div className="text-center mb-2">
         <h4 className="text-lg font-bold">Inizia il tuo percorso di coaching</h4>
-        <p className="text-sm text-muted-foreground">Compila il form e riceverai una consulenza gratuita personalizzata</p>
+        <p className="text-sm text-muted-foreground">Compila il form e ti contatteremo per costruire il tuo percorso</p>
       </div>
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
@@ -498,7 +498,7 @@ function CoachingContactForm({ packageTitle, gradient }: { packageTitle: string;
         {submitted && errors.gdpr && <p className="text-xs text-destructive ml-7">{errors.gdpr}</p>}
       </div>
       <Button type="submit" disabled={mutation.isPending} className={`w-full h-12 text-base rounded-xl bg-gradient-to-r ${gradient} hover:opacity-90 text-white font-bold shadow-lg`} data-testid="button-coaching-submit">
-        {mutation.isPending ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Invio in corso...</>) : (<><Send className="w-4 h-4 mr-2" />Richiedi Consulenza Gratuita</>)}
+        {mutation.isPending ? (<><Loader2 className="w-4 h-4 mr-2 animate-spin" />Invio in corso...</>) : (<><Send className="w-4 h-4 mr-2" />Richiedi la Tua Consulenza</>)}
       </Button>
     </form>
   );
@@ -594,7 +594,7 @@ function PackageCard({ pkg, index }: { pkg: typeof packages[0]; index: number })
                   data-testid={`button-coaching-toggle-form-${pkg.id}`}
                 >
                   <Mail className="w-4 h-4 mr-2" />
-                  Prenota la Tua Consulenza Gratuita
+                  Prenota la Tua Consulenza
                   {formOpen ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
                 </Button>
               </div>
@@ -719,7 +719,7 @@ export default function LanguageCoachingPage() {
                 {[
                   { icon: Shield, text: "Coach certificati madrelingua" },
                   { icon: Target, text: "Percorsi 100% personalizzati" },
-                  { icon: Lightbulb, text: "Consulenza iniziale gratuita" },
+                  { icon: Lightbulb, text: "Consulenza iniziale personalizzata" },
                 ].map((item, i) => (
                   <div key={i} className="fi-glass-card px-4 py-2.5 rounded-full flex items-center gap-2">
                     <item.icon className="w-4 h-4 text-amber-300" />
@@ -900,7 +900,7 @@ export default function LanguageCoachingPage() {
                   Il fatto che tu sia arrivato fin qui dice qualcosa di importante su di te. Dice che sei pronto per un livello diverso. Che non ti accontenti di 'cavartela'. Che vuoi padroneggiare la lingua con la stessa sicurezza con cui padroneggi il tuo lavoro.
                 </p>
                 <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-2xl mx-auto">
-                  La consulenza iniziale è gratuita e senza impegno. È semplicemente una conversazione per capire dove sei, dove vuoi arrivare, e quale percorso può portarti lì nel modo più naturale ed efficace.
+                  La consulenza iniziale è una conversazione dedicata per capire dove sei, dove vuoi arrivare, e quale percorso può portarti lì nel modo più naturale ed efficace.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Button
@@ -910,7 +910,7 @@ export default function LanguageCoachingPage() {
                     data-testid="button-coaching-cta-bottom"
                   >
                     <Sparkles className="w-5 h-5 mr-2" />
-                    Prenota la Tua Consulenza Gratuita
+                    Prenota la Tua Consulenza
                   </Button>
                   <Link href="/formazione-in-presenza">
                     <Button size="lg" variant="outline" className="text-base px-8 py-6 rounded-xl" data-testid="button-coaching-corsi">
