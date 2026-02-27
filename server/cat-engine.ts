@@ -66,7 +66,8 @@ export function selectNextQuestion(
 }
 
 export function updateTheta(oldTheta: number, isCorrect: boolean, standardError: number, difficulty: number = 0, discrimination: number = 100): number {
-  const se = standardError / 100;
+  const safeSE = Math.max(standardError, 20);
+  const se = safeSE / 100;
   const p = calculateProbability(oldTheta, difficulty, discrimination);
   const residual = (isCorrect ? 1 : 0) - p;
   const step = 0.8 * residual * (1 / se);

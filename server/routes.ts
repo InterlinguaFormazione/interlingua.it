@@ -1495,18 +1495,38 @@ export async function registerRoutes(
         consecutiveIncorrectA1: 0,
       });
 
-      const firstSkill = SECTION_SKILLS[0];
       const allQuestions = await storage.getBeQuestions();
-      const firstQuestion = selectNextQuestion(startingTheta, [], firstSkill, allQuestions);
+      let firstQuestion = null;
+      let startSectionIndex = 1;
+      let startSkill = SECTION_SKILLS[0];
+
+      for (let si = 0; si < SECTION_SKILLS.length; si++) {
+        const skill = SECTION_SKILLS[si];
+        const q = selectNextQuestion(startingTheta, [], skill, allQuestions);
+        if (q) {
+          firstQuestion = q;
+          startSectionIndex = si + 1;
+          startSkill = skill;
+          break;
+        }
+      }
+
+      if (!firstQuestion) {
+        return res.status(500).json({ success: false, message: "No questions available. Please contact the administrator." });
+      }
+
+      if (startSectionIndex !== 1) {
+        await storage.updateBeTestSession(session.id, { currentSectionIndex: startSectionIndex });
+      }
 
       res.json({
         success: true,
         sessionId: session.id,
         currentTheta: startingTheta,
         currentLevel: session.currentLevel,
-        currentSectionIndex: 1,
-        currentSkill: firstSkill,
-        question: firstQuestion ? {
+        currentSectionIndex: startSectionIndex,
+        currentSkill: startSkill,
+        question: {
           id: firstQuestion.id,
           question: firstQuestion.question,
           options: JSON.parse(firstQuestion.options),
@@ -1514,7 +1534,7 @@ export async function registerRoutes(
           level: firstQuestion.level,
           passage: firstQuestion.passage,
           audioUrl: firstQuestion.audioUrl,
-        } : null,
+        },
       });
     } catch (error) {
       console.error("Error starting business English test:", error);
@@ -1532,8 +1552,18 @@ export async function registerRoutes(
       const session = await storage.getBeTestSession(sessionId);
       if (!session) return res.status(404).json({ success: false, message: "Session not found" });
 
+      const currentSectionIdx = session.currentSectionIndex ?? 1;
+      if (currentSectionIdx > SECTION_SKILLS.length) {
+        return res.status(400).json({ success: false, message: "MC phase already completed" });
+      }
+
       const question = await storage.getBeQuestionById(questionId);
       if (!question) return res.status(404).json({ success: false, message: "Question not found" });
+
+      const expectedSkill = SECTION_SKILLS[currentSectionIdx - 1];
+      if (question.skillType !== expectedSkill) {
+        return res.status(400).json({ success: false, message: "Question does not belong to current section" });
+      }
 
       const isCorrect = answer === question.correctAnswer;
       const oldTheta = session.currentTheta ?? 0;
@@ -1829,9 +1859,14 @@ export async function registerRoutes(
 
   app.post("/api/english-test/submit-speaking", upload.single("audio"), async (req: any, res) => {
     try {
-      const { sessionId, prompt } = req.body;
-      if (!sessionId || !req.file) {
+      const { sessionId: rawSessionId, prompt } = req.body;
+      if (!rawSessionId || !req.file) {
         return res.status(400).json({ success: false, message: "Missing audio or session" });
+      }
+
+      const sessionId = parseInt(rawSessionId);
+      if (isNaN(sessionId)) {
+        return res.status(400).json({ success: false, message: "Invalid sessionId" });
       }
 
       const session = await storage.getBeTestSession(sessionId);
@@ -1846,7 +1881,7 @@ export async function registerRoutes(
       );
 
       await storage.createBeWritingSpeaking({
-        sessionId: parseInt(sessionId),
+        sessionId,
         taskType: "speaking",
         prompt: prompt || getSpeakingPrompt(session.currentLevel),
         response: transcript,
@@ -1859,7 +1894,7 @@ export async function registerRoutes(
       });
 
       await storage.createBeSectionResult({
-        sessionId: parseInt(sessionId),
+        sessionId,
         sectionName: "speaking",
         sectionIndex: 7,
         questionsAttempted: 1,
@@ -1871,7 +1906,7 @@ export async function registerRoutes(
         sectionConfidence: session.confidenceLevel,
       });
 
-      await storage.updateBeTestSession(parseInt(sessionId), {
+      await storage.updateBeTestSession(sessionId, {
         speakingScore: aiResult.level,
         currentSectionIndex: 8,
       });
@@ -2009,6 +2044,10 @@ export async function registerRoutes(
 
       const session = await storage.getBeTestSession(sessionId);
       if (!session) return res.status(404).json({ success: false, message: "Session not found" });
+
+      if (session.resultsEmailSentAt) {
+        return res.json({ success: true, message: "Already completed", finalLevel: session.finalLevel });
+      }
 
       await storage.updateBeTestSession(sessionId, { audioUnavailable: true });
 
