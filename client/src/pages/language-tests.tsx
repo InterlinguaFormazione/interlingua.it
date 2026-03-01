@@ -75,7 +75,7 @@ export default function LanguageTestsPage() {
               <Globe className="w-4 h-4" />
               Test di Livello
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-white dark:via-blue-100 dark:to-indigo-200 bg-clip-text text-transparent leading-tight" data-testid="text-page-title">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-white dark:via-blue-100 dark:to-indigo-200 bg-clip-text text-transparent leading-tight pb-1" data-testid="text-page-title">
               Scopri il Tuo Livello<br className="hidden md:block" /> Linguistico
             </h1>
             <p className="text-slate-500 dark:text-slate-400 mt-4 text-base max-w-lg mx-auto">
