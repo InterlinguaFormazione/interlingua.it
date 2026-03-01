@@ -1952,14 +1952,31 @@ export async function registerRoutes(
       if (!checkResult.success) {
         return res.status(400).json({ success: false, message: checkResult.error || "Voucher non valido." });
       }
-      if (checkResult.importo !== undefined && checkResult.importo < amountToCharge) {
+
+      const ccAmount = (checkResult.importo !== undefined) ? Math.min(checkResult.importo, amountToCharge) : amountToCharge;
+      const paypalRemainder = Math.round((amountToCharge - ccAmount) * 100) / 100;
+
+      if (paypalRemainder > 0 && !req.body.paypalOrderId) {
         return res.status(400).json({
           success: false,
-          message: `Il voucher ha un importo di €${checkResult.importo.toFixed(2)}, insufficiente per questo acquisto (€${amountToCharge.toFixed(2)}).`,
+          splitPayment: true,
+          ccAmount: ccAmount.toFixed(2),
+          paypalAmount: paypalRemainder.toFixed(2),
+          message: `Il voucher copre €${ccAmount.toFixed(2)}. Rimangono €${paypalRemainder.toFixed(2)} da pagare con PayPal.`,
         });
       }
 
-      const confirmResult = await confirmVoucher(codiceVoucher.trim(), amountToCharge);
+      if (paypalRemainder > 0 && req.body.paypalOrderId) {
+        const verification = await verifyPaypalOrder(req.body.paypalOrderId, paypalRemainder.toFixed(2));
+        if (!verification.verified) {
+          return res.status(400).json({ success: false, message: "Il pagamento PayPal non è stato verificato. Riprova." });
+        }
+        if (verification.status !== "COMPLETED") {
+          return res.status(400).json({ success: false, message: "Il pagamento PayPal non è stato completato." });
+        }
+      }
+
+      const confirmResult = await confirmVoucher(codiceVoucher.trim(), ccAmount);
       if (!confirmResult.success) {
         return res.status(400).json({
           success: false,
@@ -1988,11 +2005,18 @@ export async function registerRoutes(
       const optionsSummary = Object.entries(selectedOptions).map(([k, v]) => `${k}: ${v}`).join(", ");
       const productNameWithOptions = optionsSummary ? `${product.name} (${optionsSummary})` : product.name;
 
+      const paymentNote = paypalRemainder > 0
+        ? `[Carta della Cultura €${ccAmount.toFixed(2)} + PayPal €${paypalRemainder.toFixed(2)} - ${checkResult.nominativo || "N/A"}]`
+        : `[Carta della Cultura - ${checkResult.nominativo || "N/A"}]`;
+      const paypalOrderRef = paypalRemainder > 0
+        ? `CC-${codiceVoucher.trim().substring(0, 8)}+PP-${req.body.paypalOrderId}`
+        : `CC-${codiceVoucher.trim().substring(0, 8)}`;
+
       const order = await storage.createShopOrder({
         productSlug: product.slug,
         productName: productNameWithOptions,
         amount: finalPrice,
-        paypalOrderId: `CC-${codiceVoucher.trim().substring(0, 8)}`,
+        paypalOrderId: paypalOrderRef,
         customerFirstName,
         customerLastName,
         customerEmail,
@@ -2010,7 +2034,7 @@ export async function registerRoutes(
         billingPartitaIva: billingPartitaIva || null,
         billingCodiceSdi: billingCodiceSdi || null,
         billingPec: billingPec || null,
-        notes: `[Carta della Cultura - ${checkResult.nominativo || "N/A"}] ${optionsSummary ? `[${optionsSummary}] ` : ""}${notes || ""}`.trim(),
+        notes: `${paymentNote} ${optionsSummary ? `[${optionsSummary}] ` : ""}${notes || ""}`.trim(),
         status: "completed",
         discountCode: appliedDiscountCode,
         discountAmount: appliedDiscountAmount,
@@ -2028,12 +2052,15 @@ export async function registerRoutes(
       }
 
       try {
+        const paymentMethod = paypalRemainder > 0
+          ? `Carta della Cultura €${ccAmount.toFixed(2)} + PayPal €${paypalRemainder.toFixed(2)}`
+          : `Carta della Cultura`;
         await sendContactNotification({
           name: `${customerFirstName} ${customerLastName}`,
           email: customerEmail,
           phone: customerPhone || undefined,
           courseInterest: `Acquisto: ${productNameWithOptions} (${finalPrice} EUR)`,
-          message: `Ordine completato via Carta della Cultura. Voucher: ${codiceVoucher}. Beneficiario: ${checkResult.nominativo || "N/A"}`,
+          message: `Ordine completato via ${paymentMethod}. Voucher CC: ${codiceVoucher}. Beneficiario: ${checkResult.nominativo || "N/A"}`,
         });
       } catch (emailError) {
         console.error("Failed to send Carta della Cultura purchase notification:", emailError);
@@ -2117,14 +2144,31 @@ export async function registerRoutes(
       if (!checkResult.success) {
         return res.status(400).json({ success: false, message: checkResult.error || "Voucher non valido." });
       }
-      if (checkResult.importo !== undefined && checkResult.importo < finalTotal) {
+
+      const ccAmount = (checkResult.importo !== undefined) ? Math.min(checkResult.importo, finalTotal) : finalTotal;
+      const paypalRemainder = Math.round((finalTotal - ccAmount) * 100) / 100;
+
+      if (paypalRemainder > 0 && !req.body.paypalOrderId) {
         return res.status(400).json({
           success: false,
-          message: `Il voucher ha un importo di €${checkResult.importo.toFixed(2)}, insufficiente per questo acquisto (€${finalTotal.toFixed(2)}).`,
+          splitPayment: true,
+          ccAmount: ccAmount.toFixed(2),
+          paypalAmount: paypalRemainder.toFixed(2),
+          message: `Il voucher copre €${ccAmount.toFixed(2)}. Rimangono €${paypalRemainder.toFixed(2)} da pagare con PayPal.`,
         });
       }
 
-      const confirmResult = await confirmVoucher(codiceVoucher.trim(), finalTotal);
+      if (paypalRemainder > 0 && req.body.paypalOrderId) {
+        const verification = await verifyPaypalOrder(req.body.paypalOrderId, paypalRemainder.toFixed(2));
+        if (!verification.verified) {
+          return res.status(400).json({ success: false, message: "Il pagamento PayPal non è stato verificato. Riprova." });
+        }
+        if (verification.status !== "COMPLETED") {
+          return res.status(400).json({ success: false, message: "Il pagamento PayPal non è stato completato." });
+        }
+      }
+
+      const confirmResult = await confirmVoucher(codiceVoucher.trim(), ccAmount);
       if (!confirmResult.success) {
         return res.status(400).json({ success: false, message: confirmResult.error || "Errore nella conferma del voucher." });
       }
@@ -2152,11 +2196,18 @@ export async function registerRoutes(
         return opts ? `${i.product.name} (${opts}) x${i.quantity}` : `${i.product.name} x${i.quantity}`;
       }).join(", ");
 
+      const paymentNote = paypalRemainder > 0
+        ? `[Carta della Cultura €${ccAmount.toFixed(2)} + PayPal €${paypalRemainder.toFixed(2)} - ${checkResult.nominativo || "N/A"}]`
+        : `[Carta della Cultura - ${checkResult.nominativo || "N/A"}]`;
+      const paypalOrderRef = paypalRemainder > 0
+        ? `CC-${codiceVoucher.trim().substring(0, 8)}+PP-${req.body.paypalOrderId}`
+        : `CC-${codiceVoucher.trim().substring(0, 8)}`;
+
       const order = await storage.createShopOrder({
         productSlug: validatedItems.map(i => i.product.slug).join(","),
         productName: allProductNames,
         amount: finalTotal.toFixed(2),
-        paypalOrderId: `CC-${codiceVoucher.trim().substring(0, 8)}`,
+        paypalOrderId: paypalOrderRef,
         customerFirstName,
         customerLastName,
         customerEmail,
@@ -2174,7 +2225,7 @@ export async function registerRoutes(
         billingPartitaIva: billingPartitaIva || null,
         billingCodiceSdi: billingCodiceSdi || null,
         billingPec: billingPec || null,
-        notes: `[Carta della Cultura - ${checkResult.nominativo || "N/A"}] ${notes || ""}`.trim(),
+        notes: `${paymentNote} ${notes || ""}`.trim(),
         status: "completed",
         discountCode: appliedDiscountCode,
         discountAmount: appliedDiscountAmount,
@@ -2192,12 +2243,15 @@ export async function registerRoutes(
       }
 
       try {
+        const paymentMethodDesc = paypalRemainder > 0
+          ? `Carta della Cultura €${ccAmount.toFixed(2)} + PayPal €${paypalRemainder.toFixed(2)}`
+          : `Carta della Cultura`;
         await sendContactNotification({
           name: `${customerFirstName} ${customerLastName}`,
           email: customerEmail,
           phone: customerPhone || undefined,
           courseInterest: `Acquisto Carrello: ${allProductNames} (${finalTotal.toFixed(2)} EUR)`,
-          message: `Ordine carrello completato via Carta della Cultura. Voucher: ${codiceVoucher}. Beneficiario: ${checkResult.nominativo || "N/A"}`,
+          message: `Ordine carrello completato via ${paymentMethodDesc}. Voucher CC: ${codiceVoucher}. Beneficiario: ${checkResult.nominativo || "N/A"}`,
         });
       } catch (emailError) {
         console.error("Failed to send Carta della Cultura cart purchase notification:", emailError);

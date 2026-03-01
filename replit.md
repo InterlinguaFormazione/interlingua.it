@@ -79,6 +79,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `spanish-test-questions.ts` - Question bank for Spanish test (~84 questions in Spanish, 5 skills, listening has audio playback)
 - `generate-listening-audio.ts` - One-time TTS script (OpenAI tts-1-hd) that generated 90 MP3 files for English listening comprehension using 6 diverse voices (alloy, echo, fable, onyx, nova, shimmer)
 - `../scripts/generate-audio.ts` - One-time TTS script (OpenAI tts-1) that generated 63 MP3 files for Italian (15), German (18), French (15), Spanish (15) listening comprehension. Audio files stored in `client/public/audio/{italian,german,french,spanish}/`
+- `carta-cultura.ts` - Carta della Cultura Giovani/Merito SOAP client (certificate-based mTLS, voucher check/confirm via Sogei web service). Supports split payment: if CC voucher amount < order total, remainder is paid via PayPal. Certificate: `server/certs/carta-cultura.cer` (PEM, valid until Aug 2028). Private key: `CARTA_CULTURA_PRIVATE_KEY` env var.
 - `email.ts` - AWS SES email notifications (contact, newsletter, subscription payment, booking confirmation, English test results)
 - `crm.ts` - CRM webhook integration (forwards contact submissions)
 - `blog-generator.ts` - Automated blog generation
@@ -161,6 +162,10 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `GET /api/shop/me` - Get current customer info (auth required)
 - `GET /api/shop/my-orders` - Get customer's orders (auth required)
 - `GET /api/shop/materials/:slug` - Get downloadable materials for a purchased course (auth required)
+- `GET /api/shop/carta-cultura/status` - Check if Carta della Cultura is configured
+- `POST /api/shop/carta-cultura/check` - Verify a CC voucher code (SOAP check, tipoOperazione=1)
+- `POST /api/shop/carta-cultura/purchase` - Single-item CC purchase (supports split payment: if voucher < total, accepts paypalOrderId for remainder)
+- `POST /api/shop/carta-cultura/purchase-cart` - Cart CC purchase (same split payment support)
 - `GET /api/admin/shop/orders` - List all shop orders (admin)
 - `GET /api/admin/shop/materials` - List all course materials (admin)
 - `POST /api/admin/shop/materials` - Add course material (admin)
@@ -184,6 +189,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `ADMIN_PASSWORD` - Default password for the initial admin user (used only for seeding)
 - `PAYPAL_CLIENT_ID` - PayPal API client ID (sandbox or production)
 - `PAYPAL_CLIENT_SECRET` - PayPal API client secret (sandbox or production)
+- `CARTA_CULTURA_PRIVATE_KEY` - PEM-format private key for Carta della Cultura mTLS certificate (P.IVA 03828240246)
 
 ## Contact Email
 - **Default email**: `infocorsi@skillcraft.interlingua.it` (used everywhere on site)

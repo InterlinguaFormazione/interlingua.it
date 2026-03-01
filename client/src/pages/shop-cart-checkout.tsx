@@ -41,6 +41,7 @@ import {
   X,
   ChevronDown,
   ChevronUp,
+  Ticket,
 } from "lucide-react";
 
 declare global {
@@ -83,6 +84,15 @@ export default function CartCheckout() {
   const [paypalReady, setPaypalReady] = useState(false);
   const [processing, setProcessing] = useState(false);
   const paypalInitialized = useRef(false);
+
+  const [paymentMethod, setPaymentMethod] = useState<"paypal" | "cartacultura">("paypal");
+  const [ccVoucherCode, setCcVoucherCode] = useState("");
+  const [ccCheckResult, setCcCheckResult] = useState<{ success: boolean; nominativo?: string; importo?: number; error?: string } | null>(null);
+  const [ccLoading, setCcLoading] = useState(false);
+  const [ccProcessing, setCcProcessing] = useState(false);
+  const [ccSplitNeeded, setCcSplitNeeded] = useState<{ ccAmount: string; paypalAmount: string } | null>(null);
+  const [ccSplitPaypalReady, setCcSplitPaypalReady] = useState(false);
+  const ccSplitPaypalInitialized = useRef(false);
 
   const [voucherCode, setVoucherCode] = useState("");
   const [voucherOpen, setVoucherOpen] = useState(true);
@@ -128,6 +138,95 @@ export default function CartCheckout() {
     setVoucherResult(null);
     setAppliedVoucherCode("");
     setVoucherCode("");
+  };
+
+  const handleCcCheck = async () => {
+    if (!ccVoucherCode.trim()) return;
+    setCcLoading(true);
+    setCcCheckResult(null);
+    setCcSplitNeeded(null);
+    ccSplitPaypalInitialized.current = false;
+    setCcSplitPaypalReady(false);
+    try {
+      const res = await apiRequest("POST", "/api/shop/carta-cultura/check", {
+        codiceVoucher: ccVoucherCode.trim(),
+      });
+      const data = await res.json();
+      setCcCheckResult(data);
+    } catch {
+      setCcCheckResult({ success: false, error: "Errore di connessione. Riprova." });
+    } finally {
+      setCcLoading(false);
+    }
+  };
+
+  const buildCcCartPurchaseBody = (extraFields?: Record<string, string>) => ({
+    codiceVoucher: ccVoucherCode.trim(),
+    items: JSON.stringify(items.map(item => ({
+      slug: item.product.slug,
+      quantity: item.quantity,
+      selectedOptions: item.selectedOptions || {},
+    }))),
+    customerFirstName,
+    customerLastName,
+    customerEmail,
+    customerPhone,
+    customerPassword,
+    codiceFiscale,
+    billingCodiceFiscale: codiceFiscale,
+    billingIndirizzo: indirizzo,
+    billingCap: cap,
+    billingCitta: citta,
+    billingProvincia: provincia,
+    billingPartitaIva: partitaIva,
+    billingCodiceSdi: codiceSdi,
+    billingPec: pec,
+    notes,
+    ...(appliedVoucherCode ? { discountCode: appliedVoucherCode } : {}),
+    ...extraFields,
+  });
+
+  const handleCcPurchase = async () => {
+    setCcProcessing(true);
+    try {
+      const res = await apiRequest("POST", "/api/shop/carta-cultura/purchase-cart", buildCcCartPurchaseBody());
+      const data = await res.json();
+      if (data.success) {
+        if (data.customerToken) localStorage.setItem("shop_customer_token", data.customerToken);
+        clearCart();
+        setStep("success");
+        toast({ title: "Acquisto completato!", description: "Il pagamento con Carta della Cultura è stato elaborato con successo." });
+      } else if (data.splitPayment) {
+        setCcSplitNeeded({ ccAmount: data.ccAmount, paypalAmount: data.paypalAmount });
+        toast({ title: "Pagamento parziale", description: `Il buono copre €${data.ccAmount}. Paga i restanti €${data.paypalAmount} con PayPal.` });
+      } else {
+        toast({ title: "Errore", description: data.message || "Errore durante l'acquisto.", variant: "destructive" });
+      }
+    } catch (error: any) {
+      toast({ title: "Errore", description: error.message || "Errore durante l'acquisto.", variant: "destructive" });
+    } finally {
+      setCcProcessing(false);
+    }
+  };
+
+  const handleCcSplitComplete = async (paypalOrderId: string) => {
+    setCcProcessing(true);
+    try {
+      const res = await apiRequest("POST", "/api/shop/carta-cultura/purchase-cart", buildCcCartPurchaseBody({ paypalOrderId }));
+      const data = await res.json();
+      if (data.success) {
+        if (data.customerToken) localStorage.setItem("shop_customer_token", data.customerToken);
+        clearCart();
+        setStep("success");
+        toast({ title: "Acquisto completato!", description: "Il pagamento combinato è stato elaborato con successo." });
+      } else {
+        toast({ title: "Errore", description: data.message || "Errore durante l'acquisto.", variant: "destructive" });
+      }
+    } catch (error: any) {
+      toast({ title: "Errore", description: error.message || "Errore durante l'acquisto.", variant: "destructive" });
+    } finally {
+      setCcProcessing(false);
+    }
   };
 
   const checkAutoApplyVoucher = async (email: string) => {
@@ -408,6 +507,88 @@ export default function CartCheckout() {
 
     loadPayPalSDK();
   }, [step]);
+
+  useEffect(() => {
+    if (!ccSplitNeeded || ccSplitPaypalInitialized.current) return;
+    ccSplitPaypalInitialized.current = true;
+
+    const initSplitPayPal = async () => {
+      try {
+        const waitForPaypal = () => new Promise<void>((resolve) => {
+          if ((window as any).paypal) return resolve();
+          const check = setInterval(() => {
+            if ((window as any).paypal) { clearInterval(check); resolve(); }
+          }, 200);
+        });
+        await waitForPaypal();
+
+        const clientToken: string = await fetch("/paypal/setup")
+          .then((r) => r.json())
+          .then((d) => d.clientToken);
+
+        const sdkInstance = await (window as any).paypal.createInstance({
+          clientToken,
+          components: ["paypal-payments"],
+        });
+
+        const splitAmount = ccSplitNeeded.paypalAmount;
+
+        const paypalCheckout = sdkInstance.createPayPalOneTimePaymentSession({
+          onApprove: async (data: any) => {
+            setCcProcessing(true);
+            try {
+              const captureRes = await fetch(`/paypal/order/${data.orderId}/capture`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+              });
+              const captureData = await captureRes.json();
+              if (captureData.status === "COMPLETED") {
+                await handleCcSplitComplete(data.orderId);
+              } else {
+                setCcProcessing(false);
+                toast({ title: "Pagamento non completato", description: "Il pagamento PayPal non è stato completato.", variant: "destructive" });
+              }
+            } catch {
+              setCcProcessing(false);
+              toast({ title: "Errore", description: "Errore durante la cattura del pagamento.", variant: "destructive" });
+            }
+          },
+          onCancel: () => {
+            toast({ title: "Pagamento annullato", description: "Hai annullato il pagamento PayPal." });
+          },
+          onError: (err: any) => {
+            console.error("PayPal split error:", err);
+            toast({ title: "Errore PayPal", description: "Si è verificato un errore con PayPal.", variant: "destructive" });
+          },
+        });
+
+        const onClick = async () => {
+          try {
+            const orderPromise = fetch("/paypal/order", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ amount: splitAmount, currency: "EUR", intent: "CAPTURE" }),
+            }).then((r) => r.json()).then((d) => ({ orderId: d.id }));
+            await paypalCheckout.start({ paymentFlow: "auto" }, orderPromise);
+          } catch (e) {
+            console.error(e);
+          }
+        };
+
+        const btn = document.getElementById("cc-split-paypal-button-cart");
+        if (btn) btn.addEventListener("click", onClick);
+        setCcSplitPaypalReady(true);
+
+        return () => {
+          if (btn) btn.removeEventListener("click", onClick);
+        };
+      } catch (e) {
+        console.error("Failed to initialize split PayPal:", e);
+      }
+    };
+
+    initSplitPayPal();
+  }, [ccSplitNeeded]);
 
   if (items.length === 0 && step !== "success") {
     return (
@@ -775,47 +956,187 @@ export default function CartCheckout() {
                       )}
                     </div>
 
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                        <Shield className="w-4 h-4" />
-                        <span>Pagamento sicuro tramite PayPal</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <SiPaypal className="w-8 h-8 text-[#003087]" />
-                        <SiVisa className="w-8 h-6 text-[#1a1f71]" />
-                        <SiMastercard className="w-8 h-6 text-[#eb001b]" />
-                      </div>
-                    </div>
-
-                    {processing ? (
+                    {(processing || ccProcessing) ? (
                       <div className="flex flex-col items-center gap-3 py-8">
                         <Loader2 className="w-8 h-8 animate-spin text-primary" />
                         <p className="text-muted-foreground">Elaborazione del pagamento in corso...</p>
                       </div>
                     ) : (
-                      <div className="space-y-3">
-                        <button
-                          id="cart-paypal-button"
-                          className={`w-full py-4 rounded-xl font-semibold text-white transition-all ${
-                            paypalReady
-                              ? "bg-[#0070ba] hover:bg-[#003087] cursor-pointer shadow-lg hover:shadow-xl"
-                              : "bg-gray-300 cursor-not-allowed"
-                          }`}
-                          disabled={!paypalReady}
-                          data-testid="button-paypal-cart"
-                        >
-                          {paypalReady ? (
-                            <span className="flex items-center justify-center gap-2">
-                              <Lock className="w-4 h-4" />
-                              Paga &euro;{displayTotal.toFixed(2)} con PayPal
-                            </span>
-                          ) : (
-                            <span className="flex items-center justify-center gap-2">
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              Caricamento PayPal...
-                            </span>
-                          )}
-                        </button>
+                      <div className="space-y-6">
+                        <div className="grid grid-cols-2 gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod("paypal")}
+                            className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                              paymentMethod === "paypal"
+                                ? "border-primary bg-primary/5"
+                                : "border-muted hover:border-muted-foreground/30"
+                            }`}
+                            data-testid="button-select-paypal-cart"
+                          >
+                            <SiPaypal className="w-6 h-6 text-[#0070ba]" />
+                            <span className="text-xs font-medium">PayPal / Carta</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod("cartacultura")}
+                            className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                              paymentMethod === "cartacultura"
+                                ? "border-primary bg-primary/5"
+                                : "border-muted hover:border-muted-foreground/30"
+                            }`}
+                            data-testid="button-select-cartacultura-cart"
+                          >
+                            <Ticket className="w-6 h-6 text-amber-600" />
+                            <span className="text-xs font-medium">Carta della Cultura</span>
+                          </button>
+                        </div>
+
+                        {paymentMethod === "paypal" && (
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                              <Shield className="w-4 h-4" />
+                              <span>Pagamento sicuro tramite PayPal</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <SiPaypal className="w-8 h-8 text-[#003087]" />
+                              <SiVisa className="w-8 h-6 text-[#1a1f71]" />
+                              <SiMastercard className="w-8 h-6 text-[#eb001b]" />
+                            </div>
+                            <button
+                              id="cart-paypal-button"
+                              className={`w-full py-4 rounded-xl font-semibold text-white transition-all ${
+                                paypalReady
+                                  ? "bg-[#0070ba] hover:bg-[#003087] cursor-pointer shadow-lg hover:shadow-xl"
+                                  : "bg-gray-300 cursor-not-allowed"
+                              }`}
+                              disabled={!paypalReady}
+                              data-testid="button-paypal-cart"
+                            >
+                              {paypalReady ? (
+                                <span className="flex items-center justify-center gap-2">
+                                  <Lock className="w-4 h-4" />
+                                  Paga &euro;{displayTotal.toFixed(2)} con PayPal
+                                </span>
+                              ) : (
+                                <span className="flex items-center justify-center gap-2">
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                  Caricamento PayPal...
+                                </span>
+                              )}
+                            </button>
+                          </div>
+                        )}
+
+                        {paymentMethod === "cartacultura" && (
+                          <div className="space-y-4">
+                            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                              <p className="text-sm text-amber-800 dark:text-amber-200">
+                                Inserisci il codice del buono generato dalla tua Carta della Cultura Giovani o Carta del Merito.
+                              </p>
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Codice Voucher</Label>
+                              <div className="flex gap-2">
+                                <Input
+                                  value={ccVoucherCode}
+                                  onChange={(e) => { setCcVoucherCode(e.target.value); setCcCheckResult(null); setCcSplitNeeded(null); }}
+                                  placeholder="Inserisci il codice del buono"
+                                  data-testid="input-cc-voucher-cart"
+                                />
+                                <Button
+                                  onClick={handleCcCheck}
+                                  disabled={ccLoading || !ccVoucherCode.trim()}
+                                  variant="outline"
+                                  data-testid="button-cc-check-cart"
+                                >
+                                  {ccLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verifica"}
+                                </Button>
+                              </div>
+                            </div>
+                            {ccCheckResult && (
+                              <div className={`rounded-lg p-4 ${ccCheckResult.success ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800" : "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"}`}>
+                                {ccCheckResult.success ? (
+                                  <div className="space-y-1">
+                                    <p className="text-sm font-medium text-green-800 dark:text-green-200">Voucher valido</p>
+                                    {ccCheckResult.nominativo && (
+                                      <p className="text-xs text-green-700 dark:text-green-300">Beneficiario: {ccCheckResult.nominativo}</p>
+                                    )}
+                                    {ccCheckResult.importo !== undefined && (
+                                      <p className="text-xs text-green-700 dark:text-green-300">Importo disponibile: &euro;{ccCheckResult.importo.toFixed(2)}</p>
+                                    )}
+                                    {ccCheckResult.importo !== undefined && ccCheckResult.importo < displayTotal && (
+                                      <p className="text-xs text-amber-600 dark:text-amber-400 font-medium mt-1">
+                                        Il buono copre &euro;{ccCheckResult.importo.toFixed(2)} — la differenza di &euro;{(displayTotal - ccCheckResult.importo).toFixed(2)} potrà essere pagata con PayPal.
+                                      </p>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <p className="text-sm text-red-800 dark:text-red-200">{ccCheckResult.error || "Voucher non valido."}</p>
+                                )}
+                              </div>
+                            )}
+                            {ccCheckResult?.success && !ccSplitNeeded && (
+                              <Button
+                                onClick={handleCcPurchase}
+                                className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                                disabled={ccProcessing}
+                                data-testid="button-cc-purchase-cart"
+                              >
+                                {ccProcessing ? (
+                                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                ) : (
+                                  <Ticket className="w-4 h-4 mr-2" />
+                                )}
+                                {ccCheckResult.importo !== undefined && ccCheckResult.importo < displayTotal
+                                  ? "Procedi con pagamento combinato"
+                                  : `Paga €${displayTotal.toFixed(2)} con Carta della Cultura`
+                                }
+                              </Button>
+                            )}
+                            {ccSplitNeeded && (
+                              <div className="space-y-3 border-t pt-4">
+                                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-2">
+                                  <p className="text-sm font-medium text-blue-800 dark:text-blue-200">Pagamento combinato</p>
+                                  <div className="flex justify-between text-xs text-blue-700 dark:text-blue-300">
+                                    <span className="flex items-center gap-1"><Ticket className="w-3 h-3" /> Carta della Cultura</span>
+                                    <span>&euro;{ccSplitNeeded.ccAmount}</span>
+                                  </div>
+                                  <div className="flex justify-between text-xs text-blue-700 dark:text-blue-300">
+                                    <span className="flex items-center gap-1"><SiPaypal className="w-3 h-3" /> PayPal</span>
+                                    <span>&euro;{ccSplitNeeded.paypalAmount}</span>
+                                  </div>
+                                  <div className="flex justify-between text-sm font-bold text-blue-800 dark:text-blue-200 border-t border-blue-200 dark:border-blue-700 pt-1">
+                                    <span>Totale</span>
+                                    <span>&euro;{(parseFloat(ccSplitNeeded.ccAmount) + parseFloat(ccSplitNeeded.paypalAmount)).toFixed(2)}</span>
+                                  </div>
+                                </div>
+                                <p className="text-xs text-muted-foreground">
+                                  Clicca il pulsante per pagare i restanti &euro;{ccSplitNeeded.paypalAmount} con PayPal. Il buono Carta della Cultura verrà consumato automaticamente.
+                                </p>
+                                {!ccSplitPaypalReady && (
+                                  <div className="flex items-center gap-2 text-muted-foreground justify-center">
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span className="text-sm">Caricamento PayPal...</span>
+                                  </div>
+                                )}
+                                <button
+                                  id="cc-split-paypal-button-cart"
+                                  className={`w-full py-3 px-6 rounded-lg font-semibold text-white transition-all flex items-center justify-center gap-2 ${
+                                    ccSplitPaypalReady
+                                      ? "bg-[#0070ba] hover:bg-[#003087] cursor-pointer"
+                                      : "bg-gray-400 cursor-not-allowed"
+                                  }`}
+                                  disabled={!ccSplitPaypalReady}
+                                  data-testid="button-cc-split-paypal-cart"
+                                >
+                                  <SiPaypal className="w-5 h-5" />
+                                  Paga &euro;{ccSplitNeeded.paypalAmount} con PayPal
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
 
