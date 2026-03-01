@@ -196,18 +196,32 @@ export default function FrenchTestPage() {
   }, [phase, toast]);
 
   useEffect(() => {
-    if (phase === "mc-questions") {
+    const activePhases = ["mc-questions", "writing"];
+    if (activePhases.includes(phase)) {
       const preventCopy = (e: ClipboardEvent) => e.preventDefault();
       const preventContext = (e: MouseEvent) => e.preventDefault();
+      const preventDrag = (e: DragEvent) => e.preventDefault();
+      const preventSelect = (e: Event) => {
+        const sel = window.getSelection();
+        if (sel) sel.removeAllRanges();
+      };
       document.addEventListener("copy", preventCopy);
       document.addEventListener("paste", preventCopy);
       document.addEventListener("cut", preventCopy);
       document.addEventListener("contextmenu", preventContext);
+      document.addEventListener("dragstart", preventDrag);
+      document.addEventListener("selectstart", preventSelect);
+      document.body.style.userSelect = "none";
+      document.body.style.webkitUserSelect = "none";
       return () => {
         document.removeEventListener("copy", preventCopy);
         document.removeEventListener("paste", preventCopy);
         document.removeEventListener("cut", preventCopy);
         document.removeEventListener("contextmenu", preventContext);
+        document.removeEventListener("dragstart", preventDrag);
+        document.removeEventListener("selectstart", preventSelect);
+        document.body.style.userSelect = "";
+        document.body.style.webkitUserSelect = "";
       };
     }
   }, [phase]);
