@@ -72,6 +72,7 @@ export default function ShopDashboard() {
   const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
   const [profileFirstName, setProfileFirstName] = useState("");
   const [profileLastName, setProfileLastName] = useState("");
+  const [profileEmail, setProfileEmail] = useState("");
   const [profilePhone, setProfilePhone] = useState("");
   const [profileCF, setProfileCF] = useState("");
   const [profileIndirizzo, setProfileIndirizzo] = useState("");
@@ -104,6 +105,7 @@ export default function ShopDashboard() {
         setCustomer(data);
         setProfileFirstName(data.firstName || "");
         setProfileLastName(data.lastName || "");
+        setProfileEmail(data.email || "");
         setProfilePhone(data.phone || "");
         setProfileCF(data.codiceFiscale || "");
         setProfileIndirizzo(data.indirizzo || "");
@@ -130,7 +132,7 @@ export default function ShopDashboard() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ firstName: profileFirstName, lastName: profileLastName, phone: profilePhone, codiceFiscale: profileCF, indirizzo: profileIndirizzo, cap: profileCap, citta: profileCitta, provincia: profileProvincia }),
+        body: JSON.stringify({ email: profileEmail, firstName: profileFirstName, lastName: profileLastName, phone: profilePhone, codiceFiscale: profileCF, indirizzo: profileIndirizzo, cap: profileCap, citta: profileCitta, provincia: profileProvincia }),
       });
       const data = await res.json();
       if (data.success) {
@@ -470,13 +472,13 @@ export default function ShopDashboard() {
                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                           id="profile-email"
-                          value={customer.email}
-                          disabled
-                          className="pl-9 opacity-60"
+                          type="email"
+                          value={profileEmail}
+                          onChange={(e) => setProfileEmail(e.target.value)}
+                          className="pl-9"
                           data-testid="input-profile-email"
                         />
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">L'email non può essere modificata</p>
                     </div>
                     <div>
                       <Label htmlFor="profile-cf">Codice Fiscale</Label>

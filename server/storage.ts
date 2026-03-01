@@ -122,7 +122,8 @@ export interface IStorage {
   getShopCustomerByEmail(email: string): Promise<ShopCustomer | undefined>;
   getShopCustomerById(id: string): Promise<ShopCustomer | undefined>;
   getAllShopCustomers(): Promise<ShopCustomer[]>;
-  updateShopCustomer(id: string, data: Partial<{ firstName: string; lastName: string; phone: string; password: string; codiceFiscale: string; indirizzo: string; cap: string; citta: string; provincia: string }>): Promise<ShopCustomer | undefined>;
+  updateShopCustomer(id: string, data: Partial<{ email: string; firstName: string; lastName: string; phone: string; password: string; codiceFiscale: string; indirizzo: string; cap: string; citta: string; provincia: string }>): Promise<ShopCustomer | undefined>;
+  updateOrdersEmail(customerId: string, newEmail: string): Promise<void>;
 
   createShopOrder(order: InsertShopOrder): Promise<ShopOrder>;
   getShopOrders(): Promise<ShopOrder[]>;
@@ -440,8 +441,9 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(shopCustomers).orderBy(desc(shopCustomers.createdAt));
   }
 
-  async updateShopCustomer(id: string, data: Partial<{ firstName: string; lastName: string; phone: string; password: string; codiceFiscale: string; indirizzo: string; cap: string; citta: string; provincia: string }>): Promise<ShopCustomer | undefined> {
+  async updateShopCustomer(id: string, data: Partial<{ email: string; firstName: string; lastName: string; phone: string; password: string; codiceFiscale: string; indirizzo: string; cap: string; citta: string; provincia: string }>): Promise<ShopCustomer | undefined> {
     const updateData: Record<string, string> = {};
+    if (data.email !== undefined) updateData.email = data.email;
     if (data.firstName !== undefined) updateData.firstName = data.firstName;
     if (data.lastName !== undefined) updateData.lastName = data.lastName;
     if (data.phone !== undefined) updateData.phone = data.phone;
@@ -453,6 +455,12 @@ export class DatabaseStorage implements IStorage {
     if (data.provincia !== undefined) updateData.provincia = data.provincia;
     const [result] = await db.update(shopCustomers).set(updateData).where(eq(shopCustomers.id, id)).returning();
     return result;
+  }
+
+  async updateOrdersEmail(customerId: string, newEmail: string): Promise<void> {
+    await db.update(shopOrders)
+      .set({ customerEmail: newEmail })
+      .where(eq(shopOrders.customerId, customerId));
   }
 
   async createShopOrder(order: InsertShopOrder): Promise<ShopOrder> {

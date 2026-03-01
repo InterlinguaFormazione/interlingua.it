@@ -1704,9 +1704,22 @@ export async function registerRoutes(
         return res.status(401).json({ success: false, message: "Sessione scaduta." });
       }
 
-      const { firstName, lastName, phone, codiceFiscale, indirizzo, cap, citta, provincia, currentPassword, newPassword } = req.body;
-      const updateData: Partial<{ firstName: string; lastName: string; phone: string; password: string; codiceFiscale: string; indirizzo: string; cap: string; citta: string; provincia: string }> = {};
+      const { email, firstName, lastName, phone, codiceFiscale, indirizzo, cap, citta, provincia, currentPassword, newPassword } = req.body;
+      const updateData: Partial<{ email: string; firstName: string; lastName: string; phone: string; password: string; codiceFiscale: string; indirizzo: string; cap: string; citta: string; provincia: string }> = {};
+      let emailChanged = false;
 
+      if (email && typeof email === "string" && email.trim()) {
+        const newEmail = email.trim().toLowerCase();
+        const customer = await storage.getShopCustomerById(session.customerId);
+        if (customer && customer.email !== newEmail) {
+          const existing = await storage.getShopCustomerByEmail(newEmail);
+          if (existing) {
+            return res.status(400).json({ success: false, message: "Questa email è già associata a un altro account." });
+          }
+          updateData.email = newEmail;
+          emailChanged = true;
+        }
+      }
       if (firstName && typeof firstName === "string" && firstName.trim()) {
         updateData.firstName = firstName.trim();
       }
@@ -1756,6 +1769,10 @@ export async function registerRoutes(
 
       const updated = await storage.updateShopCustomer(session.customerId, updateData);
       if (!updated) return res.status(404).json({ success: false, message: "Cliente non trovato." });
+
+      if (emailChanged && updateData.email) {
+        await storage.updateOrdersEmail(session.customerId, updateData.email);
+      }
 
       res.json({ success: true, customer: { id: updated.id, firstName: updated.firstName, lastName: updated.lastName, email: updated.email, phone: updated.phone || "", codiceFiscale: updated.codiceFiscale || "", indirizzo: updated.indirizzo || "", cap: updated.cap || "", citta: updated.citta || "", provincia: updated.provincia || "" } });
     } catch (error) {
