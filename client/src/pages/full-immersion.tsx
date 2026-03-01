@@ -863,6 +863,17 @@ export default function FullImmersionPage() {
                       Chiama: 0444 321601
                     </a>
                   </Button>
+                  <Link href="/test-di-livello">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="h-16 px-10 text-lg rounded-2xl border-white/25 text-white hover:bg-white/10 backdrop-blur-sm font-medium"
+                      data-testid="button-fi-test"
+                    >
+                      <GraduationCap className="w-5 h-5 mr-2" />
+                      Fai il Test di Livello
+                    </Button>
+                  </Link>
                   <Button
                     size="lg"
                     variant="outline"

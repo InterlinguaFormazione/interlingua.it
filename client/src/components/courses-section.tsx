@@ -11,7 +11,8 @@ import {
   Users,
   BookOpen,
   Sparkles,
-  Languages
+  Languages,
+  GraduationCap
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -320,6 +321,12 @@ export function CoursesSection() {
               Richiedi Informazioni
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
+            <Link href="/test-di-livello">
+              <Button size="lg" variant="outline" data-testid="button-courses-test">
+                <GraduationCap className="mr-2 h-5 w-5" />
+                Fai il Test di Livello
+              </Button>
+            </Link>
           </div>
           
           <p className="mt-6 text-sm text-muted-foreground">

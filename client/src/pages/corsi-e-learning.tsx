@@ -956,6 +956,17 @@ export default function CorsiELearningPage() {
                       info@interlingua.it
                     </a>
                   </Button>
+                  <Link href="/test-di-livello">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="h-16 px-10 text-lg rounded-2xl border-white/25 text-white hover:bg-white/10 backdrop-blur-sm font-medium"
+                      data-testid="button-el-test"
+                    >
+                      <GraduationCap className="w-5 h-5 mr-2" />
+                      Fai il Test di Livello
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </AnimatedSection>
