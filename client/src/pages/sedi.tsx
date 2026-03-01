@@ -26,6 +26,7 @@ import { Link } from "wouter";
 import vicenzaCity from "@assets/vicenza_1772179633305.jpg";
 import classroomVicenza from "@assets/corso-di-inglese-vicenza_1769355404957.jpg";
 import aboutTeaching from "@/assets/images/about-teaching.jpg";
+import thieneTown from "@/assets/images/thiene-town.png";
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -375,12 +376,25 @@ export default function SediPage() {
 
                     {idx === 1 && (
                       <>
+                        <div className="rounded-3xl overflow-hidden shadow-xl border border-slate-100 dark:border-slate-800">
+                          <img
+                            src={thieneTown}
+                            alt="Corso Garibaldi — Thiene, ai piedi dell'Altopiano di Asiago"
+                            className="w-full h-52 object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                          <div className="bg-white dark:bg-slate-800 px-6 py-4 border-t border-slate-100 dark:border-slate-700">
+                            <p className="text-sm font-semibold text-foreground">Thiene — Città ai piedi dell'Altopiano</p>
+                            <p className="text-xs text-muted-foreground mt-1">Corso Garibaldi, cuore del centro storico</p>
+                          </div>
+                        </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800">
                             <img
                               src={aboutTeaching}
                               alt="Formazione linguistica — Sede di Thiene"
-                              className="w-full h-40 object-cover"
+                              className="w-full h-36 object-cover"
                               loading="lazy"
                               decoding="async"
                             />
@@ -393,7 +407,7 @@ export default function SediPage() {
                             <img
                               src="/images/team/elena-thiene.webp"
                               alt="Elena — Responsabile sede Thiene"
-                              className="w-full h-40 object-cover"
+                              className="w-full h-36 object-cover"
                               loading="lazy"
                               decoding="async"
                             />
