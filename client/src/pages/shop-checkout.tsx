@@ -1223,7 +1223,7 @@ export default function ShopCheckout() {
                             }`}
                             data-testid="button-select-cartacultura"
                           >
-                            <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-8 w-auto object-contain" />
+                            <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-8 w-auto rounded-lg object-contain" />
                             <span className="text-xs font-medium">Carta della Cultura</span>
                           </button>
                         </div>

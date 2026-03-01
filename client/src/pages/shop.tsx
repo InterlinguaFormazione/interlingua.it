@@ -173,7 +173,7 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
-                <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-5 w-auto opacity-60 hover:opacity-100 transition-opacity" title="Pagabile con Carta della Cultura" />
+                <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-5 w-auto rounded-lg opacity-60 hover:opacity-100 transition-opacity" title="Pagabile con Carta della Cultura" />
                 <Button
                   size="icon"
                   variant="outline"
@@ -307,7 +307,7 @@ export default function ShopPage() {
                 <SiVisa className="w-6 h-4 text-white/50" />
                 <SiMastercard className="w-6 h-4 text-white/50" />
                 <div className="w-px h-4 bg-white/15" />
-                <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-4 w-auto opacity-50" />
+                <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-4 w-auto rounded-lg opacity-50" />
               </div>
               <Button
                 variant="ghost"
@@ -486,7 +486,7 @@ export default function ShopPage() {
                   <SiVisa className="w-8 h-5 text-[#1a1f71] dark:text-blue-400" />
                   <SiMastercard className="w-8 h-5 text-[#eb001b] dark:text-red-400" />
                   <div className="w-px h-5 bg-border/50" />
-                  <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-6 w-auto" />
+                  <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-6 w-auto rounded-lg" />
                 </div>
               </div>
             </Card>

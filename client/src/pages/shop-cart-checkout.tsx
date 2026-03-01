@@ -1013,7 +1013,7 @@ export default function CartCheckout() {
                             }`}
                             data-testid="button-select-cartacultura-cart"
                           >
-                            <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-8 w-auto object-contain" />
+                            <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-8 w-auto rounded-lg object-contain" />
                             <span className="text-xs font-medium">Carta della Cultura</span>
                           </button>
                         </div>

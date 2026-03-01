@@ -666,7 +666,7 @@ export default function CourseDetailPage() {
                   </div>
 
                   <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 mb-4">
-                    <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-6 w-auto" />
+                    <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-6 w-auto rounded-lg" />
                     <span className="text-xs text-amber-800 dark:text-amber-200">Pagabile con Carta della Cultura Giovani e del Merito</span>
                   </div>
 
