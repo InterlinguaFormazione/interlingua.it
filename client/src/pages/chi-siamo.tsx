@@ -29,7 +29,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 
 import aboutTeamImage from "@/assets/images/about-team.jpg";
-import aboutTeachingImage from "@assets/digitalizzazione-tecnologie_1772392734563.webp";
+import aboutTeachingImage from "@assets/Metodologia_Innovativa_1772393171969.png";
 import aboutVicenzaImage from "@/assets/images/about-vicenza.jpg";
 
 const fadeInUp = {
