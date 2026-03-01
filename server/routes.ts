@@ -1360,7 +1360,8 @@ export async function registerRoutes(
           const newCustomer = await storage.createShopCustomer({
             email: parsed.data.customerEmail,
             password: hashedPassword,
-            name: `${parsed.data.customerFirstName} ${parsed.data.customerLastName}`,
+            firstName: parsed.data.customerFirstName,
+            lastName: parsed.data.customerLastName,
             phone: parsed.data.customerPhone || null,
           });
           customerId = newCustomer.id;
@@ -1536,7 +1537,8 @@ export async function registerRoutes(
           const newCustomer = await storage.createShopCustomer({
             email: customerEmail,
             password: hashedPassword,
-            name: `${customerFirstName} ${customerLastName}`,
+            firstName: customerFirstName,
+            lastName: customerLastName,
             phone: customerPhone || null,
           });
           customerId = newCustomer.id;
@@ -1646,7 +1648,7 @@ export async function registerRoutes(
       res.json({
         success: true,
         token,
-        customer: { id: customer.id, name: customer.name, email: customer.email },
+        customer: { id: customer.id, firstName: customer.firstName, lastName: customer.lastName, email: customer.email },
       });
     } catch (error) {
       console.error("Shop customer login error:", error);
@@ -1666,7 +1668,7 @@ export async function registerRoutes(
       }
       const customer = await storage.getShopCustomerById(session.customerId);
       if (!customer) return res.status(401).json({ success: false, message: "Cliente non trovato." });
-      res.json({ id: customer.id, name: customer.name, email: customer.email, phone: customer.phone || "", codiceFiscale: customer.codiceFiscale || "", indirizzo: customer.indirizzo || "", cap: customer.cap || "", citta: customer.citta || "", provincia: customer.provincia || "" });
+      res.json({ id: customer.id, firstName: customer.firstName, lastName: customer.lastName, email: customer.email, phone: customer.phone || "", codiceFiscale: customer.codiceFiscale || "", indirizzo: customer.indirizzo || "", cap: customer.cap || "", citta: customer.citta || "", provincia: customer.provincia || "" });
     } catch (error) {
       console.error("Shop me error:", error);
       res.status(500).json({ success: false, message: "Errore del server." });
@@ -1702,11 +1704,14 @@ export async function registerRoutes(
         return res.status(401).json({ success: false, message: "Sessione scaduta." });
       }
 
-      const { name, phone, codiceFiscale, indirizzo, cap, citta, provincia, currentPassword, newPassword } = req.body;
-      const updateData: Partial<{ name: string; phone: string; password: string; codiceFiscale: string; indirizzo: string; cap: string; citta: string; provincia: string }> = {};
+      const { firstName, lastName, phone, codiceFiscale, indirizzo, cap, citta, provincia, currentPassword, newPassword } = req.body;
+      const updateData: Partial<{ firstName: string; lastName: string; phone: string; password: string; codiceFiscale: string; indirizzo: string; cap: string; citta: string; provincia: string }> = {};
 
-      if (name && typeof name === "string" && name.trim()) {
-        updateData.name = name.trim();
+      if (firstName && typeof firstName === "string" && firstName.trim()) {
+        updateData.firstName = firstName.trim();
+      }
+      if (lastName && typeof lastName === "string" && lastName.trim()) {
+        updateData.lastName = lastName.trim();
       }
       if (phone !== undefined) {
         updateData.phone = typeof phone === "string" ? phone.trim() : "";
@@ -1752,7 +1757,7 @@ export async function registerRoutes(
       const updated = await storage.updateShopCustomer(session.customerId, updateData);
       if (!updated) return res.status(404).json({ success: false, message: "Cliente non trovato." });
 
-      res.json({ success: true, customer: { id: updated.id, name: updated.name, email: updated.email, phone: updated.phone || "", codiceFiscale: updated.codiceFiscale || "", indirizzo: updated.indirizzo || "", cap: updated.cap || "", citta: updated.citta || "", provincia: updated.provincia || "" } });
+      res.json({ success: true, customer: { id: updated.id, firstName: updated.firstName, lastName: updated.lastName, email: updated.email, phone: updated.phone || "", codiceFiscale: updated.codiceFiscale || "", indirizzo: updated.indirizzo || "", cap: updated.cap || "", citta: updated.citta || "", provincia: updated.provincia || "" } });
     } catch (error) {
       console.error("Shop profile update error:", error);
       res.status(500).json({ success: false, message: "Errore del server." });
@@ -2217,7 +2222,8 @@ export async function registerRoutes(
           const newCustomer = await storage.createShopCustomer({
             email: customerEmail,
             password: hashedPassword,
-            name: `${customerFirstName} ${customerLastName}`,
+            firstName: customerFirstName,
+            lastName: customerLastName,
             phone: customerPhone || null,
           });
           customerId = newCustomer.id;
@@ -2429,7 +2435,8 @@ export async function registerRoutes(
           const newCustomer = await storage.createShopCustomer({
             email: customerEmail,
             password: hashedPassword,
-            name: `${customerFirstName} ${customerLastName}`,
+            firstName: customerFirstName,
+            lastName: customerLastName,
             phone: customerPhone || null,
           });
           customerId = newCustomer.id;

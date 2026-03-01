@@ -122,7 +122,7 @@ export interface IStorage {
   getShopCustomerByEmail(email: string): Promise<ShopCustomer | undefined>;
   getShopCustomerById(id: string): Promise<ShopCustomer | undefined>;
   getAllShopCustomers(): Promise<ShopCustomer[]>;
-  updateShopCustomer(id: string, data: Partial<{ name: string; phone: string; password: string; codiceFiscale: string; indirizzo: string; cap: string; citta: string; provincia: string }>): Promise<ShopCustomer | undefined>;
+  updateShopCustomer(id: string, data: Partial<{ firstName: string; lastName: string; phone: string; password: string; codiceFiscale: string; indirizzo: string; cap: string; citta: string; provincia: string }>): Promise<ShopCustomer | undefined>;
 
   createShopOrder(order: InsertShopOrder): Promise<ShopOrder>;
   getShopOrders(): Promise<ShopOrder[]>;
@@ -440,9 +440,10 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(shopCustomers).orderBy(desc(shopCustomers.createdAt));
   }
 
-  async updateShopCustomer(id: string, data: Partial<{ name: string; phone: string; password: string; codiceFiscale: string; indirizzo: string; cap: string; citta: string; provincia: string }>): Promise<ShopCustomer | undefined> {
+  async updateShopCustomer(id: string, data: Partial<{ firstName: string; lastName: string; phone: string; password: string; codiceFiscale: string; indirizzo: string; cap: string; citta: string; provincia: string }>): Promise<ShopCustomer | undefined> {
     const updateData: Record<string, string> = {};
-    if (data.name !== undefined) updateData.name = data.name;
+    if (data.firstName !== undefined) updateData.firstName = data.firstName;
+    if (data.lastName !== undefined) updateData.lastName = data.lastName;
     if (data.phone !== undefined) updateData.phone = data.phone;
     if (data.password !== undefined) updateData.password = data.password;
     if (data.codiceFiscale !== undefined) updateData.codiceFiscale = data.codiceFiscale;

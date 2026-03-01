@@ -100,7 +100,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `sc_bookings` - Session bookings (subscriber + session link)
 - `sc_email_settings` - Email notification settings (suspend/resume for holidays)
 - `sc_payments` - PayPal payment records (subscriber ID, PayPal order ID, amount, currency, status, payer email)
-- `shop_customers` - Customer accounts created during shop checkout (email, hashed password, name, phone)
+- `shop_customers` - Customer accounts created during shop checkout (email, hashed password, first_name, last_name, phone, codice_fiscale, indirizzo, cap, citta, provincia)
 - `shop_orders` - Online shop orders (product slug/name, amount, PayPal order ID, customer first/last name, email, phone, student first/last name + email for third-party purchases, billing info, status, discount_code, discount_amount, linked to customer account)
 - `discount_vouchers` - Discount voucher codes for the shop (code, description, discount_type percentage/fixed, discount_value, min_order_amount, max_uses, used_count, valid_from, valid_until, product_slugs, first_time_buyer_only, auto_apply, requires_newsletter_sub, active)
 - `course_materials` - Downloadable files per course product (slug, file name, URL, size, description)
@@ -261,6 +261,9 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - Cookie policy page with specific cookie tables, third-party disclosures, legal bases
 - Privacy policy covering all data processing, GDPR rights, Garante Privacy contact
 - 12-month consent retention
+
+## Naming Convention Rule
+- **Always separate first name (nome) and last name (cognome)** — never combine them into a single "name" field. Use `firstName`/`lastName` (or `nome`/`cognome` in Italian contexts) across schema, API, and UI.
 
 ## Running the Project
 - **Dev**: `npm run dev` (Express backend + Vite frontend on port 5000)

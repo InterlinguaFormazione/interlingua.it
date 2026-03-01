@@ -31,7 +31,8 @@ import {
 
 interface CustomerInfo {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone?: string;
   codiceFiscale?: string;
@@ -69,7 +70,8 @@ export default function ShopDashboard() {
   const [loginPassword, setLoginPassword] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
   const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
-  const [profileName, setProfileName] = useState("");
+  const [profileFirstName, setProfileFirstName] = useState("");
+  const [profileLastName, setProfileLastName] = useState("");
   const [profilePhone, setProfilePhone] = useState("");
   const [profileCF, setProfileCF] = useState("");
   const [profileIndirizzo, setProfileIndirizzo] = useState("");
@@ -100,7 +102,8 @@ export default function ShopDashboard() {
       if (res.ok) {
         const data = await res.json();
         setCustomer(data);
-        setProfileName(data.name || "");
+        setProfileFirstName(data.firstName || "");
+        setProfileLastName(data.lastName || "");
         setProfilePhone(data.phone || "");
         setProfileCF(data.codiceFiscale || "");
         setProfileIndirizzo(data.indirizzo || "");
@@ -127,7 +130,7 @@ export default function ShopDashboard() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: profileName, phone: profilePhone, codiceFiscale: profileCF, indirizzo: profileIndirizzo, cap: profileCap, citta: profileCitta, provincia: profileProvincia }),
+        body: JSON.stringify({ firstName: profileFirstName, lastName: profileLastName, phone: profilePhone, codiceFiscale: profileCF, indirizzo: profileIndirizzo, cap: profileCap, citta: profileCitta, provincia: profileProvincia }),
       });
       const data = await res.json();
       if (data.success) {
@@ -306,7 +309,7 @@ export default function ShopDashboard() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
             <div>
               <h1 className="text-2xl font-bold" data-testid="text-dashboard-title">
-                Ciao, {customer.name.split(" ")[0]}!
+                Ciao, {customer.firstName}!
               </h1>
               <p className="text-muted-foreground">{customer.email}</p>
             </div>
@@ -425,15 +428,27 @@ export default function ShopDashboard() {
                 <form onSubmit={handleProfileUpdate} className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="profile-name">Nome e Cognome</Label>
+                      <Label htmlFor="profile-firstname">Nome</Label>
                       <Input
-                        id="profile-name"
-                        value={profileName}
-                        onChange={(e) => setProfileName(e.target.value)}
+                        id="profile-firstname"
+                        value={profileFirstName}
+                        onChange={(e) => setProfileFirstName(e.target.value)}
                         className="mt-1"
-                        data-testid="input-profile-name"
+                        data-testid="input-profile-firstname"
                       />
                     </div>
+                    <div>
+                      <Label htmlFor="profile-lastname">Cognome</Label>
+                      <Input
+                        id="profile-lastname"
+                        value={profileLastName}
+                        onChange={(e) => setProfileLastName(e.target.value)}
+                        className="mt-1"
+                        data-testid="input-profile-lastname"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="profile-phone">Telefono</Label>
                       <div className="relative mt-1">
