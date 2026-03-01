@@ -210,7 +210,9 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
       const res = await fetch("/api/admin/english-test-results", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return res.json();
+      if (!res.ok) throw new Error("Failed to fetch test results");
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
     },
   });
 
@@ -580,7 +582,9 @@ function ContactsTab({ token }: { token: string }) {
       const res = await fetch("/api/admin/contacts", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return res.json();
+      if (!res.ok) throw new Error("Failed to fetch contacts");
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
     },
   });
 
@@ -624,7 +628,9 @@ function NewsletterTab({ token }: { token: string }) {
       const res = await fetch("/api/admin/newsletter", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return res.json();
+      if (!res.ok) throw new Error("Failed to fetch newsletter");
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
     },
   });
 
@@ -673,7 +679,9 @@ function BlogTab({ token }: { token: string }) {
       const res = await fetch("/api/admin/blog", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return res.json();
+      if (!res.ok) throw new Error("Failed to fetch blog");
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
     },
   });
 
@@ -748,7 +756,9 @@ function UsersTab({ token, currentUserId }: { token: string; currentUserId: stri
       const res = await fetch("/api/admin/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return res.json();
+      if (!res.ok) throw new Error("Failed to fetch users");
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
     },
   });
 
