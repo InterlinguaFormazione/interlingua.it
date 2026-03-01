@@ -772,6 +772,19 @@ export default function EnglishTestPage() {
                 <p className="text-slate-400 dark:text-slate-500 text-sm mt-2">
                   Prima di iniziare, verifichiamo che il tuo audio e microfono funzionino correttamente.
                 </p>
+                <button
+                  onClick={() => {
+                    setAudioAvailable(false);
+                    setMicAvailable(false);
+                    setAudioCheckStep("done");
+                    setPhase("self-assessment");
+                    toast({ title: "Audio/Microfono disattivati", description: "Le domande di listening verranno mostrate come testo. La sezione speaking verrà saltata.", variant: "destructive" });
+                  }}
+                  className="mt-3 inline-flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+                  data-testid="button-no-audio-skip-all"
+                >
+                  <MicOff className="w-3.5 h-3.5" /> Non ho audio né microfono — salta questo controllo →
+                </button>
               </div>
 
               <div className="px-8 pb-4">
