@@ -347,7 +347,7 @@ export default function ChiSiamoPage() {
                   decoding="async"
                 />
               </div>
-              <Card className="absolute -bottom-8 -left-8 p-6 shadow-xl max-w-xs">
+              <Card className="absolute -bottom-4 -left-4 p-6 shadow-xl max-w-xs">
                 <div className="flex items-center gap-4 mb-3">
                   <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
                     <Award className="w-6 h-6 text-accent" />
