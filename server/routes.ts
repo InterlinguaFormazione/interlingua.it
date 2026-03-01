@@ -12,6 +12,15 @@ import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalO
 import { SHOP_PRODUCTS, getProductBySlug, getEffectivePrice } from "@shared/products";
 import { scoreWriting, scoreSpeaking, transcribeAudio } from "./english-test";
 import { getAllQuestions } from "./english-test-questions";
+
+function shuffleArray<T>(arr: T[]): T[] {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
 import {
   calculateProbability, calculateFisherInformation, selectNextQuestion,
   updateTheta, updateStandardError, thetaToCEFR, selfAssessmentToTheta,
@@ -1528,7 +1537,7 @@ export async function registerRoutes(
         question: {
           id: firstQuestion.id,
           question: firstQuestion.question,
-          options: JSON.parse(firstQuestion.options),
+          options: shuffleArray(JSON.parse(firstQuestion.options)),
           skillType: firstQuestion.skillType,
           level: firstQuestion.level,
           passage: firstQuestion.passage,
@@ -1780,7 +1789,7 @@ export async function registerRoutes(
         question: {
           id: nextQuestion.id,
           question: nextQuestion.question,
-          options: JSON.parse(nextQuestion.options),
+          options: shuffleArray(JSON.parse(nextQuestion.options)),
           skillType: nextQuestion.skillType,
           level: nextQuestion.level,
           passage: nextQuestion.passage,
