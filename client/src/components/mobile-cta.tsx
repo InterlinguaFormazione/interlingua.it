@@ -100,12 +100,12 @@ export function MobileCTA() {
         </Button>
         <Button
           variant="outline"
-          size="icon"
-          className="border-[#25D366] text-[#25D366]"
+          className="gap-2 border-[#25D366] text-[#25D366] px-4"
           onClick={() => setShowAgents(!showAgents)}
           data-testid="button-mobile-whatsapp"
         >
           <SiWhatsapp className="w-5 h-5" />
+          WhatsApp
         </Button>
       </div>
     </>
