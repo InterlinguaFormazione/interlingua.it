@@ -632,32 +632,32 @@ export async function sendEnglishTestConfirmationEmail(email: string, firstName:
 
   const courseRecommendations: Record<string, { description: string; courses: string[] }> = {
     "A0": {
-      description: "You are at the very beginning of your English learning journey. We recommend starting with a foundational course to build essential skills.",
+      description: "Your test result is A0. To progress to the next level, we recommend an A1 beginner course to build your foundational English skills.",
       courses: ["General English - Beginner (A1)", "English Starter Intensive Course"],
     },
     "A1": {
-      description: "You have a basic understanding of English. A structured beginner course will help you build confidence in everyday communication.",
-      courses: ["General English - Elementary (A1-A2)", "English for Daily Life - Beginner"],
+      description: "Your current level is A1. To reach A2, we recommend an elementary course that will expand your vocabulary and build confidence in everyday situations.",
+      courses: ["General English - Elementary (A2)", "English for Daily Life (A2)", "Conversation Course - Elementary"],
     },
     "A2": {
-      description: "You can handle simple, everyday situations. An elementary to pre-intermediate course will strengthen your grammar and expand your vocabulary.",
-      courses: ["General English - Pre-Intermediate (A2-B1)", "Conversation Course - Elementary"],
+      description: "Your current level is A2. To progress to B1, we recommend a pre-intermediate course to develop your grammar and communication skills for more complex situations.",
+      courses: ["General English - Pre-Intermediate (B1)", "Conversation Course - Pre-Intermediate", "Cambridge KET Preparation"],
     },
     "B1": {
-      description: "You can communicate in most everyday situations. An intermediate course will refine your fluency and introduce more complex language structures.",
-      courses: ["General English - Intermediate (B1-B2)", "Business English - Intermediate", "Cambridge PET Preparation"],
+      description: "Your current level is B1. To advance to B2, we recommend an upper-intermediate course that will strengthen your fluency and prepare you for professional or academic contexts.",
+      courses: ["General English - Upper-Intermediate (B2)", "Business English - Upper-Intermediate (B2)", "Cambridge FCE Preparation", "Full Immersion Course"],
     },
     "B2": {
-      description: "You communicate effectively in most contexts. An upper-intermediate course will polish your skills for professional or academic settings.",
-      courses: ["General English - Upper-Intermediate (B2-C1)", "Business English - Upper-Intermediate", "Cambridge FCE Preparation", "Full Immersion Course"],
+      description: "Your current level is B2. To reach C1, we recommend an advanced course that will refine your precision, nuance, and ability to handle complex language.",
+      courses: ["Advanced English (C1)", "Business English - Advanced (C1)", "Cambridge CAE Preparation", "Full Immersion Course"],
     },
     "C1": {
-      description: "You have an advanced command of English. A course focused on precision, nuance, and specialised language will help you reach near-native fluency.",
-      courses: ["Advanced English (C1-C2)", "Business English - Advanced", "Cambridge CAE Preparation", "Full Immersion Course"],
+      description: "Your current level is C1. To achieve C2 proficiency, we recommend a mastery-level course focused on specialised language and near-native fluency.",
+      courses: ["English Masterclass (C2)", "Cambridge CPE Preparation", "Specialised Business English - Proficiency", "Full Immersion Course"],
     },
     "C2": {
-      description: "Congratulations — you have a near-native command of English! A proficiency-level course can help you maintain and sharpen your skills in specialised areas.",
-      courses: ["English Masterclass (C2)", "Cambridge CPE Preparation", "Specialised Business English", "Full Immersion Course"],
+      description: "Congratulations — you have reached C2, the highest level! To maintain and sharpen your skills, we recommend specialised courses in your areas of interest.",
+      courses: ["English Masterclass - Maintenance (C2)", "Cambridge CPE Preparation", "Specialised Business English", "Full Immersion Course"],
     },
   };
 
