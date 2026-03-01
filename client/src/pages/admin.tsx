@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import { SHOP_PRODUCTS } from "@shared/products";
 import {
   Shield,
   Mail,
@@ -1245,13 +1246,58 @@ function VouchersTab({ token }: { token: string }) {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Prodotti (slug separati da virgola, vuoto = tutti)</Label>
-                <Input
-                  value={formData.productSlugs}
-                  onChange={e => setFormData({ ...formData, productSlugs: e.target.value })}
-                  placeholder="es. camclass-selflearning,speakers-corner"
-                  data-testid="input-voucher-product-slugs"
-                />
+                <Label>Prodotti applicabili (vuoto = tutti i prodotti)</Label>
+                <Select value="__trigger__" onValueChange={(slug) => {
+                  if (slug === "__clear__") {
+                    setFormData({ ...formData, productSlugs: "" });
+                    return;
+                  }
+                  const current = formData.productSlugs ? formData.productSlugs.split(",").map(s => s.trim()).filter(Boolean) : [];
+                  if (current.includes(slug)) {
+                    setFormData({ ...formData, productSlugs: current.filter(s => s !== slug).join(",") });
+                  } else {
+                    setFormData({ ...formData, productSlugs: [...current, slug].join(",") });
+                  }
+                }}>
+                  <SelectTrigger data-testid="select-voucher-products">
+                    <span className="truncate text-left">
+                      {formData.productSlugs
+                        ? formData.productSlugs.split(",").map(s => s.trim()).filter(Boolean).map(s => SHOP_PRODUCTS.find(p => p.slug === s)?.name || s).join(", ")
+                        : "Tutti i prodotti"}
+                    </span>
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    <SelectItem value="__clear__" className="text-muted-foreground italic">
+                      Tutti i prodotti (nessun filtro)
+                    </SelectItem>
+                    {SHOP_PRODUCTS.map(product => {
+                      const selected = formData.productSlugs ? formData.productSlugs.split(",").map(s => s.trim()).includes(product.slug) : false;
+                      return (
+                        <SelectItem key={product.slug} value={product.slug}>
+                          <span className="flex items-center gap-2">
+                            <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center text-[10px] ${selected ? "bg-primary border-primary text-primary-foreground" : "border-muted-foreground"}`}>
+                              {selected ? "✓" : ""}
+                            </span>
+                            <span className="truncate">{product.name}</span>
+                          </span>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+                {formData.productSlugs && (
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {formData.productSlugs.split(",").map(s => s.trim()).filter(Boolean).map(slug => (
+                      <Badge key={slug} variant="secondary" className="text-xs cursor-pointer" onClick={() => {
+                        const current = formData.productSlugs.split(",").map(s => s.trim()).filter(Boolean);
+                        setFormData({ ...formData, productSlugs: current.filter(s => s !== slug).join(",") });
+                      }}>
+                        {SHOP_PRODUCTS.find(p => p.slug === slug)?.name || slug}
+                        <span className="ml-1">&times;</span>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
               <Button
                 className="w-full mt-4"
