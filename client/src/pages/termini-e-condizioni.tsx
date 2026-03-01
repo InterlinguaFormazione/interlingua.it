@@ -56,19 +56,21 @@ export default function TerminiECondizioniPage() {
             <section>
               <h2 className="text-xl font-bold mb-3">2. Ambito di Applicazione</h2>
               <p className="text-muted-foreground leading-relaxed text-sm">
-                Le presenti Condizioni Generali di Vendita si applicano a tutti gli acquisti effettuati tramite il sito web <strong className="text-foreground">skillcraft.interlingua.it</strong> (di seguito "il Sito"), gestito da Interlingua Formazione S.r.l. (di seguito "il Venditore"). L'acquisto di prodotti e/o servizi attraverso il Sito comporta l'integrale accettazione delle presenti condizioni.
+                Le presenti Condizioni Generali di Vendita si applicano a tutti gli acquisti effettuati tramite il sito web <strong className="text-foreground">skillcraft.interlingua.it</strong> (di seguito "il Sito"), gestito da Interlingua Formazione S.r.l. (di seguito "il Venditore"). L'acquisto di servizi attraverso il Sito comporta l'integrale accettazione delle presenti condizioni.
               </p>
               <p className="text-muted-foreground leading-relaxed text-sm mt-3">
-                I servizi e prodotti offerti tramite il Sito includono, a titolo esemplificativo e non esaustivo:
+                I servizi offerti tramite il Sito includono, a titolo esemplificativo e non esaustivo:
               </p>
               <ul className="list-disc list-inside text-muted-foreground space-y-1 mt-2 text-sm">
-                <li>Abbonamenti annuali Speaker's Corner</li>
-                <li>Corsi di formazione linguistica (individuali e di gruppo, in presenza e online)</li>
+                <li>Corsi di formazione linguistica individuali e di gruppo, in presenza e online</li>
                 <li>Programmi Full Immersion</li>
                 <li>Corsi e-learning e piattaforme digitali</li>
+                <li>Abbonamenti annuali Speaker's Corner</li>
                 <li>Certificazioni linguistiche</li>
-                <li>Prodotti digitali e materiali didattici disponibili nello Shop</li>
               </ul>
+              <p className="text-muted-foreground leading-relaxed text-sm mt-3">
+                Tutti i servizi offerti sono erogati in presenza presso le nostre sedi di Vicenza e Thiene, oppure online. Non è prevista la vendita o la spedizione di prodotti fisici.
+              </p>
             </section>
 
             <section>
@@ -77,7 +79,7 @@ export default function TerminiECondizioniPage() {
                 L'acquisto avviene attraverso la procedura guidata presente sul Sito. Il Cliente è tenuto a fornire dati veritieri, completi e aggiornati al momento dell'ordine. Interlingua Formazione S.r.l. si riserva il diritto di rifiutare ordini contenenti dati manifestamente errati o incompleti.
               </p>
               <p className="text-muted-foreground leading-relaxed text-sm mt-3">
-                Il contratto si intende concluso nel momento in cui il Cliente riceve conferma dell'avvenuto pagamento e dell'attivazione del servizio o della spedizione del prodotto.
+                Il contratto si intende concluso nel momento in cui il Cliente riceve conferma dell'avvenuto pagamento e dell'attivazione del servizio.
               </p>
             </section>
 
@@ -144,7 +146,7 @@ export default function TerminiECondizioniPage() {
             <section>
               <h2 className="text-xl font-bold mb-3">7. Diritto di Recesso</h2>
               <p className="text-muted-foreground leading-relaxed text-sm">
-                Ai sensi degli artt. 52 e seguenti del <strong className="text-foreground">Codice del Consumo</strong> (D.lgs. 206/2005), il Cliente consumatore ha diritto di recedere dal contratto entro <strong className="text-foreground">14 giorni</strong> dalla data di conclusione del contratto (per i servizi) o dalla data di ricezione del prodotto (per i beni fisici), senza dover fornire alcuna motivazione.
+                Ai sensi degli artt. 52 e seguenti del <strong className="text-foreground">Codice del Consumo</strong> (D.lgs. 206/2005), il Cliente consumatore ha diritto di recedere dal contratto entro <strong className="text-foreground">14 giorni</strong> dalla data di conclusione del contratto, senza dover fornire alcuna motivazione.
               </p>
               <p className="text-muted-foreground leading-relaxed text-sm mt-3">
                 Per esercitare il diritto di recesso, il Cliente deve inviare una comunicazione scritta a:
@@ -160,9 +162,9 @@ export default function TerminiECondizioniPage() {
                 <strong className="text-foreground">Esclusioni dal diritto di recesso:</strong>
               </p>
               <ul className="list-disc list-inside text-muted-foreground space-y-1 mt-2 text-sm">
-                <li>Contenuti digitali già fruiti o con accesso già attivato (art. 59, co. 1, lett. o)</li>
-                <li>Servizi di formazione già iniziati con il consenso del Cliente</li>
-                <li>Servizi personalizzati o su misura per il Cliente</li>
+                <li>Corsi e-learning o contenuti digitali con accesso già attivato (art. 59, co. 1, lett. o)</li>
+                <li>Corsi di formazione (in presenza o online) già iniziati con il consenso del Cliente</li>
+                <li>Percorsi formativi personalizzati o su misura per il Cliente</li>
               </ul>
             </section>
 
@@ -178,7 +180,7 @@ export default function TerminiECondizioniPage() {
                 <li>Lezioni individuali non cancellate nel rispetto dei termini di cui all'art. 5.1</li>
                 <li>Lezioni di gruppo non frequentate</li>
                 <li>Sessioni Speaker's Corner non utilizzate durante il periodo di abbonamento</li>
-                <li>Contenuti digitali già fruiti</li>
+                <li>Corsi e-learning o contenuti digitali con accesso già attivato</li>
               </ul>
             </section>
 
@@ -231,7 +233,7 @@ export default function TerminiECondizioniPage() {
             <section>
               <h2 className="text-xl font-bold mb-3">13. Modifiche alle Condizioni</h2>
               <p className="text-muted-foreground leading-relaxed text-sm">
-                Il Venditore si riserva il diritto di modificare le presenti Condizioni Generali in qualsiasi momento. Le modifiche saranno efficaci dalla data di pubblicazione sul Sito. Si consiglia di consultare periodicamente la presente pagina. L'utilizzo del Sito o l'acquisto di servizi/prodotti dopo la pubblicazione delle modifiche implica l'accettazione delle nuove condizioni.
+                Il Venditore si riserva il diritto di modificare le presenti Condizioni Generali in qualsiasi momento. Le modifiche saranno efficaci dalla data di pubblicazione sul Sito. Si consiglia di consultare periodicamente la presente pagina. L'utilizzo del Sito o l'acquisto di servizi dopo la pubblicazione delle modifiche implica l'accettazione delle nuove condizioni.
               </p>
             </section>
 
