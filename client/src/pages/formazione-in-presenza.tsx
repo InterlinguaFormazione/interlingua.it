@@ -154,7 +154,7 @@ const courses = [
     reviewSlug: "corsi-gruppo",
     title: "Corsi di Gruppo",
     subtitle: "Lingue straniere per tutti i livelli",
-    description: "Corsi collettivi serali e diurni nelle nostre sedi di Vicenza e Thiene, con docenti madrelingua qualificati. Formazione strutturata e certificata per tutti i livelli QCER, dal principiante all'avanzato.",
+    description: "Corsi collettivi serali e diurni nelle nostre sedi di Vicenza e Thiene, con docenti qualificati. Formazione strutturata e certificata per tutti i livelli QCER, dal principiante all'avanzato.",
     fullDescription: [
       "I corsi di gruppo di Interlingua offrono un ambiente stimolante dove imparare insieme ad altri studenti motivati, con classi omogenee per livello. Ogni modulo dura 6 settimane con 1 incontro settimanale in sede, e può essere rinnovato per un percorso progressivo e continuo.",
       "Il Metodo Interlingua combina l'approccio comunicativo con Task-Based Learning e Content and Language Integrated Learning (CLIL): si impara la lingua usandola attivamente in contesti reali, non studiandola a memoria. Ogni lezione è progettata per sviluppare tutte e 4 le competenze: comprensione, produzione orale, lettura e scrittura.",
@@ -168,7 +168,7 @@ const courses = [
     icon: Globe,
     showLingua: true,
     features: [
-      "Docente madrelingua in sede",
+      "Docente qualificato in sede",
       "Programmi strutturati, progressivi e interattivi",
       "Tutti i livelli QCER disponibili",
       "1 incontro/settimana + piattaforma e-learning 24/7",
@@ -184,11 +184,11 @@ const courses = [
     reviewSlug: "individuali-presenza",
     title: "Corsi Individuali o Semi-Individuali",
     subtitle: "1 o 2 partecipanti, massima personalizzazione",
-    description: "Apprendimento personalizzato con docenti madrelingua, lezioni su misura e massima flessibilità. Un percorso efficace per un progresso rapido in un ambiente motivante.",
+    description: "Apprendimento personalizzato con docenti qualificati, lezioni su misura e massima flessibilità. Un percorso efficace per un progresso rapido in un ambiente motivante.",
     fullDescription: [
       "Il corso individuale è la soluzione ideale per chi ha obiettivi specifici, tempistiche precise o esigenze professionali particolari. Il programma viene costruito interamente attorno alle tue necessità: preparazione a colloqui, presentazioni aziendali, negoziazioni internazionali, o miglioramento delle competenze comunicative generali.",
       "Con il formato semi-individuale (2 partecipanti) puoi condividere il percorso con un collega o un amico allo stesso livello, dimezzando il costo senza rinunciare all'attenzione personalizzata del docente. Gli orari sono completamente flessibili e concordati direttamente con il tuo insegnante.",
-      "Ogni lezione si svolge nella nostra sede con materiale didattico personalizzato. Il docente madrelingua monitora i tuoi progressi e adatta costantemente il percorso per garantirti il massimo risultato nel minor tempo possibile.",
+      "Ogni lezione si svolge nella nostra sede con materiale didattico personalizzato. Il docente monitora i tuoi progressi e adatta costantemente il percorso per garantirti il massimo risultato nel minor tempo possibile.",
     ],
     image: courseIndividual,
     price: "da 300",
@@ -198,7 +198,7 @@ const courses = [
     icon: UserCheck,
     showLingua: true,
     features: [
-      "Docente madrelingua in sede",
+      "Docente qualificato in sede",
       "Tutti i livelli QCER disponibili",
       "Programmi strutturati, progressivi e interattivi",
       "Materiale didattico personalizzato",
@@ -215,9 +215,9 @@ const courses = [
     reviewSlug: "individuale-blended",
     title: "Corso Individuale Blended",
     subtitle: "In sede + piattaforma online",
-    description: "Il meglio dei due mondi: lezioni individuali in sede con docente madrelingua, integrate dalla piattaforma e-learning attiva 24/7 per uno studio continuo e autonomo tra una lezione e l'altra.",
+    description: "Il meglio dei due mondi: lezioni individuali in sede con docente qualificato, integrate dalla piattaforma e-learning attiva 24/7 per uno studio continuo e autonomo tra una lezione e l'altra.",
     fullDescription: [
-      "Il corso blended combina il contatto diretto con il docente madrelingua in aula con la flessibilità dello studio autonomo sulla piattaforma digitale. Ogni settimana avrai una lezione in sede focalizzata sulla produzione orale, la correzione personalizzata e il potenziamento delle competenze comunicative.",
+      "Il corso blended combina il contatto diretto con il docente in aula con la flessibilità dello studio autonomo sulla piattaforma digitale. Ogni settimana avrai una lezione in sede focalizzata sulla produzione orale, la correzione personalizzata e il potenziamento delle competenze comunicative.",
       "Tra una lezione e l'altra, la piattaforma e-learning ti accompagna con un programma strutturato: esercizi interattivi, riconoscimento vocale per migliorare la pronuncia, video-lezioni e test di autovalutazione. Puoi studiare quando e dove vuoi, 24 ore su 24, 7 giorni su 7.",
       "Questo formato è particolarmente efficace per chi vuole massimizzare i risultati combinando pratica guidata e studio indipendente. Il docente monitora i tuoi progressi sia in aula che sulla piattaforma, adattando il percorso in tempo reale alle tue esigenze.",
     ],
@@ -229,7 +229,7 @@ const courses = [
     icon: Monitor,
     showLingua: true,
     features: [
-      "Docente madrelingua in sede",
+      "Docente qualificato in sede",
       "1 incontro/settimana + piattaforma e-learning 24/7",
       "Tutti i livelli QCER disponibili",
       "Programmi strutturati, progressivi e interattivi",
@@ -928,7 +928,7 @@ export default function FormazioneInPresenzaPage() {
                   <span className="gradient-text"> in Sede</span>
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                  Tutti i corsi si svolgono presso le nostre sedi di Vicenza e Thiene, con docenti madrelingua o qualificati, in piccoli gruppi per garantire la massima efficacia.
+                  Tutti i corsi si svolgono presso le nostre sedi di Vicenza e Thiene, con docenti qualificati, in piccoli gruppi per garantire la massima efficacia.
                 </p>
               </div>
             </AnimatedSection>
@@ -1004,7 +1004,7 @@ export default function FormazioneInPresenzaPage() {
                           <GraduationCap className="w-8 h-8 text-white" />
                         </div>
                         <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">Full Immersion Workshop</h3>
-                        <p className="text-muted-foreground mb-4 leading-relaxed">Un livello QCER in una settimana. 30+ ore frontali con team di coach madrelingua.</p>
+                        <p className="text-muted-foreground mb-4 leading-relaxed">Un livello QCER in una settimana. 30+ ore frontali con team di coach qualificati.</p>
                         <span className="inline-flex items-center gap-1.5 text-primary font-semibold">
                           Scopri di più <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </span>
@@ -1019,7 +1019,7 @@ export default function FormazioneInPresenzaPage() {
                           <Users className="w-8 h-8 text-white" />
                         </div>
                         <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">Speaker's Corner</h3>
-                        <p className="text-muted-foreground mb-4 leading-relaxed">Pratica la conversazione in inglese ogni venerdi con docenti madrelingua.</p>
+                        <p className="text-muted-foreground mb-4 leading-relaxed">Pratica la conversazione in inglese ogni venerdì con docenti qualificati.</p>
                         <span className="inline-flex items-center gap-1.5 text-primary font-semibold">
                           Scopri di più <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </span>

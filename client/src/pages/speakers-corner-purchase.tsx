@@ -354,7 +354,7 @@ export default function SpeakersCornerPurchase() {
                       </div>
                       <div className="flex items-center gap-3">
                         <Mic className="w-5 h-5 text-green-600 shrink-0" />
-                        <span className="text-sm text-muted-foreground">Moderatore madrelingua</span>
+                        <span className="text-sm text-muted-foreground">Moderatore qualificato</span>
                       </div>
                     </div>
                     <div className="pt-4 border-t space-y-3">

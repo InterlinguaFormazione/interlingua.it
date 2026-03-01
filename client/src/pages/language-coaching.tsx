@@ -179,7 +179,7 @@ const packages = [
     accentBg: "bg-indigo-50 dark:bg-indigo-950/30",
     icon: UserCheck,
     features: [
-      "Coach madrelingua dedicato",
+      "Coach qualificato dedicato",
       "Sessioni in sede a Vicenza o Thiene",
       "Programma 100% personalizzato",
       "Valutazione iniziale approfondita",
@@ -208,7 +208,7 @@ const packages = [
     accentBg: "bg-violet-50 dark:bg-violet-950/30",
     icon: Brain,
     features: [
-      "Coach madrelingua dedicato in sede",
+      "Coach qualificato dedicato in sede",
       "Piattaforma e-learning 24/7 con AI",
       "Riconoscimento vocale avanzato",
       "Sessione settimanale + studio autonomo",
@@ -227,7 +227,7 @@ const packages = [
     description: "Per chi sa che la distanza non è un ostacolo quando la connessione è autentica. Le sessioni via Zoom mantengono tutta l'intensità e la personalizzazione del coaching in presenza, con la flessibilità di poter lavorare da qualsiasi luogo.",
     fullDescription: [
       "Il coaching online non è una versione 'ridotta' del coaching in presenza. È un'esperienza completa, pensata per professionisti che viaggiano, imprenditori con agende fitte, o semplicemente per chi preferisce la comodità del proprio spazio.",
-      "12 sessioni individuali su Zoom con il tuo coach madrelingua dedicato: un rapporto uno a uno che si costruisce nel tempo, sessione dopo sessione. Il programma viene creato intorno ai tuoi obiettivi reali e adattato continuamente in base ai tuoi progressi.",
+      "12 sessioni individuali su Zoom con il tuo coach dedicato: un rapporto uno a uno che si costruisce nel tempo, sessione dopo sessione. Il programma viene creato intorno ai tuoi obiettivi reali e adattato continuamente in base ai tuoi progressi.",
       "Orari completamente flessibili con prenotazione tramite app. Materiale personalizzato condiviso in tempo reale. Report di progresso dettagliato. Tutto quello che ti serve per trasformare il tuo rapporto con la lingua, senza muoverti da dove sei.",
     ],
     image: categoryOnline,
@@ -237,7 +237,7 @@ const packages = [
     accentBg: "bg-teal-50 dark:bg-teal-950/30",
     icon: Globe,
     features: [
-      "Coach madrelingua dedicato",
+      "Coach qualificato dedicato",
       "12 sessioni individuali su Zoom",
       "Orari flessibili, prenotazione via app",
       "Programma interamente personalizzato",
@@ -266,7 +266,7 @@ const packages = [
     accentBg: "bg-amber-50 dark:bg-amber-950/30",
     icon: Mic,
     features: [
-      "Coach madrelingua dedicato",
+      "Coach qualificato dedicato",
       "5 sessioni intensive via Zoom",
       "Focus esclusivo su fluency",
       "Simulazioni di scenari reali",
@@ -739,7 +739,7 @@ export default function LanguageCoachingPage() {
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex flex-wrap justify-center gap-6 md:gap-10">
                 {[
-                  { icon: Shield, text: "Coach certificati madrelingua" },
+                  { icon: Shield, text: "Coach certificati e qualificati" },
                   { icon: Target, text: "Percorsi 100% personalizzati" },
                   { icon: Lightbulb, text: "Percorso su misura per te" },
                 ].map((item, i) => (

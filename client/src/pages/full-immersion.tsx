@@ -137,8 +137,8 @@ const formats = [
   {
     title: "FIW Collettivo",
     subtitle: "5-8 partecipanti",
-    description: "Il formato più amato: un piccolo gruppo di persone motivate che condividono la stessa settimana di immersione totale nella nostra sede di Vicenza. L'energia del gruppo diventa il motore dell'apprendimento. Ogni giornata è un mix calibrato di language studies, conversazione, business English e soft skills, guidato da un team di coach madrelingua che si alternano per offrirti stili e stimoli diversi.",
-    features: ["5 giorni intensivi (lun-ven)", "30+ ore frontali, dalle 9:00 alle 16:30", "Team di coach madrelingua", "Livelli da A2 a C1", "Convenzioni B&B e hotel a Vicenza"],
+    description: "Il formato più amato: un piccolo gruppo di persone motivate che condividono la stessa settimana di immersione totale nella nostra sede di Vicenza. L'energia del gruppo diventa il motore dell'apprendimento. Ogni giornata è un mix calibrato di language studies, conversazione, business English e soft skills, guidato da un team di coach qualificati che si alternano per offrirti stili e stimoli diversi.",
+    features: ["5 giorni intensivi (lun-ven)", "30+ ore frontali, dalle 9:00 alle 16:30", "Team di coach qualificati", "Livelli da A2 a C1", "Convenzioni B&B e hotel a Vicenza"],
     color: "from-primary to-blue-600",
     icon: Users,
     popular: true,
@@ -147,7 +147,7 @@ const formats = [
     title: "FIW Semi-Individuale",
     subtitle: "2-4 partecipanti",
     description: "Un'attenzione più mirata in un gruppo ristretto di 2-4 partecipanti, dove ogni conversazione diventa un'opportunità su misura. I tuoi obiettivi specifici guidano il percorso fin dal primo giorno: il programma viene adattato alle esigenze reali del gruppo, con ampio spazio per la pratica orale e il feedback personalizzato da parte del team di coach.",
-    features: ["5 giorni intensivi (lun-ven)", "Percorso personalizzato e mirato", "Conversazioni reali e sfide pratiche", "Team di coach madrelingua dedicato", "Convenzioni B&B e hotel a Vicenza"],
+    features: ["5 giorni intensivi (lun-ven)", "Percorso personalizzato e mirato", "Conversazioni reali e sfide pratiche", "Team di coach qualificati dedicato", "Convenzioni B&B e hotel a Vicenza"],
     color: "from-emerald-500 to-teal-600",
     icon: UserCheck,
     popular: false,
@@ -155,8 +155,8 @@ const formats = [
   {
     title: "FIW Individuale",
     subtitle: "1 partecipante",
-    description: "Un'esperienza esclusiva costruita interamente intorno a te: i tuoi obiettivi, il tuo stile, il tuo ritmo. Un team di 3-4 coach madrelingua dedicati lavora con te per un'intera settimana, alternandosi per offrirti prospettive e competenze diverse. Ideale per manager, professionisti e imprenditori che vogliono fare un salto di qualità decisivo in tempi rapidi.",
-    features: ["5 giorni intensivi (lun-ven)", "3-4 coach madrelingua dedicati", "Programma 100% personalizzato", "Obiettivi specifici professionali", "Convenzioni B&B e hotel a Vicenza"],
+    description: "Un'esperienza esclusiva costruita interamente intorno a te: i tuoi obiettivi, il tuo stile, il tuo ritmo. Un team di 3-4 coach dedicati lavora con te per un'intera settimana, alternandosi per offrirti prospettive e competenze diverse. Ideale per manager, professionisti e imprenditori che vogliono fare un salto di qualità decisivo in tempi rapidi.",
+    features: ["5 giorni intensivi (lun-ven)", "3-4 coach dedicati", "Programma 100% personalizzato", "Obiettivi specifici professionali", "Convenzioni B&B e hotel a Vicenza"],
     color: "from-violet-500 to-purple-600",
     icon: GraduationCap,
     popular: false,
@@ -379,7 +379,7 @@ export default function FullImmersionPage() {
                     Per cinque giorni entrerai in un ambiente dove si comunica, si pensa e si vive in inglese. Un programma superintensivo di almeno 30 ore frontali, dalle 9:00 alle 16:30, che puoi prolungare fino alle 18:00 con attività esperienziali. Il tutto basato sul metodo Interlingua, che unisce l'experiential learning al Task-Based Learning e al CLIL (Content and Language Integrated Learning). Non impari solo l'inglese: lo vivi.
                   </p>
                   <p>
-                    E ciò che costruisci durante la settimana continua a crescere: 3 mesi di accesso a un corso online completo sulla nostra piattaforma 24/7, più sessioni di conversazione con coach madrelingua nello Speaker's Corner.
+                    E ciò che costruisci durante la settimana continua a crescere: 3 mesi di accesso a un corso online completo sulla nostra piattaforma 24/7, più sessioni di conversazione con coach qualificati nello Speaker's Corner.
                   </p>
                 </div>
               </AnimatedSection>
@@ -429,10 +429,10 @@ export default function FullImmersionPage() {
                 </Badge>
                 <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fi-program-title">
                   Quattro Aree Tematiche
-                  <span className="block gradient-text">Quattro Docenti Madrelingua</span>
+                  <span className="block gradient-text">Quattro Docenti Specializzati</span>
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                  Quattro sessioni da 90 minuti al giorno, ciascuna guidata da un coach madrelingua esperto nel proprio topic. Il programma è customizzato e interdisciplinare.
+                  Quattro sessioni da 90 minuti al giorno, ciascuna guidata da un coach esperto nel proprio topic. Il programma è customizzato e interdisciplinare.
                 </p>
               </div>
             </AnimatedSection>
@@ -689,7 +689,7 @@ export default function FullImmersionPage() {
                           </div>
                           <div>
                             <h4 className="text-lg font-bold text-foreground">3 Mesi di Speaker's Corner</h4>
-                            <p className="text-xs text-muted-foreground font-medium">Conversazione con coach madrelingua</p>
+                            <p className="text-xs text-muted-foreground font-medium">Conversazione con coach qualificati</p>
                           </div>
                         </div>
                         <p className="text-sm text-muted-foreground leading-relaxed">

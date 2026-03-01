@@ -97,7 +97,7 @@ export default function SpeakersCornerPage() {
     {
       icon: Award,
       title: "Moderatore Esperto",
-      description: "Un insegnante madrelingua guida la conversazione e fornisce correzioni utili.",
+      description: "Un insegnante qualificato guida la conversazione e fornisce correzioni utili.",
       gradient: "from-amber-500/20 to-orange-500/20",
       iconColor: "text-amber-500",
     },

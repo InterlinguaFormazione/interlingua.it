@@ -106,7 +106,7 @@ const locations = [
 const highlights = [
   { icon: GraduationCap, label: "30+ anni di esperienza", desc: "Formazione dal 1993" },
   { icon: Users, label: "2 sedi operative", desc: "Vicenza e Thiene" },
-  { icon: Globe, label: "10+ lingue insegnate", desc: "Docenti madrelingua" },
+  { icon: Globe, label: "10+ lingue insegnate", desc: "Docenti qualificati" },
   { icon: Star, label: "15.000+ studenti formati", desc: "Privati e aziende" },
 ];
 

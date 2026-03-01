@@ -202,7 +202,7 @@ export default function ChiSiamoPage() {
                     Un team di esperti al tuo servizio
                   </p>
                   <p className="text-white/80 text-sm">
-                    Docenti madrelingua qualificati e appassionati
+                    Docenti qualificati e appassionati
                   </p>
                 </div>
               </div>
@@ -583,7 +583,7 @@ export default function ChiSiamoPage() {
               <GraduationCap className="w-6 h-6 text-primary" />
               Team Docenti
             </h3>
-            <p className="text-muted-foreground mb-6">I nostri insegnanti madrelingua e formatori qualificati</p>
+            <p className="text-muted-foreground mb-6">I nostri docenti e formatori qualificati</p>
           </motion.div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
             {[

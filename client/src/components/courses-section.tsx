@@ -47,7 +47,7 @@ const categories = [
   {
     id: "coaching",
     title: "Language Coaching",
-    description: "Percorsi personalizzati 1-to-1 con coach madrelingua. Sviluppa fluency, confidence e competenze comunicative su misura per i tuoi obiettivi.",
+    description: "Percorsi personalizzati 1-to-1 con coach qualificati. Sviluppa fluency, confidence e competenze comunicative su misura per i tuoi obiettivi.",
     icon: Mic,
     image: languageCoachingImage,
     color: "from-indigo-500 to-indigo-600",
@@ -57,7 +57,7 @@ const categories = [
   {
     id: "online",
     title: "Formazione Online",
-    description: "Piattaforma 24/7 con AI e riconoscimento vocale. Corsi blended con tutor madrelingua via Zoom. Studia quando e dove vuoi.",
+    description: "Piattaforma 24/7 con AI e riconoscimento vocale. Corsi blended con tutor qualificati via Zoom. Studia quando e dove vuoi.",
     icon: Monitor,
     image: corsoOnlineImage,
     color: "from-teal-500 to-teal-600",
@@ -67,7 +67,7 @@ const categories = [
   {
     id: "speakers",
     title: "Speakers' Corner",
-    description: "Pratica la conversazione in inglese ogni venerdì con docenti madrelingua. Abbonamento annuale, prova gratuita o lezioni individuali.",
+    description: "Pratica la conversazione in inglese ogni venerdì con docenti qualificati. Abbonamento annuale, prova gratuita o lezioni individuali.",
     icon: MessageCircle,
     image: speakersCornerCourseImage,
     color: "from-orange-500 to-orange-600",

@@ -15,7 +15,7 @@ INFORMAZIONI SULL'AZIENDA
 - Fondata nel 1993 come agenzia di traduzioni e corsi aziendali
 - Prima struttura di formazione linguistica accreditata dalla Regione Veneto (dal 2003)
 - Nel 2024 ha lanciato il brand "SkillCraft-Interlingua" focalizzandosi su AI, competenze digitali, soft skills e lingue
-- Statistiche: 30+ anni di esperienza, 15.000+ studenti formati, 500+ aziende partner, 50+ docenti madrelingua, 98% soddisfazione
+- Statistiche: 30+ anni di esperienza, 15.000+ studenti formati, 500+ aziende partner, 50+ docenti qualificati, 98% soddisfazione
 
 ═══════════════════════════════════════════
 SEDI E CONTATTI
@@ -42,7 +42,7 @@ Staff amministrativo:
 - Elena: Responsabile sede Thiene
 - Michela: Coordinatrice Progetti Aziendali e Formazione Finanziata
 
-Docenti di lingua (tutti madrelingua):
+Docenti di lingua (madrelingua e qualificati):
 - Mark (Coordinatore/Inglese), James (Inglese), Will (Inglese/Coach), Marcus (Inglese)
 - Giulia (Inglese/Italiano per stranieri), Stephanie Vella (Coach e Formatrice CLIL)
 - Ruben (Spagnolo), Magalì (Francese), Paola (Tedesco commerciale), Mara (Tedesco/Italiano)
@@ -59,7 +59,7 @@ Esperti specializzati:
 ═══════════════════════════════════════════
 CATALOGO CORSI — FORMAZIONE IN PRESENZA
 ═══════════════════════════════════════════
-1. Corsi di Gruppo (5-8 partecipanti) — da €340, 12 settimane, docente madrelingua
+1. Corsi di Gruppo (5-8 partecipanti) — da €340, 12 settimane, docente qualificato
    Lingue: Inglese, Francese, Tedesco, Spagnolo
    Pagina: /formazione-in-presenza
 
@@ -89,7 +89,7 @@ CATALOGO CORSI — E-LEARNING / ONLINE
    Pagina: /corsi-e-learning
 
 8. Cam-Class Blended di Gruppo — da €60/mese
-   Lezioni di gruppo con tutor madrelingua via Zoom + piattaforma e-learning 24/7
+   Lezioni di gruppo con tutor qualificato via Zoom + piattaforma e-learning 24/7
 
 9. Cam-Class Individuale o Semi-Individuale — da €120
    Pacchetti da 6 o 12 lezioni personalizzate con tutor dedicato
@@ -115,7 +115,7 @@ CATALOGO CORSI — LANGUAGE COACHING
     Sessioni in sede + piattaforma e-learning 24/7 con AI
 
 15. Coaching Individuale Online — €300
-    12 sessioni con coach madrelingua via Zoom
+    12 sessioni con coach qualificato via Zoom
 
 16. Fluency Coaching Intensivo — €125
     5 sessioni focalizzate sulla scioltezza orale, per chi sa la grammatica ma fatica a parlare
@@ -124,7 +124,7 @@ CATALOGO CORSI — LANGUAGE COACHING
 FULL IMMERSION WORKSHOP
 ═══════════════════════════════════════════
 Workshop intensivi di una settimana (Lun-Ven) a Vicenza con 30+ ore di contatto.
-4 sessioni giornaliere da 90 min con coach madrelingua diversi:
+4 sessioni giornaliere da 90 min con coach qualificati:
 - Language Studies (grammatica attiva, strutture professionali)
 - Small Talk & Ear Training (fluency, pronuncia, roleplay)
 - Specialist & Executive Language (linguaggio tecnico per settore)
@@ -163,7 +163,7 @@ Servizio di conversazione in inglese su abbonamento annuale.
 - Prezzo: €200/anno
 - Formato: sessioni settimanali di 1 ora ogni venerdì, 18:30-19:30
 - Gruppi piccoli: max 12 partecipanti
-- Moderatore madrelingua che guida la discussione e fornisce correzioni
+- Moderatore qualificato che guida la discussione e fornisce correzioni
 - Circa 40 sessioni all'anno
 - Ogni settimana un tema diverso (cultura, tecnologia, viaggi, ecc.)
 - Il martedì gli iscritti ricevono email con il tema della settimana e materiali preparatori

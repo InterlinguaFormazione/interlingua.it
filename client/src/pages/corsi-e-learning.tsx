@@ -151,9 +151,9 @@ const courses = [
     reviewSlug: "camclass-selflearning",
     title: "Cam-Class Blended Individuale e Self-Learning",
     subtitle: "Studia al tuo ritmo con supporto tutor",
-    description: "Impara comodamente da casa con un corso di lingua online dinamico ed efficace su piattaforma e-learning moderna. Self-learning per uno studio personalizzato, oppure modalità blended con 2-4 lezioni individuali da 30 minuti al mese con tutor madrelingua via Zoom.",
+    description: "Impara comodamente da casa con un corso di lingua online dinamico ed efficace su piattaforma e-learning moderna. Self-learning per uno studio personalizzato, oppure modalità blended con 2-4 lezioni individuali da 30 minuti al mese con tutor qualificato via Zoom.",
     fullDescription: [
-      "Lezioni su piattaforma digitale altamente tecnologica con lezioni virtuali individuali. Benefici: massima flessibilità, personalizzazione completa del percorso, docente madrelingua qualificato e tutor dedicato.",
+      "Lezioni su piattaforma digitale altamente tecnologica con lezioni virtuali individuali. Benefici: massima flessibilità, personalizzazione completa del percorso, docente qualificato e tutor dedicato.",
       "La piattaforma è basata su Intelligenza Artificiale con riconoscimento vocale avanzato, coinvolgimento attivo, test e certificazione finale CEFR. Possibilità di auto-prenotazione delle lezioni e di scegliere un programma completamente self-learning.",
       "Interazione con una community internazionale di oltre 4 milioni di studenti attiva 24/7 per esercitarsi e confrontarsi con studenti da tutto il mondo.",
     ],
@@ -166,7 +166,7 @@ const courses = [
     features: [
       "Lezioni serali, 1 incontro/settimana",
       "Durata minima 1 mese, rinnovabile mensilmente",
-      "Virtual Classroom Zoom con tutor madrelingua",
+      "Virtual Classroom Zoom con tutor qualificato",
       "Piattaforma online accessibile 24/7",
       "Programmi strutturati e progressivi",
       "Certificato a fine corso",
@@ -180,11 +180,11 @@ const courses = [
     reviewSlug: "camclass-gruppo",
     title: "Cam-Class Blended di Gruppo",
     subtitle: "Lezioni live in piccolo gruppo + e-learning",
-    description: "Corso blended con lezioni live con tutor madrelingua qualificati e piattaforma e-learning interattiva con strumenti avanzati come riconoscimento vocale e AI.",
+    description: "Corso blended con lezioni live con tutor qualificati e piattaforma e-learning interattiva con strumenti avanzati come riconoscimento vocale e AI.",
     fullDescription: [
-      "Corso di lingua online in piccoli gruppi con docente madrelingua. Lezioni serali settimanali su Zoom integrate dalla piattaforma e-learning attiva 24/7. Inizio flessibile con focus sulla conversazione e metodo comunicativo.",
+      "Corso di lingua online in piccoli gruppi con docente qualificato. Lezioni serali settimanali su Zoom integrate dalla piattaforma e-learning attiva 24/7. Inizio flessibile con focus sulla conversazione e metodo comunicativo.",
       "Avanza ogni mese con valutazione orale continua e ottieni il certificato QCER in 4 mesi. Interazione con una community internazionale di oltre 4 milioni di studenti per esercitarti anche fuori dalla lezione.",
-      "Strumenti avanzati come riconoscimento vocale e AI per un feedback immediato sulla pronuncia. Supporto costante del tutor madrelingua qualificato durante tutto il percorso.",
+      "Strumenti avanzati come riconoscimento vocale e AI per un feedback immediato sulla pronuncia. Supporto costante del tutor qualificato durante tutto il percorso.",
     ],
     image: lingueStraniereImage,
     price: "60",
@@ -195,7 +195,7 @@ const courses = [
     features: [
       "Lezioni serali, 1 incontro/settimana",
       "Durata minima 1 mese, rinnovabile mensilmente",
-      "Virtual Classroom Zoom con tutor madrelingua",
+      "Virtual Classroom Zoom con tutor qualificato",
       "Piattaforma online accessibile 24/7",
       "Programmi strutturati e progressivi",
       "Certificato a fine corso",
@@ -211,7 +211,7 @@ const courses = [
     subtitle: "Percorso personalizzato 1-2 partecipanti",
     description: "Formazione linguistica online modulare per 1 o 2 partecipanti, con programma interamente personalizzato sugli obiettivi e il livello dello studente.",
     fullDescription: [
-      "Pacchetto di 12 lezioni online con docenti madrelingua in inglese, francese, tedesco, spagnolo, portoghese, russo o italiano. Lezioni flessibili, personalizzate e interattive su Zoom.",
+      "Pacchetto di 12 lezioni online con docenti qualificati in inglese, francese, tedesco, spagnolo, portoghese, russo o italiano. Lezioni flessibili, personalizzate e interattive su Zoom.",
       "Il programma viene costruito interamente sulle tue esigenze: obiettivi professionali, preparazione a colloqui, presentazioni, negoziazioni o semplicemente migliorare le competenze comunicative generali.",
       "Massima flessibilità di orari con prenotazione via app. Materiale didattico personalizzato e certificato a fine corso con il livello raggiunto secondo il QCER.",
     ],
@@ -225,7 +225,7 @@ const courses = [
       "Orari flessibili su prenotazione",
       "12 lezioni in videoconferenza",
       "Virtual Classroom Zoom",
-      "Tutor madrelingua dedicato",
+      "Tutor qualificato dedicato",
       "Programmi strutturati e progressivi",
       "Metodo Interlingua",
       "Acquistabile con 18app",
@@ -240,9 +240,9 @@ const courses = [
     subtitle: "Preparazione esami MIUR: LanguageCert, IELTS, TOEFL, Cambridge e altri",
     description: "Percorso di certificazione mirato alla preparazione degli esami riconosciuti dal MIUR in inglese, francese, tedesco e spagnolo.",
     fullDescription: [
-      "Corso di preparazione agli esami di certificazione linguistica riconosciuti dal MIUR: LanguageCert, IELTS, TOEFL, Cambridge English, Trinity, DELF, DELE, Goethe-Zertifikat. Lezioni online con tutor madrelingua specializzato e percorso personalizzato.",
+      "Corso di preparazione agli esami di certificazione linguistica riconosciuti dal MIUR: LanguageCert, IELTS, TOEFL, Cambridge English, Trinity, DELF, DELE, Goethe-Zertifikat. Lezioni online con tutor specializzato e percorso personalizzato.",
       "Puoi scegliere tra intero percorso (preparazione + esame), solo il percorso di preparazione, oppure acquistare solo l'iscrizione all'esame (solo lingua inglese). Il percorso include 12 lezioni live su Zoom con simulazioni di esame, oltre a 60 ore di e-learning interattivo con esercitazioni mirate sulle 4 skills.",
-      "Il percorso di preparazione può essere svolto, a scelta, solo in aula virtuale con tutor madrelingua specializzato, oppure attraverso un corso blended con lezioni live + piattaforma e-learning con programma completo mirato al superamento dell'esame.",
+      "Il percorso di preparazione può essere svolto, a scelta, solo in aula virtuale con tutor specializzato, oppure attraverso un corso blended con lezioni live + piattaforma e-learning con programma completo mirato al superamento dell'esame.",
     ],
     image: managementImage,
     price: "da 230",
@@ -252,7 +252,7 @@ const courses = [
     icon: Award,
     features: [
       "Esami MIUR: LanguageCert, IELTS, TOEFL, Cambridge, Trinity, DELF, DELE, Goethe",
-      "Tutor madrelingua specializzato",
+      "Tutor specializzato",
       "Simulazioni di esame incluse",
       "12 lezioni live in aula virtuale Zoom",
       "Orari flessibili autoprenotabili (app di self-booking)",
@@ -265,12 +265,12 @@ const courses = [
   {
     id: "conversazione",
     reviewSlug: "conversazione-individuale",
-    title: "Cam-Class Conversazione Individuale con Madrelingua",
+    title: "Cam-Class Conversazione Individuale",
     subtitle: "Sessioni 1-to-1 per sviluppare fluency",
-    description: "Sessioni di conversazione individuali con insegnanti madrelingua via Zoom, pensate per sviluppare fluency, sicurezza e padronanza della lingua.",
+    description: "Sessioni di conversazione individuali con insegnanti qualificati via Zoom, pensate per sviluppare fluency, sicurezza e padronanza della lingua.",
     fullDescription: [
       "Il corso di conversazione individuale di Interlingua è dedicato a perfezionare le abilità di interazione orale. Attraverso le lezioni interattive in aula virtuale, sviluppi abilità comunicative praticando dialoghi autentici e guadagnando fiducia nell'uso della lingua.",
-      "L'insegnante madrelingua qualificato offre feedback immediato e consigli personalizzati per migliorare la fluidità nella conversazione, sviluppare il vocabolario, migliorare la pronuncia e molto altro.",
+      "L'insegnante qualificato offre feedback immediato e consigli personalizzati per migliorare la fluidità nella conversazione, sviluppare il vocabolario, migliorare la pronuncia e molto altro.",
       "Pacchetto di 5 lezioni individuali di 30 minuti ciascuna. Metodologia didattica interattiva Task Based Learning e Content and Language Integrated Learning (CLIL). Orari flessibili prenotabili tramite app. Livello minimo richiesto: B1.",
     ],
     image: courseIndividual,
@@ -281,7 +281,7 @@ const courses = [
     icon: Mic,
     features: [
       "Virtual Classroom Zoom",
-      "Tutor madrelingua dedicato",
+      "Tutor qualificato dedicato",
       "Metodologia Task Based Learning e CLIL",
       "Orario flessibile",
       "Prenotazione tramite app",
@@ -298,7 +298,7 @@ const courses = [
     subtitle: "Max 5 partecipanti, massima interazione",
     description: "Corso in piccolo gruppo con un massimo di 5 partecipanti per garantire la massima interazione e attenzione individuale.",
     fullDescription: [
-      "Corso online di lingua in piccoli gruppi con docente madrelingua. Lezioni serali settimanali su Zoom, integrate da accesso illimitato alla piattaforma e-learning 24/7. Disponibile per inglese, francese, tedesco, spagnolo, portoghese, russo o italiano.",
+      "Corso online di lingua in piccoli gruppi con docente qualificato. Lezioni serali settimanali su Zoom, integrate da accesso illimitato alla piattaforma e-learning 24/7. Disponibile per inglese, francese, tedesco, spagnolo, portoghese, russo o italiano.",
       "Metodo Interlingua con approccio Task-Based Learning e CLIL per un apprendimento pratico e orientato alla comunicazione reale. Massimo 5 partecipanti per garantire attenzione individuale e ampio spazio di pratica.",
       "Orari concordati tra studenti e docente per la massima flessibilità. Programmi strutturati e progressivi con certificato a fine corso.",
     ],
@@ -312,7 +312,7 @@ const courses = [
       "Orari concordati tra studenti e docente",
       "12 lezioni in videoconferenza",
       "Virtual Classroom Zoom",
-      "Tutor madrelingua dedicato",
+      "Tutor qualificato dedicato",
       "Programmi strutturati e progressivi",
       "Max 5 partecipanti",
       "Metodo Interlingua",
@@ -327,7 +327,7 @@ const courses = [
     subtitle: "Corsi di inglese online dedicati ai giovani",
     description: "Corsi di inglese online pensati appositamente per bambini e ragazzi, con metodologie didattiche coinvolgenti e interattive adatte alle diverse fasce di età.",
     fullDescription: [
-      "Lezioni live con tutor madrelingua qualificati in un ambiente stimolante e sicuro, pensate per le diverse fasce di età. Metodologie didattiche specifiche per giovani studenti, con contenuti interattivi e coinvolgenti.",
+      "Lezioni live con tutor qualificati in un ambiente stimolante e sicuro, pensate per le diverse fasce di età. Metodologie didattiche specifiche per giovani studenti, con contenuti interattivi e coinvolgenti.",
       "Virtual Classroom su Zoom con programmi strutturati per fasce di età, materiali multimediali e attività ludiche che rendono l'apprendimento divertente e naturale. Certificato a fine corso con il livello raggiunto.",
       "Metodo Interlingua adattato alle esigenze dei giovani studenti, con focus su comunicazione orale, giochi di ruolo e attività collaborative per sviluppare la sicurezza nell'uso della lingua fin da subito.",
     ],
@@ -339,7 +339,7 @@ const courses = [
     icon: GraduationCap,
     features: [
       "Virtual Classroom Zoom",
-      "Tutor madrelingua qualificato",
+      "Tutor qualificato",
       "Metodologia adatta a bambini e ragazzi",
       "Contenuti interattivi e coinvolgenti",
       "Programmi strutturati per fasce di età",
@@ -360,7 +360,7 @@ const stats = [
 
 const advantages = [
   { icon: Play, title: "Studia Quando Vuoi", desc: "Piattaforma e-learning accessibile 24 ore su 24, 7 giorni su 7. Impara al tuo ritmo.", gradient: "from-teal-500 to-cyan-600", bgLight: "bg-teal-50 dark:bg-teal-950/30" },
-  { icon: Video, title: "Lezioni Live su Zoom", desc: "Virtual Classroom con tutor madrelingua qualificati per un'esperienza interattiva.", gradient: "from-violet-500 to-purple-600", bgLight: "bg-violet-50 dark:bg-violet-950/30" },
+  { icon: Video, title: "Lezioni Live su Zoom", desc: "Virtual Classroom con tutor qualificati per un'esperienza interattiva.", gradient: "from-violet-500 to-purple-600", bgLight: "bg-violet-50 dark:bg-violet-950/30" },
   { icon: Brain, title: "AI e Voice Recognition", desc: "Tecnologie avanzate per migliorare pronuncia, comprensione e produzione linguistica.", gradient: "from-blue-500 to-indigo-600", bgLight: "bg-blue-50 dark:bg-blue-950/30" },
   { icon: Shield, title: "Certificazione Inclusa", desc: "Attestato riconosciuto al completamento del corso con il livello raggiunto.", gradient: "from-amber-500 to-orange-600", bgLight: "bg-amber-50 dark:bg-amber-950/30" },
 ];
@@ -728,7 +728,7 @@ export default function CorsiELearningPage() {
                   </span>
                 </motion.h1>
                 <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.35 }} className="text-xl text-white/85 mb-4 leading-relaxed max-w-xl">
-                  Impara una lingua ovunque tu sia, con piattaforma e-learning 24/7, lezioni live con tutor madrelingua e tecnologie AI avanzate.
+                  Impara una lingua ovunque tu sia, con piattaforma e-learning 24/7, lezioni live con tutor qualificati e tecnologie AI avanzate.
                 </motion.p>
                 <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.45 }} className="text-lg text-white/60 mb-10 leading-relaxed max-w-xl">
                   7 lingue disponibili. Da 25 euro al mese. Community internazionale di oltre 4 milioni di studenti.
@@ -782,7 +782,7 @@ export default function CorsiELearningPage() {
                     </div>
                     <div>
                       <p className="font-bold text-foreground">Live su Zoom</p>
-                      <p className="text-xs text-muted-foreground">Tutor madrelingua</p>
+                      <p className="text-xs text-muted-foreground">Tutor qualificato</p>
                     </div>
                   </div>
                 </div>
@@ -835,7 +835,7 @@ export default function CorsiELearningPage() {
                   <span className="bg-gradient-to-r from-teal-500 to-cyan-600 bg-clip-text text-transparent"> E-Learning</span>
                 </h2>
                 <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                  Piattaforma interattiva, lezioni live con tutor madrelingua e tecnologie avanzate per un apprendimento efficace ovunque tu sia.
+                  Piattaforma interattiva, lezioni live con tutor qualificati e tecnologie avanzate per un apprendimento efficace ovunque tu sia.
                 </p>
               </div>
             </AnimatedSection>
@@ -926,7 +926,7 @@ export default function CorsiELearningPage() {
                           <Award className="w-8 h-8 text-white" />
                         </div>
                         <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">Full Immersion Workshop</h3>
-                        <p className="text-muted-foreground mb-4 leading-relaxed">Un livello QCER in una settimana. 30+ ore frontali con team di coach madrelingua.</p>
+                        <p className="text-muted-foreground mb-4 leading-relaxed">Un livello QCER in una settimana. 30+ ore frontali con team di coach qualificati.</p>
                         <span className="inline-flex items-center gap-1.5 text-primary font-semibold">
                           Scopri di più <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </span>
