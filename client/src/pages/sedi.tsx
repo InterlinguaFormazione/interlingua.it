@@ -445,13 +445,31 @@ export default function SediPage() {
                 <p className="text-lg text-white/50 mb-12 max-w-2xl mx-auto leading-relaxed">
                   Il nostro team è pronto ad accoglierti e guidarti nella scelta del percorso formativo ideale.
                 </p>
-                <div className="flex flex-wrap justify-center gap-5">
-                  <Button size="lg" className="h-16 px-10 text-lg rounded-2xl bg-white text-primary hover:bg-white/90 shadow-2xl shadow-black/20 font-bold" asChild data-testid="button-sedi-call">
-                    <a href="tel:+390444321601">
-                      <Phone className="w-5 h-5 mr-2" />
-                      Chiama: 0444 321601
+                <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto mb-8">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/15">
+                    <div className="flex items-center gap-2 mb-3">
+                      <MapPin className="w-5 h-5 text-cyan-300" />
+                      <h3 className="text-lg font-bold text-white">Vicenza</h3>
+                    </div>
+                    <p className="text-sm text-white/60 mb-3">Viale Giuseppe Mazzini 27</p>
+                    <a href="tel:+390444321601" className="inline-flex items-center gap-2 text-white hover:text-cyan-300 transition-colors font-semibold" data-testid="button-sedi-call-vicenza">
+                      <Phone className="w-4 h-4" />
+                      0444 321601
                     </a>
-                  </Button>
+                  </div>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/15">
+                    <div className="flex items-center gap-2 mb-3">
+                      <MapPin className="w-5 h-5 text-indigo-300" />
+                      <h3 className="text-lg font-bold text-white">Thiene</h3>
+                    </div>
+                    <p className="text-sm text-white/60 mb-3">Corso Garibaldi 174</p>
+                    <a href="tel:+390445382744" className="inline-flex items-center gap-2 text-white hover:text-indigo-300 transition-colors font-semibold" data-testid="button-sedi-call-thiene">
+                      <Phone className="w-4 h-4" />
+                      0445 382744
+                    </a>
+                  </div>
+                </div>
+                <div className="flex flex-wrap justify-center gap-5">
                   <Button size="lg" variant="outline" className="h-16 px-10 text-lg rounded-2xl border-white/25 text-white hover:bg-white/10 backdrop-blur-sm font-medium" asChild data-testid="button-sedi-email">
                     <a href="mailto:infocorsi@skillcraft.interlingua.it">
                       <Mail className="w-5 h-5 mr-2" />
@@ -459,7 +477,7 @@ export default function SediPage() {
                     </a>
                   </Button>
                   <Link href="/test-di-livello">
-                    <Button size="lg" variant="outline" className="h-16 px-10 text-lg rounded-2xl border-white/25 text-white hover:bg-white/10 backdrop-blur-sm font-medium" data-testid="button-sedi-test">
+                    <Button size="lg" className="h-16 px-10 text-lg rounded-2xl bg-white text-primary hover:bg-white/90 shadow-2xl shadow-black/20 font-bold" data-testid="button-sedi-test">
                       <GraduationCap className="w-5 h-5 mr-2" />
                       Fai il Test di Livello
                     </Button>
