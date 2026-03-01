@@ -110,6 +110,7 @@ export default function CartCheckout() {
         code: voucherCode.trim(),
         cartTotal: totalPrice.toFixed(2),
         productSlugs,
+        customerEmail: customerEmail || undefined,
       });
       const data = await res.json();
       setVoucherResult(data);

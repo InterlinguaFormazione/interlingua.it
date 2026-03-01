@@ -1261,7 +1261,16 @@ export async function registerRoutes(
           const validProduct = !voucher.productSlugs || voucher.productSlugs.split(",").map((s: string) => s.trim()).includes(product.slug);
           const total = parseFloat(expectedPrice);
           const validMin = !voucher.minOrderAmount || total >= parseFloat(voucher.minOrderAmount);
-          if (validTime && validUses && validProduct && validMin) {
+          let validFirstTime = true;
+          if (voucher.firstTimeBuyerOnly) {
+            if (!parsed.data.customerEmail) {
+              validFirstTime = false;
+            } else {
+              const hasOrders = await storage.hasCompletedOrdersByEmail(parsed.data.customerEmail);
+              if (hasOrders) validFirstTime = false;
+            }
+          }
+          if (validTime && validUses && validProduct && validMin && validFirstTime) {
             let discount = 0;
             if (voucher.discountType === "percentage") {
               discount = total * (parseFloat(voucher.discountValue) / 100);
@@ -1404,7 +1413,16 @@ export async function registerRoutes(
           const allowedSlugs = voucher.productSlugs ? voucher.productSlugs.split(",").map((s: string) => s.trim()) : [];
           const validProduct = !voucher.productSlugs || cartSlugs.every((s: string) => allowedSlugs.includes(s));
           const validMin = !voucher.minOrderAmount || expectedTotal >= parseFloat(voucher.minOrderAmount);
-          if (validTime && validUses && validProduct && validMin) {
+          let validFirstTime = true;
+          if (voucher.firstTimeBuyerOnly) {
+            if (!customerEmail) {
+              validFirstTime = false;
+            } else {
+              const hasOrders = await storage.hasCompletedOrdersByEmail(customerEmail);
+              if (hasOrders) validFirstTime = false;
+            }
+          }
+          if (validTime && validUses && validProduct && validMin && validFirstTime) {
             let discount = 0;
             if (voucher.discountType === "percentage") {
               discount = expectedTotal * (parseFloat(voucher.discountValue) / 100);
@@ -1658,7 +1676,7 @@ export async function registerRoutes(
 
   app.post("/api/admin/vouchers", requireAuth, async (req, res) => {
     try {
-      const { code, description, discountType, discountValue, minOrderAmount, maxUses, validFrom, validUntil, productSlugs, active } = req.body;
+      const { code, description, discountType, discountValue, minOrderAmount, maxUses, validFrom, validUntil, productSlugs, firstTimeBuyerOnly, active } = req.body;
       if (!code || !discountType || !discountValue) {
         return res.status(400).json({ success: false, message: "Codice, tipo e valore sconto sono obbligatori." });
       }
@@ -1687,6 +1705,7 @@ export async function registerRoutes(
         validFrom: validFrom ? new Date(validFrom) : null,
         validUntil: validUntil ? new Date(validUntil) : null,
         productSlugs: productSlugs || null,
+        firstTimeBuyerOnly: firstTimeBuyerOnly || false,
         active: active !== false,
       });
       res.json({ success: true, voucher });
@@ -1698,7 +1717,7 @@ export async function registerRoutes(
 
   app.patch("/api/admin/vouchers/:id", requireAuth, async (req, res) => {
     try {
-      const { code, description, discountType, discountValue, minOrderAmount, maxUses, validFrom, validUntil, productSlugs, active } = req.body;
+      const { code, description, discountType, discountValue, minOrderAmount, maxUses, validFrom, validUntil, productSlugs, firstTimeBuyerOnly, active } = req.body;
       const updateData: any = {};
       if (code !== undefined) updateData.code = code.toUpperCase().trim();
       if (description !== undefined) updateData.description = description || null;
@@ -1709,6 +1728,7 @@ export async function registerRoutes(
       if (validFrom !== undefined) updateData.validFrom = validFrom ? new Date(validFrom) : null;
       if (validUntil !== undefined) updateData.validUntil = validUntil ? new Date(validUntil) : null;
       if (productSlugs !== undefined) updateData.productSlugs = productSlugs || null;
+      if (firstTimeBuyerOnly !== undefined) updateData.firstTimeBuyerOnly = firstTimeBuyerOnly;
       if (active !== undefined) updateData.active = active;
       const voucher = await storage.updateDiscountVoucher(req.params.id, updateData);
       if (!voucher) {
@@ -1733,7 +1753,7 @@ export async function registerRoutes(
 
   app.post("/api/shop/validate-voucher", async (req, res) => {
     try {
-      const { code, cartTotal, productSlugs: reqProductSlugs } = req.body;
+      const { code, cartTotal, productSlugs: reqProductSlugs, customerEmail } = req.body;
       if (!code) {
         return res.status(400).json({ valid: false, message: "Inserisci un codice sconto." });
       }
@@ -1750,6 +1770,15 @@ export async function registerRoutes(
       }
       if (voucher.maxUses !== null && (voucher.usedCount || 0) >= voucher.maxUses) {
         return res.json({ valid: false, message: "Questo codice sconto ha raggiunto il limite di utilizzi." });
+      }
+      if (voucher.firstTimeBuyerOnly) {
+        if (!customerEmail) {
+          return res.json({ valid: false, message: "Inserisci la tua email per utilizzare questo codice sconto." });
+        }
+        const hasOrders = await storage.hasCompletedOrdersByEmail(customerEmail);
+        if (hasOrders) {
+          return res.json({ valid: false, message: "Questo codice sconto è riservato ai nuovi clienti." });
+        }
       }
       if (voucher.productSlugs && reqProductSlugs) {
         const allowedSlugs = voucher.productSlugs.split(",").map((s: string) => s.trim());

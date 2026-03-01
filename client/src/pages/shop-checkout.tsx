@@ -116,6 +116,7 @@ export default function ShopCheckout() {
         code: voucherCode.trim(),
         cartTotal: effectivePrice,
         productSlugs: product ? [product.slug] : [],
+        customerEmail: customerEmail || undefined,
       });
       const data = await res.json();
       setVoucherResult(data);

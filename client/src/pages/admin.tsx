@@ -988,6 +988,7 @@ function VouchersTab({ token }: { token: string }) {
     validFrom: "",
     validUntil: "",
     productSlugs: "",
+    firstTimeBuyerOnly: false,
     active: true,
   });
   const { toast } = useToast();
@@ -1072,6 +1073,7 @@ function VouchersTab({ token }: { token: string }) {
       validFrom: "",
       validUntil: "",
       productSlugs: "",
+      firstTimeBuyerOnly: false,
       active: true,
     });
   };
@@ -1088,6 +1090,7 @@ function VouchersTab({ token }: { token: string }) {
       validFrom: v.validFrom ? v.validFrom.slice(0, 16) : "",
       validUntil: v.validUntil ? v.validUntil.slice(0, 16) : "",
       productSlugs: v.productSlugs || "",
+      firstTimeBuyerOnly: v.firstTimeBuyerOnly || false,
       active: v.active !== false,
     });
     setIsDialogOpen(true);
@@ -1108,6 +1111,7 @@ function VouchersTab({ token }: { token: string }) {
       validFrom: formData.validFrom || null,
       validUntil: formData.validUntil || null,
       productSlugs: formData.productSlugs || null,
+      firstTimeBuyerOnly: formData.firstTimeBuyerOnly,
       active: formData.active,
     };
     saveMutation.mutate(payload);
@@ -1225,13 +1229,23 @@ function VouchersTab({ token }: { token: string }) {
                   />
                 </div>
                 <div className="space-y-2 flex items-end gap-2 pb-1">
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={formData.active}
-                      onCheckedChange={val => setFormData({ ...formData, active: val })}
-                      data-testid="switch-voucher-active"
-                    />
-                    <Label className="mb-0">Attivo</Label>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={formData.active}
+                        onCheckedChange={val => setFormData({ ...formData, active: val })}
+                        data-testid="switch-voucher-active"
+                      />
+                      <Label className="mb-0">Attivo</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={formData.firstTimeBuyerOnly}
+                        onCheckedChange={val => setFormData({ ...formData, firstTimeBuyerOnly: val })}
+                        data-testid="switch-voucher-first-time"
+                      />
+                      <Label className="mb-0">Solo primo acquisto</Label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1372,6 +1386,9 @@ function VouchersTab({ token }: { token: string }) {
                         <Badge variant="secondary">Esaurito</Badge>
                       ) : (
                         <Badge variant="default">Attivo</Badge>
+                      )}
+                      {v.firstTimeBuyerOnly && (
+                        <Badge variant="outline" className="ml-1">1° acquisto</Badge>
                       )}
                     </td>
                     <td className="py-3 px-2 text-right whitespace-nowrap">
