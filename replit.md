@@ -39,7 +39,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/shop-product.tsx` - Product detail page with full description, features, reviews section (rating summary, distribution chart, review cards), review submission form, and purchase sidebar
 - `src/pages/speakers-corner-admin.tsx` - Admin panel for managing subscribers, sessions, email settings
 - `src/pages/blog.tsx` - Blog listing page
-- `src/pages/blog-post.tsx` - Blog post detail page
+- `src/pages/blog-post.tsx` - Blog post detail page with comment section (AI auto-replies via OpenAI)
 - `src/pages/language-coaching.tsx` - Premium language coaching page (1-to-1, 30% premium pricing, Milton Method copy)
 - `src/pages/corsi-italiano.tsx` - Italian for Foreigners page with IT/EN bilingual toggle, course pricing, Vicenza info, contact form
 - `src/pages/language-tests.tsx` - Language test landing page at `/test-di-livello` where users select which language test to take. All 5 languages are available with SVG flag icons.

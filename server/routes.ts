@@ -1,7 +1,7 @@
 import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContactSchema, insertNewsletterSchema, insertCookieConsentSchema, insertShopOrderSchema, insertCourseMaterialSchema } from "@shared/schema";
+import { insertContactSchema, insertNewsletterSchema, insertCookieConsentSchema, insertShopOrderSchema, insertCourseMaterialSchema, insertBlogCommentSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendSubscriptionConfirmation, sendBookingConfirmation } from "./email";
@@ -651,6 +651,159 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Blog generation error:", error);
       res.status(500).json({ success: false, message: "Generation failed" });
+    }
+  });
+
+  app.get("/api/blog/:slug/comments", async (req, res) => {
+    try {
+      const comments = await storage.getBlogCommentsBySlug(req.params.slug);
+      res.json(comments);
+    } catch (error) {
+      console.error("Error fetching blog comments:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  const blogCommentBodySchema = insertBlogCommentSchema.pick({ authorName: true, content: true }).extend({
+    authorName: z.string().min(1, "Nome obbligatorio").max(100),
+    content: z.string().min(3, "Commento troppo breve").max(2000, "Commento troppo lungo"),
+  });
+
+  app.post("/api/blog/:slug/comments", async (req, res) => {
+    try {
+      const parsed = blogCommentBodySchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ success: false, message: parsed.error.errors[0]?.message || "Dati non validi." });
+      }
+      const { authorName, content } = parsed.data;
+      const comment = await storage.createBlogComment({
+        blogSlug: req.params.slug,
+        authorName: authorName.trim(),
+        content: content.trim(),
+        isAiReply: false,
+        parentId: null,
+        approved: true,
+      });
+
+      generateBlogCommentReply(req.params.slug, comment.id, comment.authorName, comment.content).catch(err =>
+        console.error("AI blog reply error:", err)
+      );
+
+      res.json(comment);
+    } catch (error) {
+      console.error("Error creating blog comment:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  async function generateBlogCommentReply(blogSlug: string, parentId: string, authorName: string, userComment: string) {
+    if (!process.env.OPENAI_API_KEY) return;
+    try {
+      const post = await storage.getBlogPostBySlug(blogSlug);
+      if (!post) return;
+      const OpenAI = (await import("openai")).default;
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `Sei il community manager di Interlingua Formazione (SkillCraft), un centro di formazione professionale fondato nel 1993 a Vicenza.
+Rispondi ai commenti del blog in modo cordiale, professionale e utile. Usa il "tu" informale.
+- Rispondi SEMPRE in italiano
+- Sii conciso (2-4 frasi)
+- Aggiungi valore alla discussione con informazioni pertinenti
+- Se appropriato, suggerisci gentilmente un nostro corso o servizio correlato
+- Non usare emoji eccessive (massimo 1-2)
+- Firma come "Il Team di Interlingua Formazione"`
+          },
+          {
+            role: "user",
+            content: `Articolo: "${post.title}"\n\nCommento di ${authorName}:\n"${userComment}"\n\nRispondi a questo commento.`
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 300,
+      });
+      const reply = completion.choices[0]?.message?.content;
+      if (reply) {
+        await storage.createBlogComment({
+          blogSlug,
+          authorName: "Interlingua Formazione",
+          content: reply.trim(),
+          isAiReply: true,
+          parentId,
+          approved: true,
+        });
+      }
+    } catch (error) {
+      console.error("AI blog reply generation error:", error);
+    }
+  }
+
+  app.post("/api/admin/blog/seed-comments", requireAuth, async (_req, res) => {
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(400).json({ success: false, message: "OPENAI_API_KEY non configurata" });
+    }
+    try {
+      const posts = await storage.getBlogPosts();
+      const publishedPosts = posts.filter(p => p.published).slice(0, 10);
+      let seeded = 0;
+      for (const post of publishedPosts) {
+        const existing = await storage.getBlogCommentsBySlug(post.slug);
+        if (existing.length > 0) continue;
+
+        const OpenAI = (await import("openai")).default;
+        const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: `Genera 2-3 commenti realistici per un blog di formazione professionale italiano (Interlingua Formazione / SkillCraft, Vicenza).
+I commenti devono sembrare scritti da persone reali italiane interessate alla formazione.
+Usa nomi italiani comuni. I commenti devono essere pertinenti all'articolo, positivi ma naturali.
+Ogni commento 1-3 frasi.
+
+Rispondi in formato JSON:
+[{"authorName": "Nome Cognome", "content": "testo del commento"}]`
+            },
+            {
+              role: "user",
+              content: `Genera commenti per l'articolo: "${post.title}"\nRiassunto: ${post.excerpt}`
+            }
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.9,
+        });
+        const text = completion.choices[0]?.message?.content;
+        if (!text) continue;
+        let parsed: any = JSON.parse(text);
+        let comments: any[] = [];
+        if (Array.isArray(parsed)) comments = parsed;
+        else if (typeof parsed === "object" && parsed !== null) {
+          const vals = Object.values(parsed);
+          const arrVal = vals.find((v: any) => Array.isArray(v));
+          if (arrVal) comments = arrVal as any[];
+        }
+        for (const c of comments) {
+          if (!c.authorName || typeof c.authorName !== "string" || !c.content || typeof c.content !== "string") continue;
+          const comment = await storage.createBlogComment({
+            blogSlug: post.slug,
+            authorName: c.authorName,
+            content: c.content,
+            isAiReply: false,
+            parentId: null,
+            approved: true,
+          });
+          await generateBlogCommentReply(post.slug, comment.id, comment.authorName, comment.content);
+          seeded++;
+        }
+      }
+      res.json({ success: true, message: `${seeded} commenti seed generati con risposte AI` });
+    } catch (error) {
+      console.error("Seed comments error:", error);
+      res.status(500).json({ success: false, message: "Errore nella generazione dei commenti" });
     }
   });
 

@@ -701,21 +701,47 @@ function BlogTab({ token }: { token: string }) {
     },
   });
 
+  const seedCommentsMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/admin/blog/seed-comments", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.json();
+    },
+  });
+
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
         <div>
           <CardTitle>Blog Management</CardTitle>
           <CardDescription>Gestione post generati dall'AI</CardDescription>
         </div>
-        <Button 
-          onClick={() => generateMutation.mutate()} 
-          disabled={generateMutation.isPending}
-          size="sm"
-        >
-          {generateMutation.isPending ? "Generando..." : "Genera Nuovo Post"}
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => seedCommentsMutation.mutate()} 
+            disabled={seedCommentsMutation.isPending}
+            size="sm"
+            variant="outline"
+            data-testid="button-seed-comments"
+          >
+            {seedCommentsMutation.isPending ? "Generando commenti..." : "Genera Commenti Seed"}
+          </Button>
+          <Button 
+            onClick={() => generateMutation.mutate()} 
+            disabled={generateMutation.isPending}
+            size="sm"
+          >
+            {generateMutation.isPending ? "Generando..." : "Genera Nuovo Post"}
+          </Button>
+        </div>
       </CardHeader>
+      {seedCommentsMutation.isSuccess && (
+        <div className="px-6 pb-2">
+          <p className="text-sm text-green-600">{(seedCommentsMutation.data as any)?.message || "Commenti generati!"}</p>
+        </div>
+      )}
       <CardContent>
         {isLoading ? (
           <div className="text-center py-8">Caricamento...</div>

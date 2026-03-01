@@ -40,6 +40,8 @@ import {
   type InsertDiscountVoucher,
   type ProductReview,
   type InsertProductReview,
+  type BlogComment,
+  type InsertBlogComment,
   users,
   contactSubmissions,
   newsletterSubscriptions,
@@ -61,6 +63,7 @@ import {
   beSectionResults,
   discountVouchers,
   productReviews,
+  blogComments,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
@@ -180,6 +183,11 @@ export interface IStorage {
   getAllProductReviews(): Promise<ProductReview[]>;
   updateProductReview(id: string, data: Partial<{ approved: boolean; verified: boolean }>): Promise<ProductReview | undefined>;
   deleteProductReview(id: string): Promise<void>;
+
+  createBlogComment(comment: InsertBlogComment): Promise<BlogComment>;
+  getBlogCommentsBySlug(blogSlug: string): Promise<BlogComment[]>;
+  getAllBlogComments(): Promise<BlogComment[]>;
+  deleteBlogComment(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -678,6 +686,25 @@ export class DatabaseStorage implements IStorage {
 
   async deleteProductReview(id: string): Promise<void> {
     await db.delete(productReviews).where(eq(productReviews.id, id));
+  }
+
+  async createBlogComment(comment: InsertBlogComment): Promise<BlogComment> {
+    const [result] = await db.insert(blogComments).values(comment).returning();
+    return result;
+  }
+
+  async getBlogCommentsBySlug(blogSlug: string): Promise<BlogComment[]> {
+    return db.select().from(blogComments)
+      .where(and(eq(blogComments.blogSlug, blogSlug), eq(blogComments.approved, true)))
+      .orderBy(blogComments.createdAt);
+  }
+
+  async getAllBlogComments(): Promise<BlogComment[]> {
+    return db.select().from(blogComments).orderBy(desc(blogComments.createdAt));
+  }
+
+  async deleteBlogComment(id: string): Promise<void> {
+    await db.delete(blogComments).where(eq(blogComments.id, id));
   }
 }
 

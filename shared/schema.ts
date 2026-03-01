@@ -99,6 +99,25 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
 export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;
 export type BlogPost = typeof blogPosts.$inferSelect;
 
+export const blogComments = pgTable("blog_comments", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  blogSlug: text("blog_slug").notNull(),
+  authorName: text("author_name").notNull(),
+  content: text("content").notNull(),
+  isAiReply: boolean("is_ai_reply").default(false),
+  parentId: varchar("parent_id"),
+  approved: boolean("approved").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertBlogCommentSchema = createInsertSchema(blogComments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertBlogComment = z.infer<typeof insertBlogCommentSchema>;
+export type BlogComment = typeof blogComments.$inferSelect;
+
 export const scSubscribers = pgTable("sc_subscribers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   nome: text("nome").notNull(),
