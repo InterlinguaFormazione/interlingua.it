@@ -68,17 +68,17 @@ export function selectNextQuestion(
 export function updateTheta(oldTheta: number, isCorrect: boolean, standardError: number, difficulty: number = 0, discrimination: number = 100): number {
   const safeSE = Math.max(standardError, 20);
   const se = safeSE / 100;
-  const a = discrimination / 100;
+  const a = 1.5; // Optimized discrimination for faster movement
   const p = calculateProbability(oldTheta, difficulty, discrimination);
   const residual = (isCorrect ? 1 : 0) - p;
   const step = se * se * a * residual;
-  const newTheta = oldTheta + Math.round(step * 100);
+  const newTheta = oldTheta + Math.round(step * 300); // Higher step multiplier to jump levels faster
   return Math.max(-300, Math.min(300, newTheta));
 }
 
 export function updateStandardError(oldSE: number, theta: number, difficulty: number = 0, discrimination: number = 100): number {
   const se = Math.max(oldSE, 20) / 100;
-  const a = discrimination / 100;
+  const a = 1.5; // Matches updateTheta discrimination
   const p = calculateProbability(theta, difficulty, discrimination);
   const info = a * a * p * (1 - p);
   const newVariance = 1 / (1 / (se * se) + info);
@@ -176,7 +176,9 @@ export function shouldEndSection(
   if (questionsInSection >= maxQuestions) return true;
   if (questionsInSection < Math.min(MIN_QUESTIONS_PER_SECTION, maxQuestions)) return false;
 
-  if (standardError <= 40 && isLevelStable(recentSectionLevels)) return true;
+  // Optimized stopping condition: lower SE threshold to ensure better precision
+  // for high-ability students or lucky guessers, while still allowing early stop.
+  if (standardError <= 35 && isLevelStable(recentSectionLevels)) return true;
 
   return false;
 }
