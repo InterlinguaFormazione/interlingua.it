@@ -531,20 +531,20 @@ export default function ChiSiamoPage() {
               {
                 name: "Giulia Ciampalini",
                 role: "CEO e Direttrice",
-                bio: "Interlingua Vicenza, Corsi online e Traduzioni",
+                bio: "Formazione Corporate e Finanziata",
                 image: "/images/team/giulia-corporate.webp",
+              },
+              {
+                name: "Giulia",
+                role: "Responsabile Sede Vicenza",
+                bio: "Interlingua Vicenza, Corsi online e Traduzioni",
+                image: "/images/team/giulia-vicenza.webp",
               },
               {
                 name: "Elena",
                 role: "Responsabile Sede Thiene",
                 bio: "Interlingua Thiene e Corsi online",
                 image: "/images/team/elena-thiene.webp",
-              },
-              {
-                name: "Giulia",
-                role: "Formazione Corporate e Finanziata",
-                bio: "Gestione dei percorsi formativi aziendali e della formazione finanziata",
-                image: "/images/team/giulia-vicenza.webp",
               },
               {
                 name: "Michela",
