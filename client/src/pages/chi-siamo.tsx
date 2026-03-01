@@ -707,7 +707,7 @@ export default function ChiSiamoPage() {
                 name: "Laura Bau",
                 role: "Web Marketing & AI",
                 bio: "Convinta che il marketing e la tecnologia abbiano il potere di trasformare le aziende. La sua passione nasce negli USA, dove ha studiato Sales & Marketing e Business Analytics. Aiuta le aziende a sfruttare al meglio gli strumenti digitali e l'AI per migliorare le loro strategie di business.",
-                color: "from-rose-500 to-pink-500",
+                image: "/images/team/docenti/laura.jpg",
               },
               {
                 name: "Alberto Arsie",
