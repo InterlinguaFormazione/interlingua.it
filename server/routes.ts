@@ -12,6 +12,11 @@ import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalO
 import { SHOP_PRODUCTS, getProductBySlug, getEffectivePrice } from "@shared/products";
 import { scoreWriting, scoreSpeaking, transcribeAudio } from "./english-test";
 import { getAllQuestions } from "./english-test-questions";
+import { getAllQuestions as getItalianQuestions } from "./italian-test-questions";
+import { getAllQuestions as getGermanQuestions } from "./german-test-questions";
+import { getAllQuestions as getFrenchQuestions } from "./french-test-questions";
+import { getAllQuestions as getSpanishQuestions } from "./spanish-test-questions";
+import type { InsertBeQuestion } from "@shared/schema";
 
 function shuffleArray<T>(arr: T[]): T[] {
   const shuffled = [...arr];
@@ -1450,7 +1455,7 @@ export async function registerRoutes(
     }
   });
 
-  function registerTestRoutes(prefix: string, testType: string, maxQ: number) {
+  function registerTestRoutes(prefix: string, testType: string, maxQ: number, getQuestionsFn: () => InsertBeQuestion[] = getAllQuestions, language: string = "english") {
 
   app.post(`${prefix}/start`, async (req, res) => {
     try {
@@ -1459,17 +1464,17 @@ export async function registerRoutes(
         return res.status(400).json({ success: false, message: "Missing required fields" });
       }
 
-      const questionCount = await storage.getBeQuestionCount();
+      const questionCount = await storage.getBeQuestionCountByLanguage(language);
       if (questionCount === 0) {
-        const questions = getAllQuestions();
+        const questions = getQuestionsFn();
         for (const q of questions) {
           await storage.createBeQuestion(q);
         }
-      } else {
-        const existingQuestions = await storage.getBeQuestions();
+      } else if (language === "english") {
+        const existingQuestions = await storage.getBeQuestionsByLanguage(language);
         const listeningWithoutAudio = existingQuestions.filter(q => q.skillType === "listening" && !q.audioUrl);
         if (listeningWithoutAudio.length > 0) {
-          const freshQuestions = getAllQuestions();
+          const freshQuestions = getQuestionsFn();
           const freshListening = freshQuestions.filter(q => q.skillType === "listening");
           for (const dbQ of listeningWithoutAudio) {
             const match = freshListening.find(fq => fq.question === dbQ.question && fq.level === dbQ.level);
@@ -1503,7 +1508,7 @@ export async function registerRoutes(
         testType,
       });
 
-      const allQuestions = await storage.getBeQuestions();
+      const allQuestions = await storage.getBeQuestionsByLanguage(language);
       let firstQuestion = null;
       let startSectionIndex = 1;
       let startSkill = SECTION_SKILLS[0];
@@ -1627,7 +1632,7 @@ export async function registerRoutes(
       const currentSkill = SECTION_SKILLS[currentSkillIdx];
 
       const sectionResponses = await storage.getBeResponsesBySession(sessionId);
-      const allQs = await storage.getBeQuestions();
+      const allQs = await storage.getBeQuestionsByLanguage(language);
 
       let questionsInCurrentSection = 0;
       let correctInCurrentSection = 0;
@@ -2246,7 +2251,11 @@ export async function registerRoutes(
 
   } // end registerTestRoutes
 
-  registerTestRoutes("/api/english-test", "general", MAX_QUESTIONS_PER_SECTION);
+  registerTestRoutes("/api/english-test", "general", MAX_QUESTIONS_PER_SECTION, getAllQuestions, "english");
+  registerTestRoutes("/api/italian-test", "italian", MAX_QUESTIONS_PER_SECTION, getItalianQuestions, "italian");
+  registerTestRoutes("/api/german-test", "german", MAX_QUESTIONS_PER_SECTION, getGermanQuestions, "german");
+  registerTestRoutes("/api/french-test", "french", MAX_QUESTIONS_PER_SECTION, getFrenchQuestions, "french");
+  registerTestRoutes("/api/spanish-test", "spanish", MAX_QUESTIONS_PER_SECTION, getSpanishQuestions, "spanish");
 
   function registerAdminTestResultRoutes(adminPrefix: string, testType: string) {
     app.get(adminPrefix, requireAdmin, async (_req, res) => {
@@ -2296,6 +2305,10 @@ export async function registerRoutes(
   }
 
   registerAdminTestResultRoutes("/api/admin/english-test-results", "general");
+  registerAdminTestResultRoutes("/api/admin/italian-test-results", "italian");
+  registerAdminTestResultRoutes("/api/admin/german-test-results", "german");
+  registerAdminTestResultRoutes("/api/admin/french-test-results", "french");
+  registerAdminTestResultRoutes("/api/admin/spanish-test-results", "spanish");
 
   return httpServer;
 }

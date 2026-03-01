@@ -138,9 +138,11 @@ export interface IStorage {
 
   createBeQuestion(question: InsertBeQuestion): Promise<BeQuestion>;
   getBeQuestions(): Promise<BeQuestion[]>;
+  getBeQuestionsByLanguage(language: string): Promise<BeQuestion[]>;
   getBeQuestionsBySkillAndLevel(skillType: string, level: string): Promise<BeQuestion[]>;
   getBeQuestionById(id: number): Promise<BeQuestion | undefined>;
   getBeQuestionCount(): Promise<number>;
+  getBeQuestionCountByLanguage(language: string): Promise<number>;
   updateBeQuestionAudioUrl(id: number, audioUrl: string): Promise<void>;
 
   createBeResponse(response: InsertBeResponse): Promise<BeResponse>;
@@ -482,6 +484,10 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(beQuestions);
   }
 
+  async getBeQuestionsByLanguage(language: string): Promise<BeQuestion[]> {
+    return db.select().from(beQuestions).where(eq(beQuestions.language, language));
+  }
+
   async getBeQuestionsBySkillAndLevel(skillType: string, level: string): Promise<BeQuestion[]> {
     return db.select().from(beQuestions).where(and(eq(beQuestions.skillType, skillType), eq(beQuestions.level, level)));
   }
@@ -493,6 +499,11 @@ export class DatabaseStorage implements IStorage {
 
   async getBeQuestionCount(): Promise<number> {
     const results = await db.select().from(beQuestions);
+    return results.length;
+  }
+
+  async getBeQuestionCountByLanguage(language: string): Promise<number> {
+    const results = await db.select().from(beQuestions).where(eq(beQuestions.language, language));
     return results.length;
   }
 

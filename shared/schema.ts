@@ -348,6 +348,7 @@ export type BeTestSession = typeof beTestSessions.$inferSelect;
 
 export const beQuestions = pgTable("be_questions", {
   id: serial("id").primaryKey(),
+  language: text("language").notNull().default("english"),
   level: text("level").notNull(),
   skillType: text("skill_type").notNull(),
   section: text("section").notNull(),

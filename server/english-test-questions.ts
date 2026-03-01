@@ -798,6 +798,7 @@ export function getEnglishTestQuestions(): InsertBeQuestion[] {
       audioUrl = `/audio/listening/listening_${q.level}_${idx.toString().padStart(3, "0")}.mp3`;
     }
     return {
+      language: "english",
       level: q.level,
       skillType: q.skillType,
       section: q.skillType,

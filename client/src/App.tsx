@@ -32,6 +32,10 @@ import ShopPage from "@/pages/shop";
 import ShopCheckoutPage from "@/pages/shop-checkout";
 import ShopDashboardPage from "@/pages/shop-dashboard";
 import EnglishTestPage from "@/pages/english-test";
+import ItalianTestPage from "@/pages/italian-test";
+import GermanTestPage from "@/pages/german-test";
+import FrenchTestPage from "@/pages/french-test";
+import SpanishTestPage from "@/pages/spanish-test";
 import LanguageTestsPage from "@/pages/language-tests";
 import NotFound from "@/pages/not-found";
 
@@ -65,6 +69,10 @@ function Router() {
       <Route path="/shop/dashboard" component={ShopDashboardPage} />
       <Route path="/test-di-livello" component={LanguageTestsPage} />
       <Route path="/english-test" component={EnglishTestPage} />
+      <Route path="/italian-test" component={ItalianTestPage} />
+      <Route path="/german-test" component={GermanTestPage} />
+      <Route path="/french-test" component={FrenchTestPage} />
+      <Route path="/spanish-test" component={SpanishTestPage} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={BlogPostPage} />
