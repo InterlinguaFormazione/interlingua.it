@@ -12,11 +12,18 @@ interface QuestionDef {
   discrimination: number;
 }
 
+const difficultyCounters: Record<string, number> = {};
+
 function q(level: string, skillType: string, topic: string, question: string, options: string[], correctAnswer: string, passage?: string): QuestionDef {
-  const difficultyMap: Record<string, number> = { A0: -250, A1: -150, A2: -50, B1: 50, B2: 150, C1: 250 };
+  const baseDifficulty: Record<string, number> = { A0: -250, A1: -150, A2: -50, B1: 50, B2: 150, C1: 250 };
+  const spread = 40;
+  const key = `${level}_${skillType}`;
+  const idx = difficultyCounters[key] ?? 0;
+  difficultyCounters[key] = idx + 1;
+  const offset = Math.round((idx / 14) * spread * 2 - spread);
   return {
     level, skillType, topic, question, options, correctAnswer, passage,
-    difficulty: difficultyMap[level] ?? 0,
+    difficulty: (baseDifficulty[level] ?? 0) + offset,
     discrimination: 100,
   };
 }

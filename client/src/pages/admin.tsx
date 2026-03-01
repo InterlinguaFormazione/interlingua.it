@@ -413,6 +413,225 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
   );
 }
 
+function BusinessEnglishTab({ token }: { token: string }) {
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [filterCompany, setFilterCompany] = useState("");
+  const [filterLevel, setFilterLevel] = useState("");
+
+  const { data: sessions = [], isLoading } = useQuery<BeSession[]>({
+    queryKey: ["/api/admin/business-english-results"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/business-english-results", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.json();
+    },
+  });
+
+  const { data: detail } = useQuery<BeSessionDetail>({
+    queryKey: ["/api/admin/business-english-results", selectedId],
+    queryFn: async () => {
+      const res = await fetch(`/api/admin/business-english-results/${selectedId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.json();
+    },
+    enabled: !!selectedId,
+  });
+
+  const filtered = sessions.filter(s => {
+    if (filterCompany && !s.company?.toLowerCase().includes(filterCompany.toLowerCase())) return false;
+    if (filterLevel && filterLevel !== "all" && s.finalLevel !== filterLevel) return false;
+    return true;
+  });
+
+  const levelBadge = (level: string | null) => {
+    if (!level) return null;
+    const colors: Record<string, string> = {
+      A0: "bg-gray-500", A1: "bg-red-500", A2: "bg-orange-500",
+      B1: "bg-yellow-500 text-black", B2: "bg-blue-500", C1: "bg-green-600",
+    };
+    return <span className={`px-2 py-0.5 rounded text-white text-xs font-bold ${colors[level] || "bg-gray-500"}`}>{level}</span>;
+  };
+
+  if (selectedId && detail) {
+    return (
+      <div className="space-y-4">
+        <Button variant="outline" onClick={() => setSelectedId(null)} data-testid="button-back-to-biz-list">
+          Back to list
+        </Button>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>{detail.session.firstName} {detail.session.lastName}</CardTitle>
+            <CardDescription>{detail.session.email}{detail.session.company ? ` - ${detail.session.company}` : ""}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="p-3 bg-muted rounded-lg">
+                <div className="text-sm text-muted-foreground">Final Level</div>
+                <div className="text-2xl font-bold mt-1">{levelBadge(detail.session.finalLevel)}</div>
+              </div>
+              <div className="p-3 bg-muted rounded-lg">
+                <div className="text-sm text-muted-foreground">MC Score</div>
+                <div className="text-lg font-bold mt-1">{detail.session.correctAnswers}/{detail.session.totalQuestions}</div>
+              </div>
+              <div className="p-3 bg-muted rounded-lg">
+                <div className="text-sm text-muted-foreground">Status</div>
+                <div className="mt-1"><Badge variant={detail.session.status === "completed" ? "default" : "secondary"}>{detail.session.status}</Badge></div>
+              </div>
+            </div>
+
+            {detail.sectionResults.length > 0 && (
+              <div>
+                <h4 className="font-semibold mb-2">Section Results</h4>
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b"><th className="text-left py-2">Section</th><th className="text-center">Level</th><th className="text-center">Accuracy</th><th className="text-center">Theta</th></tr></thead>
+                  <tbody>
+                    {detail.sectionResults.map((s, i) => (
+                      <tr key={i} className="border-b">
+                        <td className="py-2 capitalize">{s.sectionName.replace(/_/g, " ")}</td>
+                        <td className="text-center">{levelBadge(s.cefrLevel)}</td>
+                        <td className="text-center">{s.accuracyPercentage ?? "-"}%</td>
+                        <td className="text-center">{s.finalTheta ?? "-"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {detail.writingSpeaking.length > 0 && (
+              <div>
+                <h4 className="font-semibold mb-2">Writing / Speaking</h4>
+                {detail.writingSpeaking.map((ws, i) => (
+                  <div key={i} className="p-4 bg-muted rounded-lg mb-3">
+                    <div className="flex justify-between items-center mb-2">
+                      <Badge>{ws.taskType}</Badge>
+                      {levelBadge(ws.aiScore)}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-1"><strong>Prompt:</strong> {ws.prompt}</p>
+                    <p className="text-sm mb-2"><strong>Response:</strong> {ws.response.substring(0, 200)}{ws.response.length > 200 ? "..." : ""}</p>
+                    {ws.aiGrammarScore !== null && (
+                      <div className="grid grid-cols-4 gap-2 text-xs mb-2">
+                        <div>Grammar: {ws.aiGrammarScore}</div>
+                        <div>Vocabulary: {ws.aiVocabularyScore}</div>
+                        <div>Coherence: {ws.aiCoherenceScore}</div>
+                        <div>Task: {ws.aiTaskCompletionScore}</div>
+                      </div>
+                    )}
+                    {ws.aiFeedback && <p className="text-sm italic text-muted-foreground">{ws.aiFeedback}</p>}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {detail.responses.length > 0 && (
+              <div>
+                <h4 className="font-semibold mb-2">IRT Audit Trail ({detail.responses.length} responses)</h4>
+                <div className="max-h-80 overflow-y-auto">
+                  <table className="w-full text-xs">
+                    <thead><tr className="border-b bg-muted"><th className="text-left py-1 px-2">#</th><th className="text-left px-2">Skill</th><th className="text-left px-2">Question</th><th className="text-center px-2">Correct</th><th className="text-center px-2">Theta</th><th className="text-center px-2">Time</th></tr></thead>
+                    <tbody>
+                      {detail.responses.map((r, i) => (
+                        <tr key={i} className="border-b">
+                          <td className="py-1 px-2">{i + 1}</td>
+                          <td className="px-2 capitalize">{r.skillType?.replace(/_/g, " ") ?? ""}</td>
+                          <td className="px-2 max-w-[200px] truncate">{r.question?.substring(0, 60)}</td>
+                          <td className="text-center px-2">{r.isCorrect ? "Y" : "N"}</td>
+                          <td className="text-center px-2">{r.thetaBefore} {"->"} {r.thetaAfter}</td>
+                          <td className="text-center px-2">{r.timeSpent ? `${r.timeSpent}s` : "-"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-3">
+        <Input
+          placeholder="Filter by company..."
+          value={filterCompany}
+          onChange={e => setFilterCompany(e.target.value)}
+          className="max-w-xs"
+          data-testid="input-filter-biz-company"
+        />
+        <Select value={filterLevel} onValueChange={setFilterLevel}>
+          <SelectTrigger className="w-[140px]" data-testid="select-filter-biz-level">
+            <SelectValue placeholder="All levels" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All levels</SelectItem>
+            <SelectItem value="A0">A0</SelectItem>
+            <SelectItem value="A1">A1</SelectItem>
+            <SelectItem value="A2">A2</SelectItem>
+            <SelectItem value="B1">B1</SelectItem>
+            <SelectItem value="B2">B2</SelectItem>
+            <SelectItem value="C1">C1</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {isLoading ? (
+        <div className="space-y-3">{[1, 2, 3].map(i => <div key={i} className="h-16 bg-muted rounded animate-pulse" />)}</div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-50" />
+          <p>No business English test results yet.</p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm" data-testid="table-biz-results">
+            <thead>
+              <tr className="border-b">
+                <th className="text-left py-3 px-2">Candidate</th>
+                <th className="text-left px-2">Company</th>
+                <th className="text-center px-2">Level</th>
+                <th className="text-center px-2">MC</th>
+                <th className="text-center px-2">Writing</th>
+                <th className="text-center px-2">Speaking</th>
+                <th className="text-center px-2">Status</th>
+                <th className="text-center px-2">Date</th>
+                <th className="text-right px-2"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(s => (
+                <tr key={s.id} className="border-b hover:bg-muted/50" data-testid={`row-biz-result-${s.id}`}>
+                  <td className="py-2 px-2">
+                    <div className="font-medium">{s.firstName} {s.lastName}</div>
+                    <div className="text-xs text-muted-foreground">{s.email}</div>
+                  </td>
+                  <td className="px-2">{s.company}</td>
+                  <td className="text-center px-2">{levelBadge(s.finalLevel)}</td>
+                  <td className="text-center px-2">{s.correctAnswers}/{s.totalQuestions}</td>
+                  <td className="text-center px-2">{s.writingScore ? levelBadge(s.writingScore) : "-"}</td>
+                  <td className="text-center px-2">{s.speakingScore ? levelBadge(s.speakingScore) : "-"}</td>
+                  <td className="text-center px-2"><Badge variant={s.status === "completed" ? "default" : "secondary"}>{s.status}</Badge></td>
+                  <td className="text-center px-2 text-xs">{s.completedAt ? new Date(s.completedAt).toLocaleDateString("it-IT") : s.startedAt ? new Date(s.startedAt).toLocaleDateString("it-IT") : "-"}</td>
+                  <td className="text-right px-2">
+                    <Button variant="ghost" size="sm" onClick={() => setSelectedId(s.id)} data-testid={`button-view-biz-${s.id}`}>
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function CourseMaterialsTab({ token }: { token: string }) {
   const [showForm, setShowForm] = useState(false);
   const [newSlug, setNewSlug] = useState("");
@@ -1056,6 +1275,12 @@ export default function AdminPage() {
                 Adaptive Test
               </TabsTrigger>
               {isAdmin && (
+              <TabsTrigger value="business-english" data-testid="tab-business-english">
+                <Briefcase className="w-4 h-4 mr-2" />
+                Business English
+              </TabsTrigger>
+              )}
+              {isAdmin && (
                 <TabsTrigger value="users" data-testid="tab-users">
                   <Users className="w-4 h-4 mr-2" />
                   Utenti
@@ -1252,6 +1477,20 @@ export default function AdminPage() {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            {isAdmin && (
+            <TabsContent value="business-english">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Business English Test Results</CardTitle>
+                  <CardDescription>Business English assessment results (5 questions per section)</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <BusinessEnglishTab token={token} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            )}
 
             {isAdmin && (
               <TabsContent value="users">

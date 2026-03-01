@@ -35,7 +35,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/bando-detail.tsx` - Individual bando/funded course detail page
 - `src/pages/speakers-corner.tsx` - Speaker's Corner landing page with login
 - `src/pages/speakers-corner-dashboard.tsx` - Subscriber dashboard for booking sessions
-- `src/pages/admin.tsx` - General admin panel (contacts, newsletter, blog, shop orders, materials, English adaptive test results, user management)
+- `src/pages/admin.tsx` - General admin panel (contacts, newsletter, blog, shop orders, materials, English adaptive test results, business English test results, user management)
 - `src/pages/speakers-corner-admin.tsx` - Admin panel for managing subscribers, sessions, email settings
 - `src/pages/blog.tsx` - Blog listing page
 - `src/pages/blog-post.tsx` - Blog post detail page
@@ -66,8 +66,8 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `storage.ts` - PostgreSQL database storage (Drizzle ORM)
 - `ai-chat.ts` - AI chat endpoint (OpenAI GPT-4o-mini with full site context)
 - `english-test.ts` - AI scoring for English test (GPT-4o writing/speaking scoring, Whisper transcription) + business English scoring functions
-- `cat-engine.ts` - CAT/IRT engine (2PL model, EAP Bayesian theta update, Fisher Information SE update, theta ×100). Min 5, max 12 questions/section. SE threshold 40 for early stop. No level-stability rule. Detailed [CAT] logging on each answer.
-- `business-english-questions.ts` - Question bank (450 questions, 5 skills x 6 levels x 15 per cell)
+- `cat-engine.ts` - CAT/IRT engine (2PL model, EAP Bayesian theta update, Fisher Information SE update, theta ×100). Min 5, max 12 questions/section (general) or max 5 (business). SE threshold 40 for early stop. No level-stability rule. Detailed [CAT] logging on each answer.
+- `business-english-questions.ts` - Question bank (450 questions, 5 skills x 6 levels x 15 per cell, difficulty spread ±40 within each level)
 - `email.ts` - AWS SES email notifications (contact, newsletter, subscription payment, booking confirmation, business English results)
 - `crm.ts` - CRM webhook integration (forwards contact submissions)
 - `blog-generator.ts` - Automated blog generation
