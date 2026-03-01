@@ -560,15 +560,15 @@ export default function ChiSiamoPage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="p-6 h-full text-center hover-elevate" data-testid={`card-admin-${index}`}>
+                <Card className="p-6 h-full text-center hover-elevate overflow-hidden" data-testid={`card-admin-${index}`}>
                   <img
                     src={member.image}
                     alt={member.name}
                     className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
                   />
-                  <h3 className="font-bold text-lg mb-1">{member.name}</h3>
-                  <Badge variant="secondary" className="mb-3">{member.role}</Badge>
-                  <p className="text-sm text-muted-foreground">{member.bio}</p>
+                  <h3 className="font-bold text-lg mb-1 truncate">{member.name}</h3>
+                  <Badge variant="secondary" className="mb-3 text-xs whitespace-normal text-center leading-snug">{member.role}</Badge>
+                  <p className="text-sm text-muted-foreground line-clamp-3">{member.bio}</p>
                 </Card>
               </motion.div>
             ))}
@@ -646,14 +646,14 @@ export default function ChiSiamoPage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.05 }}
               >
-                <Card className="p-6 h-full text-center hover-elevate" data-testid={`card-teacher-${index}`}>
+                <Card className="p-6 h-full text-center hover-elevate overflow-hidden" data-testid={`card-teacher-${index}`}>
                   <img
                     src={member.image}
                     alt={member.name}
                     className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
                   />
                   <h3 className="font-bold text-lg mb-1">{member.name}</h3>
-                  <Badge variant="secondary" className="mb-3">{member.role}</Badge>
+                  <Badge variant="secondary" className="mb-3 text-xs whitespace-normal text-center leading-snug">{member.role}</Badge>
                 </Card>
               </motion.div>
             ))}
@@ -723,21 +723,15 @@ export default function ChiSiamoPage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="p-6 h-full text-center hover-elevate" data-testid={`card-expert-${index}`}>
-                  {"image" in member && member.image ? (
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
-                    />
-                  ) : (
-                    <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${member.color} mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold`}>
-                      {member.name.split(" ")[0][0]}{member.name.split(" ").slice(-1)[0][0]}
-                    </div>
-                  )}
-                  <h3 className="font-bold text-lg mb-1">{member.name}</h3>
-                  <Badge variant="secondary" className="mb-3">{member.role}</Badge>
-                  <p className="text-sm text-muted-foreground">{member.bio}</p>
+                <Card className="p-6 h-full text-center hover-elevate overflow-hidden" data-testid={`card-expert-${index}`}>
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
+                  />
+                  <h3 className="font-bold text-lg mb-1 truncate">{member.name}</h3>
+                  <Badge variant="secondary" className="mb-3 text-xs whitespace-normal text-center leading-snug">{member.role}</Badge>
+                  <p className="text-sm text-muted-foreground line-clamp-4">{member.bio}</p>
                 </Card>
               </motion.div>
             ))}
