@@ -14,7 +14,34 @@ const EVEN_MAP: Record<string, number> = {
 
 const REMAINDER_TO_CHAR = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-export function validateCodiceFiscale(cf: string): { valid: boolean; message?: string } {
+function getConsonants(s: string): string {
+  return s.replace(/[^A-Z]/g, "").replace(/[AEIOU]/g, "");
+}
+
+function getVowels(s: string): string {
+  return s.replace(/[^A-Z]/g, "").replace(/[^AEIOU]/g, "");
+}
+
+function encodeSurname(surname: string): string {
+  const upper = surname.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const consonants = getConsonants(upper);
+  const vowels = getVowels(upper);
+  const combined = consonants + vowels + "XXX";
+  return combined.substring(0, 3);
+}
+
+function encodeName(name: string): string {
+  const upper = name.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const consonants = getConsonants(upper);
+  const vowels = getVowels(upper);
+  if (consonants.length >= 4) {
+    return consonants[0] + consonants[2] + consonants[3];
+  }
+  const combined = consonants + vowels + "XXX";
+  return combined.substring(0, 3);
+}
+
+export function validateCodiceFiscale(cf: string, firstName?: string, lastName?: string): { valid: boolean; message?: string } {
   if (!cf || typeof cf !== "string") {
     return { valid: false, message: "Codice Fiscale mancante." };
   }
@@ -45,6 +72,22 @@ export function validateCodiceFiscale(cf: string): { valid: boolean; message?: s
 
   if (expectedCheck !== actualCheck) {
     return { valid: false, message: "Il carattere di controllo del Codice Fiscale non è corretto." };
+  }
+
+  if (lastName) {
+    const expectedSurname = encodeSurname(lastName);
+    const cfSurname = cleaned.substring(0, 3);
+    if (cfSurname !== expectedSurname) {
+      return { valid: false, message: "Il Codice Fiscale non corrisponde al cognome inserito." };
+    }
+  }
+
+  if (firstName) {
+    const expectedName = encodeName(firstName);
+    const cfName = cleaned.substring(3, 6);
+    if (cfName !== expectedName) {
+      return { valid: false, message: "Il Codice Fiscale non corrisponde al nome inserito." };
+    }
   }
 
   return { valid: true };

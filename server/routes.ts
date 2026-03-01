@@ -1222,7 +1222,7 @@ export async function registerRoutes(
       const { paypalOrderId, productSlug, customerFirstName, customerLastName, customerEmail, customerPhone, billingCodiceFiscale, billingIndirizzo, billingCap, billingCitta, billingProvincia, billingPartitaIva, billingCodiceSdi, billingPec, notes } = req.body;
 
       if (billingCodiceFiscale) {
-        const cfCheck = validateCodiceFiscale(billingCodiceFiscale);
+        const cfCheck = validateCodiceFiscale(billingCodiceFiscale, customerFirstName, customerLastName);
         if (!cfCheck.valid) {
           return res.status(400).json({ success: false, message: cfCheck.message });
         }
@@ -1444,7 +1444,7 @@ export async function registerRoutes(
       }
 
       if (billingCodiceFiscale) {
-        const cfCheck = validateCodiceFiscale(billingCodiceFiscale);
+        const cfCheck = validateCodiceFiscale(billingCodiceFiscale, customerFirstName, customerLastName);
         if (!cfCheck.valid) {
           return res.status(400).json({ success: false, message: cfCheck.message });
         }
@@ -1745,7 +1745,16 @@ export async function registerRoutes(
         updateData.phone = typeof phone === "string" ? phone.trim() : "";
       }
       if (codiceFiscale !== undefined) {
-        updateData.codiceFiscale = typeof codiceFiscale === "string" ? codiceFiscale.trim().toUpperCase() : "";
+        const cfVal = typeof codiceFiscale === "string" ? codiceFiscale.trim().toUpperCase() : "";
+        if (cfVal) {
+          const effectiveFirst = (updateData.firstName || firstName || "").trim();
+          const effectiveLast = (updateData.lastName || lastName || "").trim();
+          const cfCheck = validateCodiceFiscale(cfVal, effectiveFirst || undefined, effectiveLast || undefined);
+          if (!cfCheck.valid) {
+            return res.status(400).json({ success: false, message: cfCheck.message });
+          }
+        }
+        updateData.codiceFiscale = cfVal;
       }
       if (indirizzo !== undefined) {
         updateData.indirizzo = typeof indirizzo === "string" ? indirizzo.trim() : "";
@@ -2155,7 +2164,7 @@ export async function registerRoutes(
       }
 
       if (billingCodiceFiscale) {
-        const cfCheck = validateCodiceFiscale(billingCodiceFiscale);
+        const cfCheck = validateCodiceFiscale(billingCodiceFiscale, customerFirstName, customerLastName);
         if (!cfCheck.valid) {
           return res.status(400).json({ success: false, message: cfCheck.message });
         }
@@ -2376,7 +2385,7 @@ export async function registerRoutes(
       }
 
       if (billingCodiceFiscale) {
-        const cfCheck = validateCodiceFiscale(billingCodiceFiscale);
+        const cfCheck = validateCodiceFiscale(billingCodiceFiscale, customerFirstName, customerLastName);
         if (!cfCheck.valid) {
           return res.status(400).json({ success: false, message: cfCheck.message });
         }
