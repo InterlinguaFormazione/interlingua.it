@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Users, Building2, ExternalLink, ArrowLeft } from "lucide-react";
+import { Menu, X, Users, Building2, ExternalLink, ArrowLeft, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/lib/cart-context";
 import logoImage from "@assets/SKILLCRAFT-INTERLINGUA_1769354785857.png";
 
 const navLinks = [
@@ -25,6 +26,7 @@ export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [location, setLocation] = useLocation();
   const isHome = location === "/";
+  const cart = useCart();
 
   const handleNavClick = (href: string) => {
     setIsOpen(false);
@@ -112,6 +114,20 @@ export function Navigation() {
           </div>
 
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative"
+              onClick={() => cart.setIsOpen(true)}
+              data-testid="button-cart"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              {cart.totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center" data-testid="badge-cart-nav">
+                  {cart.totalItems}
+                </span>
+              )}
+            </Button>
             <ThemeToggle />
             <Button
               className="hidden md:inline-flex"

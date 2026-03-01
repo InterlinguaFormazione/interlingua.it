@@ -153,7 +153,8 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 
 ### Shop API
 - `GET /api/shop/products` - Get all purchasable products
-- `POST /api/shop/purchase` - Complete shop purchase (verifies PayPal, creates order + customer account)
+- `POST /api/shop/purchase` - Complete single-item shop purchase (verifies PayPal, creates order + customer account, requires T&C acceptance)
+- `POST /api/shop/purchase-cart` - Complete multi-item cart purchase (verifies PayPal total, creates one order per item, requires acceptedTerms="true")
 - `POST /api/shop/login` - Customer login (email + password)
 - `GET /api/shop/me` - Get current customer info (auth required)
 - `GET /api/shop/my-orders` - Get customer's orders (auth required)
@@ -197,8 +198,9 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `/speakers-corner` - Speaker's Corner info page with subscriber login
 - `/speakers-corner/acquista` - Purchase Speaker's Corner subscription (PayPal checkout)
 - `/speakers-corner/dashboard` - Subscriber dashboard (view/book sessions)
-- `/shop` - Online course shop (all fixed-price courses)
-- `/shop/checkout/:slug` - Checkout page with billing, account creation, and PayPal payment
+- `/shop` - Online course shop (all fixed-price courses, cart icon on each product without options, "Configura" for products with options)
+- `/shop/checkout` - Multi-item cart checkout page (4 steps: cart review → details → billing with T&C → PayPal payment)
+- `/shop/checkout/:slug` - Single-item checkout page with billing, T&C acceptance, account creation, and PayPal payment
 - `/shop/dashboard` - Customer area (login, purchased courses, downloadable materials)
 - `/test-inglese` - Free English placement test (CEFR A1-C2, 50 questions)
 - `/admin` - General admin panel (contacts, newsletter, orders, blog management)

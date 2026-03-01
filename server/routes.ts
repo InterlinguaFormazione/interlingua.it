@@ -1314,6 +1314,136 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/shop/purchase-cart", async (req, res) => {
+    try {
+      const { paypalOrderId, cartItems: cartItemsJson, customerFirstName, customerLastName, customerEmail, customerPhone, customerPassword, billingCodiceFiscale, billingIndirizzo, billingCap, billingCitta, billingProvincia, billingPartitaIva, billingCodiceSdi, billingPec, notes } = req.body;
+
+      if (!paypalOrderId || !cartItemsJson || !customerFirstName || !customerLastName || !customerEmail) {
+        return res.status(400).json({ success: false, message: "Dati mancanti." });
+      }
+
+      if (!req.body.acceptedTerms || req.body.acceptedTerms !== "true") {
+        return res.status(400).json({ success: false, message: "È necessario accettare i Termini e Condizioni." });
+      }
+
+      const existingOrder = await storage.getShopOrderByPaypalId(paypalOrderId);
+      if (existingOrder) {
+        return res.status(400).json({ success: false, message: "Questo pagamento è già stato elaborato." });
+      }
+
+      let cartItems: Array<{ productSlug: string; selectedOptions: Record<string, string>; quantity: number; unitPrice: string }>;
+      try {
+        cartItems = JSON.parse(cartItemsJson);
+      } catch {
+        return res.status(400).json({ success: false, message: "Formato carrello non valido." });
+      }
+
+      if (!Array.isArray(cartItems) || cartItems.length === 0) {
+        return res.status(400).json({ success: false, message: "Carrello vuoto." });
+      }
+
+      let expectedTotal = 0;
+      const validatedItems: Array<{ product: any; selectedOptions: Record<string, string>; quantity: number; unitPrice: string }> = [];
+      for (const item of cartItems) {
+        const product = getProductBySlug(item.productSlug);
+        if (!product) {
+          return res.status(400).json({ success: false, message: `Prodotto non trovato: ${item.productSlug}` });
+        }
+        const qty = Math.max(1, Math.min(50, Math.floor(item.quantity || 1)));
+        const price = getEffectivePrice(product, item.selectedOptions || {});
+        expectedTotal += parseFloat(price) * qty;
+        validatedItems.push({ product, selectedOptions: item.selectedOptions || {}, quantity: qty, unitPrice: price });
+      }
+
+      const verification = await verifyPaypalOrder(paypalOrderId, expectedTotal.toFixed(2));
+      if (!verification.verified) {
+        console.error("PayPal order verification failed for cart purchase:", verification);
+        return res.status(400).json({
+          success: false,
+          message: "Pagamento non verificato. Contatta l'assistenza se il problema persiste.",
+        });
+      }
+
+      let customerId: string | null = null;
+      if (customerPassword && customerPassword.length >= 6) {
+        const existingCustomer = await storage.getShopCustomerByEmail(customerEmail);
+        if (existingCustomer) {
+          const passwordMatch = await bcrypt.compare(customerPassword, existingCustomer.password);
+          if (passwordMatch) {
+            customerId = existingCustomer.id;
+          }
+        } else {
+          const hashedPassword = await bcrypt.hash(customerPassword, 10);
+          const newCustomer = await storage.createShopCustomer({
+            email: customerEmail,
+            password: hashedPassword,
+            name: `${customerFirstName} ${customerLastName}`,
+            phone: customerPhone || null,
+          });
+          customerId = newCustomer.id;
+        }
+      }
+
+      const orders = [];
+      for (const item of validatedItems) {
+        const optionsSummary = Object.entries(item.selectedOptions).map(([k, v]) => `${k}: ${v}`).join(", ");
+        const productNameWithOptions = optionsSummary ? `${item.product.name} (${optionsSummary})` : item.product.name;
+        const qtyLabel = item.quantity > 1 ? ` x${item.quantity}` : "";
+
+        const order = await storage.createShopOrder({
+          productSlug: item.product.slug,
+          productName: `${productNameWithOptions}${qtyLabel}`,
+          amount: (parseFloat(item.unitPrice) * item.quantity).toFixed(2),
+          currency: "EUR",
+          paypalOrderId,
+          status: "completed",
+          customerFirstName,
+          customerLastName,
+          customerEmail,
+          customerPhone: customerPhone || null,
+          studentFirstName: null,
+          studentLastName: null,
+          studentEmail: null,
+          billingCodiceFiscale: billingCodiceFiscale || null,
+          billingIndirizzo: billingIndirizzo || null,
+          billingCap: billingCap || null,
+          billingCitta: billingCitta || null,
+          billingProvincia: billingProvincia || null,
+          billingPartitaIva: billingPartitaIva || null,
+          billingCodiceSdi: billingCodiceSdi || null,
+          billingPec: billingPec || null,
+          notes: notes || null,
+          customerId: customerId,
+        });
+        orders.push(order);
+      }
+
+      let customerToken: string | undefined;
+      if (customerId) {
+        customerToken = generateAdminToken();
+        shopCustomerSessions.set(customerToken, { createdAt: Date.now(), customerId });
+      }
+
+      const itemsSummary = validatedItems.map(i => `${i.product.name} x${i.quantity}`).join(", ");
+      try {
+        await sendContactNotification({
+          name: `${customerFirstName} ${customerLastName}`,
+          email: customerEmail,
+          phone: customerPhone || undefined,
+          courseInterest: `Acquisto carrello: ${itemsSummary} (${expectedTotal.toFixed(2)} EUR)`,
+          message: `Ordine carrello completato via PayPal. ID: ${paypalOrderId}`,
+        });
+      } catch (emailError) {
+        console.error("Failed to send cart purchase notification:", emailError);
+      }
+
+      res.json({ success: true, orders, customerToken, customerId });
+    } catch (error) {
+      console.error("Error processing cart purchase:", error);
+      res.status(500).json({ success: false, message: "Errore durante l'elaborazione dell'acquisto." });
+    }
+  });
+
   app.post("/api/shop/login", async (req, res) => {
     try {
       const { email, password } = req.body;

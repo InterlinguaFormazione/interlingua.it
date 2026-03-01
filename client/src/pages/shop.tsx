@@ -7,9 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useLocation } from "wouter";
 import { SHOP_PRODUCTS, type ShopProduct, formatPriceDisplay } from "@shared/products";
+import { useCart } from "@/lib/cart-context";
+import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingBag,
+  ShoppingCart,
   Search,
   ArrowRight,
   CheckCircle,
@@ -46,6 +49,17 @@ const FEATURED_SLUGS = ["camclass-selflearning", "coaching-online", "full-immers
 function ProductCard({ product, index, featured = false }: { product: ShopProduct; index: number; featured?: boolean }) {
   const categoryConfig = CATEGORY_CONFIG.find(c => c.key === product.category);
   const gradientClass = categoryConfig?.color || "from-primary to-blue-400";
+  const cart = useCart();
+  const { toast } = useToast();
+  const hasOptions = product.options && product.options.length > 0;
+
+  const handleAddToCart = () => {
+    cart.addItem(product);
+    toast({
+      title: "Aggiunto al carrello",
+      description: product.name,
+    });
+  };
 
   return (
     <motion.div
@@ -129,16 +143,29 @@ function ProductCard({ product, index, featured = false }: { product: ShopProduc
                     )}
                   </div>
                 </div>
-                <Link href={`/shop/checkout/${product.slug}`}>
-                  <Button
-                    size="sm"
-                    className={`bg-gradient-to-r ${gradientClass} hover:opacity-90 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 group/btn`}
-                    data-testid={`button-buy-${product.slug}`}
-                  >
-                    Acquista
-                    <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-0.5" />
-                  </Button>
-                </Link>
+                <div className="flex items-center gap-1.5">
+                  {!hasOptions && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-border/50 hover:bg-muted"
+                      onClick={handleAddToCart}
+                      data-testid={`button-cart-${product.slug}`}
+                    >
+                      <ShoppingCart className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <Link href={`/shop/checkout/${product.slug}`}>
+                    <Button
+                      size="sm"
+                      className={`bg-gradient-to-r ${gradientClass} hover:opacity-90 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 group/btn`}
+                      data-testid={`button-buy-${product.slug}`}
+                    >
+                      {hasOptions ? "Configura" : "Acquista"}
+                      <ArrowRight className="ml-1 h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-0.5" />
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

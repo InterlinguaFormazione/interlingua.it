@@ -39,7 +39,10 @@ import SpanishTestPage from "@/pages/spanish-test";
 import LanguageTestsPage from "@/pages/language-tests";
 import SediPage from "@/pages/sedi";
 import TerminiECondizioniPage from "@/pages/termini-e-condizioni";
+import CartCheckoutPage from "@/pages/shop-cart-checkout";
 import NotFound from "@/pages/not-found";
+import { CartProvider } from "@/lib/cart-context";
+import { CartDrawer } from "@/components/cart-drawer";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -67,6 +70,7 @@ function Router() {
       <Route path="/language-coaching" component={LanguageCoachingPage} />
       <Route path="/corsi-italiano" component={CorsiItalianoPage} />
       <Route path="/shop" component={ShopPage} />
+      <Route path="/shop/checkout" component={CartCheckoutPage} />
       <Route path="/shop/checkout/:slug" component={ShopCheckoutPage} />
       <Route path="/shop/dashboard" component={ShopDashboardPage} />
       <Route path="/test-di-livello" component={LanguageTestsPage} />
@@ -91,15 +95,18 @@ function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="skillcraft-theme">
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <ScrollToTop />
-          <Router />
-          <CookieBanner />
-          <WhatsAppButton />
-          <MobileCTA />
-          <AIChatWidget />
-          <Toaster />
-        </TooltipProvider>
+        <CartProvider>
+          <TooltipProvider>
+            <ScrollToTop />
+            <Router />
+            <CartDrawer />
+            <CookieBanner />
+            <WhatsAppButton />
+            <MobileCTA />
+            <AIChatWidget />
+            <Toaster />
+          </TooltipProvider>
+        </CartProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );

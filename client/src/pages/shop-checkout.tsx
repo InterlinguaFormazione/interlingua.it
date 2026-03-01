@@ -76,6 +76,7 @@ export default function ShopCheckout() {
   const [pec, setPec] = useState("");
 
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [step, setStep] = useState<"details" | "billing" | "payment" | "success">("details");
   const [paypalReady, setPaypalReady] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -200,6 +201,10 @@ export default function ShopCheckout() {
     }
     if (provincia.length !== 2) {
       toast({ title: "Provincia non valida", description: "Inserisci la sigla (es. VI, MI, RM).", variant: "destructive" });
+      return;
+    }
+    if (!acceptTerms) {
+      toast({ title: "Termini e Condizioni", description: "Devi accettare i Termini e Condizioni per procedere.", variant: "destructive" });
       return;
     }
     setStep("payment");
@@ -730,6 +735,22 @@ export default function ShopCheckout() {
                           <Label htmlFor="provincia">Prov. *</Label>
                           <Input id="provincia" value={provincia} onChange={(e) => setProvincia(e.target.value.toUpperCase())} maxLength={2} placeholder="VI" className="mt-1" data-testid="input-provincia" />
                         </div>
+                      </div>
+
+                      <div className="flex items-start gap-3 p-4 rounded-xl border bg-muted/30">
+                        <Checkbox
+                          id="acceptTerms"
+                          checked={acceptTerms}
+                          onCheckedChange={(checked) => setAcceptTerms(checked === true)}
+                          data-testid="checkbox-accept-terms"
+                        />
+                        <Label htmlFor="acceptTerms" className="text-sm leading-relaxed cursor-pointer">
+                          Ho letto e accetto i{" "}
+                          <a href="/termini-e-condizioni" className="text-primary underline hover:no-underline" target="_blank" rel="noopener noreferrer">
+                            Termini e Condizioni
+                          </a>{" "}
+                          di vendita di Interlingua Formazione S.r.l. *
+                        </Label>
                       </div>
 
                       <div className="flex gap-3 pt-2">
