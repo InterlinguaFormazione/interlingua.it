@@ -342,7 +342,7 @@ export default function ChiSiamoPage() {
                 <img 
                   src={aboutTeachingImage} 
                   alt="Metodologia didattica" 
-                  className="w-full h-[500px] object-cover"
+                  className="w-full h-auto object-contain"
                   loading="lazy"
                   decoding="async"
                 />
