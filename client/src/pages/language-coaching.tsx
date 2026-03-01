@@ -514,7 +514,7 @@ function PackageCard({ pkg, index }: { pkg: typeof packages[0]; index: number })
 
   return (
     <AnimatedSection delay={index * 0.08}>
-      <Card className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-card" data-testid={`card-coaching-${pkg.id}`}>
+      <Card id={pkg.id} className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-card scroll-mt-24" data-testid={`card-coaching-${pkg.id}`}>
         <div className={`absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r ${pkg.gradient}`} />
         <CardContent className="p-0">
           <div className="grid md:grid-cols-[300px_1fr] lg:grid-cols-[360px_1fr]">

@@ -82,7 +82,7 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
       <Card
         className="h-full group relative overflow-hidden border border-border/50 bg-card hover:shadow-xl hover:border-primary/30 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
         data-testid={`card-product-${product.slug}`}
-        onClick={() => setLocation(product.pageLink)}
+        onClick={() => setLocation(`${product.pageLink}${product.pageAnchor ? `#${product.pageAnchor}` : ""}`)}
       >
         <div className={`relative h-28 bg-gradient-to-br ${gradientClass} overflow-hidden`}>
           <div className="absolute inset-0 opacity-10"

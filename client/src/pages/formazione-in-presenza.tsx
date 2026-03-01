@@ -584,7 +584,8 @@ function CourseCard({ course, index }: { course: typeof courses[0]; index: numbe
   return (
     <AnimatedSection delay={index * 0.08}>
       <Card
-        className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-card"
+        id={course.id}
+        className="group relative overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-500 bg-card scroll-mt-24"
         data-testid={`card-fip-course-${course.id}`}
       >
         <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${course.gradient}`} />

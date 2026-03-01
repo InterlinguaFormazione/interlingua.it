@@ -19,6 +19,7 @@ export interface ShopProduct {
   duration: string;
   features: string[];
   pageLink: string;
+  pageAnchor?: string;
   options?: ProductOption[];
   variations?: ProductVariation[];
   priceRange?: { min: string; max: string };
@@ -40,6 +41,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Metodo Interlingua",
     ],
     pageLink: "/formazione-in-presenza",
+    pageAnchor: "corsi-gruppo",
     options: [
       {
         name: "lingua",
@@ -83,6 +85,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Certificato di competenza",
     ],
     pageLink: "/formazione-in-presenza",
+    pageAnchor: "corsi-individuali",
     options: [
       {
         name: "lingua",
@@ -123,6 +126,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Orari flessibili",
     ],
     pageLink: "/formazione-in-presenza",
+    pageAnchor: "corso-blended",
     options: [
       {
         name: "lingua",
@@ -151,6 +155,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Ideale per l'estate",
     ],
     pageLink: "/formazione-in-presenza",
+    pageAnchor: "courses-section",
     options: [
       {
         name: "lingua",
@@ -179,6 +184,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Esercitazioni pratiche",
     ],
     pageLink: "/formazione-in-presenza",
+    pageAnchor: "office",
   },
   {
     slug: "ai-senza-segreti",
@@ -195,6 +201,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Applicazioni pratiche",
     ],
     pageLink: "/formazione-in-presenza",
+    pageAnchor: "ai",
   },
   {
     slug: "full-immersion",
@@ -249,6 +256,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Certificato finale",
     ],
     pageLink: "/formazione-in-presenza",
+    pageAnchor: "courses-section",
     options: [
       {
         name: "durata",
@@ -290,6 +298,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Certificato CEFR finale",
     ],
     pageLink: "/corsi-e-learning",
+    pageAnchor: "self-learning",
     options: [
       {
         name: "lingua",
@@ -338,6 +347,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Certificato CEFR finale",
     ],
     pageLink: "/corsi-e-learning",
+    pageAnchor: "gruppo",
     options: [
       {
         name: "lingua",
@@ -377,6 +387,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Certificato finale",
     ],
     pageLink: "/corsi-e-learning",
+    pageAnchor: "individuale",
     options: [
       {
         name: "lingua",
@@ -420,6 +431,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "60 ore piattaforma e-learning",
     ],
     pageLink: "/corsi-e-learning",
+    pageAnchor: "certificazione",
     options: [
       {
         name: "lingua",
@@ -466,6 +478,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Feedback personalizzato",
     ],
     pageLink: "/corsi-e-learning",
+    pageAnchor: "conversazione",
     options: [
       {
         name: "lingua",
@@ -489,6 +502,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Piattaforma e-learning 24/7",
     ],
     pageLink: "/corsi-e-learning",
+    pageAnchor: "mini-gruppi",
     options: [
       {
         name: "lingua",
@@ -517,6 +531,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Report progressi periodico",
     ],
     pageLink: "/language-coaching",
+    pageAnchor: "coaching-presenza",
     options: [
       {
         name: "lingua",
@@ -540,6 +555,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Certificato CEFR finale",
     ],
     pageLink: "/language-coaching",
+    pageAnchor: "coaching-blended",
     options: [
       {
         name: "lingua",
@@ -563,6 +579,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Report di progresso dettagliato",
     ],
     pageLink: "/language-coaching",
+    pageAnchor: "coaching-online",
     options: [
       {
         name: "lingua",
@@ -586,6 +603,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Coach madrelingua dedicato",
     ],
     pageLink: "/language-coaching",
+    pageAnchor: "coaching-fluency",
     options: [
       {
         name: "lingua",
@@ -609,6 +627,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Certificato finale",
     ],
     pageLink: "/corsi-italiano",
+    pageAnchor: "italian-courses",
   },
   {
     slug: "italiano-intensivo-20",
@@ -625,6 +644,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       "Certificato finale",
     ],
     pageLink: "/corsi-italiano",
+    pageAnchor: "italian-courses",
   },
 ];
 
