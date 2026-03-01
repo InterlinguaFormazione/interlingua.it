@@ -11,6 +11,7 @@ const navLinks = [
   { href: "/shop", label: "Shop Corsi" },
   { href: "/bandi-e-corsi-finanziati", label: "Bandi e Corsi Finanziati" },
   { href: "/chi-siamo", label: "Chi Siamo" },
+  { href: "/sedi", label: "Le Nostre Sedi" },
   { href: "/blog", label: "Blog" },
   { href: "#contact", label: "Contatti" },
 ];

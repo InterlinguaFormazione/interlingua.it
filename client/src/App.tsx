@@ -37,6 +37,7 @@ import GermanTestPage from "@/pages/german-test";
 import FrenchTestPage from "@/pages/french-test";
 import SpanishTestPage from "@/pages/spanish-test";
 import LanguageTestsPage from "@/pages/language-tests";
+import SediPage from "@/pages/sedi";
 import NotFound from "@/pages/not-found";
 
 function ScrollToTop() {
@@ -77,6 +78,7 @@ function Router() {
       <Route path="/blog" component={BlogPage} />
       <Route path="/blog/:slug" component={BlogPostPage} />
       <Route path="/cookie-policy" component={CookiePolicyPage} />
+      <Route path="/sedi" component={SediPage} />
       <Route path="/privacy-policy" component={PrivacyPolicyPage} />
       <Route component={NotFound} />
     </Switch>

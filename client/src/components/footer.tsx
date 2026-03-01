@@ -14,6 +14,7 @@ const footerLinks = {
   ],
   azienda: [
     { label: "Chi Siamo", href: "/chi-siamo" },
+    { label: "Le Nostre Sedi", href: "/sedi" },
     { label: "Il Nostro Team", href: "/chi-siamo" },
     { label: "Testimonianze", href: "#testimonials" },
     { label: "Lavora con Noi", href: "#contact" },
