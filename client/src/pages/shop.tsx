@@ -27,6 +27,10 @@ import {
   BookOpen,
   ChevronRight,
   X,
+  Award,
+  Users,
+  Zap,
+  Star,
 } from "lucide-react";
 import { SiPaypal, SiVisa, SiMastercard } from "react-icons/si";
 import cartaCulturaLogo from "@assets/carte-cultura-1200x675_1772388120185.avif";
@@ -59,61 +63,70 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.3, delay: index * 0.03 }}
+      transition={{ duration: 0.3, delay: index * 0.04 }}
       layout
       className="h-full"
     >
       <Card
-        className="h-full group relative overflow-hidden border border-border/40 shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300"
+        className="h-full group relative overflow-hidden border border-border/50 bg-card hover:shadow-xl hover:border-primary/30 hover:-translate-y-1 transition-all duration-300"
         data-testid={`card-product-${product.slug}`}
       >
-        <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${gradientClass} opacity-70 group-hover:opacity-100 transition-opacity`} />
-
-        <CardContent className="p-0 flex flex-col h-full">
-          <div className="p-5 pb-3 flex-grow">
-            <div className="flex items-center gap-2 mb-3">
-              <div className={`w-7 h-7 rounded-md bg-gradient-to-br ${gradientClass} flex items-center justify-center`}>
-                {categoryConfig && <categoryConfig.icon className="w-3.5 h-3.5 text-white" />}
-              </div>
-              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
-                {product.category}
-              </span>
+        <div className={`relative h-28 bg-gradient-to-br ${gradientClass} overflow-hidden`}>
+          <div className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+              backgroundSize: "24px 24px",
+            }}
+          />
+          <div className="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full" />
+          <div className="absolute -right-2 -bottom-8 w-20 h-20 bg-white/5 rounded-full" />
+          <div className="absolute bottom-3 left-4 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center">
+              {categoryConfig && <categoryConfig.icon className="w-4 h-4 text-white" />}
             </div>
+            <span className="text-[11px] font-semibold text-white/90 uppercase tracking-wider">
+              {product.category}
+            </span>
+          </div>
+          <div className="absolute top-3 right-3 flex items-center gap-1">
+            <div className="flex items-center gap-0.5 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1">
+              <Clock className="w-3 h-3 text-white/90" />
+              <span className="text-[10px] font-medium text-white/90">{product.duration}</span>
+            </div>
+          </div>
+        </div>
 
+        <CardContent className="p-0 flex flex-col flex-grow">
+          <div className="p-5 pb-3 flex-grow">
             <h3
-              className="text-base font-bold mb-1.5 group-hover:text-primary transition-colors leading-snug line-clamp-2"
+              className="text-[15px] font-bold mb-2 group-hover:text-primary transition-colors leading-snug line-clamp-2"
               data-testid={`text-product-name-${product.slug}`}
             >
               {product.name}
             </h3>
 
-            <p className="text-sm text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
+            <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
               {product.description}
             </p>
 
-            <ul className="space-y-1.5 mb-3">
-              {product.features.slice(0, 2).map((f, i) => (
+            <ul className="space-y-2">
+              {product.features.slice(0, 3).map((f, i) => (
                 <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
                   <span className="line-clamp-1">{f}</span>
                 </li>
               ))}
             </ul>
-
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Clock className="w-3 h-3" />
-              <span>{product.duration}</span>
-            </div>
           </div>
 
           <div className="px-5 pb-5 mt-auto">
-            <div className="border-t border-border/40 pt-3 flex items-end justify-between">
+            <div className="border-t border-border/40 pt-4 flex items-end justify-between">
               <div>
-                <span className="text-[10px] text-muted-foreground block mb-0.5">
-                  {product.priceRange ? "Da" : "Prezzo"}
+                <span className="text-[10px] text-muted-foreground block mb-0.5 uppercase tracking-wide">
+                  {product.priceRange ? "A partire da" : "Prezzo"}
                 </span>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-xl font-extrabold text-foreground">
+                  <span className="text-2xl font-extrabold text-foreground">
                     &euro;{product.priceRange ? parseFloat(product.priceRange.min).toFixed(0) : parseFloat(product.price).toFixed(0)}
                   </span>
                   {!product.priceRange && product.priceLabel && (
@@ -127,11 +140,11 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
-                <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-5 w-auto opacity-70" title="Pagabile con Carta della Cultura" />
+                <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-5 w-auto opacity-60 hover:opacity-100 transition-opacity" title="Pagabile con Carta della Cultura" />
                 <Button
                   size="icon"
                   variant="outline"
-                  className="h-9 w-9 border-border/50 hover:bg-muted"
+                  className="h-9 w-9 border-border/50 hover:bg-primary/5 hover:border-primary/30 transition-all"
                   onClick={handleAddToCart}
                   data-testid={`button-cart-${product.slug}`}
                 >
@@ -140,7 +153,7 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
                 <Link href={`/shop/checkout/${product.slug}`}>
                   <Button
                     size="sm"
-                    className={`bg-gradient-to-r ${gradientClass} hover:opacity-90 text-white border-0 shadow-sm transition-all duration-300 group/btn h-9`}
+                    className={`bg-gradient-to-r ${gradientClass} hover:opacity-90 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 group/btn h-9`}
                     data-testid={`button-buy-${product.slug}`}
                   >
                     Acquista
@@ -185,54 +198,88 @@ export default function ShopPage() {
     <div className="min-h-screen flex flex-col bg-background">
       <Navigation />
 
-      <section className="relative pt-24 pb-12 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(222,67%,20%)] via-[hsl(222,67%,30%)] to-[hsl(240,60%,25%)]" />
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400 rounded-full blur-[120px]" />
-          <div className="absolute bottom-10 right-10 w-64 h-64 bg-violet-500 rounded-full blur-[120px]" />
+      <section className="relative pt-28 pb-20 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(222,67%,15%)] via-[hsl(222,67%,25%)] to-[hsl(250,60%,20%)]" />
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-[10%] w-80 h-80 bg-blue-500/20 rounded-full blur-[100px]" />
+          <div className="absolute bottom-0 right-[15%] w-72 h-72 bg-violet-500/20 rounded-full blur-[100px]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px]" />
         </div>
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          className="absolute inset-0 opacity-[0.04]"
           style={{
             backgroundImage: `radial-gradient(circle at 1px 1px, white 1px, transparent 0)`,
-            backgroundSize: "40px 40px",
+            backgroundSize: "32px 32px",
           }}
         />
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
+            transition={{ duration: 0.7 }}
+            className="text-center max-w-3xl mx-auto"
           >
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-5">
-              <ShoppingBag className="w-4 h-4 text-white/90" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 py-2 mb-6"
+            >
+              <ShoppingBag className="w-4 h-4 text-cyan-300" />
               <span className="text-sm font-medium text-white/90">Catalogo Corsi</span>
-            </div>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            </motion.div>
 
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-3 tracking-tight" data-testid="text-shop-title">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-4 tracking-tight leading-[1.1]" data-testid="text-shop-title">
               Investi nel Tuo{" "}
               <span className="bg-gradient-to-r from-cyan-300 via-blue-300 to-violet-300 bg-clip-text text-transparent">
                 Futuro Professionale
               </span>
             </h1>
 
-            <p className="text-base text-white/60 max-w-xl mx-auto mb-6">
-              {SHOP_PRODUCTS.length} corsi di formazione linguistica e professionale. Pagamento sicuro con PayPal.
+            <p className="text-lg text-white/50 max-w-xl mx-auto mb-8">
+              {SHOP_PRODUCTS.length} corsi di formazione linguistica e professionale. Acquista online in modo sicuro.
             </p>
 
-            <div className="flex items-center justify-center gap-4">
-              <div className="flex items-center gap-2 text-white/50 text-sm">
-                <SiPaypal className="w-5 h-4" style={{ filter: "brightness(2)" }} />
-                <SiVisa className="w-6 h-4" />
-                <SiMastercard className="w-6 h-4" />
+            <div className="flex flex-wrap items-center justify-center gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="flex items-center gap-3"
+              >
+                {[
+                  { icon: Shield, label: "Pagamento Sicuro" },
+                  { icon: Award, label: "Ente Accreditato" },
+                  { icon: Users, label: "3000+ Studenti" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-1.5 text-white/40 text-xs">
+                    <item.icon className="w-3.5 h-3.5" />
+                    <span>{item.label}</span>
+                    {i < 2 && <span className="ml-2 text-white/15">|</span>}
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="mt-6 flex items-center justify-center gap-4"
+            >
+              <div className="flex items-center gap-3 bg-white/5 backdrop-blur-sm rounded-full px-4 py-2 border border-white/10">
+                <SiPaypal className="w-5 h-4 text-white/50" />
+                <SiVisa className="w-6 h-4 text-white/50" />
+                <SiMastercard className="w-6 h-4 text-white/50" />
+                <div className="w-px h-4 bg-white/15" />
+                <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-4 w-auto opacity-50" />
               </div>
-              <span className="text-white/20">|</span>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-white/60 hover:text-white hover:bg-white/10 h-8"
+                className="text-white/50 hover:text-white hover:bg-white/10 h-9 rounded-full border border-white/10"
                 onClick={() => setLocation("/shop/dashboard")}
                 data-testid="button-area-clienti"
               >
@@ -240,13 +287,14 @@ export default function ShopPage() {
                 Area Clienti
                 <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
               </Button>
-            </div>
+            </motion.div>
           </motion.div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-background to-transparent" />
+
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-background to-transparent" />
       </section>
 
-      <main className="flex-grow -mt-4 relative z-10 pb-16">
+      <main className="flex-grow -mt-6 relative z-10 pb-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
 
           <motion.div
@@ -255,58 +303,60 @@ export default function ShopPage() {
             transition={{ delay: 0.2, duration: 0.4 }}
             className="mb-8"
           >
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <div className="relative flex-grow max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Cerca un corso..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10 h-10 text-sm rounded-lg border-border/50 bg-card"
-                  data-testid="input-search"
-                />
-                {search && (
-                  <button
-                    onClick={() => setSearch("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    aria-label="Cancella ricerca"
-                    data-testid="button-clear-search"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                )}
-              </div>
-
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-                {CATEGORY_CONFIG.map((cat) => {
-                  const Icon = cat.icon;
-                  const isActive = activeCategory === cat.key;
-                  const count = categoryCounts[cat.key] || 0;
-                  return (
+            <Card className="p-4 border-border/50 shadow-sm">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <div className="relative flex-grow max-w-sm">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Cerca un corso..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="pl-10 h-10 text-sm rounded-lg border-border/50 bg-muted/50 focus:bg-card"
+                    data-testid="input-search"
+                  />
+                  {search && (
                     <button
-                      key={cat.key}
-                      onClick={() => setActiveCategory(cat.key)}
-                      className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
-                        isActive
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "bg-card hover:bg-muted text-muted-foreground border border-border/40"
-                      }`}
-                      data-testid={`button-filter-${cat.key.toLowerCase().replace(/\s/g, "-")}`}
+                      onClick={() => setSearch("")}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      aria-label="Cancella ricerca"
+                      data-testid="button-clear-search"
                     >
-                      <Icon className="w-3.5 h-3.5" />
-                      {cat.label}
-                      <span className={`text-[10px] px-1 py-0.5 rounded ${isActive ? "bg-white/20" : "bg-muted"}`}>
-                        {count}
-                      </span>
+                      <X className="h-3.5 w-3.5" />
                     </button>
-                  );
-                })}
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                  {CATEGORY_CONFIG.map((cat) => {
+                    const Icon = cat.icon;
+                    const isActive = activeCategory === cat.key;
+                    const count = categoryCounts[cat.key] || 0;
+                    return (
+                      <button
+                        key={cat.key}
+                        onClick={() => setActiveCategory(cat.key)}
+                        className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+                          isActive
+                            ? `bg-gradient-to-r ${cat.color} text-white shadow-md`
+                            : "bg-muted/50 hover:bg-muted text-muted-foreground"
+                        }`}
+                        data-testid={`button-filter-${cat.key.toLowerCase().replace(/\s/g, "-")}`}
+                      >
+                        <Icon className="w-3.5 h-3.5" />
+                        {cat.label}
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${isActive ? "bg-white/25" : "bg-background"}`}>
+                          {count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            </Card>
           </motion.div>
 
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold flex items-center gap-2">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-primary" />
               {activeCategory === "Tutti" && search.length === 0
                 ? "Tutti i Corsi"
@@ -314,9 +364,9 @@ export default function ShopPage() {
                   ? "Risultati ricerca"
                   : activeCategory}
             </h2>
-            <span className="text-sm text-muted-foreground">
+            <Badge variant="secondary" className="text-xs">
               {filtered.length} {filtered.length === 1 ? "corso" : "corsi"}
-            </span>
+            </Badge>
           </div>
 
           <AnimatePresence mode="popLayout">
@@ -326,26 +376,26 @@ export default function ShopPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="text-center py-16"
+                className="text-center py-20"
               >
-                <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
-                  <Search className="w-6 h-6 text-muted-foreground" />
+                <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-7 h-7 text-muted-foreground" />
                 </div>
-                <p className="text-base font-medium mb-1">Nessun corso trovato</p>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Prova a cambiare i criteri di ricerca.
+                <p className="text-lg font-semibold mb-2">Nessun corso trovato</p>
+                <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
+                  Non abbiamo trovato corsi corrispondenti alla tua ricerca. Prova con altri termini.
                 </p>
                 <Button
                   variant="outline"
-                  size="sm"
                   onClick={() => { setSearch(""); setActiveCategory("Tutti"); }}
                   data-testid="button-show-all-courses"
                 >
-                  Mostra tutti
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Mostra tutti i corsi
                 </Button>
               </motion.div>
             ) : (
-              <motion.div layout className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <motion.div layout className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                 {filtered.map((product, i) => (
                   <ProductCard key={product.slug} product={product} index={i} />
                 ))}
@@ -358,29 +408,55 @@ export default function ShopPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="mt-14"
+            className="mt-16"
           >
-            <div className="rounded-xl bg-muted/50 border border-border/40 p-6 md:p-8">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    <Shield className="w-5 h-5 text-primary" />
+            <Card className="overflow-hidden border-border/50">
+              <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border/40">
+                <div className="p-6 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/10 to-primary/10 flex items-center justify-center shrink-0">
+                    <Shield className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm">Pagamento Sicuro</h3>
-                    <p className="text-xs text-muted-foreground">
-                      Transazioni crittografate tramite PayPal, Visa e Mastercard. Accettiamo anche Carta della Cultura.
+                    <h3 className="font-bold text-sm mb-0.5">Pagamento Sicuro</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Transazioni crittografate tramite PayPal, Visa e Mastercard
                     </p>
                   </div>
                 </div>
+                <div className="p-6 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 flex items-center justify-center shrink-0">
+                    <Award className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-sm mb-0.5">Ente Accreditato</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Accreditati dalla Regione Veneto dal 2003
+                    </p>
+                  </div>
+                </div>
+                <div className="p-6 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500/10 to-purple-500/10 flex items-center justify-center shrink-0">
+                    <Zap className="w-6 h-6 text-violet-600 dark:text-violet-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-sm mb-0.5">Accesso Immediato</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Conferma automatica via email dopo l'acquisto
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="border-t border-border/40 px-6 py-4 bg-muted/30 flex flex-wrap items-center justify-between gap-4">
+                <span className="text-xs text-muted-foreground">Metodi di pagamento accettati</span>
                 <div className="flex items-center gap-4">
                   <SiPaypal className="w-8 h-5 text-[#003087] dark:text-[#0070ba]" />
                   <SiVisa className="w-8 h-5 text-[#1a1f71] dark:text-blue-400" />
                   <SiMastercard className="w-8 h-5 text-[#eb001b] dark:text-red-400" />
+                  <div className="w-px h-5 bg-border/50" />
                   <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-6 w-auto" />
                 </div>
               </div>
-            </div>
+            </Card>
           </motion.div>
         </div>
       </main>
