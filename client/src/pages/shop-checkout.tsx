@@ -136,6 +136,31 @@ export default function ShopCheckout() {
     setVoucherCode("");
   };
 
+  const checkAutoApplyVoucher = async (email: string) => {
+    if (appliedVoucherCode) return;
+    try {
+      const res = await apiRequest("POST", "/api/shop/auto-apply-voucher", {
+        email,
+        cartTotal: effectivePrice,
+        productSlugs: product ? [product.slug] : [],
+      });
+      const data = await res.json();
+      if (data.found) {
+        setVoucherCode(data.code);
+        setAppliedVoucherCode(data.code);
+        setVoucherResult({
+          valid: true,
+          discount: data.discount,
+          discountedTotal: data.discountedTotal,
+          discountType: data.discountType,
+          discountValue: data.discountValue,
+          message: data.message,
+        });
+        setVoucherOpen(true);
+      }
+    } catch {}
+  };
+
   const purchaseMutation = useMutation({
     mutationFn: async (data: Record<string, string>) => {
       const res = await apiRequest("POST", "/api/shop/purchase", data);
@@ -207,6 +232,7 @@ export default function ShopCheckout() {
       toast({ title: "Le password non coincidono", description: "La password e la conferma devono essere uguali.", variant: "destructive" });
       return;
     }
+    checkAutoApplyVoucher(customerEmail);
     setStep("billing");
   };
 

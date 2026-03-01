@@ -989,6 +989,8 @@ function VouchersTab({ token }: { token: string }) {
     validUntil: "",
     productSlugs: "",
     firstTimeBuyerOnly: false,
+    autoApply: false,
+    requiresNewsletterSub: false,
     active: true,
   });
   const { toast } = useToast();
@@ -1074,6 +1076,8 @@ function VouchersTab({ token }: { token: string }) {
       validUntil: "",
       productSlugs: "",
       firstTimeBuyerOnly: false,
+      autoApply: false,
+      requiresNewsletterSub: false,
       active: true,
     });
   };
@@ -1091,6 +1095,8 @@ function VouchersTab({ token }: { token: string }) {
       validUntil: v.validUntil ? v.validUntil.slice(0, 16) : "",
       productSlugs: v.productSlugs || "",
       firstTimeBuyerOnly: v.firstTimeBuyerOnly || false,
+      autoApply: v.autoApply || false,
+      requiresNewsletterSub: v.requiresNewsletterSub || false,
       active: v.active !== false,
     });
     setIsDialogOpen(true);
@@ -1112,6 +1118,8 @@ function VouchersTab({ token }: { token: string }) {
       validUntil: formData.validUntil || null,
       productSlugs: formData.productSlugs || null,
       firstTimeBuyerOnly: formData.firstTimeBuyerOnly,
+      autoApply: formData.autoApply,
+      requiresNewsletterSub: formData.requiresNewsletterSub,
       active: formData.active,
     };
     saveMutation.mutate(payload);
@@ -1245,6 +1253,22 @@ function VouchersTab({ token }: { token: string }) {
                         data-testid="switch-voucher-first-time"
                       />
                       <Label className="mb-0">Solo primo acquisto</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={formData.autoApply}
+                        onCheckedChange={val => setFormData({ ...formData, autoApply: val })}
+                        data-testid="switch-voucher-auto-apply"
+                      />
+                      <Label className="mb-0">Applica automaticamente</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={formData.requiresNewsletterSub}
+                        onCheckedChange={val => setFormData({ ...formData, requiresNewsletterSub: val })}
+                        data-testid="switch-voucher-newsletter"
+                      />
+                      <Label className="mb-0">Solo iscritti newsletter</Label>
                     </div>
                   </div>
                 </div>
@@ -1389,6 +1413,12 @@ function VouchersTab({ token }: { token: string }) {
                       )}
                       {v.firstTimeBuyerOnly && (
                         <Badge variant="outline" className="ml-1">1° acquisto</Badge>
+                      )}
+                      {v.autoApply && (
+                        <Badge variant="outline" className="ml-1 border-blue-400 text-blue-600">Auto</Badge>
+                      )}
+                      {v.requiresNewsletterSub && (
+                        <Badge variant="outline" className="ml-1 border-green-400 text-green-600">Newsletter</Badge>
                       )}
                     </td>
                     <td className="py-3 px-2 text-right whitespace-nowrap">

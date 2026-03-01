@@ -77,6 +77,8 @@ export interface IStorage {
   createNewsletterSubscription(newsletter: InsertNewsletter): Promise<NewsletterSubscription>;
   getNewsletterSubscriptionByEmail(email: string): Promise<NewsletterSubscription | undefined>;
   getNewsletterSubscriptions(): Promise<NewsletterSubscription[]>;
+  unsubscribeNewsletter(email: string): Promise<boolean>;
+  isActiveNewsletterSubscriber(email: string): Promise<boolean>;
 
   createCookieConsent(consent: InsertCookieConsent): Promise<CookieConsent>;
   getCookieConsents(): Promise<CookieConsent[]>;
@@ -162,6 +164,7 @@ export interface IStorage {
   getDiscountVouchers(): Promise<DiscountVoucher[]>;
   getDiscountVoucherByCode(code: string): Promise<DiscountVoucher | undefined>;
   getDiscountVoucherById(id: string): Promise<DiscountVoucher | undefined>;
+  getAutoApplyVouchers(): Promise<DiscountVoucher[]>;
   updateDiscountVoucher(id: string, data: Partial<InsertDiscountVoucher>): Promise<DiscountVoucher | undefined>;
   deleteDiscountVoucher(id: string): Promise<void>;
   incrementVoucherUsage(id: string): Promise<void>;
@@ -222,6 +225,22 @@ export class DatabaseStorage implements IStorage {
 
   async getNewsletterSubscriptions(): Promise<NewsletterSubscription[]> {
     return db.select().from(newsletterSubscriptions).orderBy(desc(newsletterSubscriptions.createdAt));
+  }
+
+  async unsubscribeNewsletter(email: string): Promise<boolean> {
+    const results = await db.update(newsletterSubscriptions)
+      .set({ subscribed: false })
+      .where(eq(newsletterSubscriptions.email, email))
+      .returning();
+    return results.length > 0;
+  }
+
+  async isActiveNewsletterSubscriber(email: string): Promise<boolean> {
+    const [sub] = await db.select({ subscribed: newsletterSubscriptions.subscribed })
+      .from(newsletterSubscriptions)
+      .where(and(eq(newsletterSubscriptions.email, email), eq(newsletterSubscriptions.subscribed, true)))
+      .limit(1);
+    return !!sub;
   }
 
   async createCookieConsent(consent: InsertCookieConsent): Promise<CookieConsent> {
@@ -574,6 +593,12 @@ export class DatabaseStorage implements IStorage {
   async getDiscountVoucherById(id: string): Promise<DiscountVoucher | undefined> {
     const [result] = await db.select().from(discountVouchers).where(eq(discountVouchers.id, id));
     return result;
+  }
+
+  async getAutoApplyVouchers(): Promise<DiscountVoucher[]> {
+    return db.select().from(discountVouchers).where(
+      and(eq(discountVouchers.active, true), eq(discountVouchers.autoApply, true))
+    );
   }
 
   async updateDiscountVoucher(id: string, data: Partial<InsertDiscountVoucher>): Promise<DiscountVoucher | undefined> {

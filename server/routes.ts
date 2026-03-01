@@ -495,6 +495,24 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/newsletter/unsubscribe", async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ success: false, message: "Email è obbligatoria." });
+      }
+      const result = await storage.unsubscribeNewsletter(email.toLowerCase().trim());
+      if (result) {
+        res.json({ success: true, message: "Ti sei disiscritto dalla newsletter con successo." });
+      } else {
+        res.json({ success: false, message: "Email non trovata nella lista newsletter." });
+      }
+    } catch (error) {
+      console.error("Error unsubscribing newsletter:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
   app.get("/api/reviews", async (_req, res) => {
     try {
       if (reviewsCache && Date.now() - reviewsCache.timestamp < CACHE_DURATION) {
@@ -1270,7 +1288,16 @@ export async function registerRoutes(
               if (hasOrders) validFirstTime = false;
             }
           }
-          if (validTime && validUses && validProduct && validMin && validFirstTime) {
+          let validNewsletter = true;
+          if (voucher.requiresNewsletterSub) {
+            if (!parsed.data.customerEmail) {
+              validNewsletter = false;
+            } else {
+              const isSub = await storage.isActiveNewsletterSubscriber(parsed.data.customerEmail);
+              if (!isSub) validNewsletter = false;
+            }
+          }
+          if (validTime && validUses && validProduct && validMin && validFirstTime && validNewsletter) {
             let discount = 0;
             if (voucher.discountType === "percentage") {
               discount = total * (parseFloat(voucher.discountValue) / 100);
@@ -1422,7 +1449,16 @@ export async function registerRoutes(
               if (hasOrders) validFirstTime = false;
             }
           }
-          if (validTime && validUses && validProduct && validMin && validFirstTime) {
+          let validNewsletter = true;
+          if (voucher.requiresNewsletterSub) {
+            if (!customerEmail) {
+              validNewsletter = false;
+            } else {
+              const isSub = await storage.isActiveNewsletterSubscriber(customerEmail);
+              if (!isSub) validNewsletter = false;
+            }
+          }
+          if (validTime && validUses && validProduct && validMin && validFirstTime && validNewsletter) {
             let discount = 0;
             if (voucher.discountType === "percentage") {
               discount = expectedTotal * (parseFloat(voucher.discountValue) / 100);
@@ -1676,7 +1712,7 @@ export async function registerRoutes(
 
   app.post("/api/admin/vouchers", requireAuth, async (req, res) => {
     try {
-      const { code, description, discountType, discountValue, minOrderAmount, maxUses, validFrom, validUntil, productSlugs, firstTimeBuyerOnly, active } = req.body;
+      const { code, description, discountType, discountValue, minOrderAmount, maxUses, validFrom, validUntil, productSlugs, firstTimeBuyerOnly, autoApply, requiresNewsletterSub, active } = req.body;
       if (!code || !discountType || !discountValue) {
         return res.status(400).json({ success: false, message: "Codice, tipo e valore sconto sono obbligatori." });
       }
@@ -1706,6 +1742,8 @@ export async function registerRoutes(
         validUntil: validUntil ? new Date(validUntil) : null,
         productSlugs: productSlugs || null,
         firstTimeBuyerOnly: firstTimeBuyerOnly || false,
+        autoApply: autoApply || false,
+        requiresNewsletterSub: requiresNewsletterSub || false,
         active: active !== false,
       });
       res.json({ success: true, voucher });
@@ -1717,7 +1755,7 @@ export async function registerRoutes(
 
   app.patch("/api/admin/vouchers/:id", requireAuth, async (req, res) => {
     try {
-      const { code, description, discountType, discountValue, minOrderAmount, maxUses, validFrom, validUntil, productSlugs, firstTimeBuyerOnly, active } = req.body;
+      const { code, description, discountType, discountValue, minOrderAmount, maxUses, validFrom, validUntil, productSlugs, firstTimeBuyerOnly, autoApply, requiresNewsletterSub, active } = req.body;
       const updateData: any = {};
       if (code !== undefined) updateData.code = code.toUpperCase().trim();
       if (description !== undefined) updateData.description = description || null;
@@ -1729,6 +1767,8 @@ export async function registerRoutes(
       if (validUntil !== undefined) updateData.validUntil = validUntil ? new Date(validUntil) : null;
       if (productSlugs !== undefined) updateData.productSlugs = productSlugs || null;
       if (firstTimeBuyerOnly !== undefined) updateData.firstTimeBuyerOnly = firstTimeBuyerOnly;
+      if (autoApply !== undefined) updateData.autoApply = autoApply;
+      if (requiresNewsletterSub !== undefined) updateData.requiresNewsletterSub = requiresNewsletterSub;
       if (active !== undefined) updateData.active = active;
       const voucher = await storage.updateDiscountVoucher(req.params.id, updateData);
       if (!voucher) {
@@ -1753,7 +1793,8 @@ export async function registerRoutes(
 
   app.post("/api/shop/validate-voucher", async (req, res) => {
     try {
-      const { code, cartTotal, productSlugs: reqProductSlugs, customerEmail } = req.body;
+      const { code, cartTotal, productSlugs: reqProductSlugs, customerEmail: rawCustEmail } = req.body;
+      const customerEmail = rawCustEmail ? rawCustEmail.toLowerCase().trim() : undefined;
       if (!code) {
         return res.status(400).json({ valid: false, message: "Inserisci un codice sconto." });
       }
@@ -1778,6 +1819,15 @@ export async function registerRoutes(
         const hasOrders = await storage.hasCompletedOrdersByEmail(customerEmail);
         if (hasOrders) {
           return res.json({ valid: false, message: "Questo codice sconto è riservato ai nuovi clienti." });
+        }
+      }
+      if (voucher.requiresNewsletterSub) {
+        if (!customerEmail) {
+          return res.json({ valid: false, message: "Inserisci la tua email per utilizzare questo codice sconto." });
+        }
+        const isSub = await storage.isActiveNewsletterSubscriber(customerEmail);
+        if (!isSub) {
+          return res.json({ valid: false, message: "Questo codice sconto è riservato agli iscritti alla newsletter." });
         }
       }
       if (voucher.productSlugs && reqProductSlugs) {
@@ -1813,6 +1863,66 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error validating voucher:", error);
       res.status(500).json({ valid: false, message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/shop/auto-apply-voucher", async (req, res) => {
+    try {
+      const { email: rawEmail, cartTotal, productSlugs: reqProductSlugs } = req.body;
+      if (!rawEmail) {
+        return res.json({ found: false });
+      }
+      const email = rawEmail.toLowerCase().trim();
+      const autoVouchers = await storage.getAutoApplyVouchers();
+      if (autoVouchers.length === 0) {
+        return res.json({ found: false });
+      }
+      const now = new Date();
+      for (const voucher of autoVouchers) {
+        const validTime = (!voucher.validFrom || now >= new Date(voucher.validFrom)) && (!voucher.validUntil || now <= new Date(voucher.validUntil));
+        if (!validTime) continue;
+        const validUses = voucher.maxUses === null || (voucher.usedCount || 0) < voucher.maxUses;
+        if (!validUses) continue;
+        if (voucher.requiresNewsletterSub) {
+          const isSub = await storage.isActiveNewsletterSubscriber(email);
+          if (!isSub) continue;
+        }
+        if (voucher.firstTimeBuyerOnly) {
+          const hasOrders = await storage.hasCompletedOrdersByEmail(email);
+          if (hasOrders) continue;
+        }
+        if (voucher.productSlugs && reqProductSlugs) {
+          const allowedSlugs = voucher.productSlugs.split(",").map((s: string) => s.trim());
+          const requestedSlugs = Array.isArray(reqProductSlugs) ? reqProductSlugs : [reqProductSlugs];
+          const allAllowed = requestedSlugs.every((s: string) => allowedSlugs.includes(s));
+          if (!allAllowed) continue;
+        }
+        const total = parseFloat(cartTotal || "0");
+        if (voucher.minOrderAmount && total < parseFloat(voucher.minOrderAmount)) continue;
+        let discount = 0;
+        if (voucher.discountType === "percentage") {
+          discount = total * (parseFloat(voucher.discountValue) / 100);
+        } else {
+          discount = parseFloat(voucher.discountValue);
+        }
+        discount = Math.min(discount, total);
+        const discountedTotal = Math.max(0, total - discount).toFixed(2);
+        return res.json({
+          found: true,
+          code: voucher.code,
+          discount: discount.toFixed(2),
+          discountedTotal,
+          discountType: voucher.discountType,
+          discountValue: voucher.discountValue,
+          message: voucher.discountType === "percentage"
+            ? `Sconto di benvenuto del ${voucher.discountValue}% applicato!`
+            : `Sconto di benvenuto di €${parseFloat(voucher.discountValue).toFixed(2)} applicato!`,
+        });
+      }
+      res.json({ found: false });
+    } catch (error) {
+      console.error("Error checking auto-apply voucher:", error);
+      res.json({ found: false });
     }
   });
 
