@@ -17,7 +17,7 @@ import {
   updateTheta, updateStandardError, thetaToCEFR, selfAssessmentToTheta,
   checkA0HardFail, calculateFinalLevel,
   getWritingPrompt, getSpeakingPrompt, SECTION_SKILLS,
-  shouldEndSection, MAX_QUESTIONS_PER_SECTION
+  shouldEndSection, MAX_QUESTIONS_PER_SECTION, isLevelStable
 } from "./cat-engine";
 import { sendBusinessEnglishResultEmail, sendBusinessEnglishConfirmationEmail } from "./email";
 import multer from "multer";
@@ -1641,11 +1641,14 @@ export async function registerRoutes(
         `a0Fail: ${a0HardFail} | outOfQ: ${outOfQuestions} | ` +
         `difficulty: ${diff} | disc: ${disc} | P: ${calculateProbability(oldTheta, diff, disc).toFixed(3)}`);
 
+      const levelStable = isLevelStable(recentSectionLevels);
       const sectionEnding = shouldEndSection(questionsInCurrentSection, newSE, recentSectionLevels);
       if (sectionEnding) {
         const seCheck = newSE <= 40;
         const maxCheck = questionsInCurrentSection >= MAX_QUESTIONS_PER_SECTION;
-        console.log(`[CAT] >>> SECTION ENDING: SE<=40? ${seCheck} (SE=${newSE}) | maxQ? ${maxCheck} (${questionsInCurrentSection}/${MAX_QUESTIONS_PER_SECTION})`);
+        console.log(`[CAT] >>> SECTION ENDING: SE<=40? ${seCheck} (SE=${newSE}) | stable? ${levelStable} | maxQ? ${maxCheck} (${questionsInCurrentSection}/${MAX_QUESTIONS_PER_SECTION})`);
+      } else if (newSE <= 40 && !levelStable) {
+        console.log(`[CAT] >>> SE low (${newSE}) but level not stable yet — last 3 levels: [${recentSectionLevels.slice(-3).join(",")}]`);
       }
 
       if (a0HardFail || outOfQuestions || sectionEnding) {

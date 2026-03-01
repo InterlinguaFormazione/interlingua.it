@@ -159,6 +159,14 @@ export const MIN_QUESTIONS_PER_SECTION = 5;
 export const MAX_QUESTIONS_PER_SECTION = 12;
 export const TOTAL_MC_SECTIONS = 5;
 
+export const LEVEL_STABILITY_COUNT = 3;
+
+export function isLevelStable(recentSectionLevels: string[], requiredConsecutive: number = LEVEL_STABILITY_COUNT): boolean {
+  if (recentSectionLevels.length < requiredConsecutive) return false;
+  const last = recentSectionLevels.slice(-requiredConsecutive);
+  return last.every(l => l === last[0]);
+}
+
 export function shouldEndSection(
   questionsInSection: number,
   standardError: number,
@@ -168,7 +176,7 @@ export function shouldEndSection(
   if (questionsInSection >= maxQuestions) return true;
   if (questionsInSection < Math.min(MIN_QUESTIONS_PER_SECTION, maxQuestions)) return false;
 
-  if (standardError <= 40) return true;
+  if (standardError <= 40 && isLevelStable(recentSectionLevels)) return true;
 
   return false;
 }
