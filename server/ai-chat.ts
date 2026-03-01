@@ -12,7 +12,7 @@ const SYSTEM_PROMPT = `Sei l'assistente virtuale di SkillCraft-Interlingua, un c
 INFORMAZIONI SULL'AZIENDA
 ═══════════════════════════════════════════
 - Ragione sociale: Interlingua Formazione S.r.l. — P.IVA 03828240246
-- Fondata nel 1992 come agenzia di traduzioni e corsi aziendali
+- Fondata nel 1993 come agenzia di traduzioni e corsi aziendali
 - Prima struttura di formazione linguistica accreditata dalla Regione Veneto (dal 2003)
 - Nel 2024 ha lanciato il brand "SkillCraft-Interlingua" focalizzandosi su AI, competenze digitali, soft skills e lingue
 - Statistiche: 30+ anni di esperienza, 15.000+ studenti formati, 500+ aziende partner, 50+ docenti madrelingua, 98% soddisfazione

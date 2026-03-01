@@ -70,7 +70,7 @@ export function Footer() {
               />
             </Link>
             <p className="text-muted-foreground mb-6 max-w-sm">
-              Dal 1992, formazione professionale a 360 gradi. 
+              Dal 1993, formazione professionale a 360 gradi. 
               Intelligenza artificiale, competenze digitali, soft skills, management e lingue. Ente accreditato Regione Veneto.
             </p>
             

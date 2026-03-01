@@ -47,8 +47,7 @@ const staggerContainer = {
 };
 
 const timelineEvents = [
-  { year: "1992", event: "Fondazione di Interlingua come agenzia di traduzioni e corsi aziendali", highlight: false },
-  { year: "1993", event: "Apertura della prima sede operativa a Vicenza", highlight: false },
+  { year: "1993", event: "Fondazione di Interlingua come agenzia di traduzioni e corsi aziendali a Vicenza", highlight: false },
   { year: "1998", event: "Inaugurazione della seconda sede a Thiene", highlight: false },
   { year: "2000", event: "Introduzione del Sistema di Gestione della Qualità", highlight: false },
   { year: "2003", event: "Primo ente di formazione linguistica accreditato in Veneto", highlight: true },
@@ -156,7 +155,7 @@ export default function ChiSiamoPage() {
             >
               <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
                 <Star className="w-3 h-3 mr-1" />
-                Dal 1992
+                Dal 1993
               </Badge>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                 La Tua Crescita è la{" "}

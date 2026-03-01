@@ -73,7 +73,7 @@ export function AboutSection() {
                 artificiale applicata</strong>, competenze digitali, soft skills, management, crescita personale e lingue straniere.
               </p>
               <p>
-                Dal 1992 formiamo persone che vogliono crescere: dalle competenze più innovative 
+                Dal 1993 formiamo persone che vogliono crescere: dalle competenze più innovative 
                 come <strong className="text-foreground">AI e automazione</strong>, al 
                 <strong className="text-foreground"> digital marketing</strong>, dalla 
                 <strong className="text-foreground">leadership</strong> al{" "}

@@ -732,7 +732,7 @@ export default function CourseDetailPage() {
 
       <footer className="border-t py-8 mt-12">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>SkillCraft-Interlingua - Dal 1992 Leader nella Formazione</p>
+          <p>SkillCraft-Interlingua - Dal 1993 Leader nella Formazione</p>
           <p className="text-sm mt-2">Vicenza | Thiene | Online</p>
         </div>
       </footer>

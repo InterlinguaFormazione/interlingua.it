@@ -55,7 +55,7 @@ export default function CodiceEticoPage() {
                 INTERLINGUA FORMAZIONE SRL, corrente in Viale Mazzini, 27, Vicenza cod. fisc. e part. Iva 03828240246, (di seguito denominato anche Ente o Società) svolge l'attività di progettazione, organizzazione, coordinamento e commercializzazione di interventi e piani formativi, nonché il servizio di traduzioni e interpretariato.
               </p>
               <p className="text-muted-foreground leading-relaxed text-sm mt-3">
-                La Società è un'istituzione indipendente costituitasi in Italia nel 1992 e giuridicamente riconosciuta dal 2 maggio 2013 come Società a Responsabilità Limitata a Socio Unico.
+                La Società è un'istituzione indipendente costituitasi in Italia nel 1993 e giuridicamente riconosciuta dal 2 maggio 2013 come Società a Responsabilità Limitata a Socio Unico.
               </p>
               <p className="text-muted-foreground leading-relaxed text-sm mt-3">
                 Nel febbraio del 2003, è stata inserita dalla Regione Veneto nell'elenco degli Organismi di Formazione accreditati per l'ambito della Formazione Continua, quindi reinserita, successivamente al conferimento in Società a Responsabilità Limitata, con nuovo codice ente nel 2013.

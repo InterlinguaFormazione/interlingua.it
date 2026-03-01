@@ -247,7 +247,7 @@ export function HeroSection() {
             className="text-lg sm:text-xl md:text-2xl font-medium text-white/90 mb-3"
             data-testid="hero-subtitle"
           >
-            Lingue, AI, Digital Skills e Crescita Professionale dal 1992
+            Lingue, AI, Digital Skills e Crescita Professionale dal 1993
           </motion.p>
 
           <motion.p
