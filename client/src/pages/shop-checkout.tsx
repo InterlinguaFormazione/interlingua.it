@@ -80,8 +80,9 @@ export default function ShopCheckout() {
   const [cap, setCap] = useState("");
   const [citta, setCitta] = useState("");
   const [provincia, setProvincia] = useState("");
-  const [comuniList, setComuniList] = useState<string[]>([]);
+  const [comuniList, setComuniList] = useState<Array<{ nome: string; cap: string[] }>>([]);
   const [loadingComuni, setLoadingComuni] = useState(false);
+  const [capList, setCapList] = useState<string[]>([]);
   const [ragioneSociale, setRagioneSociale] = useState("");
   const [partitaIva, setPartitaIva] = useState("");
   const [codiceSdi, setCodiceSdi] = useState("");
@@ -354,6 +355,8 @@ export default function ShopCheckout() {
     if (isItaly && provincia) {
       setLoadingComuni(true);
       setCitta("");
+      setCap("");
+      setCapList([]);
       fetch(`/api/comuni/${provincia}`)
         .then((r) => r.json())
         .then((data) => setComuniList(data))
@@ -361,8 +364,21 @@ export default function ShopCheckout() {
         .finally(() => setLoadingComuni(false));
     } else {
       setComuniList([]);
+      setCapList([]);
     }
   }, [provincia, isItaly]);
+
+  const handleComuneChange = (comune: string) => {
+    setCitta(comune);
+    const found = comuniList.find((c) => c.nome === comune);
+    const caps = found?.cap || [];
+    setCapList(caps);
+    if (caps.length === 1) {
+      setCap(caps[0]);
+    } else {
+      setCap("");
+    }
+  };
 
   const handleBillingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1130,13 +1146,9 @@ export default function ShopCheckout() {
                       </div>
 
                       <div className={`grid ${isItaly ? "grid-cols-3" : "grid-cols-2"} gap-4`}>
-                        <div>
-                          <Label htmlFor="cap">{isItaly ? "CAP" : "Codice Postale"} *</Label>
-                          <Input id="cap" value={cap} onChange={(e) => setCap(e.target.value)} maxLength={isItaly ? 5 : 10} className="mt-1" data-testid="input-cap" />
-                        </div>
                         {isItaly && (
                           <div>
-                            <Label htmlFor="provincia">Prov. *</Label>
+                            <Label htmlFor="provincia">Provincia *</Label>
                             <Select value={provincia} onValueChange={setProvincia}>
                               <SelectTrigger className="mt-1" data-testid="select-provincia">
                                 <SelectValue placeholder="Seleziona..." />
@@ -1152,18 +1164,35 @@ export default function ShopCheckout() {
                         <div>
                           <Label htmlFor="citta">{isItaly ? "Comune" : "Città"} *</Label>
                           {isItaly && provincia && comuniList.length > 0 ? (
-                            <Select value={citta} onValueChange={setCitta}>
+                            <Select value={citta} onValueChange={handleComuneChange}>
                               <SelectTrigger className="mt-1" data-testid="select-citta">
                                 <SelectValue placeholder={loadingComuni ? "Caricamento..." : "Seleziona comune..."} />
                               </SelectTrigger>
                               <SelectContent>
                                 {comuniList.map((c) => (
-                                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                                  <SelectItem key={c.nome} value={c.nome}>{c.nome}</SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
                           ) : (
                             <Input id="citta" value={citta} onChange={(e) => setCitta(e.target.value)} className="mt-1" data-testid="input-citta" placeholder={isItaly && provincia ? "Caricamento..." : ""} />
+                          )}
+                        </div>
+                        <div>
+                          <Label htmlFor="cap">{isItaly ? "CAP" : "Codice Postale"} *</Label>
+                          {isItaly && capList.length > 1 ? (
+                            <Select value={cap} onValueChange={setCap}>
+                              <SelectTrigger className="mt-1" data-testid="select-cap">
+                                <SelectValue placeholder="Seleziona CAP..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {capList.map((c) => (
+                                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <Input id="cap" value={cap} onChange={(e) => setCap(e.target.value)} maxLength={isItaly ? 5 : 10} className="mt-1" data-testid="input-cap" readOnly={isItaly && capList.length === 1} />
                           )}
                         </div>
                       </div>

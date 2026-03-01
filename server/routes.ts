@@ -1215,12 +1215,12 @@ export async function registerRoutes(
     }
   });
 
-  const comuniData: Array<{ nome: string; sigla: string }> = (() => {
+  const comuniData: Array<{ nome: string; sigla: string; cap: string[] }> = (() => {
     try {
       const filePath = resolve(process.cwd(), "server", "comuni-data.json");
       const raw = JSON.parse(readFileSync(filePath, "utf-8"));
       console.log(`Loaded ${raw.length} comuni from data file`);
-      return raw.map((c: any) => ({ nome: c.nome, sigla: c.sigla }));
+      return raw.map((c: any) => ({ nome: c.nome, sigla: c.sigla, cap: c.cap || [] }));
     } catch (e) { console.error("Failed to load comuni data:", e); return []; }
   })();
 
@@ -1228,8 +1228,8 @@ export async function registerRoutes(
     const sigla = req.params.sigla.toUpperCase();
     const comuni = comuniData
       .filter((c) => c.sigla === sigla)
-      .map((c) => c.nome)
-      .sort((a, b) => a.localeCompare(b, "it"));
+      .map((c) => ({ nome: c.nome, cap: c.cap }))
+      .sort((a, b) => a.nome.localeCompare(b.nome, "it"));
     res.json(comuni);
   });
 
