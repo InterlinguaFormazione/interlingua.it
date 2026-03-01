@@ -2038,8 +2038,21 @@ export async function registerRoutes(
         }),
       });
 
+      const studentResultData = {
+        finalLevel,
+        sectionResults: sectionResults.map(s => ({
+          sectionName: s.sectionName,
+          cefrLevel: s.cefrLevel,
+          accuracy: s.accuracyPercentage,
+        })),
+        writingLevel: writingTask?.aiScore || null,
+        writingFeedback: writingTask?.aiFeedback || null,
+        speakingLevel: speakingTask?.aiScore || null,
+        speakingFeedback: speakingTask?.aiFeedback || null,
+      };
+
       try {
-        await sendEnglishTestConfirmationEmail(session.email, session.firstName);
+        await sendEnglishTestConfirmationEmail(session.email, session.firstName, studentResultData);
       } catch (e) {
         console.error("Failed to send confirmation email:", e);
       }
@@ -2164,7 +2177,18 @@ export async function registerRoutes(
       });
 
       try {
-        await sendEnglishTestConfirmationEmail(session.email, session.firstName);
+        await sendEnglishTestConfirmationEmail(session.email, session.firstName, {
+          finalLevel,
+          sectionResults: sectionResults.map(s => ({
+            sectionName: s.sectionName,
+            cefrLevel: s.cefrLevel,
+            accuracy: s.accuracyPercentage,
+          })),
+          writingLevel: writingTask?.aiScore || null,
+          writingFeedback: writingTask?.aiFeedback || null,
+          speakingLevel: null,
+          speakingFeedback: null,
+        });
         await sendEnglishTestResultEmail({
           candidateName: `${session.firstName} ${session.lastName}`,
           candidateEmail: session.email,

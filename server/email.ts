@@ -620,18 +620,128 @@ export async function sendEnglishTestResultEmail(data: {
   await ses.send(command);
 }
 
-export async function sendEnglishTestConfirmationEmail(email: string, firstName: string): Promise<void> {
+export async function sendEnglishTestConfirmationEmail(email: string, firstName: string, resultData?: {
+  finalLevel: string;
+  sectionResults: Array<{ sectionName: string; cefrLevel: string | null; accuracy: number | null }>;
+  writingLevel: string | null;
+  writingFeedback: string | null;
+  speakingLevel: string | null;
+  speakingFeedback: string | null;
+}): Promise<void> {
   if (!ses) return;
 
-  const htmlBody = `
-    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;">
-      <div style="background:linear-gradient(135deg,#1e40af,#3b82f6);padding:24px;text-align:center;">
-        <h1 style="color:#fff;margin:0;font-size:20px;">Grazie, ${firstName}!</h1>
+  const courseRecommendations: Record<string, { description: string; courses: string[] }> = {
+    "A0": {
+      description: "You are at the very beginning of your English learning journey. We recommend starting with a foundational course to build essential skills.",
+      courses: ["General English - Beginner (A1)", "English Starter Intensive Course"],
+    },
+    "A1": {
+      description: "You have a basic understanding of English. A structured beginner course will help you build confidence in everyday communication.",
+      courses: ["General English - Elementary (A1-A2)", "English for Daily Life - Beginner"],
+    },
+    "A2": {
+      description: "You can handle simple, everyday situations. An elementary to pre-intermediate course will strengthen your grammar and expand your vocabulary.",
+      courses: ["General English - Pre-Intermediate (A2-B1)", "Conversation Course - Elementary"],
+    },
+    "B1": {
+      description: "You can communicate in most everyday situations. An intermediate course will refine your fluency and introduce more complex language structures.",
+      courses: ["General English - Intermediate (B1-B2)", "Business English - Intermediate", "Cambridge PET Preparation"],
+    },
+    "B2": {
+      description: "You communicate effectively in most contexts. An upper-intermediate course will polish your skills for professional or academic settings.",
+      courses: ["General English - Upper-Intermediate (B2-C1)", "Business English - Upper-Intermediate", "Cambridge FCE Preparation", "Full Immersion Course"],
+    },
+    "C1": {
+      description: "You have an advanced command of English. A course focused on precision, nuance, and specialised language will help you reach near-native fluency.",
+      courses: ["Advanced English (C1-C2)", "Business English - Advanced", "Cambridge CAE Preparation", "Full Immersion Course"],
+    },
+    "C2": {
+      description: "Congratulations — you have a near-native command of English! A proficiency-level course can help you maintain and sharpen your skills in specialised areas.",
+      courses: ["English Masterclass (C2)", "Cambridge CPE Preparation", "Specialised Business English", "Full Immersion Course"],
+    },
+  };
+
+  let resultBlock = "";
+  let courseBlock = "";
+  let subjectSuffix = "";
+
+  if (resultData) {
+    subjectSuffix = ` — Your Level: ${resultData.finalLevel}`;
+
+    const rec = courseRecommendations[resultData.finalLevel] || courseRecommendations["B1"];
+
+    const sectionRows = resultData.sectionResults.map(s =>
+      `<tr>
+        <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#334155;">${s.sectionName}</td>
+        <td style="padding:10px 12px;text-align:center;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#1e40af;">${s.cefrLevel || "N/A"}</td>
+        <td style="padding:10px 12px;text-align:center;border-bottom:1px solid #e2e8f0;color:#334155;">${s.accuracy !== null ? s.accuracy + "%" : "N/A"}</td>
+      </tr>`
+    ).join("");
+
+    const writingRow = resultData.writingLevel ? `
+      <tr>
+        <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#334155;">✍️ Writing</td>
+        <td style="padding:10px 12px;text-align:center;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#2563eb;">${resultData.writingLevel}</td>
+        <td style="padding:10px 12px;text-align:center;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:12px;font-style:italic;">${resultData.writingFeedback ? resultData.writingFeedback.substring(0, 80) + (resultData.writingFeedback.length > 80 ? "..." : "") : ""}</td>
+      </tr>` : "";
+
+    const speakingRow = resultData.speakingLevel ? `
+      <tr>
+        <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#334155;">🎤 Speaking</td>
+        <td style="padding:10px 12px;text-align:center;border-bottom:1px solid #e2e8f0;font-weight:bold;color:#7c3aed;">${resultData.speakingLevel}</td>
+        <td style="padding:10px 12px;text-align:center;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:12px;font-style:italic;">${resultData.speakingFeedback ? resultData.speakingFeedback.substring(0, 80) + (resultData.speakingFeedback.length > 80 ? "..." : "") : ""}</td>
+      </tr>` : "";
+
+    resultBlock = `
+      <div style="text-align:center;margin:24px 0;">
+        <p style="color:#64748b;font-size:13px;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;">Your Overall Level</p>
+        <div style="display:inline-block;background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;padding:16px 40px;border-radius:12px;font-size:32px;font-weight:bold;letter-spacing:2px;">${resultData.finalLevel}</div>
       </div>
-      <div style="padding:24px;">
-        <p>Thank you for completing the English Adaptive Test.</p>
-        <p>Your results have been submitted and will be reviewed by our team. You will receive detailed feedback from the school shortly.</p>
-        <p style="color:#666;font-size:13px;margin-top:24px;">Best regards,<br/>Interlingua / SkillCraft</p>
+
+      <h3 style="color:#1e293b;font-size:16px;margin:28px 0 12px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;">📊 Section Breakdown</h3>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:8px;">
+        <tr style="background:#f1f5f9;">
+          <th style="padding:10px 12px;text-align:left;font-size:13px;color:#64748b;">Section</th>
+          <th style="padding:10px 12px;text-align:center;font-size:13px;color:#64748b;">Level</th>
+          <th style="padding:10px 12px;text-align:center;font-size:13px;color:#64748b;">Accuracy</th>
+        </tr>
+        ${sectionRows}
+        ${writingRow}
+        ${speakingRow}
+      </table>
+    `;
+
+    const courseList = rec.courses.map(c => `<li style="padding:4px 0;color:#334155;">${c}</li>`).join("");
+
+    courseBlock = `
+      <div style="margin:28px 0;padding:20px;background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border-radius:12px;border-left:4px solid #3b82f6;">
+        <h3 style="color:#1e40af;font-size:16px;margin:0 0 10px;">🎯 Our Recommendation for You</h3>
+        <p style="color:#334155;font-size:14px;line-height:1.6;margin:0 0 12px;">${rec.description}</p>
+        <p style="color:#1e40af;font-size:13px;font-weight:bold;margin:0 0 6px;">Suggested courses:</p>
+        <ul style="margin:0;padding-left:20px;font-size:14px;">${courseList}</ul>
+      </div>
+
+      <div style="text-align:center;margin:20px 0;">
+        <a href="https://skillcraft.interlingua.it" style="display:inline-block;background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">Explore Our Courses</a>
+      </div>
+    `;
+  }
+
+  const htmlBody = `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;">
+      <div style="background:linear-gradient(135deg,#1e40af,#3b82f6);padding:28px;text-align:center;">
+        <h1 style="color:#fff;margin:0;font-size:22px;">Grazie, ${firstName}!</h1>
+        <p style="color:#dbeafe;margin:8px 0 0;font-size:14px;">English Adaptive Test — Results</p>
+      </div>
+      <div style="padding:28px;">
+        <p style="color:#334155;font-size:15px;line-height:1.6;">Thank you for completing the English Adaptive Test. Here are your results:</p>
+        ${resultBlock}
+        ${courseBlock}
+        <p style="color:#334155;font-size:14px;line-height:1.6;">If you have any questions about your results or would like to discuss the best course for your needs, please don't hesitate to contact us.</p>
+        <div style="margin-top:28px;padding:16px;background:#f8fafc;border-radius:8px;text-align:center;">
+          <p style="margin:0;color:#64748b;font-size:12px;">Test completed: ${new Date().toLocaleDateString("it-IT", { day:"2-digit", month:"long", year:"numeric", hour:"2-digit", minute:"2-digit" })}</p>
+          <p style="margin:8px 0 0;color:#94a3b8;font-size:11px;">Interlingua / SkillCraft</p>
+        </div>
       </div>
     </div>`;
 
@@ -639,7 +749,7 @@ export async function sendEnglishTestConfirmationEmail(email: string, firstName:
     Source: FROM_EMAIL,
     Destination: { ToAddresses: [email] },
     Message: {
-      Subject: { Data: "English Adaptive Test - Thank You", Charset: "UTF-8" },
+      Subject: { Data: `English Adaptive Test — Results${subjectSuffix}`, Charset: "UTF-8" },
       Body: { Html: { Data: htmlBody, Charset: "UTF-8" } },
     },
   });
