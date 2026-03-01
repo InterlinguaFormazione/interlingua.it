@@ -17,6 +17,7 @@ const footerLinks = {
     { label: "Le Nostre Sedi", href: "/sedi" },
     { label: "Il Nostro Team", href: "/chi-siamo" },
     { label: "Testimonianze", href: "#testimonials" },
+    { label: "Soddisfazione Cliente", href: "https://quality-skillcraft.interlingua.it/", external: true },
     { label: "Lavora con Noi", href: "#contact" },
   ],
   supporto: [
@@ -133,13 +134,25 @@ export function Footer() {
             <ul className="space-y-3">
               {footerLinks.azienda.map((link) => (
                 <li key={link.label}>
-                  <button
-                    onClick={() => handleNavClick(link.href)}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                    data-testid={`link-footer-${link.label.toLowerCase().replace(/\s/g, "-")}`}
-                  >
-                    {link.label}
-                  </button>
+                  {link.external ? (
+                    <a
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      data-testid={`link-footer-${link.label.toLowerCase().replace(/\s/g, "-")}`}
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <button
+                      onClick={() => handleNavClick(link.href)}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      data-testid={`link-footer-${link.label.toLowerCase().replace(/\s/g, "-")}`}
+                    >
+                      {link.label}
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
