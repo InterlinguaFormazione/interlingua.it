@@ -156,7 +156,7 @@ export default function ChiSiamoPage() {
             >
               <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
                 <Star className="w-3 h-3 mr-1" />
-                Dal 1993
+                Dal 1992
               </Badge>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                 La Tua Crescita è la{" "}

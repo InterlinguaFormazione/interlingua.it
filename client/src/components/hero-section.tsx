@@ -43,7 +43,7 @@ function useCounter(end: number, duration: number = 2000, decimals: number = 0) 
 }
 
 const stats = [
-  { icon: Users, end: 10000, suffix: "+", label: "Studenti Formati", decimals: 0 },
+  { icon: Users, end: 15000, suffix: "+", label: "Studenti Formati", decimals: 0 },
   { icon: BookOpen, end: 20, suffix: "+", label: "Corsi Disponibili", decimals: 0 },
   { icon: Award, end: 30, suffix: "+", label: "Anni di Esperienza", decimals: 0 },
   { icon: Star, end: 4.8, suffix: "", label: "Stelle Google", decimals: 1 },
@@ -247,7 +247,7 @@ export function HeroSection() {
             className="text-lg sm:text-xl md:text-2xl font-medium text-white/90 mb-3"
             data-testid="hero-subtitle"
           >
-            Intelligenza Artificiale, Competenze Digitali e Crescita Professionale dal 1993
+            Intelligenza Artificiale, Competenze Digitali e Crescita Professionale dal 1992
           </motion.p>
 
           <motion.p

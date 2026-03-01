@@ -60,7 +60,7 @@ function AnimatedSection({ children, className = "" }: { children: React.ReactNo
 const locations = [
   {
     name: "Sede di Vicenza",
-    subtitle: "Sede Principale — dal 1993",
+    subtitle: "Sede Principale — dal 1992",
     address: "Viale Giuseppe Mazzini, 27",
     city: "36100 Vicenza (VI)",
     phone: "+39 0444 321601",
@@ -104,10 +104,10 @@ const locations = [
 ];
 
 const highlights = [
-  { icon: GraduationCap, label: "30+ anni di esperienza", desc: "Formazione dal 1993" },
+  { icon: GraduationCap, label: "30+ anni di esperienza", desc: "Formazione dal 1992" },
   { icon: Users, label: "2 sedi operative", desc: "Vicenza e Thiene" },
   { icon: Globe, label: "10+ lingue insegnate", desc: "Docenti madrelingua" },
-  { icon: Star, label: "5000+ studenti formati", desc: "Privati e aziende" },
+  { icon: Star, label: "15.000+ studenti formati", desc: "Privati e aziende" },
 ];
 
 export default function SediPage() {
@@ -208,7 +208,7 @@ export default function SediPage() {
                 <span className="gradient-text">Due sedi, una missione</span>
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                Dal 1993 formiamo professionisti e studenti con passione e competenza. Le nostre sedi sono progettate per offrirti il miglior ambiente di apprendimento.
+                Dal 1992 formiamo professionisti e studenti con passione e competenza. Le nostre sedi sono progettate per offrirti il miglior ambiente di apprendimento.
               </p>
             </AnimatedSection>
 

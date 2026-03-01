@@ -3,7 +3,7 @@ import { motion, useInView } from "framer-motion";
 import { Users, GraduationCap, Award, Calendar } from "lucide-react";
 
 const stats = [
-  { icon: Users, value: 5000, suffix: "+", label: "Studenti Formati", duration: 2000 },
+  { icon: Users, value: 15000, suffix: "+", label: "Studenti Formati", duration: 2000 },
   { icon: GraduationCap, value: 200, suffix: "+", label: "Corsi Erogati", duration: 1800 },
   { icon: Award, value: 30, suffix: "+", label: "Anni di Esperienza", duration: 1500 },
   { icon: Calendar, value: 98, suffix: "%", label: "Soddisfazione Clienti", duration: 2200 },
