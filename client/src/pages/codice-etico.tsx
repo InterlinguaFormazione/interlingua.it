@@ -392,7 +392,7 @@ export default function CodiceEticoPage() {
 
             <section className="border-t pt-8 mt-8">
               <p className="text-xs text-muted-foreground/70 leading-relaxed">
-                Interlingua Formazione S.r.l. (unipersonale) — Capitale Sociale € 10.000,00 i.v. — P.IVA e Cod. Fiscale 03828240246 — Iscrizione CCIAA R.E.A. VI-357313
+                Interlingua Formazione S.r.l. (unipersonale) — Capitale Sociale € 10.000,00 i.v. — P.IVA e Cod. Fiscale 03828240246 — Codice Destinatario: M5UXCR1 — Iscrizione CCIAA R.E.A. VI-357313
               </p>
               <p className="text-xs text-muted-foreground/70 leading-relaxed mt-1">
                 Sede Legale: Viale Mazzini, 27 — 36100 Vicenza — Tel/Fax 0444 321601

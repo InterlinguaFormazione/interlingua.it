@@ -308,6 +308,7 @@ export default function PrivacyPolicyPage() {
                 <p>Viale Giuseppe Mazzini 27</p>
                 <p>36100 Vicenza (VI), Italia</p>
                 <p>P.IVA e C.F.: 03828240246</p>
+                <p>Codice Destinatario: M5UXCR1</p>
               </div>
 
               <h3 className="font-bold mb-2">Contatti per la privacy:</h3>

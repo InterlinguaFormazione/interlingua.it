@@ -205,7 +205,8 @@ export function Footer() {
             </div>
             <div className="text-xs text-muted-foreground/70 text-center sm:text-left leading-relaxed" data-testid="text-company-details">
               <p>Interlingua Formazione S.r.l. — Sede legale: Viale Giuseppe Mazzini 27, 36100 Vicenza (VI), Italia</p>
-              <p>P. IVA 03828240246 — Registro Imprese di Vicenza VI-357313 — Capitale Sociale € 10.000 i.v.</p>
+              <p>P. IVA 03828240246 — C.F. 03828240246 — Codice Destinatario: M5UXCR1</p>
+              <p>Registro Imprese di Vicenza VI-357313 — Capitale Sociale € 10.000 i.v.</p>
               <p>Ente accreditato dalla Regione Veneto per la Formazione Continua</p>
             </div>
           </div>

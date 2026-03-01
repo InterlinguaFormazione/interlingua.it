@@ -46,6 +46,8 @@ export default function TerminiECondizioniPage() {
                 <p className="text-muted-foreground"><strong className="text-foreground">Sede legale:</strong> Viale Giuseppe Mazzini 27, 36100 Vicenza (VI), Italia</p>
                 <p className="text-muted-foreground"><strong className="text-foreground">Sede operativa:</strong> Corso Garibaldi 174, 36016 Thiene (VI), Italia</p>
                 <p className="text-muted-foreground"><strong className="text-foreground">P. IVA:</strong> 03828240246</p>
+                <p className="text-muted-foreground"><strong className="text-foreground">C.F.:</strong> 03828240246</p>
+                <p className="text-muted-foreground"><strong className="text-foreground">Codice Destinatario:</strong> M5UXCR1</p>
                 <p className="text-muted-foreground"><strong className="text-foreground">Registro Imprese:</strong> Camera di Commercio di Vicenza — VI-357313</p>
                 <p className="text-muted-foreground"><strong className="text-foreground">Capitale Sociale:</strong> € 10.000 i.v.</p>
                 <p className="text-muted-foreground"><strong className="text-foreground">Email:</strong> infocorsi@skillcraft.interlingua.it</p>
