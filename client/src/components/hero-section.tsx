@@ -196,7 +196,7 @@ export function HeroSection() {
           >
             <Badge variant="secondary" className="mb-8 px-5 py-2.5 bg-white/[0.08] backdrop-blur-md border-white/[0.15] text-white no-default-hover-elevate no-default-active-elevate" data-testid="badge-leader">
               <Sparkles className="w-4 h-4 mr-2" />
-              AI, Digital Skills e Formazione Professionale
+              Lingue, AI e Formazione Professionale
             </Badge>
           </motion.div>
 
@@ -247,7 +247,7 @@ export function HeroSection() {
             className="text-lg sm:text-xl md:text-2xl font-medium text-white/90 mb-3"
             data-testid="hero-subtitle"
           >
-            Intelligenza Artificiale, Competenze Digitali e Crescita Professionale dal 1992
+            Lingue, AI, Digital Skills e Crescita Professionale dal 1992
           </motion.p>
 
           <motion.p
@@ -257,9 +257,9 @@ export function HeroSection() {
             className="text-base sm:text-lg text-white/60 mb-10 max-w-2xl mx-auto leading-relaxed"
             data-testid="hero-description"
           >
-            Impara a usare l'AI per la tua produttività. Corsi di ChatGPT, Copilot,
-            automazione, digital marketing, soft skills, management e lingue.
-            Percorsi formativi su misura, in presenza o online.
+            Corsi di lingua con docenti madrelingua, Full Immersion, Language Coaching,
+            competenze digitali, AI, soft skills e management.
+            In presenza a Vicenza e Thiene, online o in modalità blended.
           </motion.p>
 
           <motion.div
