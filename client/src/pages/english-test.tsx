@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { GraduationCap, CheckCircle, ChevronRight, Loader2, Mic, MicOff, PenTool, Volume2, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight, User, Mail, Phone, Building2, MapPin, Map, Play, Pause, RotateCcw } from "lucide-react";
+import { GraduationCap, CheckCircle, ChevronRight, Loader2, Mic, MicOff, PenTool, Volume2, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight, ArrowLeft, User, Mail, Phone, Building2, MapPin, Map, Play, Pause, RotateCcw } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 type Phase = "registration" | "audio-check" | "self-assessment" | "mc-questions" | "writing" | "speaking" | "results";
@@ -562,6 +562,18 @@ export default function EnglishTestPage() {
         <div className="absolute -bottom-20 right-1/4 w-72 h-72 bg-violet-200/20 dark:bg-violet-800/10 rounded-full blur-3xl" />
       </div>
       <div className="relative container mx-auto px-4 py-10 max-w-4xl">
+        {(phase === "registration" || phase === "audio-check" || phase === "self-assessment") && (
+          <div className="mb-6">
+            <a
+              href="/"
+              className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+              data-testid="link-back-home"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Torna alla home
+            </a>
+          </div>
+        )}
         {(phase === "registration" || phase === "audio-check" || phase === "self-assessment") && (
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-blue-700 dark:text-blue-300 px-5 py-2 rounded-full text-sm font-medium mb-5 border border-blue-100 dark:border-blue-800/40 shadow-sm">
