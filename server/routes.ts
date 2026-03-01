@@ -5,7 +5,7 @@ import { insertContactSchema, insertNewsletterSchema, insertCookieConsentSchema,
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendSubscriptionConfirmation, sendBookingConfirmation } from "./email";
-import { forwardToCRM } from "./crm";
+import { forwardToCRM, forwardPurchaseToCRM, forwardTestToCRM, forwardNewsletterToCRM } from "./crm";
 import { generateBlogPost } from "./blog-generator";
 import { chatWithAI } from "./ai-chat";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalOrder } from "./paypal";
@@ -459,6 +459,12 @@ export async function registerRoutes(
         await sendNewsletterConfirmation(validatedData.email);
       } catch (emailError) {
         console.error("Failed to send newsletter confirmation email:", emailError);
+      }
+
+      try {
+        await forwardNewsletterToCRM(validatedData.email);
+      } catch (crmError) {
+        console.error("Failed to forward newsletter to CRM:", crmError);
       }
 
       res.status(201).json({ 
@@ -1181,6 +1187,23 @@ export async function registerRoutes(
         console.error("Failed to send subscription confirmation email:", emailError);
       }
 
+      try {
+        await forwardPurchaseToCRM({
+          firstName: nome,
+          lastName: cognome,
+          email,
+          phone: null,
+          city: citta || null,
+          province: provincia || null,
+          productName: "Speaker's Corner (Abbonamento Annuale)",
+          amount: verification.amount || "200.00",
+          paymentMethod: "PayPal",
+          source: "speakers-corner",
+        });
+      } catch (crmError) {
+        console.error("Failed to forward SC purchase to CRM:", crmError);
+      }
+
       const { password: _, ...safeSubscriber } = subscriber;
       res.json({ success: true, subscriber: safeSubscriber });
     } catch (error) {
@@ -1379,6 +1402,23 @@ export async function registerRoutes(
         console.error("Failed to send shop purchase notification:", emailError);
       }
 
+      try {
+        await forwardPurchaseToCRM({
+          firstName: customerFirstName,
+          lastName: customerLastName,
+          email: customerEmail,
+          phone: customerPhone || null,
+          city: billingCitta || null,
+          province: billingProvincia || null,
+          productName: productNameWithOptions,
+          amount: finalPrice,
+          paymentMethod: "PayPal",
+          source: "shop-acquisto",
+        });
+      } catch (crmError) {
+        console.error("Failed to forward shop purchase to CRM:", crmError);
+      }
+
       res.json({ success: true, order, customerToken, customerId });
     } catch (error) {
       console.error("Error processing shop purchase:", error);
@@ -1561,6 +1601,23 @@ export async function registerRoutes(
         });
       } catch (emailError) {
         console.error("Failed to send cart purchase notification:", emailError);
+      }
+
+      try {
+        await forwardPurchaseToCRM({
+          firstName: customerFirstName,
+          lastName: customerLastName,
+          email: customerEmail,
+          phone: customerPhone || null,
+          city: billingCitta || null,
+          province: billingProvincia || null,
+          productName: itemsSummary,
+          amount: finalTotal.toFixed(2),
+          paymentMethod: "PayPal",
+          source: "shop-carrello",
+        });
+      } catch (crmError) {
+        console.error("Failed to forward cart purchase to CRM:", crmError);
       }
 
       res.json({ success: true, orders, customerToken, customerId });
@@ -2163,6 +2220,23 @@ export async function registerRoutes(
         console.error("Failed to send Carta della Cultura purchase notification:", emailError);
       }
 
+      try {
+        await forwardPurchaseToCRM({
+          firstName: customerFirstName,
+          lastName: customerLastName,
+          email: customerEmail,
+          phone: customerPhone || null,
+          city: billingCitta || null,
+          province: billingProvincia || null,
+          productName: productNameWithOptions,
+          amount: finalPrice,
+          paymentMethod: "Carta della Cultura",
+          source: "carta-cultura",
+        });
+      } catch (crmError) {
+        console.error("Failed to forward Carta Cultura purchase to CRM:", crmError);
+      }
+
       res.json({ success: true, order, customerToken, customerId });
     } catch (error) {
       console.error("Error processing Carta della Cultura purchase:", error);
@@ -2360,6 +2434,23 @@ export async function registerRoutes(
         console.error("Failed to send Carta della Cultura cart purchase notification:", emailError);
       }
 
+      try {
+        await forwardPurchaseToCRM({
+          firstName: customerFirstName,
+          lastName: customerLastName,
+          email: customerEmail,
+          phone: customerPhone || null,
+          city: billingCitta || null,
+          province: billingProvincia || null,
+          productName: allProductNames,
+          amount: finalTotal.toFixed(2),
+          paymentMethod: "Carta della Cultura",
+          source: "carta-cultura-carrello",
+        });
+      } catch (crmError) {
+        console.error("Failed to forward Carta Cultura cart to CRM:", crmError);
+      }
+
       res.json({ success: true, order, customerToken, customerId });
     } catch (error) {
       console.error("Error processing Carta della Cultura cart purchase:", error);
@@ -2489,6 +2580,23 @@ export async function registerRoutes(
         consecutiveIncorrectA1: 0,
         testType,
       });
+
+      try {
+        await forwardTestToCRM({
+          firstName,
+          lastName,
+          email,
+          phone: phone || null,
+          city: city || null,
+          province: province || null,
+          selfAssessedLevel,
+          finalLevel: null,
+          language,
+          source: `test-${language}-inizio`,
+        });
+      } catch (crmError) {
+        console.error("Failed to forward test start to CRM:", crmError);
+      }
 
       const allQuestions = await storage.getBeQuestionsByLanguage(language);
       let firstQuestion = null;
@@ -3080,6 +3188,23 @@ export async function registerRoutes(
         console.error("Failed to send admin result email:", e);
       }
 
+      try {
+        await forwardTestToCRM({
+          firstName: session.firstName,
+          lastName: session.lastName,
+          email: session.email,
+          phone: session.phone || null,
+          city: session.city || null,
+          province: session.province || null,
+          selfAssessedLevel: session.selfAssessedLevel,
+          finalLevel,
+          language,
+          source: `test-${language}-completato`,
+        });
+      } catch (crmError) {
+        console.error("Failed to forward test completion to CRM:", crmError);
+      }
+
       res.json({
         success: true,
         finalLevel,
@@ -3204,6 +3329,23 @@ export async function registerRoutes(
         });
       } catch (e) {
         console.error("Failed to send emails:", e);
+      }
+
+      try {
+        await forwardTestToCRM({
+          firstName: session.firstName,
+          lastName: session.lastName,
+          email: session.email,
+          phone: session.phone || null,
+          city: session.city || null,
+          province: session.province || null,
+          selfAssessedLevel: session.selfAssessedLevel,
+          finalLevel,
+          language,
+          source: `test-${language}-completato`,
+        });
+      } catch (crmError) {
+        console.error("Failed to forward test completion to CRM:", crmError);
       }
 
       res.json({

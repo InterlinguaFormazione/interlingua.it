@@ -18,7 +18,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - **Backend**: Express.js
 - **Database**: PostgreSQL (Drizzle ORM)
 - **Email**: AWS SES (gracefully disabled if credentials not set)
-- **CRM Integration**: Webhook to `crm.skillcraft.it` (via `server/crm.ts`)
+- **CRM Integration**: Webhook to `crm-privati.skillcraft.it` (via `server/crm.ts`, env: CRM_API_KEY + CRM_WEBHOOK_URL)
 - **State Management**: TanStack React Query
 - **Animations**: Framer Motion
 - **Routing**: Wouter
@@ -82,7 +82,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `../scripts/generate-audio.ts` - One-time TTS script (OpenAI tts-1) that generated 63 MP3 files for Italian (15), German (18), French (15), Spanish (15) listening comprehension. Audio files stored in `client/public/audio/{italian,german,french,spanish}/`
 - `carta-cultura.ts` - Carta della Cultura Giovani/Merito SOAP client (certificate-based mTLS, voucher check/confirm via Sogei web service). Supports split payment: if CC voucher amount < order total, remainder is paid via PayPal. Certificate: `server/certs/carta-cultura.cer` (PEM, valid until Aug 2028). Private key: `CARTA_CULTURA_PRIVATE_KEY` env var.
 - `email.ts` - AWS SES email notifications (contact, newsletter, subscription payment, booking confirmation, English test results)
-- `crm.ts` - CRM webhook integration (forwards contact submissions)
+- `crm.ts` - CRM webhook integration (forwards all form submissions, purchases, newsletter signups, and test results to SkillCraft CRM at crm-privati.skillcraft.it via POST /api/webhook/nuova-richiesta). Uses CRM_API_KEY secret and CRM_WEBHOOK_URL env var. Integrated into: contact form, newsletter, shop purchases (single + cart), Speaker's Corner, Carta della Cultura (single + cart), and all language test starts/completions.
 - `blog-generator.ts` - Automated blog generation
 
 ### Shared (`shared/`)
