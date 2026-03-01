@@ -30,10 +30,20 @@ export interface EnglishTestScore {
   feedback: string;
 }
 
-export async function scoreWriting(prompt: string, response: string, currentLevel: string): Promise<EnglishTestScore> {
+export async function scoreWriting(prompt: string, response: string, currentLevel: string, language: string = "english"): Promise<EnglishTestScore> {
   const openai = getOpenAI();
 
-  const systemPrompt = `You are an expert English language examiner. Evaluate a candidate's written response for a General English placement test.
+  const languageNames: Record<string, string> = {
+    english: "English",
+    italian: "Italian",
+    german: "German",
+    french: "French",
+    spanish: "Spanish",
+  };
+  const langName = languageNames[language] || "English";
+
+  const systemPrompt = `You are an expert ${langName} language examiner. Evaluate a candidate's written response for a General ${langName} placement test.
+The candidate's response MUST be evaluated as ${langName} writing. If the response is not in ${langName}, score it very low.
 The candidate's estimated CEFR level is ${currentLevel}.
 
 Score these four dimensions from 0-100:

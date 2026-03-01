@@ -1838,7 +1838,8 @@ export async function registerRoutes(
         : await scoreWriting(
             prompt || getWritingPrompt(session.currentLevel),
             responseText,
-            session.currentLevel
+            session.currentLevel,
+            language
           );
 
       await storage.createBeWritingSpeaking({
