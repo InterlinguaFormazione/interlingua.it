@@ -325,7 +325,7 @@ export default function EnglishTestPage() {
         } else {
           if (data.sectionAdvanced && data.currentSkill !== currentSkill) {
             setSectionTransition(SKILL_LABELS[data.currentSkill] || data.currentSkill);
-            setTimeout(() => setSectionTransition(null), 2000);
+            setTimeout(() => setSectionTransition(null), 1000);
           }
           setCurrentQuestion(data.question);
           setCurrentSkill(data.currentSkill);
