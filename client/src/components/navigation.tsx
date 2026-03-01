@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import logoImage from "@assets/SKILLCRAFT-INTERLINGUA_1769354785857.png";
 
 const navLinks = [
-  { href: "/english-test", label: "English Test" },
+  { href: "/test-di-livello", label: "Test di Livello" },
   { href: "/shop", label: "Shop Corsi" },
   { href: "/bandi-e-corsi-finanziati", label: "Bandi e Corsi Finanziati" },
   { href: "/chi-siamo", label: "Chi Siamo" },
