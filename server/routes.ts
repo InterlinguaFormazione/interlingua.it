@@ -11,6 +11,7 @@ import { chatWithAI } from "./ai-chat";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalOrder } from "./paypal";
 import { checkVoucher, confirmVoucher, isCartaCulturaAvailable, ALLOWED_AMBITO, ALLOWED_BENE } from "./carta-cultura";
 import { SHOP_PRODUCTS, getProductBySlug, getEffectivePrice } from "@shared/products";
+import { validateCodiceFiscale } from "@shared/cf-validator";
 import { scoreWriting, scoreSpeaking, transcribeAudio } from "./english-test";
 import { getAllQuestions } from "./english-test-questions";
 import { getAllQuestions as getItalianQuestions } from "./italian-test-questions";
@@ -1220,6 +1221,13 @@ export async function registerRoutes(
     try {
       const { paypalOrderId, productSlug, customerFirstName, customerLastName, customerEmail, customerPhone, billingCodiceFiscale, billingIndirizzo, billingCap, billingCitta, billingProvincia, billingPartitaIva, billingCodiceSdi, billingPec, notes } = req.body;
 
+      if (billingCodiceFiscale) {
+        const cfCheck = validateCodiceFiscale(billingCodiceFiscale);
+        if (!cfCheck.valid) {
+          return res.status(400).json({ success: false, message: cfCheck.message });
+        }
+      }
+
       const orderData = {
         productSlug: req.body.productSlug,
         productName: "",
@@ -1433,6 +1441,13 @@ export async function registerRoutes(
 
       if (!paypalOrderId || !cartItemsJson || !customerFirstName || !customerLastName || !customerEmail) {
         return res.status(400).json({ success: false, message: "Dati mancanti." });
+      }
+
+      if (billingCodiceFiscale) {
+        const cfCheck = validateCodiceFiscale(billingCodiceFiscale);
+        if (!cfCheck.valid) {
+          return res.status(400).json({ success: false, message: cfCheck.message });
+        }
       }
 
       if (!req.body.acceptedTerms || req.body.acceptedTerms !== "true") {
@@ -2139,6 +2154,13 @@ export async function registerRoutes(
         return res.status(400).json({ success: false, message: "Codice voucher Carta della Cultura mancante." });
       }
 
+      if (billingCodiceFiscale) {
+        const cfCheck = validateCodiceFiscale(billingCodiceFiscale);
+        if (!cfCheck.valid) {
+          return res.status(400).json({ success: false, message: cfCheck.message });
+        }
+      }
+
       const product = getProductBySlug(productSlug);
       if (!product) {
         return res.status(400).json({ success: false, message: "Prodotto non trovato." });
@@ -2351,6 +2373,13 @@ export async function registerRoutes(
       }
       if (!customerFirstName || !customerLastName || !customerEmail) {
         return res.status(400).json({ success: false, message: "Dati cliente mancanti." });
+      }
+
+      if (billingCodiceFiscale) {
+        const cfCheck = validateCodiceFiscale(billingCodiceFiscale);
+        if (!cfCheck.valid) {
+          return res.status(400).json({ success: false, message: cfCheck.message });
+        }
       }
 
       let items: Array<{ slug: string; quantity: number; selectedOptions?: Record<string, string> }>;
