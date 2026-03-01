@@ -162,32 +162,36 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} SkillCraft-Interlingua. Tutti i diritti riservati.
-            </p>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => {
-                  window.dispatchEvent(new Event("open-cookie-settings"));
-                }}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
-                data-testid="button-cookie-preferences"
-              >
-                <Cookie className="h-3.5 w-3.5" />
-                Preferenze Cookie
-              </button>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-sm text-muted-foreground">
-                Ente accreditato Regione Veneto
+                © {new Date().getFullYear()} SkillCraft-Interlingua. Tutti i diritti riservati.
               </p>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={scrollToTop}
-                data-testid="button-back-to-top"
-              >
-                <ArrowUp className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => {
+                    window.dispatchEvent(new Event("open-cookie-settings"));
+                  }}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1.5"
+                  data-testid="button-cookie-preferences"
+                >
+                  <Cookie className="h-3.5 w-3.5" />
+                  Preferenze Cookie
+                </button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={scrollToTop}
+                  data-testid="button-back-to-top"
+                >
+                  <ArrowUp className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="text-xs text-muted-foreground/70 text-center sm:text-left leading-relaxed" data-testid="text-company-details">
+              <p>Interlingua Formazione S.r.l. — Sede legale: Viale Giuseppe Mazzini 27, 36100 Vicenza (VI), Italia</p>
+              <p>P. IVA 03828240246 — Registro Imprese di Vicenza VI-357313 — Capitale Sociale € 10.000 i.v.</p>
+              <p>Ente accreditato dalla Regione Veneto per la Formazione Continua</p>
             </div>
           </div>
         </div>
