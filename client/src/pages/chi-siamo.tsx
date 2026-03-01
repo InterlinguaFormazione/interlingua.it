@@ -609,11 +609,6 @@ export default function ChiSiamoPage() {
                 image: "/images/team/docenti/will.jpg",
               },
               {
-                name: "Stephanie Vella",
-                role: "Coach e Formatore CLIL",
-                image: "/images/team/docenti/stephanie.jpg",
-              },
-              {
                 name: "Marcus",
                 role: "Tutor di Inglese e Formatore CLIL",
                 image: "/images/team/docenti/marcus.jpg",
@@ -676,7 +671,7 @@ export default function ChiSiamoPage() {
             </h3>
             <p className="text-muted-foreground mb-6">Professionisti specializzati in competenze digitali, trasversali e gestionali</p>
           </motion.div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {[
               {
                 name: "Valentino Spolaore",
@@ -697,6 +692,12 @@ export default function ChiSiamoPage() {
                 color: "from-teal-500 to-green-500",
               },
               {
+                name: "Stephanie Vella",
+                role: "Coach e Formatore CLIL",
+                bio: "Coach professionista e formatrice CLIL con esperienza nella formazione linguistica integrata e nello sviluppo delle competenze comunicative.",
+                image: "/images/team/docenti/stephanie.jpg",
+              },
+              {
                 name: "Andrea",
                 role: "Intelligenza Artificiale & AI Ambassador",
                 bio: "Esperto di Intelligenza Artificiale e AI Ambassador presso SkillCraft. Si occupa di applicazioni pratiche dell'AI per aziende e professionisti, aiutando a integrare queste tecnologie nei processi aziendali per migliorarne l'efficienza e l'innovazione.",
@@ -711,9 +712,17 @@ export default function ChiSiamoPage() {
                 transition={{ delay: index * 0.1 }}
               >
                 <Card className="p-6 h-full text-center hover-elevate" data-testid={`card-expert-${index}`}>
-                  <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${member.color} mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold`}>
-                    {member.name.split(" ")[0][0]}{member.name.split(" ").slice(-1)[0][0]}
-                  </div>
+                  {"image" in member && member.image ? (
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
+                    />
+                  ) : (
+                    <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${member.color} mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold`}>
+                      {member.name.split(" ")[0][0]}{member.name.split(" ").slice(-1)[0][0]}
+                    </div>
+                  )}
                   <h3 className="font-bold text-lg mb-1">{member.name}</h3>
                   <Badge variant="secondary" className="mb-3">{member.role}</Badge>
                   <p className="text-sm text-muted-foreground">{member.bio}</p>
