@@ -226,6 +226,23 @@ export default function SpanishTestPage() {
     }
   }, [phase]);
 
+  useEffect(() => {
+    const prevLang = document.documentElement.lang;
+    document.documentElement.lang = "es";
+    document.documentElement.setAttribute("translate", "no");
+    document.documentElement.classList.add("notranslate");
+    const meta = document.createElement("meta");
+    meta.name = "google";
+    meta.content = "notranslate";
+    document.head.appendChild(meta);
+    return () => {
+      document.documentElement.lang = prevLang || "";
+      document.documentElement.removeAttribute("translate");
+      document.documentElement.classList.remove("notranslate");
+      meta.remove();
+    };
+  }, []);
+
   const handleRegistration = async (data: z.infer<typeof registrationSchema>) => {
     setRegistrationData(data);
     setPhase("audio-check");
@@ -353,7 +370,7 @@ export default function SpanishTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50/50 to-violet-50 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50/50 to-violet-50 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950 relative overflow-hidden notranslate" translate="no">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-200/30 dark:bg-blue-800/10 rounded-full blur-3xl" />
         <div className="absolute top-1/3 -left-32 w-80 h-80 bg-indigo-200/25 dark:bg-indigo-800/10 rounded-full blur-3xl" />
