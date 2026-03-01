@@ -934,7 +934,7 @@ export default function CartCheckout() {
                               </SelectTrigger>
                               <SelectContent>
                                 {PROVINCES.map((p) => (
-                                  <SelectItem key={p.sigla} value={p.sigla}>{p.sigla} - {p.nome}</SelectItem>
+                                  <SelectItem key={p.sigla} value={p.sigla}>{p.nome}</SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
