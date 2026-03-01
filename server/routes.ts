@@ -778,7 +778,7 @@ REGOLE FONDAMENTALI per sembrare autentici:
 - Qualche commento può avere piccole imperfezioni tipiche dello scritto informale (frasi spezzate, "..." al posto di punti, esclamazioni)
 - NON usare frasi fatte tipo "articolo molto interessante" o "grazie per l'articolo" — sono tipiche dei bot
 - NON usare tutti lo stesso registro linguistico
-- Nomi italiani REALISTICI e vari (non solo Mario Rossi): mix di nomi comuni, qualcuno con solo il nome di battesimo, qualcuno nome e cognome
+- Nomi italiani REALISTICI e vari: EVITA cognomi generici e ovvi come Rossi, Bianchi, Ferrari, Esposito, Russo, Romano. Usa cognomi meno comuni ma plausibili (es. Marchetti, Trevisan, Colombo, Zanetti, Pellegrini, Damiani, Moretti, Galli, Ferrero, Cattaneo, Baroni, Venturi). Mix di formati: qualcuno con solo il nome, qualcuno nome e iniziale del cognome (es. "Marco T."), qualcuno nome e cognome completo
 - Almeno un commento NON deve essere esclusivamente positivo — può essere curioso, dubbioso o semplicemente neutro
 - Il contenuto deve essere SPECIFICO all'argomento dell'articolo, non generico
 
