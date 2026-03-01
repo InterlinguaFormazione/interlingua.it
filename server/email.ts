@@ -632,31 +632,31 @@ export async function sendEnglishTestConfirmationEmail(email: string, firstName:
 
   const courseRecommendations: Record<string, { description: string; courses: string[] }> = {
     "A0": {
-      description: "Your test result is A0. To progress to the next level, we recommend an A1 beginner course to build your foundational English skills.",
+      description: "Il tuo risultato è A0. Per progredire al livello successivo, ti consigliamo un corso A1 per principianti per costruire le tue competenze di base in inglese.",
       courses: ["General English - Beginner (A1)", "English Starter Intensive Course"],
     },
     "A1": {
-      description: "Your current level is A1. To reach A2, we recommend an elementary course that will expand your vocabulary and build confidence in everyday situations.",
+      description: "Il tuo livello attuale è A1. Per raggiungere il livello A2, ti consigliamo un corso elementare che amplierà il tuo vocabolario e rafforzerà la tua sicurezza nelle situazioni quotidiane.",
       courses: ["General English - Elementary (A2)", "English for Daily Life (A2)", "Conversation Course - Elementary"],
     },
     "A2": {
-      description: "Your current level is A2. To progress to B1, we recommend a pre-intermediate course to develop your grammar and communication skills for more complex situations.",
+      description: "Il tuo livello attuale è A2. Per progredire al B1, ti consigliamo un corso pre-intermedio per sviluppare la grammatica e le competenze comunicative in situazioni più complesse.",
       courses: ["General English - Pre-Intermediate (B1)", "Conversation Course - Pre-Intermediate", "Cambridge KET Preparation"],
     },
     "B1": {
-      description: "Your current level is B1. To advance to B2, we recommend an upper-intermediate course that will strengthen your fluency and prepare you for professional or academic contexts.",
+      description: "Il tuo livello attuale è B1. Per avanzare al B2, ti consigliamo un corso upper-intermediate che rafforzerà la tua fluenza e ti preparerà per contesti professionali o accademici.",
       courses: ["General English - Upper-Intermediate (B2)", "Business English - Upper-Intermediate (B2)", "Cambridge FCE Preparation", "Full Immersion Course"],
     },
     "B2": {
-      description: "Your current level is B2. To reach C1, we recommend an advanced course that will refine your precision, nuance, and ability to handle complex language.",
+      description: "Il tuo livello attuale è B2. Per raggiungere il C1, ti consigliamo un corso avanzato che perfezionerà la tua precisione, le sfumature e la capacità di gestire un linguaggio complesso.",
       courses: ["Advanced English (C1)", "Business English - Advanced (C1)", "Cambridge CAE Preparation", "Full Immersion Course"],
     },
     "C1": {
-      description: "Your current level is C1. To achieve C2 proficiency, we recommend a mastery-level course focused on specialised language and near-native fluency.",
+      description: "Il tuo livello attuale è C1. Per raggiungere la competenza C2, ti consigliamo un corso di livello avanzato focalizzato su linguaggio specialistico e fluenza quasi nativa.",
       courses: ["English Masterclass (C2)", "Cambridge CPE Preparation", "Specialised Business English - Proficiency", "Full Immersion Course"],
     },
     "C2": {
-      description: "Congratulations — you have reached C2, the highest level! To maintain and sharpen your skills, we recommend specialised courses in your areas of interest.",
+      description: "Complimenti — hai raggiunto il C2, il livello più alto! Per mantenere e affinare le tue competenze, ti consigliamo corsi specialistici nelle tue aree di interesse.",
       courses: ["English Masterclass - Maintenance (C2)", "Cambridge CPE Preparation", "Specialised Business English", "Full Immersion Course"],
     },
   };
@@ -666,7 +666,7 @@ export async function sendEnglishTestConfirmationEmail(email: string, firstName:
   let subjectSuffix = "";
 
   if (resultData) {
-    subjectSuffix = ` — Your Level: ${resultData.finalLevel}`;
+    subjectSuffix = ` — Il tuo livello: ${resultData.finalLevel}`;
 
     const rec = courseRecommendations[resultData.finalLevel] || courseRecommendations["B1"];
 
@@ -694,16 +694,16 @@ export async function sendEnglishTestConfirmationEmail(email: string, firstName:
 
     resultBlock = `
       <div style="text-align:center;margin:24px 0;">
-        <p style="color:#64748b;font-size:13px;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;">Your Overall Level</p>
+        <p style="color:#64748b;font-size:13px;margin:0 0 8px;text-transform:uppercase;letter-spacing:1px;">Il tuo livello complessivo</p>
         <div style="display:inline-block;background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;padding:16px 40px;border-radius:12px;font-size:32px;font-weight:bold;letter-spacing:2px;">${resultData.finalLevel}</div>
       </div>
 
-      <h3 style="color:#1e293b;font-size:16px;margin:28px 0 12px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;">📊 Section Breakdown</h3>
+      <h3 style="color:#1e293b;font-size:16px;margin:28px 0 12px;border-bottom:2px solid #e2e8f0;padding-bottom:8px;">📊 Dettaglio per sezione</h3>
       <table style="width:100%;border-collapse:collapse;margin-bottom:8px;">
         <tr style="background:#f1f5f9;">
-          <th style="padding:10px 12px;text-align:left;font-size:13px;color:#64748b;">Section</th>
-          <th style="padding:10px 12px;text-align:center;font-size:13px;color:#64748b;">Level</th>
-          <th style="padding:10px 12px;text-align:center;font-size:13px;color:#64748b;">Accuracy</th>
+          <th style="padding:10px 12px;text-align:left;font-size:13px;color:#64748b;">Sezione</th>
+          <th style="padding:10px 12px;text-align:center;font-size:13px;color:#64748b;">Livello</th>
+          <th style="padding:10px 12px;text-align:center;font-size:13px;color:#64748b;">Accuratezza</th>
         </tr>
         ${sectionRows}
         ${writingRow}
@@ -715,14 +715,14 @@ export async function sendEnglishTestConfirmationEmail(email: string, firstName:
 
     courseBlock = `
       <div style="margin:28px 0;padding:20px;background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border-radius:12px;border-left:4px solid #3b82f6;">
-        <h3 style="color:#1e40af;font-size:16px;margin:0 0 10px;">🎯 Our Recommendation for You</h3>
+        <h3 style="color:#1e40af;font-size:16px;margin:0 0 10px;">🎯 Il nostro consiglio per te</h3>
         <p style="color:#334155;font-size:14px;line-height:1.6;margin:0 0 12px;">${rec.description}</p>
-        <p style="color:#1e40af;font-size:13px;font-weight:bold;margin:0 0 6px;">Suggested courses:</p>
+        <p style="color:#1e40af;font-size:13px;font-weight:bold;margin:0 0 6px;">Corsi consigliati:</p>
         <ul style="margin:0;padding-left:20px;font-size:14px;">${courseList}</ul>
       </div>
 
       <div style="text-align:center;margin:20px 0;">
-        <a href="https://skillcraft.interlingua.it" style="display:inline-block;background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">Explore Our Courses</a>
+        <a href="https://skillcraft.interlingua.it" style="display:inline-block;background:linear-gradient(135deg,#1e40af,#3b82f6);color:#fff;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:15px;">Scopri i nostri corsi</a>
       </div>
     `;
   }
@@ -731,15 +731,15 @@ export async function sendEnglishTestConfirmationEmail(email: string, firstName:
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;">
       <div style="background:linear-gradient(135deg,#1e40af,#3b82f6);padding:28px;text-align:center;">
         <h1 style="color:#fff;margin:0;font-size:22px;">Grazie, ${firstName}!</h1>
-        <p style="color:#dbeafe;margin:8px 0 0;font-size:14px;">English Adaptive Test — Results</p>
+        <p style="color:#dbeafe;margin:8px 0 0;font-size:14px;">Test Adattivo di Inglese — Risultati</p>
       </div>
       <div style="padding:28px;">
-        <p style="color:#334155;font-size:15px;line-height:1.6;">Thank you for completing the English Adaptive Test. Here are your results:</p>
+        <p style="color:#334155;font-size:15px;line-height:1.6;">Grazie per aver completato il Test Adattivo di Inglese. Ecco i tuoi risultati:</p>
         ${resultBlock}
         ${courseBlock}
-        <p style="color:#334155;font-size:14px;line-height:1.6;">If you have any questions about your results or would like to discuss the best course for your needs, please don't hesitate to contact us.</p>
+        <p style="color:#334155;font-size:14px;line-height:1.6;">Se hai domande sui tuoi risultati o desideri discutere il corso più adatto alle tue esigenze, non esitare a contattarci.</p>
         <div style="margin-top:28px;padding:16px;background:#f8fafc;border-radius:8px;text-align:center;">
-          <p style="margin:0;color:#64748b;font-size:12px;">Test completed: ${new Date().toLocaleDateString("it-IT", { day:"2-digit", month:"long", year:"numeric", hour:"2-digit", minute:"2-digit" })}</p>
+          <p style="margin:0;color:#64748b;font-size:12px;">Test completato: ${new Date().toLocaleDateString("it-IT", { day:"2-digit", month:"long", year:"numeric", hour:"2-digit", minute:"2-digit" })}</p>
           <p style="margin:8px 0 0;color:#94a3b8;font-size:11px;">Interlingua / SkillCraft</p>
         </div>
       </div>
@@ -749,7 +749,7 @@ export async function sendEnglishTestConfirmationEmail(email: string, firstName:
     Source: FROM_EMAIL,
     Destination: { ToAddresses: [email] },
     Message: {
-      Subject: { Data: `English Adaptive Test — Results${subjectSuffix}`, Charset: "UTF-8" },
+      Subject: { Data: `Test Adattivo di Inglese — Risultati${subjectSuffix}`, Charset: "UTF-8" },
       Body: { Html: { Data: htmlBody, Charset: "UTF-8" } },
     },
   });
