@@ -11,6 +11,8 @@ import { chatWithAI } from "./ai-chat";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalOrder } from "./paypal";
 import { checkVoucher, confirmVoucher, isCartaCulturaAvailable, ALLOWED_AMBITO, ALLOWED_BENE } from "./carta-cultura";
 import { SHOP_PRODUCTS, getProductBySlug, getEffectivePrice } from "@shared/products";
+import { readFileSync } from "fs";
+import { resolve } from "path";
 import { validateCodiceFiscale } from "@shared/cf-validator";
 import { scoreWriting, scoreSpeaking, transcribeAudio } from "./english-test";
 import { getAllQuestions } from "./english-test-questions";
@@ -1211,6 +1213,24 @@ export async function registerRoutes(
       console.error("Error processing SC purchase:", error);
       res.status(500).json({ success: false, message: "Errore durante l'elaborazione dell'acquisto" });
     }
+  });
+
+  const comuniData: Array<{ nome: string; sigla: string }> = (() => {
+    try {
+      const filePath = resolve(process.cwd(), "server", "comuni-data.json");
+      const raw = JSON.parse(readFileSync(filePath, "utf-8"));
+      console.log(`Loaded ${raw.length} comuni from data file`);
+      return raw.map((c: any) => ({ nome: c.nome, sigla: c.sigla }));
+    } catch (e) { console.error("Failed to load comuni data:", e); return []; }
+  })();
+
+  app.get("/api/comuni/:sigla", (req, res) => {
+    const sigla = req.params.sigla.toUpperCase();
+    const comuni = comuniData
+      .filter((c) => c.sigla === sigla)
+      .map((c) => c.nome)
+      .sort((a, b) => a.localeCompare(b, "it"));
+    res.json(comuni);
   });
 
   app.get("/api/shop/products", async (_req, res) => {

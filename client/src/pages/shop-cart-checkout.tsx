@@ -78,6 +78,8 @@ export default function CartCheckout() {
   const [cap, setCap] = useState("");
   const [citta, setCitta] = useState("");
   const [provincia, setProvincia] = useState("");
+  const [comuniList, setComuniList] = useState<string[]>([]);
+  const [loadingComuni, setLoadingComuni] = useState(false);
   const [ragioneSociale, setRagioneSociale] = useState("");
   const [partitaIva, setPartitaIva] = useState("");
   const [codiceSdi, setCodiceSdi] = useState("");
@@ -326,6 +328,20 @@ export default function CartCheckout() {
   };
 
   const isItaly = paese === "IT";
+
+  useEffect(() => {
+    if (isItaly && provincia) {
+      setLoadingComuni(true);
+      setCitta("");
+      fetch(`/api/comuni/${provincia}`)
+        .then((r) => r.json())
+        .then((data) => setComuniList(data))
+        .catch(() => setComuniList([]))
+        .finally(() => setLoadingComuni(false));
+    } else {
+      setComuniList([]);
+    }
+  }, [provincia, isItaly]);
 
   const handleBillingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -921,10 +937,6 @@ export default function CartCheckout() {
                           <Label htmlFor="cap">{isItaly ? "CAP" : "Codice Postale"} *</Label>
                           <Input id="cap" value={cap} onChange={(e) => setCap(e.target.value)} maxLength={isItaly ? 5 : 10} data-testid="input-cap" />
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="citta">Città *</Label>
-                          <Input id="citta" value={citta} onChange={(e) => setCitta(e.target.value)} data-testid="input-citta" />
-                        </div>
                         {isItaly && (
                           <div className="space-y-2">
                             <Label htmlFor="provincia">Provincia *</Label>
@@ -940,6 +952,23 @@ export default function CartCheckout() {
                             </Select>
                           </div>
                         )}
+                        <div className="space-y-2">
+                          <Label htmlFor="citta">{isItaly ? "Comune" : "Città"} *</Label>
+                          {isItaly && provincia && comuniList.length > 0 ? (
+                            <Select value={citta} onValueChange={setCitta}>
+                              <SelectTrigger data-testid="select-citta">
+                                <SelectValue placeholder={loadingComuni ? "Caricamento..." : "Seleziona comune..."} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {comuniList.map((c) => (
+                                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <Input id="citta" value={citta} onChange={(e) => setCitta(e.target.value)} data-testid="input-citta" placeholder={isItaly && provincia ? "Caricamento..." : ""} />
+                          )}
+                        </div>
                       </div>
 
                       <div className="flex items-start gap-3 p-4 rounded-xl border bg-muted/30">
