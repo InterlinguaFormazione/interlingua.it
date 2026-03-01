@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { GraduationCap, CheckCircle, ChevronRight, Loader2, PenTool, Volume2, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight, ArrowLeft, User, Mail, Phone, Building2, MapPin, Map } from "lucide-react";
+import { GraduationCap, CheckCircle, ChevronRight, Loader2, PenTool, Volume2, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight, ArrowLeft, User, Mail, Phone, Building2, MapPin, Map, Play, Pause } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 type Phase = "registration" | "self-assessment" | "mc-questions" | "writing" | "results";
@@ -77,6 +77,12 @@ const SKILL_ICONS: Record<string, typeof Brain> = {
   use_of_english: MessageSquare,
 };
 
+function formatAudioTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return mins.toString().padStart(2, "0") + ":" + secs.toString().padStart(2, "0");
+}
+
 export default function SpanishTestPage() {
   const [phase, setPhase] = useState<Phase>("registration");
   const [sessionId, setSessionId] = useState<number | null>(null);
@@ -97,11 +103,50 @@ export default function SpanishTestPage() {
   const [tabSwitchCount, setTabSwitchCount] = useState(0);
   const [sectionTransition, setSectionTransition] = useState<string | null>(null);
   const [registrationData, setRegistrationData] = useState<any>(null);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [audioProgress, setAudioProgress] = useState(0);
+  const [audioDuration, setAudioDuration] = useState(0);
+  const [listeningPlaysLeft, setListeningPlaysLeft] = useState(3);
+  const listeningAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const audioAvailable = false;
   const micAvailable = false;
 
   const { toast } = useToast();
+
+  const resetListeningAudio = useCallback(() => {
+    if (listeningAudioRef.current) {
+      listeningAudioRef.current.pause();
+      listeningAudioRef.current.removeAttribute("src");
+      listeningAudioRef.current.load();
+      listeningAudioRef.current = null;
+    }
+    setIsAudioPlaying(false);
+    setAudioProgress(0);
+    setAudioDuration(0);
+  }, []);
+
+  const playListeningAudio = useCallback(() => {
+    if (!currentQuestion?.audioUrl || listeningPlaysLeft <= 0) return;
+    if (listeningAudioRef.current && isAudioPlaying) {
+      listeningAudioRef.current.pause();
+      setIsAudioPlaying(false);
+      return;
+    }
+    if (!listeningAudioRef.current) {
+      const audio = new Audio(currentQuestion.audioUrl);
+      audio.onloadedmetadata = () => { setAudioDuration(audio.duration); };
+      audio.ontimeupdate = () => { setAudioProgress(audio.currentTime); };
+      audio.onended = () => { setIsAudioPlaying(false); setListeningPlaysLeft(prev => prev - 1); setAudioProgress(0); };
+      audio.onerror = () => { toast({ title: "Audio Error", description: "Could not load the audio file.", variant: "destructive" }); setIsAudioPlaying(false); };
+      listeningAudioRef.current = audio;
+    } else {
+      listeningAudioRef.current.currentTime = 0;
+    }
+    listeningAudioRef.current.play().then(() => { setIsAudioPlaying(true); }).catch(() => {
+      toast({ title: "Audio Error", description: "Could not play audio.", variant: "destructive" });
+    });
+  }, [currentQuestion, listeningPlaysLeft, isAudioPlaying, toast]);
 
   const form = useForm({
     resolver: zodResolver(registrationSchema),
@@ -188,13 +233,19 @@ export default function SpanishTestPage() {
         setTotalAnswered(prev => prev + 1);
 
         if (data.mcPhaseComplete) {
+          resetListeningAudio();
+          setListeningPlaysLeft(3);
           setWritingPrompt(data.writingPrompt);
           setPhase("writing");
         } else {
           if (data.sectionAdvanced && data.currentSkill !== currentSkill) {
+            resetListeningAudio();
+            setListeningPlaysLeft(3);
             setSectionTransition(SKILL_LABELS[data.currentSkill] || data.currentSkill);
             setTimeout(() => setSectionTransition(null), 1000);
           }
+          resetListeningAudio();
+          setListeningPlaysLeft(3);
           setCurrentQuestion(data.question);
           setCurrentSkill(data.currentSkill);
           setCurrentSectionIndex(data.currentSectionIndex);
@@ -572,7 +623,33 @@ export default function SpanishTestPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {currentQuestion.passage && (
+                  {currentQuestion.skillType === "listening" && currentQuestion.audioUrl && (
+                    <div className="rounded-xl p-4 border bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800 space-y-3" data-testid="audio-player">
+                      <div className="flex items-center gap-2">
+                        <Volume2 className="w-4 h-4 text-indigo-500" />
+                        <span className="text-xs uppercase tracking-wider text-indigo-500 font-medium">Audio</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Button size="sm" variant="outline" onClick={playListeningAudio} disabled={listeningPlaysLeft <= 0 && !isAudioPlaying} className={listeningPlaysLeft <= 0 && !isAudioPlaying ? "opacity-50" : ""} data-testid="button-play-audio">
+                          {isAudioPlaying ? (<><Pause className="w-4 h-4" /> Pause</>) : (<><Play className="w-4 h-4" /> Play</>)}
+                        </Button>
+                        <div className="flex-1">
+                          <Progress value={audioDuration > 0 ? (audioProgress / audioDuration) * 100 : 0} className="h-2" />
+                        </div>
+                        <div className="text-xs text-slate-500 font-mono flex gap-1">
+                          <span>{formatAudioTime(audioProgress)}</span>
+                          <span>/</span>
+                          <span>{formatAudioTime(audioDuration)}</span>
+                        </div>
+                      </div>
+                      <div className="text-xs text-slate-500">Reproducciones restantes: {listeningPlaysLeft}</div>
+                      {listeningPlaysLeft <= 0 && !isAudioPlaying && (
+                        <p className="text-xs text-amber-600 dark:text-amber-400">Has agotado las reproducciones. Responde a la pregunta.</p>
+                      )}
+                    </div>
+                  )}
+
+                  {currentQuestion.passage && (!currentQuestion.audioUrl || currentQuestion.skillType !== "listening") && (
                     <div className={`rounded-xl p-4 border ${
                       currentQuestion.skillType === "listening"
                         ? "bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800"
@@ -582,7 +659,7 @@ export default function SpanishTestPage() {
                         {currentQuestion.skillType === "listening" ? (
                           <>
                             <BookOpen className="w-4 h-4 text-indigo-500" />
-                            <span className="text-xs uppercase tracking-wider text-indigo-500 font-medium">Listening Transcript (Reading Mode)</span>
+                            <span className="text-xs uppercase tracking-wider text-indigo-500 font-medium">Transcripci&oacute;n de audio (modo lectura)</span>
                           </>
                         ) : (
                           <span className="text-xs uppercase tracking-wider text-slate-500 font-medium">Reading Passage</span>

@@ -1470,7 +1470,7 @@ export async function registerRoutes(
         for (const q of questions) {
           await storage.createBeQuestion(q);
         }
-      } else if (language === "english") {
+      } else {
         const existingQuestions = await storage.getBeQuestionsByLanguage(language);
         const listeningWithoutAudio = existingQuestions.filter(q => q.skillType === "listening" && !q.audioUrl);
         if (listeningWithoutAudio.length > 0) {

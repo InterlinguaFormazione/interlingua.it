@@ -43,10 +43,10 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/corsi-italiano.tsx` - Italian for Foreigners page with IT/EN bilingual toggle, course pricing, Vicenza info, contact form
 - `src/pages/language-tests.tsx` - Language test landing page at `/test-di-livello` where users select which language test to take. All 5 languages are available with SVG flag icons.
 - `src/pages/english-test.tsx` - English Adaptive Test at `/english-test` with CAT/IRT engine, 5 MC sections (grammar, vocabulary, use of English, reading, listening), writing + speaking AI-scored tasks, anti-cheating measures. Topics cover daily life, travel, food, health, education, technology, entertainment, sports, environment, and culture. Company field is optional. Listening comprehension uses real audio playback (90 MP3 files, 6 OpenAI TTS voices for accent variety, 2 plays per question).
-- `src/pages/italian-test.tsx` - Italian Adaptive Test at `/italian-test` — simplified version without audio/speaking, 5 MC sections + writing, listening uses transcript mode.
-- `src/pages/german-test.tsx` - German Adaptive Test at `/german-test` — same structure, German UI labels and CEFR descriptions.
-- `src/pages/french-test.tsx` - French Adaptive Test at `/french-test` — same structure, French UI labels and CEFR descriptions.
-- `src/pages/spanish-test.tsx` - Spanish Adaptive Test at `/spanish-test` — same structure, Spanish UI labels and CEFR descriptions.
+- `src/pages/italian-test.tsx` - Italian Adaptive Test at `/italian-test` — 5 MC sections + writing (no speaking), listening has audio playback (15 MP3 files via OpenAI TTS).
+- `src/pages/german-test.tsx` - German Adaptive Test at `/german-test` — same structure, German UI labels, 18 listening audio files.
+- `src/pages/french-test.tsx` - French Adaptive Test at `/french-test` — same structure, French UI labels, 15 listening audio files.
+- `src/pages/spanish-test.tsx` - Spanish Adaptive Test at `/spanish-test` — same structure, Spanish UI labels, 15 listening audio files.
 - `src/pages/cookie-policy.tsx` - GDPR cookie policy
 - `src/pages/privacy-policy.tsx` - GDPR privacy policy
 - `src/components/` - Reusable UI components
@@ -72,11 +72,12 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `english-test.ts` - AI scoring for English test (GPT-4o writing/speaking scoring, Whisper transcription)
 - `cat-engine.ts` - CAT/IRT engine (2PL model, EAP Bayesian theta update, Fisher Information SE update, theta ×100). Min 5, max 25 questions/section. SE threshold 40 for early stop. Level stability rule: last 3 consecutive answers must be at the same CEFR level before SE-based early stop is allowed. Detailed [CAT] logging on each answer.
 - `english-test-questions.ts` - Question bank for General English test (450 questions, 5 skills x 6 levels x 15 per cell, difficulty spread ±40 within each level). Listening questions auto-assign audioUrl paths to MP3 files in `client/public/audio/listening/`
-- `italian-test-questions.ts` - Question bank for Italian test (~75 questions in Italian, 5 skills, listening uses transcript mode)
-- `german-test-questions.ts` - Question bank for German test (~90 questions in German, 5 skills, listening uses transcript mode)
-- `french-test-questions.ts` - Question bank for French test (~75 questions in French, 5 skills, listening uses transcript mode)
-- `spanish-test-questions.ts` - Question bank for Spanish test (~84 questions in Spanish, 5 skills, listening uses transcript mode)
-- `generate-listening-audio.ts` - One-time TTS script (OpenAI tts-1-hd) that generated 90 MP3 files for listening comprehension using 6 diverse voices (alloy, echo, fable, onyx, nova, shimmer)
+- `italian-test-questions.ts` - Question bank for Italian test (~75 questions in Italian, 5 skills, listening has audio playback)
+- `german-test-questions.ts` - Question bank for German test (~90 questions in German, 5 skills, listening has audio playback)
+- `french-test-questions.ts` - Question bank for French test (~78 questions in French, 5 skills, listening has audio playback)
+- `spanish-test-questions.ts` - Question bank for Spanish test (~84 questions in Spanish, 5 skills, listening has audio playback)
+- `generate-listening-audio.ts` - One-time TTS script (OpenAI tts-1-hd) that generated 90 MP3 files for English listening comprehension using 6 diverse voices (alloy, echo, fable, onyx, nova, shimmer)
+- `../scripts/generate-audio.ts` - One-time TTS script (OpenAI tts-1) that generated 63 MP3 files for Italian (15), German (18), French (15), Spanish (15) listening comprehension. Audio files stored in `client/public/audio/{italian,german,french,spanish}/`
 - `email.ts` - AWS SES email notifications (contact, newsletter, subscription payment, booking confirmation, English test results)
 - `crm.ts` - CRM webhook integration (forwards contact submissions)
 - `blog-generator.ts` - Automated blog generation

@@ -168,7 +168,13 @@ const listeningQuestions: QuestionDef[] = [
 
 export function getFrenchTestQuestions(): InsertBeQuestion[] {
   const all = [...grammarQuestions, ...vocabularyQuestions, ...useOfLanguageQuestions, ...readingQuestions, ...listeningQuestions];
+  let listeningIdx = 0;
   return all.map(q => {
+    let audioUrl: string | null = null;
+    if (q.skillType === "listening") {
+      const idx = listeningIdx++;
+      audioUrl = `/audio/french/listening_${q.level}_${idx.toString().padStart(3, "0")}.mp3`;
+    }
     return {
       language: "french",
       level: q.level,
@@ -179,7 +185,7 @@ export function getFrenchTestQuestions(): InsertBeQuestion[] {
       options: JSON.stringify(q.options),
       correctAnswer: q.correctAnswer,
       passage: q.passage || null,
-      audioUrl: null,
+      audioUrl,
       explanation: null,
       difficulty: q.difficulty,
       discrimination: q.discrimination,

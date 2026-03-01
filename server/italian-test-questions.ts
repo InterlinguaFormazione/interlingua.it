@@ -174,7 +174,13 @@ const listeningQuestions: QuestionDef[] = [
 
 export function getItalianTestQuestions(): InsertBeQuestion[] {
   const all = [...grammarQuestions, ...vocabularyQuestions, ...useOfLanguageQuestions, ...readingQuestions, ...listeningQuestions];
+  let listeningIdx = 0;
   return all.map(q => {
+    let audioUrl: string | null = null;
+    if (q.skillType === "listening") {
+      const idx = listeningIdx++;
+      audioUrl = `/audio/italian/listening_${q.level}_${idx.toString().padStart(3, "0")}.mp3`;
+    }
     return {
       language: "italian",
       level: q.level,
@@ -185,7 +191,7 @@ export function getItalianTestQuestions(): InsertBeQuestion[] {
       options: JSON.stringify(q.options),
       correctAnswer: q.correctAnswer,
       passage: q.passage || null,
-      audioUrl: null,
+      audioUrl,
       explanation: null,
       difficulty: q.difficulty,
       discrimination: q.discrimination,
