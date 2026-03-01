@@ -689,6 +689,12 @@ export default function CourseDetailPage() {
                       <Phone className="w-4 h-4 mr-2" />
                       Chiamaci
                     </Button>
+                    <Link href="/test-di-livello">
+                      <Button variant="outline" className="w-full border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950" size="lg" data-testid="button-placement-test">
+                        <GraduationCap className="w-4 h-4 mr-2" />
+                        Fai il Test di Livello
+                      </Button>
+                    </Link>
                   </div>
 
                   <div className="mt-6 pt-6 border-t">

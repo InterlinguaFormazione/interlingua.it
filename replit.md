@@ -41,6 +41,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/blog-post.tsx` - Blog post detail page
 - `src/pages/language-coaching.tsx` - Premium language coaching page (1-to-1, 30% premium pricing, Milton Method copy)
 - `src/pages/corsi-italiano.tsx` - Italian for Foreigners page with IT/EN bilingual toggle, course pricing, Vicenza info, contact form
+- `src/pages/language-tests.tsx` - Language test landing page at `/test-di-livello` where users select which language test to take. English is available; Italian, German, French, Spanish shown as "coming soon".
 - `src/pages/english-test.tsx` - General English Adaptive Test at `/english-test` with CAT/IRT engine, 5 MC sections (grammar, vocabulary, use of English, reading, listening), writing + speaking AI-scored tasks, anti-cheating measures. Topics cover daily life, travel, food, health, education, technology, entertainment, sports, environment, and culture. Company field is optional.
 - `src/pages/cookie-policy.tsx` - GDPR cookie policy
 - `src/pages/privacy-policy.tsx` - GDPR privacy policy

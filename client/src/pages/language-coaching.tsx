@@ -921,6 +921,12 @@ export default function LanguageCoachingPage() {
                       Scopri i Corsi Tradizionali
                     </Button>
                   </Link>
+                  <Link href="/test-di-livello">
+                    <Button size="lg" variant="outline" className="text-base px-8 py-6 rounded-xl border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950" data-testid="button-coaching-test">
+                      <GraduationCap className="w-5 h-5 mr-2" />
+                      Fai il Test di Livello
+                    </Button>
+                  </Link>
                 </div>
                 <p className="mt-6 text-sm text-muted-foreground">
                   Oppure chiamaci al <a href="tel:+390444321601" className="text-primary hover:underline font-medium">0444 321601</a> per parlare direttamente con noi

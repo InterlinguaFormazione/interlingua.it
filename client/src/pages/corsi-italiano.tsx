@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "wouter";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -514,6 +515,12 @@ export default function CorsiItalianoPage() {
                     <Mail className="mr-2 h-5 w-5" />
                     {t.heroCtaSecondary}
                   </Button>
+                  <Link href="/test-di-livello">
+                    <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm" data-testid="button-italian-test">
+                      <GraduationCap className="mr-2 h-5 w-5" />
+                      Test di Livello
+                    </Button>
+                  </Link>
                 </motion.div>
               </div>
               <motion.div
