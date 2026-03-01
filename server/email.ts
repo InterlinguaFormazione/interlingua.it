@@ -532,7 +532,7 @@ export async function sendTestResultEmail(data: {
   await ses.send(command);
 }
 
-export async function sendBusinessEnglishResultEmail(data: {
+export async function sendEnglishTestResultEmail(data: {
   candidateName: string;
   candidateEmail: string;
   company: string;
@@ -620,7 +620,7 @@ export async function sendBusinessEnglishResultEmail(data: {
   await ses.send(command);
 }
 
-export async function sendBusinessEnglishConfirmationEmail(email: string, firstName: string): Promise<void> {
+export async function sendEnglishTestConfirmationEmail(email: string, firstName: string): Promise<void> {
   if (!ses) return;
 
   const htmlBody = `

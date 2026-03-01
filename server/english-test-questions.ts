@@ -788,7 +788,7 @@ const listeningQuestions: QuestionDef[] = [
     "You will hear:\nEconomist: GDP measures economic activity, but it says nothing about wellbeing, sustainability, or equality. An oil spill actually increases GDP because of the cleanup costs. A parent raising their child at home contributes nothing to GDP. We're using a ruler to measure temperature, and then wondering why our policies aren't making people's lives better."),
 ];
 
-export function getBusinessEnglishQuestions(): InsertBeQuestion[] {
+export function getEnglishTestQuestions(): InsertBeQuestion[] {
   const all = [...grammarQuestions, ...vocabularyQuestions, ...useOfEnglishQuestions, ...readingQuestions, ...listeningQuestions];
   return all.map(q => ({
     level: q.level,
@@ -809,5 +809,5 @@ export function getBusinessEnglishQuestions(): InsertBeQuestion[] {
 }
 
 export function getAllQuestions(): InsertBeQuestion[] {
-  return getBusinessEnglishQuestions();
+  return getEnglishTestQuestions();
 }

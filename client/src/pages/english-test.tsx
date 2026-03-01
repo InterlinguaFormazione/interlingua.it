@@ -80,7 +80,7 @@ const SKILL_ICONS: Record<string, typeof Brain> = {
   use_of_english: MessageSquare,
 };
 
-export default function BusinessEnglishTestPage() {
+export default function EnglishTestPage() {
   const [phase, setPhase] = useState<Phase>("registration");
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState<QuestionData | null>(null);

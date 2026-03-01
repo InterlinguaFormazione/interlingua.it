@@ -366,7 +366,7 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
       ) : filtered.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
           <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p>No business English test results yet.</p>
+          <p>No English test results yet.</p>
         </div>
       ) : (
         <div className="overflow-x-auto">

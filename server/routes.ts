@@ -10,8 +10,8 @@ import { generateBlogPost } from "./blog-generator";
 import { chatWithAI } from "./ai-chat";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalOrder } from "./paypal";
 import { SHOP_PRODUCTS, getProductBySlug, getEffectivePrice } from "@shared/products";
-import { scoreBusinessWriting, scoreBusinessSpeaking, transcribeAudio } from "./english-test";
-import { getBusinessEnglishQuestions as getAllQuestions } from "./business-english-questions";
+import { scoreWriting, scoreSpeaking, transcribeAudio } from "./english-test";
+import { getAllQuestions } from "./english-test-questions";
 import {
   calculateProbability, calculateFisherInformation, selectNextQuestion,
   updateTheta, updateStandardError, thetaToCEFR, selfAssessmentToTheta,
@@ -19,7 +19,7 @@ import {
   getWritingPrompt, getSpeakingPrompt, SECTION_SKILLS,
   shouldEndSection, MAX_QUESTIONS_PER_SECTION, isLevelStable
 } from "./cat-engine";
-import { sendBusinessEnglishResultEmail, sendBusinessEnglishConfirmationEmail } from "./email";
+import { sendEnglishTestResultEmail, sendEnglishTestConfirmationEmail } from "./email";
 import multer from "multer";
 import cron from "node-cron";
 import crypto from "crypto";
@@ -1805,7 +1805,7 @@ export async function registerRoutes(
       const responseText = writtenResponse || "";
       const aiResult = responseText.trim().length < 5
         ? { level: "A0", grammar: 0, vocabulary: 0, coherence: 0, taskCompletion: 0, feedback: "No writing response provided or response too short to evaluate." }
-        : await scoreBusinessWriting(
+        : await scoreWriting(
             prompt || getWritingPrompt(session.currentLevel),
             responseText,
             session.currentLevel
@@ -1890,7 +1890,7 @@ export async function registerRoutes(
 
       const aiResult = !transcript || transcript.trim().length < 3
         ? { level: "A0", grammar: 0, vocabulary: 0, coherence: 0, taskCompletion: 0, feedback: "Audio could not be transcribed or was too short to evaluate." }
-        : await scoreBusinessSpeaking(
+        : await scoreSpeaking(
             prompt || getSpeakingPrompt(session.currentLevel),
             transcript,
             session.currentLevel
@@ -2014,13 +2014,13 @@ export async function registerRoutes(
       });
 
       try {
-        await sendBusinessEnglishConfirmationEmail(session.email, session.firstName);
+        await sendEnglishTestConfirmationEmail(session.email, session.firstName);
       } catch (e) {
         console.error("Failed to send confirmation email:", e);
       }
 
       try {
-        await sendBusinessEnglishResultEmail({
+        await sendEnglishTestResultEmail({
           candidateName: `${session.firstName} ${session.lastName}`,
           candidateEmail: session.email,
           company: session.company,
@@ -2139,8 +2139,8 @@ export async function registerRoutes(
       });
 
       try {
-        await sendBusinessEnglishConfirmationEmail(session.email, session.firstName);
-        await sendBusinessEnglishResultEmail({
+        await sendEnglishTestConfirmationEmail(session.email, session.firstName);
+        await sendEnglishTestResultEmail({
           candidateName: `${session.firstName} ${session.lastName}`,
           candidateEmail: session.email,
           company: session.company,
