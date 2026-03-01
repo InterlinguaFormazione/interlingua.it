@@ -808,15 +808,25 @@ export default function EnglishTestPage() {
                         <CheckCircle className="w-4 h-4 mr-2" /> Sento l'audio
                       </Button>
                       <Button
-                        onClick={() => {
-                          toast({ title: "Suggerimento", description: "Controlla le cuffie/altoparlanti e il volume del dispositivo, poi riprova.", variant: "destructive" });
-                        }}
+                        onClick={playTestAudio}
                         variant="outline"
                         className="flex-1 rounded-xl"
-                        data-testid="button-audio-not-ok"
+                        data-testid="button-audio-retry"
                       >
-                        Non sento nulla
+                        <RotateCcw className="w-4 h-4 mr-2" /> Riprova
                       </Button>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                      <button
+                        onClick={() => {
+                          confirmListeningOk();
+                          toast({ title: "Attenzione", description: "La sezione di ascolto richiede l'audio. Potresti non riuscire a rispondere alle domande di listening.", variant: "destructive" });
+                        }}
+                        className="w-full text-center text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors py-1"
+                        data-testid="button-skip-audio-check"
+                      >
+                        Non riesco a sentire l'audio — procedi comunque →
+                      </button>
                     </div>
                   </div>
                 )}
@@ -859,6 +869,9 @@ export default function EnglishTestPage() {
                           <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 font-medium">
                             <MicOff className="w-5 h-5" /> Microfono non disponibile
                           </div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">
+                            Controlla che il microfono sia collegato e che il browser abbia i permessi per accedervi.
+                          </p>
                           <button
                             onClick={checkMicPermission}
                             className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-all"
@@ -878,6 +891,21 @@ export default function EnglishTestPage() {
                       >
                         <CheckCircle className="w-4 h-4 mr-2" /> Tutto funziona, procedi
                       </Button>
+                    )}
+
+                    {micCheckStatus === "denied" && (
+                      <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                        <button
+                          onClick={() => {
+                            confirmMicOk();
+                            toast({ title: "Attenzione", description: "Senza microfono non potrai completare la sezione di speaking. Potrai comunque saltarla durante il test.", variant: "destructive" });
+                          }}
+                          className="w-full text-center text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors py-1"
+                          data-testid="button-skip-mic-check"
+                        >
+                          Non ho un microfono — procedi comunque →
+                        </button>
+                      </div>
                     )}
                   </div>
                 )}
