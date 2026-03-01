@@ -138,13 +138,6 @@ export function Navigation() {
             </Button>
             <ThemeToggle />
             <Button
-              className="hidden md:inline-flex"
-              onClick={() => handleNavClick("#contact")}
-              data-testid="button-cta-header"
-            >
-              Inizia Ora
-            </Button>
-            <Button
               variant="ghost"
               size="icon"
               className="md:hidden"
@@ -175,15 +168,6 @@ export function Navigation() {
                     {link.label}
                   </button>
                 ))}
-                <div className="pt-2">
-                  <Button
-                    className="w-full"
-                    onClick={() => handleNavClick("#contact")}
-                    data-testid="button-cta-mobile"
-                  >
-                    Inizia Ora
-                  </Button>
-                </div>
               </div>
             </motion.div>
           )}
