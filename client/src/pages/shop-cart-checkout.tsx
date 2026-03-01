@@ -837,7 +837,7 @@ export default function CartCheckout() {
                       </h2>
                       <div className="space-y-2">
                         <Label htmlFor="paese">Paese *</Label>
-                        <Select value={paese} onValueChange={(v) => { setPaese(v); if (v !== "IT") setTipoFatturazione("privato"); }}>
+                        <Select value={paese} onValueChange={(v) => { setPaese(v); if (v !== "IT") { setTipoFatturazione("privato"); setPaymentMethod("paypal"); } }}>
                           <SelectTrigger data-testid="select-paese">
                             <SelectValue />
                           </SelectTrigger>
@@ -1025,7 +1025,7 @@ export default function CartCheckout() {
                       </div>
                     ) : (
                       <div className="space-y-6">
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className={`grid ${isItaly ? "grid-cols-2" : "grid-cols-1"} gap-3`}>
                           <button
                             type="button"
                             onClick={() => setPaymentMethod("paypal")}
@@ -1043,19 +1043,21 @@ export default function CartCheckout() {
                             </div>
                             <span className="text-xs font-medium">PayPal / Carta</span>
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => setPaymentMethod("cartacultura")}
-                            className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
-                              paymentMethod === "cartacultura"
-                                ? "border-primary bg-primary/5"
-                                : "border-muted hover:border-muted-foreground/30"
-                            }`}
-                            data-testid="button-select-cartacultura-cart"
-                          >
-                            <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-8 w-auto rounded-lg object-contain" />
-                            <span className="text-xs font-medium">Carta della Cultura</span>
-                          </button>
+                          {isItaly && (
+                            <button
+                              type="button"
+                              onClick={() => setPaymentMethod("cartacultura")}
+                              className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                                paymentMethod === "cartacultura"
+                                  ? "border-primary bg-primary/5"
+                                  : "border-muted hover:border-muted-foreground/30"
+                              }`}
+                              data-testid="button-select-cartacultura-cart"
+                            >
+                              <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-8 w-auto rounded-lg object-contain" />
+                              <span className="text-xs font-medium">Carta della Cultura</span>
+                            </button>
+                          )}
                         </div>
 
                         {paymentMethod === "paypal" && (
