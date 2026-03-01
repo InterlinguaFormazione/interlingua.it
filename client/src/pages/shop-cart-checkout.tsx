@@ -837,7 +837,7 @@ export default function CartCheckout() {
                       </h2>
                       <div className="space-y-2">
                         <Label htmlFor="paese">Paese *</Label>
-                        <Select value={paese} onValueChange={setPaese}>
+                        <Select value={paese} onValueChange={(v) => { setPaese(v); if (v !== "IT") setTipoFatturazione("privato"); }}>
                           <SelectTrigger data-testid="select-paese">
                             <SelectValue />
                           </SelectTrigger>

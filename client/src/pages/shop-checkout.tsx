@@ -1061,7 +1061,7 @@ export default function ShopCheckout() {
                     <form onSubmit={handleBillingSubmit} className="space-y-4">
                       <div>
                         <Label htmlFor="paese">Paese *</Label>
-                        <Select value={paese} onValueChange={setPaese}>
+                        <Select value={paese} onValueChange={(v) => { setPaese(v); if (v !== "IT") setTipoFatturazione("privato"); }}>
                           <SelectTrigger className="mt-1" data-testid="select-paese">
                             <SelectValue />
                           </SelectTrigger>
