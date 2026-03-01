@@ -253,6 +253,130 @@ function ReviewForm({ productSlugs, onSuccess }: { productSlugs: string[]; onSuc
   );
 }
 
+export function CourseReviewsInline({ productSlug }: { productSlug: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const PREVIEW_COUNT = 3;
+
+  const { data: reviews = [], isLoading } = useQueries({
+    queries: [{
+      queryKey: [`/api/shop/reviews/${productSlug}`],
+      queryFn: async () => {
+        const res = await fetch(`/api/shop/reviews/${productSlug}`);
+        if (!res.ok) throw new Error("Failed to fetch reviews");
+        return res.json() as Promise<ProductReview[]>;
+      },
+    }],
+    combine: (results) => ({
+      data: (results[0]?.data || []).sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()),
+      isLoading: results[0]?.isLoading ?? true,
+    }),
+  });
+
+  const avgRating = reviews.length > 0
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+    : 0;
+
+  const displayedReviews = expanded ? reviews : reviews.slice(0, PREVIEW_COUNT);
+  const hasMore = reviews.length > PREVIEW_COUNT;
+
+  if (isLoading) {
+    return (
+      <div className="mt-6 pt-6 border-t border-border/40">
+        <div className="animate-pulse space-y-3">
+          <div className="h-4 bg-muted rounded w-40" />
+          <div className="h-3 bg-muted rounded w-full" />
+          <div className="h-3 bg-muted rounded w-2/3" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-6 pt-6 border-t border-border/40" id={`reviews-${productSlug}`} data-testid={`reviews-inline-${productSlug}`}>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <MessageSquare className="w-4 h-4 text-primary" />
+          <span className="font-semibold text-sm">Recensioni</span>
+          {reviews.length > 0 && (
+            <>
+              <div className="flex items-center gap-1 ml-1">
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <span className="text-sm font-bold">{avgRating.toFixed(1)}</span>
+              </div>
+              <span className="text-xs text-muted-foreground">({reviews.length})</span>
+            </>
+          )}
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-xs h-7"
+          onClick={() => setShowReviewForm(!showReviewForm)}
+          data-testid={`button-write-review-${productSlug}`}
+        >
+          <MessageSquare className="w-3 h-3 mr-1" />
+          {showReviewForm ? "Chiudi" : "Scrivi"}
+        </Button>
+      </div>
+
+      <AnimatePresence>
+        {showReviewForm && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-4 overflow-hidden"
+          >
+            <ReviewForm
+              productSlugs={[productSlug]}
+              onSuccess={() => setShowReviewForm(false)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {reviews.length === 0 ? (
+        <p className="text-xs text-muted-foreground italic">
+          Nessuna recensione ancora. Sii il primo!
+        </p>
+      ) : (
+        <>
+          <div className="space-y-3">
+            {displayedReviews.map((review) => (
+              <div key={review.id} className="text-sm">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <StarRating rating={review.rating} size="sm" />
+                  <span className="font-medium text-xs">{review.authorName}</span>
+                  {review.verified && (
+                    <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                  )}
+                  <span className="text-[10px] text-muted-foreground ml-auto">
+                    {new Date(review.createdAt!).toLocaleDateString("it-IT", { month: "short", year: "numeric" })}
+                  </span>
+                </div>
+                {review.title && <p className="font-medium text-xs mb-0.5">{review.title}</p>}
+                <p className="text-xs text-muted-foreground leading-relaxed">{review.comment}</p>
+              </div>
+            ))}
+          </div>
+          {hasMore && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs mt-3 h-7 w-full"
+              onClick={() => setExpanded(!expanded)}
+              data-testid={`button-toggle-reviews-${productSlug}`}
+            >
+              {expanded ? "Mostra meno" : `Mostra tutte le ${reviews.length} recensioni`}
+            </Button>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 export function ProductReviewsSection({ productSlugs }: { productSlugs: string[] }) {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);

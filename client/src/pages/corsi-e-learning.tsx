@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { ProductReviewsSection } from "@/components/product-reviews";
+import { CourseReviewsInline } from "@/components/product-reviews";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -148,6 +148,7 @@ const province = [
 const courses = [
   {
     id: "self-learning",
+    reviewSlug: "camclass-selflearning",
     title: "Cam-Class Blended Individuale e Self-Learning",
     subtitle: "Studia al tuo ritmo con supporto tutor",
     description: "Impara comodamente da casa con un corso di lingua online dinamico ed efficace su piattaforma e-learning moderna. Self-learning per uno studio personalizzato, oppure modalità blended con 2-4 lezioni individuali da 30 minuti al mese con tutor madrelingua via Zoom.",
@@ -176,6 +177,7 @@ const courses = [
   },
   {
     id: "gruppo",
+    reviewSlug: "camclass-gruppo",
     title: "Cam-Class Blended di Gruppo",
     subtitle: "Lezioni live in piccolo gruppo + e-learning",
     description: "Corso blended con lezioni live con tutor madrelingua qualificati e piattaforma e-learning interattiva con strumenti avanzati come riconoscimento vocale e AI.",
@@ -204,6 +206,7 @@ const courses = [
   },
   {
     id: "individuale",
+    reviewSlug: "camclass-individuale",
     title: "Cam-Class Corso Individuale o Semi-Individuale",
     subtitle: "Percorso personalizzato 1-2 partecipanti",
     description: "Formazione linguistica online modulare per 1 o 2 partecipanti, con programma interamente personalizzato sugli obiettivi e il livello dello studente.",
@@ -232,6 +235,7 @@ const courses = [
   },
   {
     id: "certificazione",
+    reviewSlug: "preparazione-certificazione",
     title: "Percorso di Preparazione a Certificazione Linguistica",
     subtitle: "Preparazione esami MIUR: LanguageCert, IELTS, TOEFL, Cambridge e altri",
     description: "Percorso di certificazione mirato alla preparazione degli esami riconosciuti dal MIUR in inglese, francese, tedesco e spagnolo.",
@@ -260,6 +264,7 @@ const courses = [
   },
   {
     id: "conversazione",
+    reviewSlug: "conversazione-individuale",
     title: "Cam-Class Conversazione Individuale con Madrelingua",
     subtitle: "Sessioni 1-to-1 per sviluppare fluency",
     description: "Sessioni di conversazione individuali con insegnanti madrelingua via Zoom, pensate per sviluppare fluency, sicurezza e padronanza della lingua.",
@@ -288,6 +293,7 @@ const courses = [
   },
   {
     id: "mini-gruppi",
+    reviewSlug: "camclass-minigruppi",
     title: "Cam-Class Corso in Mini-Gruppi",
     subtitle: "Max 5 partecipanti, massima interazione",
     description: "Corso in piccolo gruppo con un massimo di 5 partecipanti per garantire la massima interazione e attenzione individuale.",
@@ -316,6 +322,7 @@ const courses = [
   },
   {
     id: "bambini-ragazzi",
+    reviewSlug: null as string | null,
     title: "Cam-Class Corso di Inglese per Bambini e Ragazzi",
     subtitle: "Corsi di inglese online dedicati ai giovani",
     description: "Corsi di inglese online pensati appositamente per bambini e ragazzi, con metodologie didattiche coinvolgenti e interattive adatte alle diverse fasce di età.",
@@ -648,6 +655,9 @@ function CourseCard({ course, index }: { course: typeof courses[0]; index: numbe
                   {formOpen ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
                 </Button>
               </div>
+              {course.reviewSlug && (
+                <CourseReviewsInline productSlug={course.reviewSlug} />
+              )}
             </div>
           </div>
           <AnimatePresence>
@@ -973,7 +983,6 @@ export default function CorsiELearningPage() {
             </AnimatedSection>
           </div>
         </section>
-        <ProductReviewsSection productSlugs={["camclass-selflearning", "camclass-gruppo", "camclass-individuale", "preparazione-certificazione", "conversazione-individuale", "camclass-minigruppi"]} />
       </main>
       <Footer />
     </div>

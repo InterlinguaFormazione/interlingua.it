@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { ProductReviewsSection } from "@/components/product-reviews";
+import { CourseReviewsInline } from "@/components/product-reviews";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -151,6 +151,7 @@ const courses = [
   {
     id: "corsi-gruppo",
     shopSlug: "corsi-gruppo",
+    reviewSlug: "corsi-gruppo",
     title: "Corsi di Gruppo",
     subtitle: "Lingue straniere per tutti i livelli",
     description: "Corsi collettivi serali e diurni nelle nostre sedi di Vicenza e Thiene, con docenti madrelingua qualificati. Formazione strutturata e certificata per tutti i livelli QCER, dal principiante all'avanzato.",
@@ -180,6 +181,7 @@ const courses = [
   {
     id: "corsi-individuali",
     shopSlug: null,
+    reviewSlug: "individuali-presenza",
     title: "Corsi Individuali o Semi-Individuali",
     subtitle: "1 o 2 partecipanti, massima personalizzazione",
     description: "Apprendimento personalizzato con docenti madrelingua, lezioni su misura e massima flessibilità. Un percorso efficace per un progresso rapido in un ambiente motivante.",
@@ -210,6 +212,7 @@ const courses = [
   {
     id: "corso-blended",
     shopSlug: "individuale-blended",
+    reviewSlug: "individuale-blended",
     title: "Corso Individuale Blended",
     subtitle: "In sede + piattaforma online",
     description: "Il meglio dei due mondi: lezioni individuali in sede con docente madrelingua, integrate dalla piattaforma e-learning attiva 24/7 per uno studio continuo e autonomo tra una lezione e l'altra.",
@@ -240,6 +243,7 @@ const courses = [
   {
     id: "office",
     shopSlug: "office-senza-segreti",
+    reviewSlug: "office-senza-segreti",
     title: "Office senza segreti",
     subtitle: "Excel, Word, PowerPoint e Copilot",
     description: "Un corso pratico e diretto per padroneggiare gli strumenti Office che usi ogni giorno. Dalle formule di Excel alle presentazioni PowerPoint, fino alle funzionalità AI di Copilot per lavorare il doppio in metà tempo.",
@@ -267,6 +271,7 @@ const courses = [
   {
     id: "ai",
     shopSlug: "ai-senza-segreti",
+    reviewSlug: "ai-senza-segreti",
     title: "AI senza segreti",
     subtitle: "Creatività, produttività e soluzioni per tutti",
     description: "Scopri come l'Intelligenza Artificiale può diventare il tuo alleato quotidiano: dalla scrittura alla creatività, dall'analisi dei dati all'automazione. Un corso accessibile a tutti, anche senza competenze tecniche.",
@@ -694,6 +699,9 @@ function CourseCard({ course, index }: { course: typeof courses[0]; index: numbe
                   {formOpen ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
                 </Button>
               </div>
+              {course.reviewSlug && (
+                <CourseReviewsInline productSlug={course.reviewSlug} />
+              )}
             </div>
           </div>
           <AnimatePresence>
@@ -1077,7 +1085,6 @@ export default function FormazioneInPresenzaPage() {
             </AnimatedSection>
           </div>
         </section>
-        <ProductReviewsSection productSlugs={["corsi-gruppo", "individuali-presenza", "individuale-blended", "corso-booster", "office-senza-segreti", "ai-senza-segreti", "experiential-workshop"]} />
       </main>
       <Footer />
     </div>
