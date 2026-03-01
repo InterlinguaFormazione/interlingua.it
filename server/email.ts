@@ -738,7 +738,30 @@ export async function sendEnglishTestConfirmationEmail(email: string, firstName:
         ${resultBlock}
         ${courseBlock}
         <p style="color:#334155;font-size:14px;line-height:1.6;">Se hai domande sui tuoi risultati o desideri discutere il corso più adatto alle tue esigenze, non esitare a contattarci.</p>
-        <div style="margin-top:28px;padding:16px;background:#f8fafc;border-radius:8px;text-align:center;">
+
+        <div style="margin:28px 0;padding:20px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0;">
+          <h3 style="color:#1e293b;font-size:15px;margin:0 0 16px;text-align:center;">📍 Le nostre sedi</h3>
+          <table style="width:100%;border-collapse:collapse;">
+            <tr>
+              <td style="padding:12px;vertical-align:top;width:50%;border-right:1px solid #e2e8f0;">
+                <p style="color:#1e40af;font-weight:bold;font-size:14px;margin:0 0 6px;">Sede di Vicenza</p>
+                <p style="color:#334155;font-size:13px;margin:0 0 4px;line-height:1.5;">Contrà del Monte, 13<br/>36100 Vicenza (VI)</p>
+                <p style="color:#64748b;font-size:12px;margin:0;">Tel: +39 0444 321 654</p>
+              </td>
+              <td style="padding:12px;vertical-align:top;width:50%;">
+                <p style="color:#1e40af;font-weight:bold;font-size:14px;margin:0 0 6px;">Sede di Thiene</p>
+                <p style="color:#334155;font-size:13px;margin:0 0 4px;line-height:1.5;">Corso Garibaldi, 174<br/>36016 Thiene (VI)</p>
+                <p style="color:#64748b;font-size:12px;margin:0;">Tel: +39 0445 364 856</p>
+              </td>
+            </tr>
+          </table>
+          <div style="text-align:center;margin-top:14px;padding-top:14px;border-top:1px solid #e2e8f0;">
+            <p style="color:#334155;font-size:13px;margin:0;">✉️ <a href="mailto:infocorsi@skillcraft.interlingua.it" style="color:#1e40af;text-decoration:none;">infocorsi@skillcraft.interlingua.it</a></p>
+            <p style="color:#64748b;font-size:12px;margin:6px 0 0;">Lun–Ven 9:00–18:00</p>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding:16px;background:#f8fafc;border-radius:8px;text-align:center;">
           <p style="margin:0;color:#64748b;font-size:12px;">Test completato: ${new Date().toLocaleDateString("it-IT", { day:"2-digit", month:"long", year:"numeric", hour:"2-digit", minute:"2-digit" })}</p>
           <p style="margin:8px 0 0;color:#94a3b8;font-size:11px;">Interlingua / SkillCraft</p>
         </div>
