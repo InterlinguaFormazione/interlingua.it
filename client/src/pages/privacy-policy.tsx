@@ -313,7 +313,7 @@ export default function PrivacyPolicyPage() {
               <h3 className="font-bold mb-2">Contatti per la privacy:</h3>
               <div className="p-4 rounded-xl bg-muted/50 border border-border/50 text-sm text-muted-foreground space-y-1">
                 <p>Email: <a href="mailto:privacy@interlingua.it" className="text-primary hover:underline">privacy@interlingua.it</a></p>
-                <p>Telefono: <a href="tel:+390444321601" className="text-primary hover:underline">+39 0444 321 601</a></p>
+                <p>Telefono: <a href="tel:+390444321601" className="text-primary hover:underline">+39 0444 321601</a></p>
                 <p>
                   Sito web:{" "}
                   <a href="https://skillcraft.interlingua.it" className="text-primary hover:underline">skillcraft.interlingua.it</a>

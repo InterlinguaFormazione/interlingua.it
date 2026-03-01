@@ -745,13 +745,13 @@ export async function sendEnglishTestConfirmationEmail(email: string, firstName:
             <tr>
               <td style="padding:12px;vertical-align:top;width:50%;border-right:1px solid #e2e8f0;">
                 <p style="color:#1e40af;font-weight:bold;font-size:14px;margin:0 0 6px;">Sede di Vicenza</p>
-                <p style="color:#334155;font-size:13px;margin:0 0 4px;line-height:1.5;">Contrà del Monte, 13<br/>36100 Vicenza (VI)</p>
-                <p style="color:#64748b;font-size:12px;margin:0;">Tel: +39 0444 321 654</p>
+                <p style="color:#334155;font-size:13px;margin:0 0 4px;line-height:1.5;">Viale Giuseppe Mazzini, 27<br/>36100 Vicenza (VI)</p>
+                <p style="color:#64748b;font-size:12px;margin:0;">Tel: +39 0444 321601</p>
               </td>
               <td style="padding:12px;vertical-align:top;width:50%;">
                 <p style="color:#1e40af;font-weight:bold;font-size:14px;margin:0 0 6px;">Sede di Thiene</p>
                 <p style="color:#334155;font-size:13px;margin:0 0 4px;line-height:1.5;">Corso Garibaldi, 174<br/>36016 Thiene (VI)</p>
-                <p style="color:#64748b;font-size:12px;margin:0;">Tel: +39 0445 364 856</p>
+                <p style="color:#64748b;font-size:12px;margin:0;">Tel: +39 0445 382744</p>
               </td>
             </tr>
           </table>

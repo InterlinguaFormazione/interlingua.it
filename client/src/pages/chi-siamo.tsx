@@ -646,7 +646,7 @@ export default function ChiSiamoPage() {
                 <div className="mt-10 pt-8 border-t border-border/50 grid sm:grid-cols-2 gap-6">
                   <div className="flex items-center justify-center gap-3">
                     <Phone className="w-5 h-5 text-primary" />
-                    <span className="font-medium">+39 0444 321 654</span>
+                    <span className="font-medium">+39 0444 321601</span>
                   </div>
                   <div className="flex items-center justify-center gap-3">
                     <Mail className="w-5 h-5 text-primary" />

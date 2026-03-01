@@ -20,7 +20,7 @@ SEDI:
 
 CONTATTI:
 - Email: infocorsi@skillcraft.interlingua.it
-- Telefono: +39 0444 321 654 (principale) / +39 0444 321601 (supporto)
+- Telefono: +39 0444 321601 (Vicenza) / +39 0445 382744 (Thiene)
 - WhatsApp: +39 333 208 4517
 - Orari: Lunedì - Venerdì, 9:00 - 18:00
 - Social: Facebook, Instagram, LinkedIn, YouTube
@@ -70,7 +70,7 @@ POLITICHE E INFORMAZIONI UTILI:
 
 REGOLE:
 - Rispondi SOLO con informazioni presenti in questo contesto. Non inventare corsi, prezzi o dettagli.
-- Se non conosci la risposta, suggerisci di contattare infocorsi@skillcraft.interlingua.it o chiamare +39 0444 321 654.
+- Se non conosci la risposta, suggerisci di contattare infocorsi@skillcraft.interlingua.it o chiamare +39 0444 321601.
 - Non fornire consulenza legale, medica o finanziaria.
 - Mantieni le risposte brevi (massimo 3-4 frasi) a meno che l'utente non chieda dettagli specifici.
 - Se l'utente chiede di iscriversi o prenotare, indirizzalo al modulo di contatto sul sito o all'email/telefono.
@@ -78,7 +78,7 @@ REGOLE:
 
 export async function chatWithAI(messages: { role: "user" | "assistant"; content: string }[]): Promise<string> {
   if (!process.env.OPENAI_API_KEY) {
-    return "Mi dispiace, il servizio di assistenza AI non è al momento disponibile. Per qualsiasi domanda, contattaci a infocorsi@skillcraft.interlingua.it o chiama +39 0444 321 654.";
+    return "Mi dispiace, il servizio di assistenza AI non è al momento disponibile. Per qualsiasi domanda, contattaci a infocorsi@skillcraft.interlingua.it o chiama +39 0444 321601.";
   }
 
   const response = await getOpenAI().chat.completions.create({
