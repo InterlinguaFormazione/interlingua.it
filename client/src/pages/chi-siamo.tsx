@@ -683,7 +683,7 @@ export default function ChiSiamoPage() {
                 name: "Maurizia Moltoni Sartori",
                 role: "Competenze Trasversali & Coaching",
                 bio: "Da oltre vent'anni si dedica alla formazione e allo sviluppo del potenziale degli adulti. Specializzata in comunicazione, leadership, team building e gestione delle emozioni con metodologie esperienziali coinvolgenti.",
-                color: "from-purple-500 to-pink-500",
+                image: "/images/team/docenti/maurizia.jpg",
               },
               {
                 name: "Ampelia Berto",
