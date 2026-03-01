@@ -38,6 +38,8 @@ import {
   type InsertBeSectionResult,
   type DiscountVoucher,
   type InsertDiscountVoucher,
+  type ProductReview,
+  type InsertProductReview,
   users,
   contactSubmissions,
   newsletterSubscriptions,
@@ -58,6 +60,7 @@ import {
   beWritingSpeaking,
   beSectionResults,
   discountVouchers,
+  productReviews,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
@@ -168,6 +171,13 @@ export interface IStorage {
   updateDiscountVoucher(id: string, data: Partial<InsertDiscountVoucher>): Promise<DiscountVoucher | undefined>;
   deleteDiscountVoucher(id: string): Promise<void>;
   incrementVoucherUsage(id: string): Promise<void>;
+
+  createProductReview(review: InsertProductReview): Promise<ProductReview>;
+  getProductReviewsBySlug(productSlug: string): Promise<ProductReview[]>;
+  getApprovedReviewsBySlug(productSlug: string): Promise<ProductReview[]>;
+  getAllProductReviews(): Promise<ProductReview[]>;
+  updateProductReview(id: string, data: Partial<{ approved: boolean; verified: boolean }>): Promise<ProductReview | undefined>;
+  deleteProductReview(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -614,6 +624,36 @@ export class DatabaseStorage implements IStorage {
     await db.update(discountVouchers)
       .set({ usedCount: sql`COALESCE(${discountVouchers.usedCount}, 0) + 1` })
       .where(eq(discountVouchers.id, id));
+  }
+
+  async createProductReview(review: InsertProductReview): Promise<ProductReview> {
+    const [result] = await db.insert(productReviews).values(review).returning();
+    return result;
+  }
+
+  async getProductReviewsBySlug(productSlug: string): Promise<ProductReview[]> {
+    return db.select().from(productReviews)
+      .where(eq(productReviews.productSlug, productSlug))
+      .orderBy(desc(productReviews.createdAt));
+  }
+
+  async getApprovedReviewsBySlug(productSlug: string): Promise<ProductReview[]> {
+    return db.select().from(productReviews)
+      .where(and(eq(productReviews.productSlug, productSlug), eq(productReviews.approved, true)))
+      .orderBy(desc(productReviews.createdAt));
+  }
+
+  async getAllProductReviews(): Promise<ProductReview[]> {
+    return db.select().from(productReviews).orderBy(desc(productReviews.createdAt));
+  }
+
+  async updateProductReview(id: string, data: Partial<{ approved: boolean; verified: boolean }>): Promise<ProductReview | undefined> {
+    const [result] = await db.update(productReviews).set(data).where(eq(productReviews.id, id)).returning();
+    return result;
+  }
+
+  async deleteProductReview(id: string): Promise<void> {
+    await db.delete(productReviews).where(eq(productReviews.id, id));
   }
 }
 

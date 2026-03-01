@@ -40,6 +40,7 @@ import LanguageTestsPage from "@/pages/language-tests";
 import SediPage from "@/pages/sedi";
 import TerminiECondizioniPage from "@/pages/termini-e-condizioni";
 import CodiceEticoPage from "@/pages/codice-etico";
+import ShopProductPage from "@/pages/shop-product";
 import CartCheckoutPage from "@/pages/shop-cart-checkout";
 import NotFound from "@/pages/not-found";
 import { CartProvider } from "@/lib/cart-context";
@@ -71,6 +72,7 @@ function Router() {
       <Route path="/language-coaching" component={LanguageCoachingPage} />
       <Route path="/corsi-italiano" component={CorsiItalianoPage} />
       <Route path="/shop" component={ShopPage} />
+      <Route path="/shop/product/:slug" component={ShopProductPage} />
       <Route path="/shop/checkout" component={CartCheckoutPage} />
       <Route path="/shop/checkout/:slug" component={ShopCheckoutPage} />
       <Route path="/shop/dashboard" component={ShopDashboardPage} />

@@ -9,7 +9,9 @@ import { Link, useLocation } from "wouter";
 import { SHOP_PRODUCTS, type ShopProduct, formatPriceDisplay } from "@shared/products";
 import { useCart } from "@/lib/cart-context";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
+import type { ProductReview } from "@shared/schema";
 import {
   ShoppingBag,
   ShoppingCart,
@@ -31,6 +33,7 @@ import {
   Users,
   Zap,
   Star,
+  MessageSquare,
 } from "lucide-react";
 import { SiPaypal, SiVisa, SiMastercard } from "react-icons/si";
 import cartaCulturaLogo from "@assets/carte-cultura-1200x675_1772388120185.avif";
@@ -48,6 +51,15 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
   const gradientClass = categoryConfig?.color || "from-primary to-blue-400";
   const cart = useCart();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
+
+  const { data: reviews = [] } = useQuery<ProductReview[]>({
+    queryKey: [`/api/shop/reviews/${product.slug}`],
+  });
+
+  const avgRating = reviews.length > 0
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+    : 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -68,8 +80,9 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
       className="h-full"
     >
       <Card
-        className="h-full group relative overflow-hidden border border-border/50 bg-card hover:shadow-xl hover:border-primary/30 hover:-translate-y-1 transition-all duration-300"
+        className="h-full group relative overflow-hidden border border-border/50 bg-card hover:shadow-xl hover:border-primary/30 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
         data-testid={`card-product-${product.slug}`}
+        onClick={() => setLocation(`/shop/product/${product.slug}`)}
       >
         <div className={`relative h-28 bg-gradient-to-br ${gradientClass} overflow-hidden`}>
           <div className="absolute inset-0 opacity-10"
@@ -99,11 +112,24 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
         <CardContent className="p-0 flex flex-col flex-grow">
           <div className="p-5 pb-3 flex-grow">
             <h3
-              className="text-[15px] font-bold mb-2 group-hover:text-primary transition-colors leading-snug line-clamp-2"
+              className="text-[15px] font-bold mb-1.5 group-hover:text-primary transition-colors leading-snug line-clamp-2"
               data-testid={`text-product-name-${product.slug}`}
             >
               {product.name}
             </h3>
+
+            {reviews.length > 0 && (
+              <div className="flex items-center gap-1.5 mb-2">
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star key={s} className={`w-3 h-3 ${s <= Math.round(avgRating) ? "fill-amber-400 text-amber-400" : "fill-muted text-muted-foreground/30"}`} />
+                  ))}
+                </div>
+                <span className="text-[11px] text-muted-foreground">
+                  ({reviews.length})
+                </span>
+              </div>
+            )}
 
             <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
               {product.description}
@@ -150,7 +176,7 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
                 >
                   <ShoppingCart className="h-4 w-4" />
                 </Button>
-                <Link href={`/shop/checkout/${product.slug}`}>
+                <Link href={`/shop/checkout/${product.slug}`} onClick={(e: any) => e.stopPropagation()}>
                   <Button
                     size="sm"
                     className={`bg-gradient-to-r ${gradientClass} hover:opacity-90 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 group/btn h-9`}

@@ -456,6 +456,29 @@ export const insertBeSectionResultSchema = createInsertSchema(beSectionResults).
 export type InsertBeSectionResult = z.infer<typeof insertBeSectionResultSchema>;
 export type BeSectionResult = typeof beSectionResults.$inferSelect;
 
+export const productReviews = pgTable("product_reviews", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  productSlug: text("product_slug").notNull(),
+  authorName: text("author_name").notNull(),
+  authorEmail: text("author_email").notNull(),
+  rating: integer("rating").notNull(),
+  title: text("title"),
+  comment: text("comment").notNull(),
+  verified: boolean("verified").default(false),
+  approved: boolean("approved").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertProductReviewSchema = createInsertSchema(productReviews).omit({
+  id: true,
+  verified: true,
+  approved: true,
+  createdAt: true,
+});
+
+export type InsertProductReview = z.infer<typeof insertProductReviewSchema>;
+export type ProductReview = typeof productReviews.$inferSelect;
+
 export interface Course {
   id: string;
   title: string;

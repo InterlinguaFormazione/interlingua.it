@@ -41,6 +41,9 @@ import {
   ToggleLeft,
   ToggleRight,
   Wand2,
+  Star,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 
 interface ShopOrder {
@@ -1465,6 +1468,148 @@ function VouchersTab({ token }: { token: string }) {
   );
 }
 
+function ReviewsTab({ token }: { token: string }) {
+  const { toast } = useToast();
+  const { data: reviews = [], isLoading } = useQuery<any[]>({
+    queryKey: ["/api/admin/reviews"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/reviews", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.json();
+    },
+  });
+
+  const approveMutation = useMutation({
+    mutationFn: async ({ id, approved }: { id: string; approved: boolean }) => {
+      const res = await fetch(`/api/admin/reviews/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ approved }),
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/reviews"] });
+      toast({ title: "Stato aggiornato" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await fetch(`/api/admin/reviews/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/reviews"] });
+      toast({ title: "Recensione eliminata" });
+    },
+  });
+
+  const pendingCount = reviews.filter((r: any) => !r.approved).length;
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Star className="w-5 h-5" /> Recensioni Prodotti
+            </CardTitle>
+            <CardDescription>
+              {reviews.length} recensioni totali{pendingCount > 0 && ` — ${pendingCount} in attesa di approvazione`}
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="text-center py-8 text-muted-foreground">Caricamento...</div>
+        ) : reviews.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">Nessuna recensione</div>
+        ) : (
+          <div className="space-y-3">
+            {reviews.map((review: any) => {
+              const product = SHOP_PRODUCTS.find(p => p.slug === review.productSlug);
+              return (
+                <div key={review.id} className={`border rounded-lg p-4 ${!review.approved ? "border-amber-300 bg-amber-50/50" : "border-border"}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-grow min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="font-semibold text-sm">{review.authorName}</span>
+                        <span className="text-xs text-muted-foreground">({review.authorEmail})</span>
+                        <div className="flex items-center gap-0.5">
+                          {[1, 2, 3, 4, 5].map((s: number) => (
+                            <Star key={s} className={`w-3 h-3 ${s <= review.rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground/20"}`} />
+                          ))}
+                        </div>
+                        {review.verified && (
+                          <Badge variant="secondary" className="text-[10px]">Verificato</Badge>
+                        )}
+                        {!review.approved && (
+                          <Badge variant="outline" className="text-[10px] border-amber-400 text-amber-600">In attesa</Badge>
+                        )}
+                        {review.approved && (
+                          <Badge variant="secondary" className="text-[10px] text-emerald-600">Approvata</Badge>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground mb-1">
+                        Prodotto: <span className="font-medium">{product?.name || review.productSlug}</span>
+                        {" · "}
+                        {new Date(review.createdAt).toLocaleDateString("it-IT")}
+                      </div>
+                      {review.title && <p className="text-sm font-medium mb-0.5">{review.title}</p>}
+                      <p className="text-sm text-muted-foreground">{review.comment}</p>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {!review.approved ? (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                          onClick={() => approveMutation.mutate({ id: review.id, approved: true })}
+                          title="Approva"
+                        >
+                          <CheckCircle className="w-4 h-4" />
+                        </Button>
+                      ) : (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                          onClick={() => approveMutation.mutate({ id: review.id, approved: false })}
+                          title="Nascondi"
+                        >
+                          <XCircle className="w-4 h-4" />
+                        </Button>
+                      )}
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => {
+                          if (confirm("Eliminare questa recensione?")) {
+                            deleteMutation.mutate(review.id);
+                          }
+                        }}
+                        title="Elimina"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function AdminPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -1631,6 +1776,9 @@ export default function AdminPage() {
               <TabsTrigger value="vouchers" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2" data-testid="tab-vouchers">
                 <Tag className="w-4 h-4" /> Vouchers
               </TabsTrigger>
+              <TabsTrigger value="reviews" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2" data-testid="tab-reviews">
+                <Star className="w-4 h-4" /> Recensioni
+              </TabsTrigger>
               {user?.role === "admin" && (
                 <TabsTrigger value="users" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
                   <Users className="w-4 h-4" /> Users
@@ -1667,6 +1815,9 @@ export default function AdminPage() {
           </TabsContent>
           <TabsContent value="vouchers">
             <VouchersTab token={token} />
+          </TabsContent>
+          <TabsContent value="reviews">
+            <ReviewsTab token={token} />
           </TabsContent>
           {user?.role === "admin" && (
             <TabsContent value="users">

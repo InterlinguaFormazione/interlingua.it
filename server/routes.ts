@@ -1867,6 +1867,85 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/shop/reviews/:slug", async (req, res) => {
+    try {
+      const reviews = await storage.getApprovedReviewsBySlug(req.params.slug);
+      const sanitized = reviews.map(({ authorEmail, ...rest }) => rest);
+      res.json(sanitized);
+    } catch (error) {
+      console.error("Error fetching product reviews:", error);
+      res.status(500).json({ message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/shop/reviews", async (req, res) => {
+    try {
+      const { productSlug, authorName, authorEmail, rating, title, comment } = req.body;
+      if (!productSlug || !authorName || !authorEmail || !rating || !comment) {
+        return res.status(400).json({ message: "Tutti i campi obbligatori devono essere compilati." });
+      }
+      if (rating < 1 || rating > 5) {
+        return res.status(400).json({ message: "La valutazione deve essere tra 1 e 5." });
+      }
+      const verified = await storage.hasCompletedOrdersByEmail(authorEmail.toLowerCase().trim());
+      const review = await storage.createProductReview({
+        productSlug,
+        authorName: authorName.trim(),
+        authorEmail: authorEmail.toLowerCase().trim(),
+        rating: Math.round(rating),
+        title: title ? title.trim() : null,
+        comment: comment.trim(),
+      });
+      if (verified) {
+        await storage.updateProductReview(review.id, { verified: true, approved: true });
+      }
+      res.json({
+        success: true,
+        message: verified
+          ? "Grazie per la tua recensione! È stata pubblicata."
+          : "Grazie per la tua recensione! Sarà visibile dopo l'approvazione.",
+        autoApproved: verified,
+      });
+    } catch (error) {
+      console.error("Error creating product review:", error);
+      res.status(500).json({ message: "Errore del server" });
+    }
+  });
+
+  app.get("/api/admin/reviews", requireAuth, async (_req, res) => {
+    try {
+      const reviews = await storage.getAllProductReviews();
+      res.json(reviews);
+    } catch (error) {
+      console.error("Error fetching all reviews:", error);
+      res.status(500).json({ message: "Errore del server" });
+    }
+  });
+
+  app.patch("/api/admin/reviews/:id", requireAuth, async (req, res) => {
+    try {
+      const { approved, verified } = req.body;
+      const updated = await storage.updateProductReview(req.params.id, { approved, verified });
+      if (!updated) {
+        return res.status(404).json({ message: "Recensione non trovata" });
+      }
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating review:", error);
+      res.status(500).json({ message: "Errore del server" });
+    }
+  });
+
+  app.delete("/api/admin/reviews/:id", requireAuth, async (req, res) => {
+    try {
+      await storage.deleteProductReview(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting review:", error);
+      res.status(500).json({ message: "Errore del server" });
+    }
+  });
+
   app.get("/api/shop/carta-cultura/status", async (_req, res) => {
     res.json({ available: isCartaCulturaAvailable() });
   });
