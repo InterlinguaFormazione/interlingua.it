@@ -13,6 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation, useParams } from "wouter";
 import { getProductBySlug, getEffectivePrice } from "@shared/products";
+import { COUNTRIES } from "@shared/countries";
 import {
   Select,
   SelectContent,
@@ -1066,18 +1067,9 @@ export default function ShopCheckout() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="IT">Italia</SelectItem>
-                            <SelectItem value="AT">Austria</SelectItem>
-                            <SelectItem value="BE">Belgio</SelectItem>
-                            <SelectItem value="CH">Svizzera</SelectItem>
-                            <SelectItem value="DE">Germania</SelectItem>
-                            <SelectItem value="ES">Spagna</SelectItem>
-                            <SelectItem value="FR">Francia</SelectItem>
-                            <SelectItem value="GB">Regno Unito</SelectItem>
-                            <SelectItem value="NL">Paesi Bassi</SelectItem>
-                            <SelectItem value="PT">Portogallo</SelectItem>
-                            <SelectItem value="US">Stati Uniti</SelectItem>
-                            <SelectItem value="OTHER">Altro</SelectItem>
+                            {COUNTRIES.map((c) => (
+                              <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </div>
