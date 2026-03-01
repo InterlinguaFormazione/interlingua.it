@@ -106,6 +106,7 @@ export default function EnglishTestPage() {
   const [recordingTime, setRecordingTime] = useState(60);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioLevel, setAudioLevel] = useState(0);
+  const [frequencyBars, setFrequencyBars] = useState<number[]>(new Array(20).fill(0));
   const [results, setResults] = useState<TestResults | null>(null);
   const [writingScores, setWritingScores] = useState<any>(null);
   const [speakingScores, setSpeakingScores] = useState<any>(null);
@@ -419,6 +420,17 @@ export default function EnglishTestPage() {
         analyserRef.current.getByteFrequencyData(data);
         const avg = data.reduce((a, b) => a + b, 0) / data.length;
         setAudioLevel(avg / 255 * 100);
+        const barCount = 20;
+        const sliceSize = Math.floor(data.length / barCount);
+        const bars: number[] = [];
+        for (let i = 0; i < barCount; i++) {
+          let sum = 0;
+          for (let j = 0; j < sliceSize; j++) {
+            sum += data[i * sliceSize + j];
+          }
+          bars.push((sum / sliceSize) / 255 * 100);
+        }
+        setFrequencyBars(bars);
         animFrameRef.current = requestAnimationFrame(updateLevel);
       };
       updateLevel();
@@ -1228,15 +1240,39 @@ export default function EnglishTestPage() {
                 )}
 
                 {isRecording && (
-                  <div className="space-y-4">
+                  <div className="space-y-5">
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse shadow-lg shadow-red-500/50" />
+                      <span className="text-xs uppercase tracking-widest font-bold text-red-500">Recording</span>
+                    </div>
+
                     <div className={`text-5xl font-bold tabular-nums ${recordingTime <= 10 ? "text-red-500 animate-pulse" : "text-slate-800 dark:text-white"}`} data-testid="text-countdown">
                       0:{recordingTime.toString().padStart(2, "0")}
                     </div>
 
-                    <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden" data-testid="vu-meter">
+                    <div className="flex items-end justify-center gap-[3px] h-24 px-4 py-3 rounded-2xl bg-slate-900 dark:bg-black border border-slate-700" data-testid="vu-meter">
+                      {frequencyBars.map((bar, i) => {
+                        const height = Math.max(4, bar);
+                        const green = bar < 40;
+                        const yellow = bar >= 40 && bar < 70;
+                        return (
+                          <div
+                            key={i}
+                            className={`w-2.5 rounded-sm transition-all duration-75 ${
+                              green ? "bg-green-500 shadow-green-500/30" :
+                              yellow ? "bg-yellow-400 shadow-yellow-400/30" :
+                              "bg-red-500 shadow-red-500/30"
+                            } shadow-md`}
+                            style={{ height: `${height}%` }}
+                          />
+                        );
+                      })}
+                    </div>
+
+                    <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 rounded-full transition-all duration-100"
-                        style={{ width: `${Math.min(audioLevel, 100)}%` }}
+                        className="h-full bg-purple-500 rounded-full transition-all duration-1000 ease-linear"
+                        style={{ width: `${((60 - recordingTime) / 60) * 100}%` }}
                       />
                     </div>
 
