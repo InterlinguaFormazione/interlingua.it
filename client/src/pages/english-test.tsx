@@ -722,11 +722,11 @@ export default function EnglishTestPage() {
             </div>
 
             <div className="rounded-3xl bg-white/80 dark:bg-slate-800/70 backdrop-blur-xl border border-white/90 dark:border-slate-700/60 shadow-2xl shadow-blue-900/5 dark:shadow-black/20 overflow-hidden">
-              <div className="px-8 pt-8 pb-2">
+              <div className="px-4 sm:px-8 pt-8 pb-2">
                 <h2 className="text-xl font-bold text-slate-800 dark:text-white">Inserisci i tuoi dati</h2>
                 <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">I campi contrassegnati con * sono obbligatori</p>
               </div>
-              <div className="px-8 pb-8 pt-4">
+              <div className="px-4 sm:px-8 pb-8 pt-4">
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(handleRegistration)} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -796,7 +796,7 @@ export default function EnglishTestPage() {
                       )} />
                     </div>
 
-                    <div className="grid grid-cols-5 gap-3">
+                    <div className="grid grid-cols-5 gap-1">
                       <div className="col-span-3">
                         <FormField control={form.control} name="province" render={({ field }) => (
                           <FormItem>
@@ -1439,7 +1439,7 @@ export default function EnglishTestPage() {
                 <p className="text-blue-200">CEFR Level</p>
               </div>
               <CardContent className="p-6">
-                <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                   <div className="text-center p-3 bg-slate-50 dark:bg-slate-900 rounded-xl">
                     <div className="text-sm text-slate-500 mb-1">MC Phase</div>
                     <div className={`inline-block px-3 py-1 rounded-lg text-white font-bold ${levelColor(results.mcLevel)}`} data-testid="text-mc-level">

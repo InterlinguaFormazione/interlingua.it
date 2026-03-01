@@ -212,7 +212,7 @@ export default function FullImmersionPage() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
-                  className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight"
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight"
                   data-testid="text-fi-title"
                 >
                   E Se Bastasse
@@ -364,7 +364,7 @@ export default function FullImmersionPage() {
                     <TrendingUp className="w-3.5 h-3.5 mr-1.5" />
                     Un Livello in Una Settimana
                   </Badge>
-                  <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6 tracking-tight" data-testid="text-fi-intro-title">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-6 tracking-tight" data-testid="text-fi-intro-title">
                     Metodologia
                     <span className="block gradient-text">Immersiva ed Esperienziale</span>
                   </h2>
@@ -427,7 +427,7 @@ export default function FullImmersionPage() {
                   <Target className="w-3.5 h-3.5 mr-1.5" />
                   Programma Interdisciplinare
                 </Badge>
-                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fi-program-title">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fi-program-title">
                   Quattro Aree Tematiche
                   <span className="block gradient-text">Quattro Docenti Specializzati</span>
                 </h2>
@@ -472,7 +472,7 @@ export default function FullImmersionPage() {
                     <Calendar className="w-3.5 h-3.5 mr-1.5" />
                     La Settimana Tipo
                   </Badge>
-                  <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fi-day-title">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fi-day-title">
                     Come Si Vive il
                     <span className="gradient-text"> Full Immersion</span>
                   </h2>
@@ -564,7 +564,7 @@ export default function FullImmersionPage() {
                   <Zap className="w-3.5 h-3.5 mr-1.5" />
                   Il Corso Giusto per Te
                 </Badge>
-                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fi-formats-title">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fi-formats-title">
                   Scegli il Tuo
                   <span className="gradient-text"> Formato</span>
                 </h2>
@@ -629,7 +629,7 @@ export default function FullImmersionPage() {
                     <Award className="w-3.5 h-3.5 mr-1.5" />
                     Risultati Garantiti
                   </Badge>
-                  <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fi-results-title">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fi-results-title">
                     Competenze e
                     <span className="gradient-text"> Risultati</span>
                   </h2>
@@ -784,7 +784,7 @@ export default function FullImmersionPage() {
                   <Star className="w-3.5 h-3.5 mr-1.5" />
                   Parola di Chi C'era
                 </Badge>
-                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fi-testimonials-title">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fi-testimonials-title">
                   Non Crederci Sulla Parola.
                   <span className="gradient-text"> Credi a Loro.</span>
                 </h2>
@@ -839,7 +839,7 @@ export default function FullImmersionPage() {
                   <Sparkles className="w-4 h-4 text-cyan-300" />
                   <span className="text-sm font-bold text-white/90 tracking-wide">Posti Limitati</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-white leading-tight tracking-tight" data-testid="text-fi-cta-title">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-white leading-tight tracking-tight" data-testid="text-fi-cta-title">
                   La Prossima Settimana
                   <br />
                   <span className="bg-gradient-to-r from-white via-cyan-200 to-blue-200 bg-clip-text text-transparent">

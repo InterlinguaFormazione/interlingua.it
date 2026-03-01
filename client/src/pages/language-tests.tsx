@@ -146,13 +146,16 @@ export default function LanguageTestsPage() {
                   {test.available ? (
                     <Link href={test.href} data-testid={`link-test-${test.id}`}>
                       <Card className="group cursor-pointer border border-slate-200/80 dark:border-slate-700/60 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 bg-white/80 dark:bg-slate-800/60 backdrop-blur-sm">
-                        <CardContent className="p-6 flex items-center gap-6">
-                          <div className="flex-shrink-0">
+                        <CardContent className="p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                          <div className="flex items-center gap-4 sm:gap-0 sm:block flex-shrink-0">
                             <FlagComponent />
+                            <h2 className="text-xl font-bold text-slate-900 dark:text-white sm:hidden" data-testid={`text-language-mobile-${test.id}`}>
+                              {test.language}
+                            </h2>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-3 mb-1.5">
-                              <h2 className="text-xl font-bold text-slate-900 dark:text-white" data-testid={`text-language-${test.id}`}>
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1.5">
+                              <h2 className="hidden sm:block text-xl font-bold text-slate-900 dark:text-white" data-testid={`text-language-${test.id}`}>
                                 {test.language}
                               </h2>
                               <Badge className="bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 border-0" data-testid={`badge-available-${test.id}`}>
@@ -161,7 +164,7 @@ export default function LanguageTestsPage() {
                               </Badge>
                             </div>
                             <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">{test.description}</p>
-                            <div className="flex items-center gap-4 text-xs text-slate-400 dark:text-slate-500">
+                            <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-slate-400 dark:text-slate-500">
                               <span className="flex items-center gap-1">
                                 <GraduationCap className="w-3.5 h-3.5" />
                                 {test.levels}
@@ -173,19 +176,22 @@ export default function LanguageTestsPage() {
                               <span>{test.sections} sezioni</span>
                             </div>
                           </div>
-                          <ArrowRight className="w-5 h-5 text-slate-300 dark:text-slate-600 group-hover:text-blue-500 group-hover:translate-x-1 transition-all flex-shrink-0" />
+                          <ArrowRight className="w-5 h-5 text-slate-300 dark:text-slate-600 group-hover:text-blue-500 group-hover:translate-x-1 transition-all flex-shrink-0 hidden sm:block" />
                         </CardContent>
                       </Card>
                     </Link>
                   ) : (
                     <Card className="border border-slate-200/60 dark:border-slate-700/40 bg-white/50 dark:bg-slate-800/30 backdrop-blur-sm opacity-70" data-testid={`card-test-${test.id}`}>
-                      <CardContent className="p-6 flex items-center gap-6">
-                        <div className="flex-shrink-0 grayscale opacity-60">
+                      <CardContent className="p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                        <div className="flex items-center gap-4 sm:gap-0 sm:block flex-shrink-0 grayscale opacity-60">
                           <FlagComponent />
+                          <h2 className="text-xl font-bold text-slate-400 dark:text-slate-500 sm:hidden">
+                            {test.language}
+                          </h2>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-1.5">
-                            <h2 className="text-xl font-bold text-slate-400 dark:text-slate-500" data-testid={`text-language-${test.id}`}>
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1.5">
+                            <h2 className="hidden sm:block text-xl font-bold text-slate-400 dark:text-slate-500" data-testid={`text-language-${test.id}`}>
                               {test.language}
                             </h2>
                             <Badge variant="secondary" className="text-xs" data-testid={`badge-coming-${test.id}`}>

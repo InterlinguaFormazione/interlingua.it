@@ -230,11 +230,11 @@ export default function ChiSiamoPage() {
                 variants={fadeInUp}
                 className="text-center"
               >
-                <Card className="p-6 h-full hover-elevate transition-all duration-300">
+                <Card className="p-4 md:p-6 h-full hover-elevate transition-all duration-300">
                   <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
                     <stat.icon className="w-6 h-6 text-primary" />
                   </div>
-                  <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-2">
                     {stat.value}
                   </div>
                   <div className="text-sm text-muted-foreground">
@@ -346,7 +346,7 @@ export default function ChiSiamoPage() {
                   decoding="async"
                 />
               </div>
-              <Card className="absolute bottom-0 left-0 translate-y-3/4 p-4 shadow-xl max-w-[240px]">
+              <Card className="absolute bottom-0 left-0 translate-y-3/4 p-4 shadow-xl max-w-[240px] hidden md:block">
                 <div className="flex items-center gap-4 mb-3">
                   <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center">
                     <Award className="w-6 h-6 text-accent" />
@@ -383,7 +383,7 @@ export default function ChiSiamoPage() {
           </motion.div>
           
           <div className="relative max-w-4xl mx-auto">
-            <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-accent to-primary" />
+            <div className="absolute left-4 md:left-1/2 md:-translate-x-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-accent to-primary" />
             
             {timelineEvents.map((event, index) => (
               <motion.div
@@ -392,9 +392,9 @@ export default function ChiSiamoPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className={`relative flex items-center mb-8 ${index % 2 === 0 ? 'justify-start' : 'justify-end'}`}
+                className={`relative flex items-center mb-8 pl-12 md:pl-0 ${index % 2 === 0 ? 'md:justify-start' : 'md:justify-end'}`}
               >
-                <div className={`w-5/12 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8 text-left order-1'}`}>
+                <div className={`w-full md:w-5/12 ${index % 2 === 0 ? 'md:pr-8 md:text-right' : 'md:pl-8 md:text-left md:order-1'}`}>
                   <Card className={`p-5 ${event.highlight ? 'border-primary/50 bg-primary/5' : ''}`}>
                     <div className={`text-2xl font-bold ${event.highlight ? 'text-primary' : ''} mb-2`}>
                       {event.year}
@@ -409,7 +409,7 @@ export default function ChiSiamoPage() {
                   </Card>
                 </div>
                 
-                <div className="absolute left-1/2 transform -translate-x-1/2 z-10">
+                <div className="absolute left-4 md:left-1/2 transform -translate-x-1/2 z-10">
                   <div className={`w-4 h-4 rounded-full border-4 ${event.highlight ? 'bg-primary border-primary' : 'bg-background border-muted-foreground/30'}`} />
                 </div>
               </motion.div>

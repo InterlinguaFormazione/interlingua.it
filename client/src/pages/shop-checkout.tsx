@@ -898,7 +898,7 @@ export default function ShopCheckout() {
                           )}
                         </div>
                       )}
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                           <Label htmlFor="customerFirstName">Nome *</Label>
                           <Input
@@ -962,7 +962,7 @@ export default function ShopCheckout() {
                       </div>
                       {buyingForOther && (
                         <div className="space-y-3 pl-4 border-l-2 border-primary/20">
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                               <Label htmlFor="studentFirstName">Nome studente *</Label>
                               <Input
@@ -1127,7 +1127,7 @@ export default function ShopCheckout() {
                             <Label htmlFor="partitaIva">Partita IVA *</Label>
                             <Input id="partitaIva" value={partitaIva} onChange={(e) => setPartitaIva(e.target.value)} className="mt-1" data-testid="input-partita-iva" />
                           </div>
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                               <Label htmlFor="codiceSdi">Codice SDI</Label>
                               <Input id="codiceSdi" value={codiceSdi} onChange={(e) => setCodiceSdi(e.target.value.toUpperCase())} maxLength={7} className="mt-1" data-testid="input-codice-sdi" />
@@ -1145,7 +1145,7 @@ export default function ShopCheckout() {
                         <Input id="indirizzo" value={indirizzo} onChange={(e) => setIndirizzo(e.target.value)} className="mt-1" data-testid="input-indirizzo" />
                       </div>
 
-                      <div className={`grid ${isItaly ? "grid-cols-3" : "grid-cols-2"} gap-4`}>
+                      <div className={`grid grid-cols-1 ${isItaly ? "sm:grid-cols-3" : "sm:grid-cols-2"} gap-4`}>
                         {isItaly && (
                           <div>
                             <Label htmlFor="provincia">Provincia *</Label>

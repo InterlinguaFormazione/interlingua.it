@@ -734,7 +734,7 @@ export default function CorsiELearningPage() {
                     Formazione Online
                   </Badge>
                 </motion.div>
-                <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight" data-testid="text-el-title">
+                <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight" data-testid="text-el-title">
                   Corsi Online
                   <br />
                   <span className="bg-gradient-to-r from-white via-teal-100 to-cyan-200 bg-clip-text text-transparent">
@@ -844,7 +844,7 @@ export default function CorsiELearningPage() {
                   <BookOpen className="w-4 h-4 text-teal-600" />
                   <span className="text-sm font-bold text-teal-600 tracking-wide">Catalogo Corsi Online</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-el-catalog-title">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-el-catalog-title">
                   I Nostri Corsi
                   <span className="bg-gradient-to-r from-teal-500 to-cyan-600 bg-clip-text text-transparent"> E-Learning</span>
                 </h2>
@@ -873,7 +873,7 @@ export default function CorsiELearningPage() {
                   <Target className="w-4 h-4 text-teal-600" />
                   <span className="text-sm font-bold text-teal-600 tracking-wide">Perché Sceglierci</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-el-why-title">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-el-why-title">
                   I Vantaggi del
                   <span className="bg-gradient-to-r from-teal-500 to-cyan-600 bg-clip-text text-transparent"> Nostro E-Learning</span>
                 </h2>
@@ -909,7 +909,7 @@ export default function CorsiELearningPage() {
                   <Zap className="w-4 h-4 text-teal-600" />
                   <span className="text-sm font-bold text-teal-600 tracking-wide">Scopri di Più</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight">
                   Preferisci la
                   <span className="bg-gradient-to-r from-teal-500 to-cyan-600 bg-clip-text text-transparent"> Formazione in Sede?</span>
                 </h2>
@@ -966,7 +966,7 @@ export default function CorsiELearningPage() {
                   <Calendar className="w-4 h-4 text-teal-300" />
                   <span className="text-sm font-bold text-white/90 tracking-wide">Inizia Subito</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-white leading-tight tracking-tight" data-testid="text-el-cta-title">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-white leading-tight tracking-tight" data-testid="text-el-cta-title">
                   Impara Una Lingua
                   <br />
                   <span className="bg-gradient-to-r from-white via-teal-200 to-cyan-200 bg-clip-text text-transparent">

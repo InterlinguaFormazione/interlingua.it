@@ -110,7 +110,7 @@ export default function BlogPostPage() {
             <div className="h-px bg-border mb-8" />
 
             <div 
-              className="prose prose-lg dark:prose-invert max-w-none"
+              className="prose sm:prose-lg dark:prose-invert max-w-none"
               dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }} 
               data-testid="blog-post-content"
             />

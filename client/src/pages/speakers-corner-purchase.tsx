@@ -431,7 +431,7 @@ export default function SpeakersCornerPurchase() {
                     </CardHeader>
                     <CardContent>
                       <form onSubmit={handleDetailsSubmit} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <Label htmlFor="purchase-nome">Nome</Label>
                             <Input
@@ -515,7 +515,7 @@ export default function SpeakersCornerPurchase() {
                       <form onSubmit={handleBillingSubmit} className="space-y-5">
                         <div className="space-y-3">
                           <Label className="text-sm font-medium">Tipo di fatturazione *</Label>
-                          <div className="grid grid-cols-3 gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <button
                               type="button"
                               onClick={() => setTipoFatturazione("privato")}
@@ -619,7 +619,7 @@ export default function SpeakersCornerPurchase() {
                           />
                         </div>
 
-                        <div className={`grid ${isItaly ? "grid-cols-3" : "grid-cols-2"} gap-4`}>
+                        <div className={`grid ${isItaly ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"} gap-4`}>
                           {isItaly && (
                             <div className="space-y-2">
                               <Label htmlFor="purchase-provincia">Provincia *</Label>
@@ -691,7 +691,7 @@ export default function SpeakersCornerPurchase() {
                             <p className="text-sm font-medium text-muted-foreground">
                               Fatturazione elettronica (inserisci almeno uno) *
                             </p>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div className="space-y-2">
                                 <Label htmlFor="purchase-sdi">Codice SDI</Label>
                                 <Input

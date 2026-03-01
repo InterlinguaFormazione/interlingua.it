@@ -784,7 +784,7 @@ export default function FormazioneInPresenzaPage() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
-                  className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight"
+                  className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-8 leading-[1.1] tracking-tight"
                   data-testid="text-fip-title"
                 >
                   Formazione
@@ -937,7 +937,7 @@ export default function FormazioneInPresenzaPage() {
                   <BookOpen className="w-4 h-4 text-primary" />
                   <span className="text-sm font-bold text-primary tracking-wide">Catalogo Corsi</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fip-catalog-title">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fip-catalog-title">
                   I Nostri Corsi
                   <span className="gradient-text"> in Sede</span>
                 </h2>
@@ -966,7 +966,7 @@ export default function FormazioneInPresenzaPage() {
                   <Target className="w-4 h-4 text-primary" />
                   <span className="text-sm font-bold text-primary tracking-wide">Il Nostro Approccio</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fip-why-title">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight" data-testid="text-fip-why-title">
                   Il Metodo
                   <span className="gradient-text"> Interlingua</span>
                 </h2>
@@ -1002,7 +1002,7 @@ export default function FormazioneInPresenzaPage() {
                   <Zap className="w-4 h-4 text-primary" />
                   <span className="text-sm font-bold text-primary tracking-wide">Scopri di Più</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-5 tracking-tight">
                   Esplora Anche i Nostri
                   <span className="gradient-text"> Percorsi Intensivi</span>
                 </h2>
@@ -1059,7 +1059,7 @@ export default function FormazioneInPresenzaPage() {
                   <Calendar className="w-4 h-4 text-cyan-300" />
                   <span className="text-sm font-bold text-white/90 tracking-wide">Iscrizioni Aperte</span>
                 </div>
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-white leading-tight tracking-tight" data-testid="text-fip-cta-title">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-white leading-tight tracking-tight" data-testid="text-fip-cta-title">
                   Inizia il Tuo
                   <br />
                   <span className="bg-gradient-to-r from-white via-cyan-200 to-blue-200 bg-clip-text text-transparent">

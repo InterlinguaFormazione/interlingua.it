@@ -142,7 +142,7 @@ export default function SediPage() {
                 initial={prefersReducedMotion ? {} : { opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6"
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight mb-6"
               >
                 <span className="text-white">Le Nostre </span>
                 <span className="bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-300 bg-clip-text text-transparent">Sedi</span>
@@ -343,7 +343,7 @@ export default function SediPage() {
                             <p className="text-xs text-muted-foreground mt-1">A pochi passi dalla nostra sede nel centro storico</p>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800">
                             <img
                               src={classroomVicenza}
@@ -389,7 +389,7 @@ export default function SediPage() {
                             <p className="text-xs text-muted-foreground mt-1">Corso Garibaldi, cuore del centro storico</p>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800">
                             <img
                               src={aboutTeaching}

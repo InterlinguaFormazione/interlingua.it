@@ -145,7 +145,7 @@ export default function SpeakersCornerPage() {
                   <Sparkles className="w-4 h-4 text-primary" />
                   <span className="text-sm font-semibold text-primary" data-testid="badge-sc-label">Servizio in Abbonamento</span>
                 </div>
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 tracking-tight leading-[1.1]" data-testid="text-sc-title">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-foreground mb-6 tracking-tight leading-[1.1]" data-testid="text-sc-title">
                   Speaker's
                   <br />
                   <span className="bg-gradient-to-r from-primary via-primary/80 to-blue-400 bg-clip-text text-transparent">
@@ -205,7 +205,7 @@ export default function SpeakersCornerPage() {
                     className="relative rounded-3xl w-full max-w-lg mx-auto shadow-2xl shadow-primary/10 border border-white/20"
                     data-testid="img-sc-hero"
                   />
-                  <div className="absolute -bottom-12 -left-6 bg-card rounded-2xl shadow-xl border border-border/50 p-4 backdrop-blur-sm">
+                  <div className="absolute -bottom-12 -left-6 bg-card rounded-2xl shadow-xl border border-border/50 p-4 backdrop-blur-sm hidden sm:block">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
                         <Mic className="w-6 h-6 text-green-500" />
@@ -216,7 +216,7 @@ export default function SpeakersCornerPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="absolute -top-8 -right-4 bg-card rounded-2xl shadow-xl border border-border/50 p-4 backdrop-blur-sm">
+                  <div className="absolute -top-8 -right-4 bg-card rounded-2xl shadow-xl border border-border/50 p-4 backdrop-blur-sm hidden sm:block">
                     <div className="flex items-center gap-2">
                       <div className="flex -space-x-2">
                         <div className="w-8 h-8 rounded-full bg-primary/20 border-2 border-card flex items-center justify-center text-xs font-bold text-primary">A</div>

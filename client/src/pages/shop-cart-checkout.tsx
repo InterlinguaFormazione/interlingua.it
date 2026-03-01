@@ -751,7 +751,7 @@ export default function CartCheckout() {
                               <Button
                                 variant="outline"
                                 size="icon"
-                                className="h-7 w-7"
+                                className="h-9 w-9"
                                 onClick={() => updateQuantity(index, item.quantity - 1)}
                                 disabled={item.quantity <= 1}
                                 data-testid={`button-checkout-qty-minus-${index}`}
@@ -762,7 +762,7 @@ export default function CartCheckout() {
                               <Button
                                 variant="outline"
                                 size="icon"
-                                className="h-7 w-7"
+                                className="h-9 w-9"
                                 onClick={() => updateQuantity(index, item.quantity + 1)}
                                 data-testid={`button-checkout-qty-plus-${index}`}
                               >
@@ -800,7 +800,7 @@ export default function CartCheckout() {
                         <User className="w-5 h-5" />
                         I tuoi dati
                       </h2>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="firstName">Nome *</Label>
                           <Input id="firstName" value={customerFirstName} onChange={(e) => setCustomerFirstName(e.target.value)} required data-testid="input-first-name" />
@@ -810,7 +810,7 @@ export default function CartCheckout() {
                           <Input id="lastName" value={customerLastName} onChange={(e) => setCustomerLastName(e.target.value)} required data-testid="input-last-name" />
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="email">Email *</Label>
                           <Input id="email" type="email" value={customerEmail} onChange={(e) => setCustomerEmail(e.target.value)} required data-testid="input-email" />
@@ -886,7 +886,7 @@ export default function CartCheckout() {
                       {isItaly && (
                         <div className="space-y-2">
                           <Label>Tipo fatturazione</Label>
-                          <div className="grid grid-cols-3 gap-2">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                             {(["privato", "professionista", "azienda"] as const).map((tipo) => (
                               <button
                                 key={tipo}
@@ -917,7 +917,7 @@ export default function CartCheckout() {
                       )}
 
                       {isItaly && (
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <Label htmlFor="codiceFiscale">Codice Fiscale *</Label>
                             <Input id="codiceFiscale" value={codiceFiscale} onChange={(e) => setCodiceFiscale(e.target.value.toUpperCase())} maxLength={16} data-testid="input-codice-fiscale" />
@@ -932,7 +932,7 @@ export default function CartCheckout() {
                       )}
 
                       {isItaly && (tipoFatturazione === "professionista" || tipoFatturazione === "azienda") && (
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="space-y-2">
                             <Label htmlFor="codiceSdi">Codice SDI</Label>
                             <Input id="codiceSdi" value={codiceSdi} onChange={(e) => setCodiceSdi(e.target.value)} placeholder="7 caratteri" data-testid="input-codice-sdi" />
@@ -948,7 +948,7 @@ export default function CartCheckout() {
                         <Label htmlFor="indirizzo">Indirizzo *</Label>
                         <Input id="indirizzo" value={indirizzo} onChange={(e) => setIndirizzo(e.target.value)} data-testid="input-indirizzo" />
                       </div>
-                      <div className={`grid ${isItaly ? "grid-cols-3" : "grid-cols-2"} gap-4`}>
+                      <div className={`grid grid-cols-1 ${isItaly ? "sm:grid-cols-3" : "sm:grid-cols-2"} gap-4`}>
                         {isItaly && (
                           <div className="space-y-2">
                             <Label htmlFor="provincia">Provincia *</Label>
