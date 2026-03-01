@@ -29,6 +29,7 @@ import {
   X,
 } from "lucide-react";
 import { SiPaypal, SiVisa, SiMastercard } from "react-icons/si";
+import cartaCulturaLogo from "@assets/carte-cultura-1200x675_1772388120185.avif";
 
 const CATEGORY_CONFIG = [
   { key: "Tutti", label: "Tutti", icon: Sparkles, color: "from-primary to-blue-400" },
@@ -126,6 +127,7 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
+                <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-5 w-auto opacity-70" title="Pagabile con Carta della Cultura" />
                 <Button
                   size="icon"
                   variant="outline"
@@ -367,7 +369,7 @@ export default function ShopPage() {
                   <div>
                     <h3 className="font-bold text-sm">Pagamento Sicuro</h3>
                     <p className="text-xs text-muted-foreground">
-                      Transazioni crittografate tramite PayPal, Visa e Mastercard
+                      Transazioni crittografate tramite PayPal, Visa e Mastercard. Accettiamo anche Carta della Cultura.
                     </p>
                   </div>
                 </div>
@@ -375,6 +377,7 @@ export default function ShopPage() {
                   <SiPaypal className="w-8 h-5 text-[#003087] dark:text-[#0070ba]" />
                   <SiVisa className="w-8 h-5 text-[#1a1f71] dark:text-blue-400" />
                   <SiMastercard className="w-8 h-5 text-[#eb001b] dark:text-red-400" />
+                  <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-6 w-auto" />
                 </div>
               </div>
             </div>

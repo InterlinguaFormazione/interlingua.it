@@ -1185,7 +1185,11 @@ export default function ShopCheckout() {
                             }`}
                             data-testid="button-select-paypal"
                           >
-                            <SiPaypal className="w-6 h-6 text-[#0070ba]" />
+                            <div className="flex items-center gap-1.5">
+                              <SiPaypal className="w-5 h-5 text-[#0070ba]" />
+                              <SiVisa className="w-5 h-4 text-[#1A1F71]" />
+                              <SiMastercard className="w-5 h-4 text-[#EB001B]" />
+                            </div>
                             <span className="text-xs font-medium">PayPal / Carta</span>
                           </button>
                           <button
