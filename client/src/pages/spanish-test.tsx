@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { GraduationCap, CheckCircle, ChevronRight, Loader2, PenTool, Volume2, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight, ArrowLeft, User, Mail, Phone, Building2, MapPin, Map, Play, Pause } from "lucide-react";
+import { GraduationCap, CheckCircle, ChevronRight, Loader2, PenTool, Volume2, VolumeX, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight, ArrowLeft, User, Mail, Phone, Building2, MapPin, Map, Play, Pause } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 type Phase = "registration" | "audio-check" | "self-assessment" | "mc-questions" | "writing" | "results";
@@ -580,6 +580,21 @@ export default function SpanishTestPage() {
                 <p className="text-slate-400 dark:text-slate-500 text-sm mt-2">
                   Antes de empezar, verifiquemos que tu audio funciona correctamente.
                 </p>
+                <p className="text-amber-600 dark:text-amber-400 text-xs mt-4 max-w-sm mx-auto">
+                  Para una evaluación más precisa, te recomendamos hacer el test con el audio activado.
+                </p>
+                <button
+                  onClick={() => {
+                    setAudioAvailable(false);
+                    setAudioCheckStep("done");
+                    setPhase("self-assessment");
+                    toast({ title: "Audio desactivado", description: "Las preguntas de comprensión auditiva se mostrarán como texto.", variant: "destructive" });
+                  }}
+                  className="mt-3 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-all"
+                  data-testid="button-no-audio-skip-all"
+                >
+                  <VolumeX className="w-4 h-4" /> No tengo audio — saltar
+                </button>
               </div>
               <div className="px-8 pb-8">
                 <div className="space-y-5" data-testid="audio-check-listening">
