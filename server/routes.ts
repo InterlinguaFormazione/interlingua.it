@@ -1662,9 +1662,7 @@ export async function registerRoutes(
       if (sectionEnding) {
         const seCheck = newSE <= 40;
         const maxCheck = questionsInCurrentSection >= MAX_QUESTIONS_PER_SECTION;
-        const last4 = recentSectionLevels.slice(-4);
-        const levelStable = questionsInCurrentSection >= 8 && last4.length >= 4 && last4[0] === last4[1] && last4[1] === last4[2] && last4[2] === last4[3];
-        console.log(`[CAT] >>> SECTION ENDING: SE<=40? ${seCheck} (SE=${newSE}) | maxQ? ${maxCheck} | 4-same-level? ${levelStable} (last4=[${last4.join(",")}])`);
+        console.log(`[CAT] >>> SECTION ENDING: SE<=40? ${seCheck} (SE=${newSE}) | maxQ? ${maxCheck} (${questionsInCurrentSection}/${MAX_QUESTIONS_PER_SECTION})`);
       }
 
       if (a0HardFail || outOfQuestions || sectionEnding) {

@@ -170,11 +170,5 @@ export function shouldEndSection(
 
   if (standardError <= 40) return true;
 
-  const minForLevelRule = Math.min(8, maxQuestions);
-  if (questionsInSection >= minForLevelRule && recentSectionLevels.length >= 4) {
-    const last4 = recentSectionLevels.slice(-4);
-    if (last4[0] === last4[1] && last4[1] === last4[2] && last4[2] === last4[3]) return true;
-  }
-
   return false;
 }
