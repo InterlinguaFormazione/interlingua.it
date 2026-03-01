@@ -81,6 +81,7 @@ export default function CartCheckout() {
   const [pec, setPec] = useState("");
 
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptGdpr, setAcceptGdpr] = useState(false);
   const [step, setStep] = useState<"cart" | "details" | "billing" | "payment" | "success">("cart");
   const [paypalReady, setPaypalReady] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -368,6 +369,10 @@ export default function CartCheckout() {
     }
     if (!acceptTerms) {
       toast({ title: "Termini e Condizioni", description: "Devi accettare i Termini e Condizioni per procedere.", variant: "destructive" });
+      return;
+    }
+    if (!acceptGdpr) {
+      toast({ title: "Consenso Privacy", description: "Devi acconsentire al trattamento dei dati personali per procedere.", variant: "destructive" });
       return;
     }
     setStep("payment");
@@ -908,6 +913,22 @@ export default function CartCheckout() {
                             Termini e Condizioni
                           </Link>{" "}
                           di vendita di Interlingua Formazione S.r.l. *
+                        </Label>
+                      </div>
+
+                      <div className="flex items-start gap-3 p-4 rounded-xl border bg-muted/30">
+                        <Checkbox
+                          id="acceptGdpr"
+                          checked={acceptGdpr}
+                          onCheckedChange={(checked) => setAcceptGdpr(checked === true)}
+                          data-testid="checkbox-accept-gdpr"
+                        />
+                        <Label htmlFor="acceptGdpr" className="text-sm leading-relaxed cursor-pointer">
+                          Acconsento al{" "}
+                          <a href="/privacy-policy" className="text-primary underline hover:no-underline" target="_blank" rel="noopener noreferrer">
+                            trattamento dei dati personali
+                          </a>{" "}
+                          ai sensi del GDPR (Reg. UE 2016/679) *
                         </Label>
                       </div>
 

@@ -876,7 +876,7 @@ export default function CorsiItalianoPage() {
                       </div>
                       <div className="flex items-start gap-2">
                         <Checkbox id="gdpr" checked={gdpr} onCheckedChange={(c) => setGdpr(c === true)} data-testid="checkbox-gdpr" className="mt-0.5" />
-                        <Label htmlFor="gdpr" className="text-sm cursor-pointer">{t.formGdpr} *</Label>
+                        <Label htmlFor="gdpr" className="text-sm cursor-pointer">{t.formGdpr}{" "}<a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">(GDPR)</a> *</Label>
                       </div>
                       {submitted && errors.gdpr && <p className="text-xs text-destructive">{errors.gdpr}</p>}
                     </div>

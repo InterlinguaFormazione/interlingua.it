@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -85,6 +86,8 @@ function formatAudioTime(seconds: number): string {
 
 export default function SpanishTestPage() {
   const [phase, setPhase] = useState<Phase>("registration");
+  const [gdprAccepted, setGdprAccepted] = useState(false);
+  const [gdprError, setGdprError] = useState(false);
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState<QuestionData | null>(null);
   const [currentSkill, setCurrentSkill] = useState<string>("grammar");
@@ -244,6 +247,11 @@ export default function SpanishTestPage() {
   }, []);
 
   const handleRegistration = async (data: z.infer<typeof registrationSchema>) => {
+    if (!gdprAccepted) {
+      setGdprError(true);
+      return;
+    }
+    setGdprError(false);
     setRegistrationData(data);
     setPhase("audio-check");
   };
@@ -590,9 +598,21 @@ export default function SpanishTestPage() {
                       </Button>
                     </div>
 
-                    <p className="text-center text-xs text-slate-400 dark:text-slate-500 pt-1">
-                      I tuoi dati sono trattati in conformita con il GDPR.
-                    </p>
+                    <div className="flex items-start gap-3 pt-2">
+                      <Checkbox
+                        id="test-gdpr"
+                        checked={gdprAccepted}
+                        onCheckedChange={(checked) => { setGdprAccepted(checked === true); if (checked) setGdprError(false); }}
+                        className="mt-0.5"
+                        data-testid="checkbox-test-gdpr"
+                      />
+                      <label htmlFor="test-gdpr" className={`text-xs leading-snug cursor-pointer ${gdprError ? "text-destructive" : "text-slate-400 dark:text-slate-500"}`}>
+                        Acconsento al{" "}
+                        <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">trattamento dei dati personali</a>{" "}
+                        ai sensi del GDPR (Reg. UE 2016/679) *
+                      </label>
+                    </div>
+                    {gdprError && <p className="text-xs text-destructive ml-7">Devi accettare il trattamento dei dati personali</p>}
                   </form>
                 </Form>
               </div>

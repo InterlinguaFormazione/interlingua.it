@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
@@ -52,6 +53,7 @@ export default function SpeakersCornerPurchase() {
   const [citta, setCitta] = useState("");
   const [provincia, setProvincia] = useState("");
   const [paese, setPaese] = useState("Italia");
+  const [acceptGdpr, setAcceptGdpr] = useState(false);
   const [ragioneSociale, setRagioneSociale] = useState("");
   const [partitaIva, setPartitaIva] = useState("");
   const [codiceSdi, setCodiceSdi] = useState("");
@@ -152,6 +154,10 @@ export default function SpeakersCornerPurchase() {
     }
     if (provincia.length !== 2) {
       toast({ title: "Provincia non valida", description: "Inserisci la sigla della provincia (es. TN, MI, RM).", variant: "destructive" });
+      return;
+    }
+    if (!acceptGdpr) {
+      toast({ title: "Consenso Privacy", description: "Devi acconsentire al trattamento dei dati personali per procedere.", variant: "destructive" });
       return;
     }
     setStep("payment");
@@ -631,6 +637,22 @@ export default function SpeakersCornerPurchase() {
                             </div>
                           </div>
                         )}
+
+                        <div className="flex items-start gap-3 p-4 rounded-xl border bg-muted/30">
+                          <Checkbox
+                            id="acceptGdpr"
+                            checked={acceptGdpr}
+                            onCheckedChange={(checked) => setAcceptGdpr(checked === true)}
+                            data-testid="checkbox-accept-gdpr"
+                          />
+                          <Label htmlFor="acceptGdpr" className="text-sm leading-relaxed cursor-pointer">
+                            Acconsento al{" "}
+                            <a href="/privacy-policy" className="text-primary underline hover:no-underline" target="_blank" rel="noopener noreferrer">
+                              trattamento dei dati personali
+                            </a>{" "}
+                            ai sensi del GDPR (Reg. UE 2016/679) *
+                          </Label>
+                        </div>
 
                         <div className="flex gap-3 pt-2">
                           <Button

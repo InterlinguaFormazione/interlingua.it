@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -46,6 +47,8 @@ const contactOptions = [
 
 export function ContactSection() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [gdprAccepted, setGdprAccepted] = useState(false);
+  const [gdprError, setGdprError] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const formLoadTime = useRef(Date.now());
   const { toast } = useToast();
@@ -89,6 +92,11 @@ export function ContactSection() {
   });
 
   const onSubmit = (data: ContactFormData) => {
+    if (!gdprAccepted) {
+      setGdprError(true);
+      return;
+    }
+    setGdprError(false);
     mutation.mutate(data);
   };
 
@@ -317,6 +325,21 @@ export function ContactSection() {
                             </FormItem>
                           )}
                         />
+
+                        <div className="flex items-start gap-3">
+                          <Checkbox
+                            id="contact-gdpr"
+                            checked={gdprAccepted}
+                            onCheckedChange={(checked) => { setGdprAccepted(checked === true); if (checked) setGdprError(false); }}
+                            data-testid="checkbox-contact-gdpr"
+                          />
+                          <label htmlFor="contact-gdpr" className={`text-sm leading-snug cursor-pointer ${gdprError ? "text-destructive" : "text-muted-foreground"}`}>
+                            Acconsento al{" "}
+                            <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">trattamento dei dati personali</a>{" "}
+                            ai sensi del GDPR (Reg. UE 2016/679) *
+                          </label>
+                        </div>
+                        {gdprError && <p className="text-xs text-destructive ml-7">Devi accettare il trattamento dei dati personali</p>}
 
                         <Button 
                           type="submit" 

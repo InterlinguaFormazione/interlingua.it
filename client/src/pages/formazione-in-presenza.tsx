@@ -555,7 +555,9 @@ function CourseInfoForm({ courseTitle, showLingua, gradient }: { courseTitle: st
             data-testid="checkbox-fip-gdpr"
           />
           <Label htmlFor="gdpr" className={`text-sm leading-snug cursor-pointer ${submitted && errors.gdpr ? "text-destructive" : "text-muted-foreground"}`}>
-            Acconsento al trattamento dei dati personali ai sensi del GDPR (Reg. UE 2016/679) *
+            Acconsento al{" "}
+            <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">trattamento dei dati personali</a>{" "}
+            ai sensi del GDPR (Reg. UE 2016/679) *
           </Label>
         </div>
         {submitted && errors.gdpr && <p className="text-xs text-destructive ml-7">{errors.gdpr}</p>}

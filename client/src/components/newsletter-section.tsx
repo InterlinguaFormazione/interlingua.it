@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
@@ -25,6 +26,8 @@ const trustIndicators = [
 
 export function NewsletterSection() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [gdprAccepted, setGdprAccepted] = useState(false);
+  const [gdprError, setGdprError] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const formLoadTime = useRef(Date.now());
   const { toast } = useToast();
@@ -64,6 +67,11 @@ export function NewsletterSection() {
   });
 
   const onSubmit = (data: NewsletterFormData) => {
+    if (!gdprAccepted) {
+      setGdprError(true);
+      return;
+    }
+    setGdprError(false);
     mutation.mutate(data);
   };
 
@@ -216,6 +224,22 @@ export function NewsletterSection() {
                   </Button>
                 </form>
               </Form>
+
+              <div className="flex items-start gap-3 max-w-lg mx-auto mt-4">
+                <Checkbox
+                  id="newsletter-gdpr"
+                  checked={gdprAccepted}
+                  onCheckedChange={(checked) => { setGdprAccepted(checked === true); if (checked) setGdprError(false); }}
+                  className="border-white/40 data-[state=checked]:bg-white data-[state=checked]:text-primary mt-0.5"
+                  data-testid="checkbox-newsletter-gdpr"
+                />
+                <label htmlFor="newsletter-gdpr" className={`text-sm leading-snug cursor-pointer ${gdprError ? "text-red-300" : "text-white/70"}`}>
+                  Acconsento al{" "}
+                  <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-white underline hover:no-underline">trattamento dei dati personali</a>{" "}
+                  ai sensi del GDPR (Reg. UE 2016/679) *
+                </label>
+              </div>
+              {gdprError && <p className="text-xs text-red-300 mt-1 text-center">Devi accettare il trattamento dei dati personali</p>}
 
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
