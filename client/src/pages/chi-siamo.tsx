@@ -671,7 +671,7 @@ export default function ChiSiamoPage() {
             </h3>
             <p className="text-muted-foreground mb-6">Professionisti specializzati in competenze digitali, trasversali e gestionali</p>
           </motion.div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {[
               {
                 name: "Valentino Spolaore",
@@ -702,6 +702,18 @@ export default function ChiSiamoPage() {
                 role: "Intelligenza Artificiale & AI Ambassador",
                 bio: "Esperto di Intelligenza Artificiale e AI Ambassador presso SkillCraft. Si occupa di applicazioni pratiche dell'AI per aziende e professionisti, aiutando a integrare queste tecnologie nei processi aziendali per migliorarne l'efficienza e l'innovazione.",
                 color: "from-orange-500 to-amber-500",
+              },
+              {
+                name: "Laura Bau",
+                role: "Web Marketing & AI",
+                bio: "Convinta che il marketing e la tecnologia abbiano il potere di trasformare le aziende. La sua passione nasce negli USA, dove ha studiato Sales & Marketing e Business Analytics. Aiuta le aziende a sfruttare al meglio gli strumenti digitali e l'AI per migliorare le loro strategie di business.",
+                color: "from-rose-500 to-pink-500",
+              },
+              {
+                name: "Alberto Arsie",
+                role: "Video Marketing & Produzione Multimediale",
+                bio: "Videomaker e fotografo professionista dal 2006. Gestisce Media Lab, dove si occupa di produzione video, cinema, animazioni 3D e formazione multimediale. Crede nel potere dell'immagine per trasmettere emozioni e messaggi unici.",
+                color: "from-indigo-500 to-violet-500",
               },
             ].map((member, index) => (
               <motion.div
