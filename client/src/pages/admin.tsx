@@ -39,6 +39,7 @@ import {
   Tag,
   ToggleLeft,
   ToggleRight,
+  Wand2,
 } from "lucide-react";
 
 interface ShopOrder {
@@ -1135,12 +1136,29 @@ function VouchersTab({ token }: { token: string }) {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Codice</Label>
-                  <Input
-                    value={formData.code}
-                    onChange={e => setFormData({ ...formData, code: e.target.value })}
-                    placeholder="es. SCONTO10"
-                    data-testid="input-voucher-code"
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      value={formData.code}
+                      onChange={e => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                      placeholder="es. SCONTO10"
+                      data-testid="input-voucher-code"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      title="Genera codice casuale"
+                      onClick={() => {
+                        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+                        let code = "";
+                        for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+                        setFormData({ ...formData, code });
+                      }}
+                      data-testid="button-generate-voucher-code"
+                    >
+                      <Wand2 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Tipo Sconto</Label>
