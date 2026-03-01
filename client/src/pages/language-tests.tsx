@@ -18,6 +18,17 @@ const languageTests = [
     sections: 7,
   },
   {
+    id: "business-english",
+    language: "Business English",
+    flag: "🇬🇧",
+    href: "/business-english-test",
+    available: true,
+    description: "Quick adaptive test for professional and corporate English skills. Shorter format ideal for HR assessments and corporate training needs.",
+    levels: "A0 - C1",
+    duration: "10-15 min",
+    sections: 7,
+  },
+  {
     id: "italian",
     language: "Italiano",
     flag: "🇮🇹",

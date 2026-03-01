@@ -17,7 +17,7 @@ import {
   updateTheta, updateStandardError, thetaToCEFR, selfAssessmentToTheta,
   checkA0HardFail, calculateFinalLevel,
   getWritingPrompt, getSpeakingPrompt, SECTION_SKILLS,
-  shouldEndSection, MAX_QUESTIONS_PER_SECTION, isLevelStable
+  shouldEndSection, MAX_QUESTIONS_PER_SECTION, BUSINESS_MAX_QUESTIONS_PER_SECTION, isLevelStable
 } from "./cat-engine";
 import { sendEnglishTestResultEmail, sendEnglishTestConfirmationEmail } from "./email";
 import multer from "multer";
@@ -1441,7 +1441,9 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/english-test/start", async (req, res) => {
+  function registerTestRoutes(prefix: string, testType: string, maxQ: number) {
+
+  app.post(`${prefix}/start`, async (req, res) => {
     try {
       const { firstName, lastName, email, company, phone, city, province, selfAssessedLevel } = req.body;
       if (!firstName || !lastName || !email || !selfAssessedLevel) {
@@ -1476,6 +1478,7 @@ export async function registerRoutes(
         levelHistory: "[]",
         questionsAtCurrentLevel: 0,
         consecutiveIncorrectA1: 0,
+        testType,
       });
 
       const allQuestions = await storage.getBeQuestions();
@@ -1520,12 +1523,12 @@ export async function registerRoutes(
         },
       });
     } catch (error) {
-      console.error("Error starting English test:", error);
+      console.error(`Error starting ${testType} test:`, error);
       res.status(500).json({ success: false, message: "Server error" });
     }
   });
 
-  app.post("/api/english-test/answer", async (req, res) => {
+  app.post(`${prefix}/answer`, async (req, res) => {
     try {
       const { sessionId, questionId, answer, timeSpent } = req.body;
       if (!sessionId || !questionId || !answer) {
@@ -1642,11 +1645,11 @@ export async function registerRoutes(
         `difficulty: ${diff} | disc: ${disc} | P: ${calculateProbability(oldTheta, diff, disc).toFixed(3)}`);
 
       const levelStable = isLevelStable(recentSectionLevels);
-      const sectionEnding = shouldEndSection(questionsInCurrentSection, newSE, recentSectionLevels);
+      const sectionEnding = shouldEndSection(questionsInCurrentSection, newSE, recentSectionLevels, maxQ);
       if (sectionEnding) {
         const seCheck = newSE <= 40;
-        const maxCheck = questionsInCurrentSection >= MAX_QUESTIONS_PER_SECTION;
-        console.log(`[CAT] >>> SECTION ENDING: SE<=40? ${seCheck} (SE=${newSE}) | stable? ${levelStable} | maxQ? ${maxCheck} (${questionsInCurrentSection}/${MAX_QUESTIONS_PER_SECTION})`);
+        const maxCheck = questionsInCurrentSection >= maxQ;
+        console.log(`[CAT] >>> SECTION ENDING: SE<=40? ${seCheck} (SE=${newSE}) | stable? ${levelStable} | maxQ? ${maxCheck} (${questionsInCurrentSection}/${maxQ})`);
       } else if (newSE <= 40 && !levelStable) {
         console.log(`[CAT] >>> SE low (${newSE}) but level not stable yet — last 3 levels: [${recentSectionLevels.slice(-3).join(",")}]`);
       }
@@ -1777,7 +1780,7 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/english-test/session/:id", async (req, res) => {
+  app.get(`${prefix}/session/:id`, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const session = await storage.getBeTestSession(id);
@@ -1788,7 +1791,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/english-test/submit-writing", async (req, res) => {
+  app.post(`${prefix}/submit-writing`, async (req, res) => {
     try {
       const { sessionId, response: writtenResponse, prompt } = req.body;
       if (!sessionId) {
@@ -1862,7 +1865,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/english-test/submit-speaking", upload.single("audio"), async (req: any, res) => {
+  app.post(`${prefix}/submit-speaking`, upload.single("audio"), async (req: any, res) => {
     try {
       const { sessionId: rawSessionId, prompt } = req.body;
       if (!rawSessionId || !req.file) {
@@ -1945,7 +1948,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/english-test/complete", async (req, res) => {
+  app.post(`${prefix}/complete`, async (req, res) => {
     try {
       const { sessionId } = req.body;
       if (!sessionId) return res.status(400).json({ success: false, message: "Missing sessionId" });
@@ -2088,7 +2091,7 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/english-test/complete-without-speaking", async (req, res) => {
+  app.post(`${prefix}/complete-without-speaking`, async (req, res) => {
     try {
       const { sessionId } = req.body;
       if (!sessionId) return res.status(400).json({ success: false, message: "Missing sessionId" });
@@ -2195,49 +2198,60 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/admin/english-test-results", requireAdmin, async (_req, res) => {
-    try {
-      const sessions = await storage.getBeTestSessions();
-      res.json(sessions);
-    } catch (error) {
-      console.error("Error fetching BE results:", error);
-      res.status(500).json({ success: false, message: "Server error" });
-    }
-  });
+  } // end registerTestRoutes
 
-  app.get("/api/admin/english-test-results/:id", requireAdmin, async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const session = await storage.getBeTestSession(id);
-      if (!session) return res.status(404).json({ success: false, message: "Session not found" });
+  registerTestRoutes("/api/english-test", "general", MAX_QUESTIONS_PER_SECTION);
+  registerTestRoutes("/api/business-english-test", "business", BUSINESS_MAX_QUESTIONS_PER_SECTION);
 
-      const responses = await storage.getBeResponsesBySession(id);
-      const sectionResults = await storage.getBeSectionResultsBySession(id);
-      const writingSpeaking = await storage.getBeWritingSpeakingBySession(id);
+  function registerAdminTestResultRoutes(adminPrefix: string, testType: string) {
+    app.get(adminPrefix, requireAdmin, async (_req, res) => {
+      try {
+        const sessions = await storage.getBeTestSessionsByType(testType);
+        res.json(sessions);
+      } catch (error) {
+        console.error(`Error fetching ${testType} test results:`, error);
+        res.status(500).json({ success: false, message: "Server error" });
+      }
+    });
 
-      const allQuestions = await storage.getBeQuestions();
-      const enrichedResponses = responses.map(r => {
-        const q = allQuestions.find(qq => qq.id === r.questionId);
-        return {
-          ...r,
-          question: q?.question,
-          correctAnswer: q?.correctAnswer,
-          skillType: q?.skillType,
-          level: q?.level,
-        };
-      });
+    app.get(`${adminPrefix}/:id`, requireAdmin, async (req, res) => {
+      try {
+        const id = parseInt(req.params.id);
+        const session = await storage.getBeTestSession(id);
+        if (!session) return res.status(404).json({ success: false, message: "Session not found" });
+        if (session.testType !== testType) return res.status(404).json({ success: false, message: "Session not found" });
 
-      res.json({
-        session,
-        responses: enrichedResponses,
-        sectionResults,
-        writingSpeaking,
-      });
-    } catch (error) {
-      console.error("Error fetching BE result detail:", error);
-      res.status(500).json({ success: false, message: "Server error" });
-    }
-  });
+        const responses = await storage.getBeResponsesBySession(id);
+        const sectionResults = await storage.getBeSectionResultsBySession(id);
+        const writingSpeaking = await storage.getBeWritingSpeakingBySession(id);
+
+        const allQuestions = await storage.getBeQuestions();
+        const enrichedResponses = responses.map(r => {
+          const q = allQuestions.find(qq => qq.id === r.questionId);
+          return {
+            ...r,
+            question: q?.question,
+            correctAnswer: q?.correctAnswer,
+            skillType: q?.skillType,
+            level: q?.level,
+          };
+        });
+
+        res.json({
+          session,
+          responses: enrichedResponses,
+          sectionResults,
+          writingSpeaking,
+        });
+      } catch (error) {
+        console.error(`Error fetching ${testType} test result detail:`, error);
+        res.status(500).json({ success: false, message: "Server error" });
+      }
+    });
+  }
+
+  registerAdminTestResultRoutes("/api/admin/english-test-results", "general");
+  registerAdminTestResultRoutes("/api/admin/business-english-results", "business");
 
   return httpServer;
 }
