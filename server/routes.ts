@@ -724,7 +724,8 @@ STILE:
 - NON iniziare mai con "Ciao [nome]!" — varia le aperture
 - NON aggiungere una firma alla fine della risposta — il sistema la aggiunge automaticamente
 - NON usare espressioni entusiastiche artificiose come "È fantastico!" o "Wow!"
-- IMPORTANTE: Scrivi in italiano del NORD ITALIA. NON usare MAI il passato remoto (feci, andai, dissi). Usa SEMPRE il passato prossimo (ho fatto, sono andato, ho detto). Siamo a Vicenza, nel Veneto.`
+- Scrivi SEMPRE in italiano PERFETTO e corretto. NESSUN dialetto, NESSUNA inflessione regionale. Solo italiano standard impeccabile.
+- NON usare MAI il passato remoto (feci, andai, dissi). Usa SEMPRE il passato prossimo (ho fatto, sono andato, ho detto).`
           },
           {
             role: "user",
@@ -781,7 +782,7 @@ REGOLE FONDAMENTALI per sembrare autentici:
 - NON usare tutti lo stesso registro linguistico
 - Nomi italiani REALISTICI e vari: EVITA cognomi generici e ovvi come Rossi, Bianchi, Ferrari, Esposito, Russo, Romano. Includi SEMPRE almeno un nome dal Veneto/Nord-Est (es. Trevisan, Zanetti, Sartori, Dalla Valle, Bortolotto, Visentin, Pavan, Brunello, Meneghin, Carraro, Zago, Tessari, Tonon, Fantinato). Alterna con cognomi del Nord Italia plausibili (es. Marchetti, Colombo, Pellegrini, Cattaneo, Baroni, Venturi, Galli, Moretti, Ferrero). Mix di formati: qualcuno con solo il nome, qualcuno nome e iniziale del cognome (es. "Marco T."), qualcuno nome e cognome completo
 - IMPORTANTE: Scrivi SEMPRE in italiano del NORD ITALIA. NON usare MAI il passato remoto (feci, andai, dissi, capii, lessi). Usa SEMPRE il passato prossimo (ho fatto, sono andato, ho detto, ho capito, ho letto). Il passato remoto si usa solo al Sud.
-- Solo in UN commento su tre (non di più!), inserisci UNA SOLA parola o espressione dialettale veneta, come farebbe un vicentino che scrive di getto. Scegli UNA tra: "schei" (soldi), "massa" (troppo), "miga" (mica), "el" come articolo. Gli altri commenti devono essere in italiano standard senza alcun dialetto. Il dialetto deve essere un dettaglio quasi invisibile, non il tema del commento.
+- La MAGGIOR PARTE dei commenti deve essere in italiano PERFETTO e corretto, senza alcun dialetto. Solo UN commento su tre può avere UNA SOLA parola dialettale veneta inserita in modo naturale (es. "schei", "massa", "miga"). Gli altri devono essere italiano standard impeccabile. Il dialetto è un dettaglio quasi invisibile, non il tema del commento.
 - Almeno un commento NON deve essere esclusivamente positivo — può essere curioso, dubbioso o semplicemente neutro
 - Il contenuto deve essere SPECIFICO all'argomento dell'articolo, non generico
 
