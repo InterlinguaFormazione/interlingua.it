@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { GraduationCap, CheckCircle, ChevronRight, Loader2, PenTool, Volume2, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight, ArrowLeft, User, Mail, Phone, Building2, MapPin, Map, Play, Pause } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
-type Phase = "registration" | "self-assessment" | "mc-questions" | "writing" | "results";
+type Phase = "registration" | "audio-check" | "self-assessment" | "mc-questions" | "writing" | "results";
 
 interface QuestionData {
   id: number;
@@ -108,9 +108,11 @@ export default function SpanishTestPage() {
   const [audioDuration, setAudioDuration] = useState(0);
   const [listeningPlaysLeft, setListeningPlaysLeft] = useState(3);
   const listeningAudioRef = useRef<HTMLAudioElement | null>(null);
-
-  const audioAvailable = false;
-  const micAvailable = false;
+  const [audioCheckStep, setAudioCheckStep] = useState<"listening" | "done">("listening");
+  const [audioCheckPassed, setAudioCheckPassed] = useState(false);
+  const [testAudioPlaying, setTestAudioPlaying] = useState(false);
+  const [audioAvailable, setAudioAvailable] = useState(true);
+  const testAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const { toast } = useToast();
 
@@ -148,6 +150,35 @@ export default function SpanishTestPage() {
     });
   }, [currentQuestion, listeningPlaysLeft, isAudioPlaying, toast]);
 
+  const playTestAudio = useCallback(() => {
+    if (testAudioRef.current && testAudioPlaying) {
+      testAudioRef.current.pause();
+      setTestAudioPlaying(false);
+      return;
+    }
+    if (!testAudioRef.current) {
+      const audio = new Audio("/audio/spanish/listening_A0_000.mp3");
+      audio.onended = () => { setTestAudioPlaying(false); };
+      audio.onerror = () => { setTestAudioPlaying(false); };
+      testAudioRef.current = audio;
+    } else {
+      testAudioRef.current.currentTime = 0;
+    }
+    testAudioRef.current.play().then(() => { setTestAudioPlaying(true); }).catch(() => {
+      setTestAudioPlaying(false);
+    });
+  }, [testAudioPlaying]);
+
+  const confirmListeningOk = useCallback(() => {
+    if (testAudioRef.current) {
+      testAudioRef.current.pause();
+      testAudioRef.current = null;
+    }
+    setTestAudioPlaying(false);
+    setAudioCheckPassed(true);
+    setPhase("self-assessment");
+  }, []);
+
   const form = useForm({
     resolver: zodResolver(registrationSchema),
     defaultValues: { firstName: "", lastName: "", email: "", phone: "", company: "", city: "", province: "" },
@@ -183,7 +214,7 @@ export default function SpanishTestPage() {
 
   const handleRegistration = async (data: z.infer<typeof registrationSchema>) => {
     setRegistrationData(data);
-    setPhase("self-assessment");
+    setPhase("audio-check");
   };
 
   const handleSelfAssessment = async (level: string) => {
@@ -315,7 +346,7 @@ export default function SpanishTestPage() {
         <div className="absolute -bottom-20 right-1/4 w-72 h-72 bg-violet-200/20 dark:bg-violet-800/10 rounded-full blur-3xl" />
       </div>
       <div className="relative container mx-auto px-4 py-10 max-w-4xl">
-        {(phase === "registration" || phase === "self-assessment") && (
+        {(phase === "registration" || phase === "audio-check" || phase === "self-assessment") && (
           <div className="mb-6">
             <a
               href="/"
@@ -327,7 +358,7 @@ export default function SpanishTestPage() {
             </a>
           </div>
         )}
-        {(phase === "registration" || phase === "self-assessment") && (
+        {(phase === "registration" || phase === "audio-check" || phase === "self-assessment") && (
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-blue-700 dark:text-blue-300 px-5 py-2 rounded-full text-sm font-medium mb-5 border border-blue-100 dark:border-blue-800/40 shadow-sm">
               <GraduationCap className="w-4 h-4" />
@@ -341,7 +372,7 @@ export default function SpanishTestPage() {
             </p>
           </div>
         )}
-        {phase !== "registration" && phase !== "self-assessment" && (
+        {phase !== "registration" && phase !== "audio-check" && phase !== "self-assessment" && (
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white" data-testid="text-page-title">
               Test de Español
@@ -349,7 +380,7 @@ export default function SpanishTestPage() {
           </div>
         )}
 
-        {phase !== "registration" && phase !== "self-assessment" && phase !== "results" && (
+        {phase !== "registration" && phase !== "audio-check" && phase !== "self-assessment" && phase !== "results" && (
           <div className="mb-6 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-xl p-4 border border-slate-200 dark:border-slate-700">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-4">
@@ -538,6 +569,73 @@ export default function SpanishTestPage() {
           </div>
         )}
 
+        {phase === "audio-check" && (
+          <div className="max-w-xl mx-auto" data-testid="card-audio-check">
+            <div className="rounded-3xl bg-white/80 dark:bg-slate-800/70 backdrop-blur-xl border border-white/90 dark:border-slate-700/60 shadow-2xl shadow-blue-900/5 dark:shadow-black/20 overflow-hidden">
+              <div className="px-8 pt-8 pb-4 text-center">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-100 to-blue-100 dark:from-indigo-900/50 dark:to-blue-900/50 flex items-center justify-center">
+                  <Volume2 className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <h2 className="text-xl font-bold text-slate-800 dark:text-white">Verificación de Audio</h2>
+                <p className="text-slate-400 dark:text-slate-500 text-sm mt-2">
+                  Antes de empezar, verifiquemos que tu audio funciona correctamente.
+                </p>
+              </div>
+              <div className="px-8 pb-8">
+                <div className="space-y-5" data-testid="audio-check-listening">
+                  <div className="rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Volume2 className="w-4 h-4 text-indigo-500" />
+                      <span className="text-sm font-medium text-indigo-700 dark:text-indigo-300">Prueba de Audio</span>
+                    </div>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                      Haz clic en el botón para reproducir un audio de prueba. Asegúrate de escucharlo con claridad.
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={playTestAudio}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all ${
+                          testAudioPlaying
+                            ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700"
+                            : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md active:scale-95"
+                        }`}
+                        data-testid="button-test-audio"
+                      >
+                        {testAudioPlaying ? (
+                          <><Volume2 className="w-4 h-4 animate-pulse" /> Reproduciendo...</>
+                        ) : (
+                          <><Play className="w-4 h-4" /> Reproducir Audio</>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={confirmListeningOk}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-xl"
+                      data-testid="button-audio-ok"
+                    >
+                      <CheckCircle className="w-4 h-4 mr-2" /> Escucho el audio
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setAudioAvailable(false);
+                        confirmListeningOk();
+                        toast({ title: "Atención", description: "Las preguntas de comprensión auditiva se mostrarán como texto.", variant: "destructive" });
+                      }}
+                      variant="outline"
+                      className="flex-1 rounded-xl border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30"
+                      data-testid="button-no-audio"
+                    >
+                      <Volume2 className="w-4 h-4 mr-2" /> No tengo audio
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {phase === "self-assessment" && (
           <div className="max-w-xl mx-auto" data-testid="card-self-assessment">
             <div className="rounded-3xl bg-white/80 dark:bg-slate-800/70 backdrop-blur-xl border border-white/90 dark:border-slate-700/60 shadow-2xl shadow-blue-900/5 dark:shadow-black/20 overflow-hidden">
@@ -623,7 +721,7 @@ export default function SpanishTestPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {currentQuestion.skillType === "listening" && currentQuestion.audioUrl && (
+                  {currentQuestion.skillType === "listening" && currentQuestion.audioUrl && audioAvailable && (
                     <div className="rounded-xl p-4 border bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800 space-y-3" data-testid="audio-player">
                       <div className="flex items-center gap-2">
                         <Volume2 className="w-4 h-4 text-indigo-500" />
@@ -649,7 +747,7 @@ export default function SpanishTestPage() {
                     </div>
                   )}
 
-                  {currentQuestion.passage && (!currentQuestion.audioUrl || currentQuestion.skillType !== "listening") && (
+                  {currentQuestion.passage && (!currentQuestion.audioUrl || currentQuestion.skillType !== "listening" || !audioAvailable) && (
                     <div className={`rounded-xl p-4 border ${
                       currentQuestion.skillType === "listening"
                         ? "bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800"
