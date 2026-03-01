@@ -781,6 +781,7 @@ REGOLE FONDAMENTALI per sembrare autentici:
 - NON usare tutti lo stesso registro linguistico
 - Nomi italiani REALISTICI e vari: EVITA cognomi generici e ovvi come Rossi, Bianchi, Ferrari, Esposito, Russo, Romano. Includi SEMPRE almeno un nome dal Veneto/Nord-Est (es. Trevisan, Zanetti, Sartori, Dalla Valle, Bortolotto, Visentin, Pavan, Brunello, Meneghin, Carraro, Zago, Tessari, Tonon, Fantinato). Alterna con cognomi del Nord Italia plausibili (es. Marchetti, Colombo, Pellegrini, Cattaneo, Baroni, Venturi, Galli, Moretti, Ferrero). Mix di formati: qualcuno con solo il nome, qualcuno nome e iniziale del cognome (es. "Marco T."), qualcuno nome e cognome completo
 - IMPORTANTE: Scrivi SEMPRE in italiano del NORD ITALIA. NON usare MAI il passato remoto (feci, andai, dissi, capii, lessi). Usa SEMPRE il passato prossimo (ho fatto, sono andato, ho detto, ho capito, ho letto). Il passato remoto si usa solo al Sud.
+- In ALMENO UN commento su tre, inserisci 1-2 piccoli errori o inflessioni dialettali venete, come farebbe un vicentino che scrive di getto. Esempi: "go fatto" (ho fatto), "xe" (è), "cossa" (cosa), "paron" (padrone), "miga" (mica), "schei" (soldi), "massa" (troppo), "semo" (siamo), doppie mancanti o scambiate, "el" usato come articolo maschile. NON esagerare — deve sembrare naturale, come un piccolo scivolone dialettale, non un testo in dialetto pieno.
 - Almeno un commento NON deve essere esclusivamente positivo — può essere curioso, dubbioso o semplicemente neutro
 - Il contenuto deve essere SPECIFICO all'argomento dell'articolo, non generico
 
