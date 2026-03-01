@@ -38,6 +38,7 @@ import FrenchTestPage from "@/pages/french-test";
 import SpanishTestPage from "@/pages/spanish-test";
 import LanguageTestsPage from "@/pages/language-tests";
 import SediPage from "@/pages/sedi";
+import TerminiECondizioniPage from "@/pages/termini-e-condizioni";
 import NotFound from "@/pages/not-found";
 
 function ScrollToTop() {
@@ -80,6 +81,7 @@ function Router() {
       <Route path="/cookie-policy" component={CookiePolicyPage} />
       <Route path="/sedi" component={SediPage} />
       <Route path="/privacy-policy" component={PrivacyPolicyPage} />
+      <Route path="/termini-e-condizioni" component={TerminiECondizioniPage} />
       <Route component={NotFound} />
     </Switch>
   );

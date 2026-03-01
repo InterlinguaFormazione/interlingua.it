@@ -49,6 +49,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/spanish-test.tsx` - Spanish Adaptive Test at `/spanish-test` — same structure, Spanish UI labels, 15 listening audio files.
 - `src/pages/cookie-policy.tsx` - GDPR cookie policy
 - `src/pages/privacy-policy.tsx` - GDPR privacy policy
+- `src/pages/termini-e-condizioni.tsx` - Terms and conditions for e-commerce (Italian law, course cancellation policies, refunds, IP, ODR)
 - `src/components/` - Reusable UI components
   - `navigation.tsx` - Fixed header with mobile menu
   - `hero-section.tsx` - Hero with animated stats
@@ -206,6 +207,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `/blog/:slug` - Blog post detail
 - `/cookie-policy` - Cookie policy (GDPR)
 - `/privacy-policy` - Privacy policy (GDPR)
+- `/termini-e-condizioni` - Terms and conditions (e-commerce)
 
 ## Bandi e Corsi Finanziati
 - Data source: `client/src/data/bandi-data.ts`
