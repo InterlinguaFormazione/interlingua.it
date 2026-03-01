@@ -122,6 +122,7 @@ export interface IStorage {
   getShopCustomerByEmail(email: string): Promise<ShopCustomer | undefined>;
   getShopCustomerById(id: string): Promise<ShopCustomer | undefined>;
   getAllShopCustomers(): Promise<ShopCustomer[]>;
+  updateShopCustomer(id: string, data: Partial<{ name: string; phone: string; password: string }>): Promise<ShopCustomer | undefined>;
 
   createShopOrder(order: InsertShopOrder): Promise<ShopOrder>;
   getShopOrders(): Promise<ShopOrder[]>;
@@ -437,6 +438,15 @@ export class DatabaseStorage implements IStorage {
 
   async getAllShopCustomers(): Promise<ShopCustomer[]> {
     return db.select().from(shopCustomers).orderBy(desc(shopCustomers.createdAt));
+  }
+
+  async updateShopCustomer(id: string, data: Partial<{ name: string; phone: string; password: string }>): Promise<ShopCustomer | undefined> {
+    const updateData: Record<string, string> = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.phone !== undefined) updateData.phone = data.phone;
+    if (data.password !== undefined) updateData.password = data.password;
+    const [result] = await db.update(shopCustomers).set(updateData).where(eq(shopCustomers.id, id)).returning();
+    return result;
   }
 
   async createShopOrder(order: InsertShopOrder): Promise<ShopOrder> {

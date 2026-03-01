@@ -21,12 +21,19 @@ import {
   Lock,
   ChevronDown,
   ChevronUp,
+  Settings,
+  Save,
+  Phone,
+  Mail,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 interface CustomerInfo {
   id: string;
   name: string;
   email: string;
+  phone?: string;
 }
 
 interface Order {
@@ -57,6 +64,15 @@ export default function ShopDashboard() {
   const [loginPassword, setLoginPassword] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
   const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
+  const [profileName, setProfileName] = useState("");
+  const [profilePhone, setProfilePhone] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("shop_customer_token");
@@ -74,6 +90,8 @@ export default function ShopDashboard() {
       if (res.ok) {
         const data = await res.json();
         setCustomer(data);
+        setProfileName(data.name || "");
+        setProfilePhone(data.phone || "");
       } else {
         localStorage.removeItem("shop_customer_token");
         setToken(null);
@@ -81,6 +99,64 @@ export default function ShopDashboard() {
     } catch {
       localStorage.removeItem("shop_customer_token");
       setToken(null);
+    }
+  };
+
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProfileLoading(true);
+    try {
+      const res = await fetch("/api/shop/profile", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: profileName, phone: profilePhone }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCustomer(data.customer);
+        toast({ title: "Profilo aggiornato", description: "I tuoi dati sono stati salvati." });
+      } else {
+        toast({ title: "Errore", description: data.message, variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Errore", description: "Errore di connessione.", variant: "destructive" });
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      toast({ title: "Errore", description: "Le password non coincidono.", variant: "destructive" });
+      return;
+    }
+    setPasswordLoading(true);
+    try {
+      const res = await fetch("/api/shop/profile", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        toast({ title: "Password aggiornata", description: "La tua password è stata cambiata con successo." });
+      } else {
+        toast({ title: "Errore", description: data.message, variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Errore", description: "Errore di connessione.", variant: "destructive" });
+    } finally {
+      setPasswordLoading(false);
     }
   };
 
@@ -320,6 +396,149 @@ export default function ShopDashboard() {
                     </table>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-primary" />
+                  Il Mio Profilo
+                </CardTitle>
+                <CardDescription>Gestisci i tuoi dati personali</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleProfileUpdate} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="profile-name">Nome e Cognome</Label>
+                      <Input
+                        id="profile-name"
+                        value={profileName}
+                        onChange={(e) => setProfileName(e.target.value)}
+                        className="mt-1"
+                        data-testid="input-profile-name"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="profile-phone">Telefono</Label>
+                      <div className="relative mt-1">
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          id="profile-phone"
+                          value={profilePhone}
+                          onChange={(e) => setProfilePhone(e.target.value)}
+                          className="pl-9"
+                          data-testid="input-profile-phone"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="profile-email">Email</Label>
+                    <div className="relative mt-1">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        id="profile-email"
+                        value={customer.email}
+                        disabled
+                        className="pl-9 opacity-60"
+                        data-testid="input-profile-email"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">L'email non può essere modificata</p>
+                  </div>
+                  <Button type="submit" disabled={profileLoading} data-testid="button-save-profile">
+                    {profileLoading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Save className="w-4 h-4 mr-2" />
+                    )}
+                    Salva Modifiche
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Lock className="w-5 h-5 text-primary" />
+                  Cambia Password
+                </CardTitle>
+                <CardDescription>Aggiorna la tua password di accesso</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handlePasswordChange} className="space-y-4">
+                  <div>
+                    <Label htmlFor="current-password">Password Attuale</Label>
+                    <div className="relative mt-1">
+                      <Input
+                        id="current-password"
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        data-testid="input-current-password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        data-testid="button-toggle-current-password"
+                      >
+                        {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="new-password">Nuova Password</Label>
+                      <div className="relative mt-1">
+                        <Input
+                          id="new-password"
+                          type={showNewPassword ? "text" : "password"}
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          data-testid="input-new-password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          data-testid="button-toggle-new-password"
+                        >
+                          {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="confirm-password">Conferma Nuova Password</Label>
+                      <Input
+                        id="confirm-password"
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="mt-1"
+                        data-testid="input-confirm-password"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale.
+                  </p>
+                  <Button
+                    type="submit"
+                    variant="outline"
+                    disabled={passwordLoading || !currentPassword || !newPassword || !confirmPassword}
+                    data-testid="button-change-password"
+                  >
+                    {passwordLoading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Lock className="w-4 h-4 mr-2" />
+                    )}
+                    Cambia Password
+                  </Button>
+                </form>
               </CardContent>
             </Card>
           </div>

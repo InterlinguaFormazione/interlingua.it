@@ -1666,7 +1666,7 @@ export async function registerRoutes(
       }
       const customer = await storage.getShopCustomerById(session.customerId);
       if (!customer) return res.status(401).json({ success: false, message: "Cliente non trovato." });
-      res.json({ id: customer.id, name: customer.name, email: customer.email });
+      res.json({ id: customer.id, name: customer.name, email: customer.email, phone: customer.phone || "" });
     } catch (error) {
       console.error("Shop me error:", error);
       res.status(500).json({ success: false, message: "Errore del server." });
@@ -1687,6 +1687,59 @@ export async function registerRoutes(
       res.json(orders);
     } catch (error) {
       console.error("Shop my-orders error:", error);
+      res.status(500).json({ success: false, message: "Errore del server." });
+    }
+  });
+
+  app.patch("/api/shop/profile", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.replace("Bearer ", "");
+      if (!token) return res.status(401).json({ success: false, message: "Non autorizzato." });
+      const session = shopCustomerSessions.get(token);
+      if (!session || Date.now() - session.createdAt > SHOP_SESSION_DURATION) {
+        if (session) shopCustomerSessions.delete(token);
+        return res.status(401).json({ success: false, message: "Sessione scaduta." });
+      }
+
+      const { name, phone, currentPassword, newPassword } = req.body;
+      const updateData: Partial<{ name: string; phone: string; password: string }> = {};
+
+      if (name && typeof name === "string" && name.trim()) {
+        updateData.name = name.trim();
+      }
+      if (phone !== undefined) {
+        updateData.phone = typeof phone === "string" ? phone.trim() : "";
+      }
+
+      if (newPassword) {
+        if (!currentPassword) {
+          return res.status(400).json({ success: false, message: "Inserisci la password attuale per cambiarla." });
+        }
+        const customer = await storage.getShopCustomerById(session.customerId);
+        if (!customer) return res.status(404).json({ success: false, message: "Cliente non trovato." });
+
+        const bcrypt = await import("bcrypt");
+        const valid = await bcrypt.compare(currentPassword, customer.password);
+        if (!valid) {
+          return res.status(400).json({ success: false, message: "La password attuale non è corretta." });
+        }
+        if (!isStrongPassword(newPassword)) {
+          return res.status(400).json({ success: false, message: "La nuova password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale." });
+        }
+        updateData.password = await bcrypt.hash(newPassword, 10);
+      }
+
+      if (Object.keys(updateData).length === 0) {
+        return res.status(400).json({ success: false, message: "Nessun dato da aggiornare." });
+      }
+
+      const updated = await storage.updateShopCustomer(session.customerId, updateData);
+      if (!updated) return res.status(404).json({ success: false, message: "Cliente non trovato." });
+
+      res.json({ success: true, customer: { id: updated.id, name: updated.name, email: updated.email, phone: updated.phone } });
+    } catch (error) {
+      console.error("Shop profile update error:", error);
       res.status(500).json({ success: false, message: "Errore del server." });
     }
   });

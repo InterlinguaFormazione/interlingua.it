@@ -131,7 +131,7 @@ export function Navigation() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setLocation("/admin")}
+              onClick={() => setLocation("/shop/dashboard")}
               data-testid="button-account"
             >
               <UserCircle className="h-5 w-5" />
