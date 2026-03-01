@@ -52,6 +52,7 @@ import {
   Play,
 } from "lucide-react";
 import { Link } from "wouter";
+import { PROVINCES } from "@shared/provinces";
 import corsoOnlineImage from "@assets/corso-lingua-online_1772143586662.jpg";
 import categoryOnline from "@/assets/images/category-online.jpg";
 import courseIndividual from "@/assets/images/course-individual.jpg";
@@ -125,24 +126,6 @@ const comeConosciutoOptions = [
   "YouTube",
   "Tramite la mia Azienda",
   "Altro",
-];
-const province = [
-  "Agrigento","Alessandria","Ancona","Aosta","L'Aquila","Arezzo","Ascoli Piceno","Asti","Avellino",
-  "Bari","Barletta-Andria-Trani","Belluno","Benevento","Bergamo","Biella","Bologna","Bolzano","Brescia","Brindisi",
-  "Cagliari","Caltanissetta","Campobasso","Caserta","Catania","Catanzaro","Chieti","Como","Cosenza","Cremona","Crotone","Cuneo",
-  "Enna","Fermo","Ferrara","Firenze","Foggia","Forlì-Cesena","Frosinone",
-  "Genova","Gorizia","Grosseto",
-  "Imperia","Isernia",
-  "La Spezia","Latina","Lecce","Lecco","Livorno","Lodi","Lucca",
-  "Macerata","Mantova","Massa-Carrara","Matera","Messina","Milano","Modena","Monza-Brianza",
-  "Napoli","Novara","Nuoro",
-  "Oristano",
-  "Padova","Palermo","Parma","Pavia","Perugia","Pesaro-Urbino","Pescara","Piacenza","Pisa","Pistoia","Pordenone","Potenza","Prato",
-  "Ragusa","Ravenna","Reggio Calabria","Reggio Emilia","Rieti","Rimini","Roma","Rovigo",
-  "Salerno","Sassari","Savona","Siena","Siracusa","Sondrio",
-  "Taranto","Teramo","Terni","Torino","Trapani","Trento","Treviso","Trieste",
-  "Udine",
-  "Varese","Venezia","Verbania","Vercelli","Verona","Vibo Valentia","Vicenza","Viterbo",
 ];
 
 const courses = [
@@ -371,17 +354,35 @@ function CourseInfoForm({ courseTitle, gradient }: { courseTitle: string; gradie
   const [livello, setLivello] = useState("");
   const [comeConosciuto, setComeConosciuto] = useState("");
   const [provincia, setProvincia] = useState("");
+  const [comuniList, setComuniList] = useState<Array<{ nome: string; cap: string[] }>>([]);
+  const [loadingComuni, setLoadingComuni] = useState(false);
+  const [citta, setCitta] = useState("");
   const [newsletter, setNewsletter] = useState(false);
   const [gdpr, setGdpr] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (provincia) {
+      setLoadingComuni(true);
+      setCitta("");
+      setComuniList([]);
+      fetch(`/api/comuni/${provincia}`)
+        .then((r) => r.json())
+        .then((data) => setComuniList(data))
+        .catch(() => setComuniList([]))
+        .finally(() => setLoadingComuni(false));
+    } else {
+      setComuniList([]);
+    }
+  }, [provincia]);
 
   const validate = (formData: FormData): Record<string, string> => {
     const errs: Record<string, string> = {};
     if (!formData.get("fname")) errs.fname = "Campo obbligatorio";
     if (!formData.get("lname")) errs.lname = "Campo obbligatorio";
     if (!formData.get("email")) errs.email = "Campo obbligatorio";
-    if (!formData.get("city")) errs.city = "Campo obbligatorio";
+    if (!citta) errs.city = "Campo obbligatorio";
     if (!provincia) errs.provincia = "Seleziona una provincia";
     if (!lingua) errs.lingua = "Seleziona una lingua";
     if (!livello) errs.livello = "Seleziona un livello";
@@ -396,7 +397,7 @@ function CourseInfoForm({ courseTitle, gradient }: { courseTitle: string; gradie
         `Corso: ${courseTitle}`,
         `Lingua: ${lingua}`,
         `Livello: ${livelloOptions.find(l => l.value === livello)?.label || livello}`,
-        `Citta: ${formData.get("city")}`,
+        `Citta: ${citta}`,
         `Provincia: ${provincia}`,
         `Come ci ha conosciuto: ${comeConosciuto}`,
         newsletter ? "Newsletter: Si" : "",
@@ -476,23 +477,36 @@ function CourseInfoForm({ courseTitle, gradient }: { courseTitle: string; gradie
       </div>
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <Label htmlFor="city" className="text-sm font-medium">Citta *</Label>
-          <Input id="city" name="city" placeholder="La tua citta" className={submitted && errors.city ? "border-destructive" : ""} data-testid="input-el-city" />
-          {submitted && errors.city && <p className="text-xs text-destructive">{errors.city}</p>}
-        </div>
-        <div className="space-y-1.5">
           <Label htmlFor="sel-provincia" className="text-sm font-medium">Provincia *</Label>
           <Select value={provincia} onValueChange={(v) => { setProvincia(v); if (submitted) setErrors(prev => { const n = {...prev}; delete n.provincia; return n; }); }}>
             <SelectTrigger id="sel-provincia" className={submitted && errors.provincia ? "border-destructive" : ""} data-testid="select-el-provincia">
               <SelectValue placeholder="Seleziona provincia" />
             </SelectTrigger>
             <SelectContent>
-              {province.map((p) => (
-                <SelectItem key={p} value={p}>{p}</SelectItem>
+              {PROVINCES.map((p) => (
+                <SelectItem key={p.sigla} value={p.sigla}>{p.nome} ({p.sigla})</SelectItem>
               ))}
             </SelectContent>
           </Select>
           {submitted && errors.provincia && <p className="text-xs text-destructive">{errors.provincia}</p>}
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="city" className="text-sm font-medium">Comune *</Label>
+          {provincia && comuniList.length > 0 ? (
+            <Select value={citta} onValueChange={(v) => { setCitta(v); if (submitted) setErrors(prev => { const n = {...prev}; delete n.city; return n; }); }}>
+              <SelectTrigger id="city" className={submitted && errors.city ? "border-destructive" : ""} data-testid="select-el-city">
+                <SelectValue placeholder={loadingComuni ? "Caricamento..." : "Seleziona comune"} />
+              </SelectTrigger>
+              <SelectContent>
+                {comuniList.map((c) => (
+                  <SelectItem key={c.nome} value={c.nome}>{c.nome}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <Input id="city" name="city" value={citta} onChange={(e) => { setCitta(e.target.value); if (submitted) setErrors(prev => { const n = {...prev}; delete n.city; return n; }); }} placeholder={provincia ? "Caricamento comuni..." : "Seleziona prima la provincia"} className={submitted && errors.city ? "border-destructive" : ""} data-testid="input-el-city" disabled={!provincia || loadingComuni} />
+          )}
+          {submitted && errors.city && <p className="text-xs text-destructive">{errors.city}</p>}
         </div>
       </div>
       <div className="grid sm:grid-cols-2 gap-4">

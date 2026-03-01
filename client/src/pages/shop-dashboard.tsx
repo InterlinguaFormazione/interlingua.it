@@ -6,9 +6,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { PROVINCES } from "@shared/provinces";
 import {
   BookOpen,
   Download,
@@ -86,6 +94,10 @@ export default function ShopDashboard() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
+  const [comuniList, setComuniList] = useState<Array<{ nome: string; cap: string[] }>>([]);
+  const [loadingComuni, setLoadingComuni] = useState(false);
+  const [capList, setCapList] = useState<string[]>([]);
+  const [initialProfileLoaded, setInitialProfileLoaded] = useState(false);
 
   useEffect(() => {
     const savedToken = localStorage.getItem("shop_customer_token");
@@ -119,6 +131,46 @@ export default function ShopDashboard() {
     } catch {
       localStorage.removeItem("shop_customer_token");
       setToken(null);
+    }
+  };
+
+  useEffect(() => {
+    if (profileProvincia) {
+      setLoadingComuni(true);
+      if (initialProfileLoaded) {
+        setProfileCitta("");
+        setProfileCap("");
+        setCapList([]);
+      }
+      fetch(`/api/comuni/${profileProvincia}`)
+        .then((r) => r.json())
+        .then((data) => {
+          setComuniList(data);
+          if (!initialProfileLoaded) {
+            setInitialProfileLoaded(true);
+            const found = data.find((c: { nome: string; cap: string[] }) => c.nome === profileCitta);
+            if (found && found.cap.length > 1) {
+              setCapList(found.cap);
+            }
+          }
+        })
+        .catch(() => setComuniList([]))
+        .finally(() => setLoadingComuni(false));
+    } else {
+      setComuniList([]);
+      setCapList([]);
+    }
+  }, [profileProvincia]);
+
+  const handleComuneChange = (comune: string) => {
+    setProfileCitta(comune);
+    const found = comuniList.find((c) => c.nome === comune);
+    const caps = found?.cap || [];
+    setCapList(caps);
+    if (caps.length === 1) {
+      setProfileCap(caps[0]);
+    } else {
+      setProfileCap("");
     }
   };
 
@@ -510,39 +562,73 @@ export default function ShopDashboard() {
                       </div>
                       <div className="grid grid-cols-3 gap-4">
                         <div>
-                          <Label htmlFor="profile-cap">CAP</Label>
-                          <Input
-                            id="profile-cap"
-                            value={profileCap}
-                            onChange={(e) => setProfileCap(e.target.value)}
-                            placeholder="36100"
-                            maxLength={5}
-                            className="mt-1"
-                            data-testid="input-profile-cap"
-                          />
+                          <Label htmlFor="profile-provincia">Provincia</Label>
+                          <Select value={profileProvincia} onValueChange={setProfileProvincia}>
+                            <SelectTrigger className="mt-1" data-testid="select-profile-provincia">
+                              <SelectValue placeholder="Seleziona..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {PROVINCES.map((p) => (
+                                <SelectItem key={p.sigla} value={p.sigla}>
+                                  {p.sigla} - {p.nome}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div>
                           <Label htmlFor="profile-citta">Città</Label>
-                          <Input
-                            id="profile-citta"
-                            value={profileCitta}
-                            onChange={(e) => setProfileCitta(e.target.value)}
-                            placeholder="Vicenza"
-                            className="mt-1"
-                            data-testid="input-profile-citta"
-                          />
+                          {profileProvincia && comuniList.length > 0 ? (
+                            <Select value={profileCitta} onValueChange={handleComuneChange}>
+                              <SelectTrigger className="mt-1" data-testid="select-profile-citta">
+                                <SelectValue placeholder={loadingComuni ? "Caricamento..." : "Seleziona..."} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {comuniList.map((c) => (
+                                  <SelectItem key={c.nome} value={c.nome}>
+                                    {c.nome}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <Input
+                              id="profile-citta"
+                              value={profileCitta}
+                              onChange={(e) => setProfileCitta(e.target.value)}
+                              placeholder={loadingComuni ? "Caricamento..." : "Vicenza"}
+                              className="mt-1"
+                              disabled={loadingComuni}
+                              data-testid="input-profile-citta"
+                            />
+                          )}
                         </div>
                         <div>
-                          <Label htmlFor="profile-provincia">Provincia</Label>
-                          <Input
-                            id="profile-provincia"
-                            value={profileProvincia}
-                            onChange={(e) => setProfileProvincia(e.target.value.toUpperCase())}
-                            placeholder="VI"
-                            maxLength={2}
-                            className="mt-1 uppercase"
-                            data-testid="input-profile-provincia"
-                          />
+                          <Label htmlFor="profile-cap">CAP</Label>
+                          {capList.length > 1 ? (
+                            <Select value={profileCap} onValueChange={setProfileCap}>
+                              <SelectTrigger className="mt-1" data-testid="select-profile-cap">
+                                <SelectValue placeholder="Seleziona..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {capList.map((c) => (
+                                  <SelectItem key={c} value={c}>
+                                    {c}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <Input
+                              id="profile-cap"
+                              value={profileCap}
+                              onChange={(e) => setProfileCap(e.target.value)}
+                              placeholder="36100"
+                              maxLength={5}
+                              className="mt-1"
+                              data-testid="input-profile-cap"
+                            />
+                          )}
                         </div>
                       </div>
                     </div>

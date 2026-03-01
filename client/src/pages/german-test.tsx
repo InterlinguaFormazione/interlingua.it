@@ -14,6 +14,8 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { GraduationCap, CheckCircle, ChevronRight, Loader2, PenTool, Volume2, VolumeX, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight, ArrowLeft, User, Mail, Phone, Building2, MapPin, Map, Play, Pause } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
+import { PROVINCES } from "@shared/provinces";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Phase = "registration" | "audio-check" | "self-assessment" | "mc-questions" | "writing" | "results";
 
@@ -186,6 +188,24 @@ export default function GermanTestPage() {
     resolver: zodResolver(registrationSchema),
     defaultValues: { firstName: "", lastName: "", email: "", phone: "", company: "", city: "", province: "" },
   });
+
+  const [comuniList, setComuniList] = useState<Array<{ nome: string; cap: string[] }>>([]);
+  const [loadingComuni, setLoadingComuni] = useState(false);
+  const watchProvince = form.watch("province");
+
+  useEffect(() => {
+    if (watchProvince) {
+      setLoadingComuni(true);
+      form.setValue("city", "");
+      fetch(`/api/comuni/${watchProvince}`)
+        .then((r) => r.json())
+        .then((data) => setComuniList(data))
+        .catch(() => setComuniList([]))
+        .finally(() => setLoadingComuni(false));
+    } else {
+      setComuniList([]);
+    }
+  }, [watchProvince]);
 
   useEffect(() => {
     const handleVisibility = () => {
@@ -560,29 +580,52 @@ export default function GermanTestPage() {
 
                     <div className="grid grid-cols-5 gap-3">
                       <div className="col-span-3">
-                        <FormField control={form.control} name="city" render={({ field }) => (
+                        <FormField control={form.control} name="province" render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">Citta</FormLabel>
-                            <FormControl>
-                              <div className="relative group">
-                                <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-600 group-focus-within:text-blue-500 transition-colors" />
-                                <Input {...field} data-testid="input-city" placeholder="La tua citta" className="pl-11 h-12 bg-slate-50/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-600/60 focus:border-blue-400 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-blue-500/10" />
-                              </div>
-                            </FormControl>
+                            <FormLabel className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">Provincia</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                              <FormControl>
+                                <SelectTrigger data-testid="select-province" className="h-12 bg-slate-50/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-600/60 rounded-xl">
+                                  <Map className="w-4 h-4 text-slate-300 dark:text-slate-600 mr-2" />
+                                  <SelectValue placeholder="Seleziona provincia" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {PROVINCES.map((p) => (
+                                  <SelectItem key={p.sigla} value={p.sigla}>{p.sigla} - {p.nome}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <FormMessage />
                           </FormItem>
                         )} />
                       </div>
                       <div className="col-span-2">
-                        <FormField control={form.control} name="province" render={({ field }) => (
+                        <FormField control={form.control} name="city" render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">Provincia</FormLabel>
-                            <FormControl>
-                              <div className="relative group">
-                                <Map className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-600 group-focus-within:text-blue-500 transition-colors" />
-                                <Input {...field} data-testid="input-province" placeholder="es. VI" maxLength={2} className="pl-11 h-12 uppercase bg-slate-50/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-600/60 focus:border-blue-400 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-blue-500/10" />
-                              </div>
-                            </FormControl>
+                            <FormLabel className="text-xs uppercase tracking-wider text-slate-400 dark:text-slate-500 font-semibold">Città</FormLabel>
+                            {watchProvince && comuniList.length > 0 ? (
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger data-testid="select-city" className="h-12 bg-slate-50/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-600/60 rounded-xl">
+                                    <MapPin className="w-4 h-4 text-slate-300 dark:text-slate-600 mr-2" />
+                                    <SelectValue placeholder={loadingComuni ? "Caricamento..." : "Seleziona comune"} />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {comuniList.map((c) => (
+                                    <SelectItem key={c.nome} value={c.nome}>{c.nome}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              <FormControl>
+                                <div className="relative group">
+                                  <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 dark:text-slate-600 group-focus-within:text-blue-500 transition-colors" />
+                                  <Input {...field} data-testid="input-city" placeholder="La tua città" className="pl-11 h-12 bg-slate-50/80 dark:bg-slate-900/40 border-slate-200/80 dark:border-slate-600/60 focus:border-blue-400 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 rounded-xl transition-all duration-200 focus:ring-4 focus:ring-blue-500/10" />
+                                </div>
+                              </FormControl>
+                            )}
                             <FormMessage />
                           </FormItem>
                         )} />

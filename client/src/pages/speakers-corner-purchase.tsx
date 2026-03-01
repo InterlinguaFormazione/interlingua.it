@@ -7,10 +7,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import { PROVINCES } from "@shared/provinces";
+import { COUNTRIES } from "@shared/countries";
 import { SiPaypal, SiVisa, SiMastercard } from "react-icons/si";
 import {
   Mic,
@@ -52,7 +61,10 @@ export default function SpeakersCornerPurchase() {
   const [cap, setCap] = useState("");
   const [citta, setCitta] = useState("");
   const [provincia, setProvincia] = useState("");
-  const [paese, setPaese] = useState("Italia");
+  const [paese, setPaese] = useState("IT");
+  const [comuniList, setComuniList] = useState<Array<{ nome: string; cap: string[] }>>([]);
+  const [loadingComuni, setLoadingComuni] = useState(false);
+  const [capList, setCapList] = useState<string[]>([]);
   const [acceptGdpr, setAcceptGdpr] = useState(false);
   const [ragioneSociale, setRagioneSociale] = useState("");
   const [partitaIva, setPartitaIva] = useState("");
@@ -89,6 +101,37 @@ export default function SpeakersCornerPurchase() {
     },
   });
 
+  const isItaly = paese === "IT";
+
+  useEffect(() => {
+    if (isItaly && provincia) {
+      setLoadingComuni(true);
+      setCitta("");
+      setCap("");
+      setCapList([]);
+      fetch(`/api/comuni/${provincia}`)
+        .then((r) => r.json())
+        .then((data) => setComuniList(data))
+        .catch(() => setComuniList([]))
+        .finally(() => setLoadingComuni(false));
+    } else {
+      setComuniList([]);
+      setCapList([]);
+    }
+  }, [provincia, isItaly]);
+
+  const handleComuneChange = (comune: string) => {
+    setCitta(comune);
+    const found = comuniList.find((c) => c.nome === comune);
+    const caps = found?.cap || [];
+    setCapList(caps);
+    if (caps.length === 1) {
+      setCap(caps[0]);
+    } else {
+      setCap("");
+    }
+  };
+
   const handleDetailsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!nome || !cognome || !email || !password || !confirmPassword) {
@@ -112,49 +155,51 @@ export default function SpeakersCornerPurchase() {
 
   const handleBillingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!codiceFiscale || !indirizzo || !cap || !citta || !provincia || !paese) {
+    if (!indirizzo || !cap || !citta) {
       toast({ title: "Campi obbligatori", description: "Compila tutti i campi di fatturazione obbligatori.", variant: "destructive" });
       return;
     }
-    if (tipoFatturazione === "privato" && codiceFiscale.length !== 16) {
-      toast({ title: "Codice Fiscale non valido", description: "Il codice fiscale deve essere di 16 caratteri.", variant: "destructive" });
-      return;
-    }
-    if (tipoFatturazione === "professionista") {
-      if (codiceFiscale.length !== 16) {
+    if (isItaly) {
+      if (!codiceFiscale || !provincia) {
+        toast({ title: "Campi obbligatori", description: "Per l'Italia, Codice Fiscale e Provincia sono obbligatori.", variant: "destructive" });
+        return;
+      }
+      if (tipoFatturazione === "privato" && codiceFiscale.length !== 16) {
         toast({ title: "Codice Fiscale non valido", description: "Il codice fiscale deve essere di 16 caratteri.", variant: "destructive" });
         return;
       }
-      if (!partitaIva) {
-        toast({ title: "Partita IVA obbligatoria", description: "Inserisci la Partita IVA.", variant: "destructive" });
+      if (tipoFatturazione === "professionista") {
+        if (codiceFiscale.length !== 16) {
+          toast({ title: "Codice Fiscale non valido", description: "Il codice fiscale deve essere di 16 caratteri.", variant: "destructive" });
+          return;
+        }
+        if (!partitaIva) {
+          toast({ title: "Partita IVA obbligatoria", description: "Inserisci la Partita IVA.", variant: "destructive" });
+          return;
+        }
+        if (!codiceSdi && !pec) {
+          toast({ title: "SDI o PEC obbligatorio", description: "Inserisci il Codice SDI oppure la PEC per la fatturazione elettronica.", variant: "destructive" });
+          return;
+        }
+      }
+      if (tipoFatturazione === "azienda") {
+        if (!ragioneSociale) {
+          toast({ title: "Ragione Sociale obbligatoria", description: "Inserisci la Ragione Sociale dell'azienda.", variant: "destructive" });
+          return;
+        }
+        if (!partitaIva) {
+          toast({ title: "Partita IVA obbligatoria", description: "Inserisci la Partita IVA dell'azienda.", variant: "destructive" });
+          return;
+        }
+        if (!codiceSdi && !pec) {
+          toast({ title: "SDI o PEC obbligatorio", description: "Inserisci il Codice SDI oppure la PEC per la fatturazione elettronica.", variant: "destructive" });
+          return;
+        }
+      }
+      if (cap.length !== 5) {
+        toast({ title: "CAP non valido", description: "Il CAP deve essere di 5 cifre.", variant: "destructive" });
         return;
       }
-      if (!codiceSdi && !pec) {
-        toast({ title: "SDI o PEC obbligatorio", description: "Inserisci il Codice SDI oppure la PEC per la fatturazione elettronica.", variant: "destructive" });
-        return;
-      }
-    }
-    if (tipoFatturazione === "azienda") {
-      if (!ragioneSociale) {
-        toast({ title: "Ragione Sociale obbligatoria", description: "Inserisci la Ragione Sociale dell'azienda.", variant: "destructive" });
-        return;
-      }
-      if (!partitaIva) {
-        toast({ title: "Partita IVA obbligatoria", description: "Inserisci la Partita IVA dell'azienda.", variant: "destructive" });
-        return;
-      }
-      if (!codiceSdi && !pec) {
-        toast({ title: "SDI o PEC obbligatorio", description: "Inserisci il Codice SDI oppure la PEC per la fatturazione elettronica.", variant: "destructive" });
-        return;
-      }
-    }
-    if (cap.length !== 5) {
-      toast({ title: "CAP non valido", description: "Il CAP deve essere di 5 cifre.", variant: "destructive" });
-      return;
-    }
-    if (provincia.length !== 2) {
-      toast({ title: "Provincia non valida", description: "Inserisci la sigla della provincia (es. TN, MI, RM).", variant: "destructive" });
-      return;
     }
     if (!acceptGdpr) {
       toast({ title: "Consenso Privacy", description: "Devi acconsentire al trattamento dei dati personali per procedere.", variant: "destructive" });
@@ -501,7 +546,7 @@ export default function SpeakersCornerPurchase() {
                           </div>
                         </div>
 
-                        {tipoFatturazione === "azienda" && (
+                        {isItaly && tipoFatturazione === "azienda" && (
                           <div className="space-y-2">
                             <Label htmlFor="purchase-ragione">Ragione Sociale *</Label>
                             <Input
@@ -516,22 +561,38 @@ export default function SpeakersCornerPurchase() {
                         )}
 
                         <div className="space-y-2">
-                          <Label htmlFor="purchase-cf">Codice Fiscale *</Label>
-                          <Input
-                            id="purchase-cf"
-                            value={codiceFiscale}
-                            onChange={(e) => setCodiceFiscale(e.target.value.toUpperCase())}
-                            placeholder={tipoFatturazione === "privato" || tipoFatturazione === "professionista" ? "RSSMRA85M01H501Z" : "01234567890"}
-                            required
-                            maxLength={16}
-                            data-testid="input-purchase-cf"
-                          />
-                          <p className="text-xs text-muted-foreground">
-                            {tipoFatturazione === "azienda" ? "Codice fiscale dell'azienda (11 cifre)" : "16 caratteri alfanumerici"}
-                          </p>
+                          <Label htmlFor="purchase-paese">Paese *</Label>
+                          <Select value={paese} onValueChange={(v) => { setPaese(v); if (v !== "IT") { setTipoFatturazione("privato"); setProvincia(""); setCitta(""); setCap(""); } }}>
+                            <SelectTrigger data-testid="select-purchase-paese">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {COUNTRIES.map((c) => (
+                                <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
 
-                        {(tipoFatturazione === "professionista" || tipoFatturazione === "azienda") && (
+                        {isItaly && (
+                          <div className="space-y-2">
+                            <Label htmlFor="purchase-cf">Codice Fiscale *</Label>
+                            <Input
+                              id="purchase-cf"
+                              value={codiceFiscale}
+                              onChange={(e) => setCodiceFiscale(e.target.value.toUpperCase())}
+                              placeholder={tipoFatturazione === "privato" || tipoFatturazione === "professionista" ? "RSSMRA85M01H501Z" : "01234567890"}
+                              required
+                              maxLength={16}
+                              data-testid="input-purchase-cf"
+                            />
+                            <p className="text-xs text-muted-foreground">
+                              {tipoFatturazione === "azienda" ? "Codice fiscale dell'azienda (11 cifre)" : "16 caratteri alfanumerici"}
+                            </p>
+                          </div>
+                        )}
+
+                        {isItaly && (tipoFatturazione === "professionista" || tipoFatturazione === "azienda") && (
                           <div className="space-y-2">
                             <Label htmlFor="purchase-piva">Partita IVA *</Label>
                             <Input
@@ -557,56 +618,75 @@ export default function SpeakersCornerPurchase() {
                             data-testid="input-purchase-indirizzo"
                           />
                         </div>
-                        <div className="grid grid-cols-3 gap-4">
-                          <div className="space-y-2 col-span-1">
-                            <Label htmlFor="purchase-cap">CAP *</Label>
-                            <Input
-                              id="purchase-cap"
-                              value={cap}
-                              onChange={(e) => setCap(e.target.value.replace(/\D/g, "").slice(0, 5))}
-                              placeholder="38122"
-                              required
-                              maxLength={5}
-                              data-testid="input-purchase-cap"
-                            />
+
+                        <div className={`grid ${isItaly ? "grid-cols-3" : "grid-cols-2"} gap-4`}>
+                          {isItaly && (
+                            <div className="space-y-2">
+                              <Label htmlFor="purchase-provincia">Provincia *</Label>
+                              <Select value={provincia} onValueChange={setProvincia}>
+                                <SelectTrigger data-testid="select-purchase-provincia">
+                                  <SelectValue placeholder="Seleziona..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {PROVINCES.map((p) => (
+                                    <SelectItem key={p.sigla} value={p.sigla}>{p.nome}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
+                          <div className="space-y-2">
+                            <Label htmlFor="purchase-citta">{isItaly ? "Comune" : "Città"} *</Label>
+                            {isItaly && provincia && comuniList.length > 0 ? (
+                              <Select value={citta} onValueChange={handleComuneChange}>
+                                <SelectTrigger data-testid="select-purchase-citta">
+                                  <SelectValue placeholder={loadingComuni ? "Caricamento..." : "Seleziona comune..."} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {comuniList.map((c) => (
+                                    <SelectItem key={c.nome} value={c.nome}>{c.nome}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              <Input
+                                id="purchase-citta"
+                                value={citta}
+                                onChange={(e) => setCitta(e.target.value)}
+                                placeholder={isItaly && provincia ? "Caricamento..." : ""}
+                                required
+                                data-testid="input-purchase-citta"
+                              />
+                            )}
                           </div>
-                          <div className="space-y-2 col-span-1">
-                            <Label htmlFor="purchase-citta">Città *</Label>
-                            <Input
-                              id="purchase-citta"
-                              value={citta}
-                              onChange={(e) => setCitta(e.target.value)}
-                              placeholder="Trento"
-                              required
-                              data-testid="input-purchase-citta"
-                            />
+                          <div className="space-y-2">
+                            <Label htmlFor="purchase-cap">{isItaly ? "CAP" : "Codice Postale"} *</Label>
+                            {isItaly && capList.length > 1 ? (
+                              <Select value={cap} onValueChange={setCap}>
+                                <SelectTrigger data-testid="select-purchase-cap">
+                                  <SelectValue placeholder="Seleziona CAP..." />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {capList.map((c) => (
+                                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              <Input
+                                id="purchase-cap"
+                                value={cap}
+                                onChange={(e) => setCap(e.target.value)}
+                                maxLength={isItaly ? 5 : 10}
+                                required
+                                readOnly={isItaly && capList.length === 1}
+                                data-testid="input-purchase-cap"
+                              />
+                            )}
                           </div>
-                          <div className="space-y-2 col-span-1">
-                            <Label htmlFor="purchase-provincia">Prov. *</Label>
-                            <Input
-                              id="purchase-provincia"
-                              value={provincia}
-                              onChange={(e) => setProvincia(e.target.value.toUpperCase().slice(0, 2))}
-                              placeholder="TN"
-                              required
-                              maxLength={2}
-                              data-testid="input-purchase-provincia"
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="purchase-paese">Paese *</Label>
-                          <Input
-                            id="purchase-paese"
-                            value={paese}
-                            onChange={(e) => setPaese(e.target.value)}
-                            placeholder="Italia"
-                            required
-                            data-testid="input-purchase-paese"
-                          />
                         </div>
 
-                        {(tipoFatturazione === "professionista" || tipoFatturazione === "azienda") && (
+                        {isItaly && (tipoFatturazione === "professionista" || tipoFatturazione === "azienda") && (
                           <div className="pt-3 border-t space-y-4">
                             <p className="text-sm font-medium text-muted-foreground">
                               Fatturazione elettronica (inserisci almeno uno) *

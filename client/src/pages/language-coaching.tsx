@@ -51,6 +51,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { Link } from "wouter";
+import { PROVINCES } from "@shared/provinces";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -295,24 +296,6 @@ const stats = [
   { value: 3, suffix: "x", label: "Più veloce dei corsi tradizionali", icon: Zap },
 ];
 
-const provinceOptions = [
-  "Agrigento","Alessandria","Ancona","Aosta","L'Aquila","Arezzo","Ascoli Piceno","Asti","Avellino",
-  "Bari","Barletta-Andria-Trani","Belluno","Benevento","Bergamo","Biella","Bologna","Bolzano","Brescia","Brindisi",
-  "Cagliari","Caltanissetta","Campobasso","Caserta","Catania","Catanzaro","Chieti","Como","Cosenza","Cremona","Crotone","Cuneo",
-  "Enna","Fermo","Ferrara","Firenze","Foggia","Forlì-Cesena","Frosinone",
-  "Genova","Gorizia","Grosseto",
-  "Imperia","Isernia",
-  "La Spezia","Latina","Lecce","Lecco","Livorno","Lodi","Lucca",
-  "Macerata","Mantova","Massa-Carrara","Matera","Messina","Milano","Modena","Monza-Brianza",
-  "Napoli","Novara","Nuoro",
-  "Oristano",
-  "Padova","Palermo","Parma","Pavia","Perugia","Pesaro-Urbino","Pescara","Piacenza","Pisa","Pistoia","Pordenone","Potenza","Prato",
-  "Ragusa","Ravenna","Reggio Calabria","Reggio Emilia","Rieti","Rimini","Roma","Rovigo",
-  "Salerno","Sassari","Savona","Siena","Siracusa","Sondrio",
-  "Taranto","Teramo","Terni","Torino","Trapani","Trento","Treviso","Trieste",
-  "Udine",
-  "Varese","Venezia","Verbania","Vercelli","Verona","Vibo Valentia","Vicenza","Viterbo",
-];
 
 const linguaOptions = ["Inglese", "Francese", "Tedesco", "Spagnolo", "Russo", "Italiano per stranieri", "Portoghese"];
 const livelloOptions = [
@@ -468,8 +451,8 @@ function CoachingContactForm({ packageTitle, gradient }: { packageTitle: string;
               <SelectValue placeholder="Seleziona" />
             </SelectTrigger>
             <SelectContent>
-              {provinceOptions.map((p) => (
-                <SelectItem key={p} value={p}>{p}</SelectItem>
+              {PROVINCES.map((p) => (
+                <SelectItem key={p.sigla} value={p.sigla}>{p.nome} ({p.sigla})</SelectItem>
               ))}
             </SelectContent>
           </Select>
