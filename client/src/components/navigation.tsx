@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, Users, Building2, ExternalLink, ArrowLeft, ShoppingCart } from "lucide-react";
+import { Menu, X, Users, Building2, ExternalLink, ArrowLeft, ShoppingCart, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { motion, AnimatePresence } from "framer-motion";
@@ -127,6 +127,14 @@ export function Navigation() {
                   {cart.totalItems}
                 </span>
               )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setLocation("/admin")}
+              data-testid="button-account"
+            >
+              <UserCircle className="h-5 w-5" />
             </Button>
             <ThemeToggle />
             <Button
