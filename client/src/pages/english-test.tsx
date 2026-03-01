@@ -780,10 +780,10 @@ export default function EnglishTestPage() {
                     setPhase("self-assessment");
                     toast({ title: "Audio/Microfono disattivati", description: "Le domande di listening verranno mostrate come testo. La sezione speaking verrà saltata.", variant: "destructive" });
                   }}
-                  className="mt-3 inline-flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+                  className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-all"
                   data-testid="button-no-audio-skip-all"
                 >
-                  <MicOff className="w-3.5 h-3.5" /> Non ho audio né microfono — salta questo controllo →
+                  <MicOff className="w-4 h-4" /> Non ho audio né microfono — salta
                 </button>
               </div>
 
