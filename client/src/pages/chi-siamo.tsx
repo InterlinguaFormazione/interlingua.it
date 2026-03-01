@@ -677,7 +677,7 @@ export default function ChiSiamoPage() {
                 name: "Valentino Spolaore",
                 role: "Digital Skills & Data Analytics",
                 bio: "Appassionato di tecnologia e formazione, Valentino trasforma dati in insight e idee in progetti concreti. Docente universitario e formatore aziendale specializzato in Excel Avanzato, Google Suite, UX/UI Design e Power BI.",
-                color: "from-blue-500 to-cyan-500",
+                image: "/images/team/docenti/valentino.jpg",
               },
               {
                 name: "Maurizia Moltoni Sartori",
