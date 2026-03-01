@@ -23,7 +23,9 @@ import {
   Globe,
 } from "lucide-react";
 import { Link } from "wouter";
-import aboutVicenza from "@/assets/images/about-vicenza.jpg";
+import vicenzaCity from "@assets/vicenza_1772179633305.jpg";
+import classroomVicenza from "@assets/corso-di-inglese-vicenza_1769355404957.jpg";
+import aboutTeaching from "@/assets/images/about-teaching.jpg";
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -309,12 +311,12 @@ export default function SediPage() {
                     </Card>
                   </div>
 
-                  <div className="order-1 lg:order-2 space-y-6">
+                  <div className="order-1 lg:order-2 space-y-5">
                     <div className="rounded-3xl overflow-hidden shadow-2xl shadow-slate-200/50 dark:shadow-black/20 border border-slate-100 dark:border-slate-800">
                       <iframe
                         src={loc.mapUrl}
                         width="100%"
-                        height="350"
+                        height="300"
                         style={{ border: 0 }}
                         allowFullScreen
                         loading="lazy"
@@ -324,20 +326,84 @@ export default function SediPage() {
                         data-testid={`map-${idx}`}
                       />
                     </div>
+
                     {idx === 0 && (
-                      <div className="rounded-3xl overflow-hidden shadow-xl">
-                        <img
-                          src={aboutVicenza}
-                          alt="Vicenza — La città del Palladio"
-                          className="w-full h-48 object-cover"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                        <div className="bg-white dark:bg-slate-800 px-6 py-4 border border-t-0 border-slate-100 dark:border-slate-700 rounded-b-3xl">
-                          <p className="text-sm font-semibold text-foreground">Vicenza — Città del Palladio</p>
-                          <p className="text-xs text-muted-foreground mt-1">Patrimonio UNESCO, a soli 60 km da Venezia</p>
+                      <>
+                        <div className="rounded-3xl overflow-hidden shadow-xl border border-slate-100 dark:border-slate-800">
+                          <img
+                            src={vicenzaCity}
+                            alt="Piazza dei Signori e Basilica Palladiana — Vicenza"
+                            className="w-full h-52 object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                          <div className="bg-white dark:bg-slate-800 px-6 py-4 border-t border-slate-100 dark:border-slate-700">
+                            <p className="text-sm font-semibold text-foreground">Piazza dei Signori — Basilica Palladiana</p>
+                            <p className="text-xs text-muted-foreground mt-1">A pochi passi dalla nostra sede nel centro storico</p>
+                          </div>
                         </div>
-                      </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800">
+                            <img
+                              src={classroomVicenza}
+                              alt="Lezione in aula — Sede di Vicenza"
+                              className="w-full h-36 object-cover"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <div className="bg-white dark:bg-slate-800 px-4 py-3">
+                              <p className="text-xs font-semibold text-foreground">Le nostre aule</p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">Lezione in sede</p>
+                            </div>
+                          </div>
+                          <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800">
+                            <img
+                              src="/images/team/giulia-vicenza.webp"
+                              alt="Giulia — Responsabile sede Vicenza"
+                              className="w-full h-36 object-cover"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <div className="bg-white dark:bg-slate-800 px-4 py-3">
+                              <p className="text-xs font-semibold text-foreground">Giulia</p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">Responsabile sede</p>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {idx === 1 && (
+                      <>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800">
+                            <img
+                              src={aboutTeaching}
+                              alt="Formazione linguistica — Sede di Thiene"
+                              className="w-full h-40 object-cover"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <div className="bg-white dark:bg-slate-800 px-4 py-3">
+                              <p className="text-xs font-semibold text-foreground">Formazione</p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">Corsi di lingua</p>
+                            </div>
+                          </div>
+                          <div className="rounded-2xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800">
+                            <img
+                              src="/images/team/elena-thiene.webp"
+                              alt="Elena — Responsabile sede Thiene"
+                              className="w-full h-40 object-cover"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                            <div className="bg-white dark:bg-slate-800 px-4 py-3">
+                              <p className="text-xs font-semibold text-foreground">Elena</p>
+                              <p className="text-[10px] text-muted-foreground mt-0.5">Responsabile sede</p>
+                            </div>
+                          </div>
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>
