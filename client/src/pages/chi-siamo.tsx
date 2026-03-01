@@ -713,7 +713,7 @@ export default function ChiSiamoPage() {
                 name: "Alberto Arsie",
                 role: "Video Marketing & Produzione Multimediale",
                 bio: "Videomaker e fotografo professionista dal 2006. Gestisce Media Lab, dove si occupa di produzione video, cinema, animazioni 3D e formazione multimediale. Crede nel potere dell'immagine per trasmettere emozioni e messaggi unici.",
-                color: "from-indigo-500 to-violet-500",
+                image: "/images/team/docenti/alberto.jpg",
               },
             ].map((member, index) => (
               <motion.div
