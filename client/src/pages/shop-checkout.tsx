@@ -72,6 +72,7 @@ export default function ShopCheckout() {
   const [notes, setNotes] = useState("");
 
   const [tipoFatturazione, setTipoFatturazione] = useState<"privato" | "professionista" | "azienda">("privato");
+  const [paese, setPaese] = useState("IT");
   const [codiceFiscale, setCodiceFiscale] = useState("");
   const [indirizzo, setIndirizzo] = useState("");
   const [cap, setCap] = useState("");
@@ -182,15 +183,16 @@ export default function ShopCheckout() {
       studentFirstName: buyingForOther ? studentFirstName : "",
       studentLastName: buyingForOther ? studentLastName : "",
       studentEmail: buyingForOther ? studentEmail : "",
-      codiceFiscale,
-      billingCodiceFiscale: codiceFiscale,
+      codiceFiscale: isItaly ? codiceFiscale : "",
+      billingCodiceFiscale: isItaly ? codiceFiscale : "",
       billingIndirizzo: indirizzo,
       billingCap: cap,
       billingCitta: citta,
-      billingProvincia: provincia,
-      billingPartitaIva: partitaIva,
-      billingCodiceSdi: codiceSdi,
-      billingPec: pec,
+      billingProvincia: isItaly ? provincia : "",
+      billingPaese: paese,
+      billingPartitaIva: isItaly ? partitaIva : "",
+      billingCodiceSdi: isItaly ? codiceSdi : "",
+      billingPec: isItaly ? pec : "",
       notes: optionsSummary ? `[${optionsSummary}] ${notes}` : notes,
       ...(appliedVoucherCode ? { discountCode: appliedVoucherCode } : {}),
       ...extraFields,
@@ -342,51 +344,59 @@ export default function ShopCheckout() {
     setStep("billing");
   };
 
+  const isItaly = paese === "IT";
+
   const handleBillingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!codiceFiscale || !indirizzo || !cap || !citta || !provincia) {
+    if (!indirizzo || !cap || !citta) {
       toast({ title: "Campi obbligatori", description: "Compila tutti i campi di fatturazione obbligatori.", variant: "destructive" });
       return;
     }
-    if (tipoFatturazione === "privato" && codiceFiscale.length !== 16) {
-      toast({ title: "Codice Fiscale non valido", description: "Il codice fiscale deve essere di 16 caratteri.", variant: "destructive" });
-      return;
-    }
-    if (tipoFatturazione === "professionista") {
-      if (codiceFiscale.length !== 16) {
+    if (isItaly) {
+      if (!codiceFiscale || !provincia) {
+        toast({ title: "Campi obbligatori", description: "Per l'Italia, Codice Fiscale e Provincia sono obbligatori.", variant: "destructive" });
+        return;
+      }
+      if (tipoFatturazione === "privato" && codiceFiscale.length !== 16) {
         toast({ title: "Codice Fiscale non valido", description: "Il codice fiscale deve essere di 16 caratteri.", variant: "destructive" });
         return;
       }
-      if (!partitaIva) {
-        toast({ title: "Partita IVA obbligatoria", description: "Inserisci la Partita IVA.", variant: "destructive" });
+      if (tipoFatturazione === "professionista") {
+        if (codiceFiscale.length !== 16) {
+          toast({ title: "Codice Fiscale non valido", description: "Il codice fiscale deve essere di 16 caratteri.", variant: "destructive" });
+          return;
+        }
+        if (!partitaIva) {
+          toast({ title: "Partita IVA obbligatoria", description: "Inserisci la Partita IVA.", variant: "destructive" });
+          return;
+        }
+        if (!codiceSdi && !pec) {
+          toast({ title: "SDI o PEC obbligatorio", description: "Inserisci il Codice SDI oppure la PEC.", variant: "destructive" });
+          return;
+        }
+      }
+      if (tipoFatturazione === "azienda") {
+        if (!ragioneSociale) {
+          toast({ title: "Ragione Sociale obbligatoria", description: "Inserisci la Ragione Sociale.", variant: "destructive" });
+          return;
+        }
+        if (!partitaIva) {
+          toast({ title: "Partita IVA obbligatoria", description: "Inserisci la Partita IVA.", variant: "destructive" });
+          return;
+        }
+        if (!codiceSdi && !pec) {
+          toast({ title: "SDI o PEC obbligatorio", description: "Inserisci il Codice SDI oppure la PEC.", variant: "destructive" });
+          return;
+        }
+      }
+      if (cap.length !== 5) {
+        toast({ title: "CAP non valido", description: "Il CAP deve essere di 5 cifre.", variant: "destructive" });
         return;
       }
-      if (!codiceSdi && !pec) {
-        toast({ title: "SDI o PEC obbligatorio", description: "Inserisci il Codice SDI oppure la PEC.", variant: "destructive" });
+      if (provincia.length !== 2) {
+        toast({ title: "Provincia non valida", description: "Inserisci la sigla (es. VI, MI, RM).", variant: "destructive" });
         return;
       }
-    }
-    if (tipoFatturazione === "azienda") {
-      if (!ragioneSociale) {
-        toast({ title: "Ragione Sociale obbligatoria", description: "Inserisci la Ragione Sociale.", variant: "destructive" });
-        return;
-      }
-      if (!partitaIva) {
-        toast({ title: "Partita IVA obbligatoria", description: "Inserisci la Partita IVA.", variant: "destructive" });
-        return;
-      }
-      if (!codiceSdi && !pec) {
-        toast({ title: "SDI o PEC obbligatorio", description: "Inserisci il Codice SDI oppure la PEC.", variant: "destructive" });
-        return;
-      }
-    }
-    if (cap.length !== 5) {
-      toast({ title: "CAP non valido", description: "Il CAP deve essere di 5 cifre.", variant: "destructive" });
-      return;
-    }
-    if (provincia.length !== 2) {
-      toast({ title: "Provincia non valida", description: "Inserisci la sigla (es. VI, MI, RM).", variant: "destructive" });
-      return;
     }
     if (!acceptTerms) {
       toast({ title: "Termini e Condizioni", description: "Devi accettare i Termini e Condizioni per procedere.", variant: "destructive" });
@@ -458,15 +468,16 @@ export default function ShopCheckout() {
                   studentFirstName: buyingForOther ? studentFirstName : "",
                   studentLastName: buyingForOther ? studentLastName : "",
                   studentEmail: buyingForOther ? studentEmail : "",
-                  codiceFiscale,
-                  billingCodiceFiscale: codiceFiscale,
+                  codiceFiscale: isItaly ? codiceFiscale : "",
+                  billingCodiceFiscale: isItaly ? codiceFiscale : "",
                   billingIndirizzo: indirizzo,
                   billingCap: cap,
                   billingCitta: citta,
-                  billingProvincia: provincia,
-                  billingPartitaIva: partitaIva,
-                  billingCodiceSdi: codiceSdi,
-                  billingPec: pec,
+                  billingProvincia: isItaly ? provincia : "",
+                  billingPaese: paese,
+                  billingPartitaIva: isItaly ? partitaIva : "",
+                  billingCodiceSdi: isItaly ? codiceSdi : "",
+                  billingPec: isItaly ? pec : "",
                   notes: optionsSummary ? `[${optionsSummary}] ${notes}` : notes,
                   ...(appliedVoucherCode ? { discountCode: appliedVoucherCode } : {}),
                 });
@@ -1024,41 +1035,68 @@ export default function ShopCheckout() {
                       </div>
                     </div>
 
-                    <div className="flex gap-2 mb-6">
-                      {[
-                        { key: "privato" as const, label: "Privato", icon: User },
-                        { key: "professionista" as const, label: "Professionista", icon: Briefcase },
-                        { key: "azienda" as const, label: "Azienda", icon: Building2 },
-                      ].map(({ key, label, icon: Icon }) => (
-                        <Button
-                          key={key}
-                          type="button"
-                          variant={tipoFatturazione === key ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setTipoFatturazione(key)}
-                          className="flex-1"
-                          data-testid={`button-billing-${key}`}
-                        >
-                          <Icon className="w-4 h-4 mr-1" />
-                          {label}
-                        </Button>
-                      ))}
-                    </div>
+                    {isItaly && (
+                      <div className="flex gap-2 mb-6">
+                        {[
+                          { key: "privato" as const, label: "Privato", icon: User },
+                          { key: "professionista" as const, label: "Professionista", icon: Briefcase },
+                          { key: "azienda" as const, label: "Azienda", icon: Building2 },
+                        ].map(({ key, label, icon: Icon }) => (
+                          <Button
+                            key={key}
+                            type="button"
+                            variant={tipoFatturazione === key ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setTipoFatturazione(key)}
+                            className="flex-1"
+                            data-testid={`button-billing-${key}`}
+                          >
+                            <Icon className="w-4 h-4 mr-1" />
+                            {label}
+                          </Button>
+                        ))}
+                      </div>
+                    )}
 
                     <form onSubmit={handleBillingSubmit} className="space-y-4">
-                      {tipoFatturazione === "azienda" && (
+                      <div>
+                        <Label htmlFor="paese">Paese *</Label>
+                        <Select value={paese} onValueChange={setPaese}>
+                          <SelectTrigger className="mt-1" data-testid="select-paese">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="IT">Italia</SelectItem>
+                            <SelectItem value="AT">Austria</SelectItem>
+                            <SelectItem value="BE">Belgio</SelectItem>
+                            <SelectItem value="CH">Svizzera</SelectItem>
+                            <SelectItem value="DE">Germania</SelectItem>
+                            <SelectItem value="ES">Spagna</SelectItem>
+                            <SelectItem value="FR">Francia</SelectItem>
+                            <SelectItem value="GB">Regno Unito</SelectItem>
+                            <SelectItem value="NL">Paesi Bassi</SelectItem>
+                            <SelectItem value="PT">Portogallo</SelectItem>
+                            <SelectItem value="US">Stati Uniti</SelectItem>
+                            <SelectItem value="OTHER">Altro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {isItaly && tipoFatturazione === "azienda" && (
                         <div>
                           <Label htmlFor="ragioneSociale">Ragione Sociale *</Label>
                           <Input id="ragioneSociale" value={ragioneSociale} onChange={(e) => setRagioneSociale(e.target.value)} className="mt-1" data-testid="input-ragione-sociale" />
                         </div>
                       )}
 
-                      <div>
-                        <Label htmlFor="codiceFiscale">Codice Fiscale *</Label>
-                        <Input id="codiceFiscale" value={codiceFiscale} onChange={(e) => setCodiceFiscale(e.target.value.toUpperCase())} maxLength={16} className="mt-1" data-testid="input-codice-fiscale" />
-                      </div>
+                      {isItaly && (
+                        <div>
+                          <Label htmlFor="codiceFiscale">Codice Fiscale *</Label>
+                          <Input id="codiceFiscale" value={codiceFiscale} onChange={(e) => setCodiceFiscale(e.target.value.toUpperCase())} maxLength={16} className="mt-1" data-testid="input-codice-fiscale" />
+                        </div>
+                      )}
 
-                      {(tipoFatturazione === "professionista" || tipoFatturazione === "azienda") && (
+                      {isItaly && (tipoFatturazione === "professionista" || tipoFatturazione === "azienda") && (
                         <>
                           <div>
                             <Label htmlFor="partitaIva">Partita IVA *</Label>
@@ -1082,19 +1120,21 @@ export default function ShopCheckout() {
                         <Input id="indirizzo" value={indirizzo} onChange={(e) => setIndirizzo(e.target.value)} className="mt-1" data-testid="input-indirizzo" />
                       </div>
 
-                      <div className="grid grid-cols-3 gap-4">
+                      <div className={`grid ${isItaly ? "grid-cols-3" : "grid-cols-2"} gap-4`}>
                         <div>
-                          <Label htmlFor="cap">CAP *</Label>
-                          <Input id="cap" value={cap} onChange={(e) => setCap(e.target.value)} maxLength={5} className="mt-1" data-testid="input-cap" />
+                          <Label htmlFor="cap">{isItaly ? "CAP" : "Codice Postale"} *</Label>
+                          <Input id="cap" value={cap} onChange={(e) => setCap(e.target.value)} maxLength={isItaly ? 5 : 10} className="mt-1" data-testid="input-cap" />
                         </div>
                         <div>
                           <Label htmlFor="citta">Città *</Label>
                           <Input id="citta" value={citta} onChange={(e) => setCitta(e.target.value)} className="mt-1" data-testid="input-citta" />
                         </div>
-                        <div>
-                          <Label htmlFor="provincia">Prov. *</Label>
-                          <Input id="provincia" value={provincia} onChange={(e) => setProvincia(e.target.value.toUpperCase())} maxLength={2} placeholder="VI" className="mt-1" data-testid="input-provincia" />
-                        </div>
+                        {isItaly && (
+                          <div>
+                            <Label htmlFor="provincia">Prov. *</Label>
+                            <Input id="provincia" value={provincia} onChange={(e) => setProvincia(e.target.value.toUpperCase())} maxLength={2} placeholder="VI" className="mt-1" data-testid="input-provincia" />
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex items-start gap-3 p-4 rounded-xl border bg-muted/30">

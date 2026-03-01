@@ -250,6 +250,7 @@ export const shopOrders = pgTable("shop_orders", {
   billingPartitaIva: text("billing_partita_iva"),
   billingCodiceSdi: text("billing_codice_sdi"),
   billingPec: text("billing_pec"),
+  billingPaese: text("billing_paese"),
   notes: text("notes"),
   discountCode: text("discount_code"),
   discountAmount: text("discount_amount"),

@@ -1219,9 +1219,10 @@ export async function registerRoutes(
 
   app.post("/api/shop/purchase", async (req, res) => {
     try {
-      const { paypalOrderId, productSlug, customerFirstName, customerLastName, customerEmail, customerPhone, billingCodiceFiscale, billingIndirizzo, billingCap, billingCitta, billingProvincia, billingPartitaIva, billingCodiceSdi, billingPec, notes } = req.body;
+      const { paypalOrderId, productSlug, customerFirstName, customerLastName, customerEmail, customerPhone, billingCodiceFiscale, billingIndirizzo, billingCap, billingCitta, billingProvincia, billingPaese, billingPartitaIva, billingCodiceSdi, billingPec, notes } = req.body;
 
-      if (billingCodiceFiscale) {
+      const isItalyOrder = !billingPaese || billingPaese === "IT";
+      if (isItalyOrder && billingCodiceFiscale) {
         const cfCheck = validateCodiceFiscale(billingCodiceFiscale, customerFirstName, customerLastName);
         if (!cfCheck.valid) {
           return res.status(400).json({ success: false, message: cfCheck.message });
@@ -1247,6 +1248,7 @@ export async function registerRoutes(
         billingCap: req.body.billingCap || null,
         billingCitta: req.body.billingCitta || null,
         billingProvincia: req.body.billingProvincia || null,
+        billingPaese: req.body.billingPaese || "IT",
         billingPartitaIva: req.body.billingPartitaIva || null,
         billingCodiceSdi: req.body.billingCodiceSdi || null,
         billingPec: req.body.billingPec || null,
@@ -1437,13 +1439,14 @@ export async function registerRoutes(
 
   app.post("/api/shop/purchase-cart", async (req, res) => {
     try {
-      const { paypalOrderId, cartItems: cartItemsJson, customerFirstName, customerLastName, customerEmail, customerPhone, customerPassword, billingCodiceFiscale, billingIndirizzo, billingCap, billingCitta, billingProvincia, billingPartitaIva, billingCodiceSdi, billingPec, notes } = req.body;
+      const { paypalOrderId, cartItems: cartItemsJson, customerFirstName, customerLastName, customerEmail, customerPhone, customerPassword, billingCodiceFiscale, billingIndirizzo, billingCap, billingCitta, billingProvincia, billingPaese, billingPartitaIva, billingCodiceSdi, billingPec, notes } = req.body;
 
       if (!paypalOrderId || !cartItemsJson || !customerFirstName || !customerLastName || !customerEmail) {
         return res.status(400).json({ success: false, message: "Dati mancanti." });
       }
 
-      if (billingCodiceFiscale) {
+      const isItalyOrder = !billingPaese || billingPaese === "IT";
+      if (isItalyOrder && billingCodiceFiscale) {
         const cfCheck = validateCodiceFiscale(billingCodiceFiscale, customerFirstName, customerLastName);
         if (!cfCheck.valid) {
           return res.status(400).json({ success: false, message: cfCheck.message });
@@ -1585,6 +1588,7 @@ export async function registerRoutes(
           billingCap: billingCap || null,
           billingCitta: billingCitta || null,
           billingProvincia: billingProvincia || null,
+          billingPaese: billingPaese || "IT",
           billingPartitaIva: billingPartitaIva || null,
           billingCodiceSdi: billingCodiceSdi || null,
           billingPec: billingPec || null,
@@ -2155,7 +2159,7 @@ export async function registerRoutes(
         customerPassword: customerPwd,
         studentFirstName: stuFirst, studentLastName: stuLast, studentEmail: stuEmail,
         codiceFiscale, billingCodiceFiscale, billingIndirizzo, billingCap,
-        billingCitta, billingProvincia, billingPartitaIva, billingCodiceSdi, billingPec, notes,
+        billingCitta, billingProvincia, billingPaese, billingPartitaIva, billingCodiceSdi, billingPec, notes,
         discountCode,
       } = req.body;
 
@@ -2163,7 +2167,8 @@ export async function registerRoutes(
         return res.status(400).json({ success: false, message: "Codice voucher Carta della Cultura mancante." });
       }
 
-      if (billingCodiceFiscale) {
+      const isItalyOrder = !billingPaese || billingPaese === "IT";
+      if (isItalyOrder && billingCodiceFiscale) {
         const cfCheck = validateCodiceFiscale(billingCodiceFiscale, customerFirstName, customerLastName);
         if (!cfCheck.valid) {
           return res.status(400).json({ success: false, message: cfCheck.message });
@@ -2307,6 +2312,7 @@ export async function registerRoutes(
         billingCap: billingCap || null,
         billingCitta: billingCitta || null,
         billingProvincia: billingProvincia || null,
+        billingPaese: billingPaese || "IT",
         billingPartitaIva: billingPartitaIva || null,
         billingCodiceSdi: billingCodiceSdi || null,
         billingPec: billingPec || null,
@@ -2373,7 +2379,7 @@ export async function registerRoutes(
         customerFirstName, customerLastName, customerEmail, customerPhone,
         customerPassword: customerPwd,
         codiceFiscale, billingCodiceFiscale, billingIndirizzo, billingCap,
-        billingCitta, billingProvincia, billingPartitaIva, billingCodiceSdi, billingPec, notes,
+        billingCitta, billingProvincia, billingPaese, billingPartitaIva, billingCodiceSdi, billingPec, notes,
         discountCode,
       } = req.body;
 
@@ -2384,7 +2390,8 @@ export async function registerRoutes(
         return res.status(400).json({ success: false, message: "Dati cliente mancanti." });
       }
 
-      if (billingCodiceFiscale) {
+      const isItalyOrder = !billingPaese || billingPaese === "IT";
+      if (isItalyOrder && billingCodiceFiscale) {
         const cfCheck = validateCodiceFiscale(billingCodiceFiscale, customerFirstName, customerLastName);
         if (!cfCheck.valid) {
           return res.status(400).json({ success: false, message: cfCheck.message });
@@ -2529,6 +2536,7 @@ export async function registerRoutes(
         billingCap: billingCap || null,
         billingCitta: billingCitta || null,
         billingProvincia: billingProvincia || null,
+        billingPaese: billingPaese || "IT",
         billingPartitaIva: billingPartitaIva || null,
         billingCodiceSdi: billingCodiceSdi || null,
         billingPec: billingPec || null,
