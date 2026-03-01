@@ -119,20 +119,11 @@ export default function EnglishTestPage() {
   const [audioDuration, setAudioDuration] = useState(0);
   const listeningAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  const [audioCheckStep, setAudioCheckStep] = useState<"listening" | "recording" | "playback" | "done">("listening");
-  const [audioCheckPassed, setAudioCheckPassed] = useState({ listening: false, recording: false });
+  const [audioCheckStep, setAudioCheckStep] = useState<"listening" | "mic" | "done">("listening");
+  const [audioCheckPassed, setAudioCheckPassed] = useState({ listening: false, mic: false });
   const [testAudioPlaying, setTestAudioPlaying] = useState(false);
-  const [testRecording, setTestRecording] = useState(false);
-  const [testRecordingBlob, setTestRecordingBlob] = useState<Blob | null>(null);
-  const [testPlaybackPlaying, setTestPlaybackPlaying] = useState(false);
-  const [testMicLevel, setTestMicLevel] = useState(0);
+  const [micCheckStatus, setMicCheckStatus] = useState<"idle" | "checking" | "granted" | "denied">("idle");
   const testAudioRef = useRef<HTMLAudioElement | null>(null);
-  const testMediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const testAudioChunksRef = useRef<Blob[]>([]);
-  const testPlaybackRef = useRef<HTMLAudioElement | null>(null);
-  const testAnalyserRef = useRef<AnalyserNode | null>(null);
-  const testAnimFrameRef = useRef<number>(0);
-  const testStreamRef = useRef<MediaStream | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -258,95 +249,23 @@ export default function EnglishTestPage() {
     }
     setTestAudioPlaying(false);
     setAudioCheckPassed(prev => ({ ...prev, listening: true }));
-    setAudioCheckStep("recording");
+    setAudioCheckStep("mic");
   }, []);
 
-  const startTestRecording = useCallback(async () => {
+  const checkMicPermission = useCallback(async () => {
+    setMicCheckStatus("checking");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      testStreamRef.current = stream;
-      const audioCtx = new AudioContext();
-      const source = audioCtx.createMediaStreamSource(stream);
-      const analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-      source.connect(analyser);
-      testAnalyserRef.current = analyser;
-
-      const updateLevel = () => {
-        if (!testAnalyserRef.current) return;
-        const data = new Uint8Array(testAnalyserRef.current.frequencyBinCount);
-        testAnalyserRef.current.getByteFrequencyData(data);
-        const avg = data.reduce((a, b) => a + b, 0) / data.length;
-        setTestMicLevel(Math.min(100, avg * 2));
-        testAnimFrameRef.current = requestAnimationFrame(updateLevel);
-      };
-      updateLevel();
-
-      const recorder = new MediaRecorder(stream);
-      testAudioChunksRef.current = [];
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) testAudioChunksRef.current.push(e.data);
-      };
-      recorder.onstop = () => {
-        const blob = new Blob(testAudioChunksRef.current, { type: "audio/webm" });
-        setTestRecordingBlob(blob);
-        cancelAnimationFrame(testAnimFrameRef.current);
-        testAnalyserRef.current = null;
-        if (testStreamRef.current) {
-          testStreamRef.current.getTracks().forEach(t => t.stop());
-          testStreamRef.current = null;
-        }
-        setTestRecording(false);
-        setTestMicLevel(0);
-        setAudioCheckStep("playback");
-      };
-      testMediaRecorderRef.current = recorder;
-      recorder.start();
-      setTestRecording(true);
-
-      setTimeout(() => {
-        if (testMediaRecorderRef.current?.state === "recording") {
-          testMediaRecorderRef.current.stop();
-        }
-      }, 5000);
+      stream.getTracks().forEach(t => t.stop());
+      setMicCheckStatus("granted");
+      setAudioCheckPassed(prev => ({ ...prev, mic: true }));
     } catch {
-      toast({ title: "Microphone Error", description: "Could not access your microphone. Please grant permission and try again.", variant: "destructive" });
+      setMicCheckStatus("denied");
+      toast({ title: "Microfono non disponibile", description: "Non è stato possibile accedere al microfono. Controlla i permessi del browser e riprova.", variant: "destructive" });
     }
   }, [toast]);
 
-  const stopTestRecording = useCallback(() => {
-    if (testMediaRecorderRef.current?.state === "recording") {
-      testMediaRecorderRef.current.stop();
-    }
-  }, []);
-
-  const playTestRecording = useCallback(() => {
-    if (!testRecordingBlob) return;
-    if (testPlaybackRef.current) {
-      testPlaybackRef.current.pause();
-      testPlaybackRef.current = null;
-      setTestPlaybackPlaying(false);
-      return;
-    }
-    const url = URL.createObjectURL(testRecordingBlob);
-    const audio = new Audio(url);
-    audio.addEventListener("ended", () => {
-      setTestPlaybackPlaying(false);
-      testPlaybackRef.current = null;
-      URL.revokeObjectURL(url);
-    });
-    testPlaybackRef.current = audio;
-    audio.play();
-    setTestPlaybackPlaying(true);
-  }, [testRecordingBlob]);
-
-  const confirmRecordingOk = useCallback(() => {
-    if (testPlaybackRef.current) {
-      testPlaybackRef.current.pause();
-      testPlaybackRef.current = null;
-    }
-    setTestPlaybackPlaying(false);
-    setAudioCheckPassed(prev => ({ ...prev, recording: true }));
+  const confirmMicOk = useCallback(() => {
     setAudioCheckStep("done");
     setPhase("self-assessment");
   }, []);
@@ -844,9 +763,9 @@ export default function EnglishTestPage() {
                   </div>
                   <div className={`flex-1 h-1 rounded-full ${audioCheckPassed.listening ? "bg-green-500" : "bg-slate-200 dark:bg-slate-700"}`} />
                   <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${
-                    audioCheckStep === "recording" || audioCheckStep === "playback" ? "bg-blue-600 text-white" : audioCheckPassed.recording ? "bg-green-500 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-400"
+                    audioCheckStep === "mic" ? "bg-blue-600 text-white" : audioCheckPassed.mic ? "bg-green-500 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-400"
                   }`}>
-                    {audioCheckPassed.recording ? <CheckCircle className="w-4 h-4" /> : "2"}
+                    {audioCheckPassed.mic ? <CheckCircle className="w-4 h-4" /> : "2"}
                   </div>
                 </div>
               </div>
@@ -902,108 +821,64 @@ export default function EnglishTestPage() {
                   </div>
                 )}
 
-                {audioCheckStep === "recording" && (
-                  <div className="space-y-5" data-testid="audio-check-recording">
+                {audioCheckStep === "mic" && (
+                  <div className="space-y-5" data-testid="audio-check-mic">
                     <div className="rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-5">
                       <div className="flex items-center gap-2 mb-3">
                         <Mic className="w-4 h-4 text-emerald-500" />
-                        <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Step 2: Test Microfono</span>
+                        <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Step 2: Verifica Microfono</span>
                       </div>
                       <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                        Clicca il pulsante e parla per qualche secondo. Verifica che il microfono rilevi la tua voce.
+                        Il test include una sezione di speaking. Verifica che il tuo microfono sia disponibile.
                       </p>
-                      {!testRecording ? (
+
+                      {micCheckStatus === "idle" && (
                         <button
-                          onClick={startTestRecording}
+                          onClick={checkMicPermission}
                           className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-all active:scale-95"
-                          data-testid="button-start-test-recording"
+                          data-testid="button-check-mic"
                         >
-                          <Mic className="w-4 h-4" /> Inizia Registrazione
+                          <Mic className="w-4 h-4" /> Verifica Microfono
                         </button>
-                      ) : (
+                      )}
+
+                      {micCheckStatus === "checking" && (
+                        <div className="flex items-center gap-2 text-sm text-slate-500">
+                          <Loader2 className="w-4 h-4 animate-spin" /> Verifica in corso...
+                        </div>
+                      )}
+
+                      {micCheckStatus === "granted" && (
+                        <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+                          <CheckCircle className="w-5 h-5" /> Microfono disponibile
+                        </div>
+                      )}
+
+                      {micCheckStatus === "denied" && (
                         <div className="space-y-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
-                            <span className="text-sm font-medium text-red-600 dark:text-red-400">Registrazione in corso...</span>
-                            <button
-                              onClick={stopTestRecording}
-                              className="ml-auto flex items-center gap-2 px-4 py-2 rounded-xl text-sm bg-red-600 hover:bg-red-700 text-white transition-all active:scale-95"
-                              data-testid="button-stop-test-recording"
-                            >
-                              <MicOff className="w-4 h-4" /> Stop
-                            </button>
+                          <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400 font-medium">
+                            <MicOff className="w-5 h-5" /> Microfono non disponibile
                           </div>
-                          <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
-                            <div
-                              className="bg-emerald-500 h-3 rounded-full transition-all duration-100"
-                              style={{ width: `${testMicLevel}%` }}
-                              data-testid="mic-level-bar"
-                            />
-                          </div>
-                          <p className="text-xs text-slate-500">Parla chiaramente — la barra sopra mostra il livello del microfono</p>
+                          <button
+                            onClick={checkMicPermission}
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-all"
+                            data-testid="button-retry-mic"
+                          >
+                            <RotateCcw className="w-4 h-4" /> Riprova
+                          </button>
                         </div>
                       )}
                     </div>
-                  </div>
-                )}
 
-                {audioCheckStep === "playback" && (
-                  <div className="space-y-5" data-testid="audio-check-playback">
-                    <div className="rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-5">
-                      <div className="flex items-center gap-2 mb-3">
-                        <CheckCircle className="w-4 h-4 text-emerald-500" />
-                        <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Step 2: Riascolto</span>
-                      </div>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                        Riascolta la tua registrazione per verificare che il microfono funzioni bene.
-                      </p>
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={playTestRecording}
-                          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all ${
-                            testPlaybackPlaying
-                              ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700"
-                              : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md active:scale-95"
-                          }`}
-                          data-testid="button-play-test-recording"
-                        >
-                          {testPlaybackPlaying ? (
-                            <><Pause className="w-4 h-4" /> Pausa</>
-                          ) : (
-                            <><Play className="w-4 h-4" /> Riascolta</>
-                          )}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setTestRecordingBlob(null);
-                            setAudioCheckStep("recording");
-                          }}
-                          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
-                          data-testid="button-redo-recording"
-                        >
-                          <RotateCcw className="w-4 h-4" /> Riprova
-                        </button>
-                      </div>
-                    </div>
-                    <div className="flex gap-3">
+                    {micCheckStatus === "granted" && (
                       <Button
-                        onClick={confirmRecordingOk}
-                        className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-xl"
-                        data-testid="button-recording-ok"
+                        onClick={confirmMicOk}
+                        className="w-full bg-green-600 hover:bg-green-700 text-white rounded-xl"
+                        data-testid="button-mic-ok"
                       >
-                        <CheckCircle className="w-4 h-4 mr-2" /> Mi sento bene, procedi
+                        <CheckCircle className="w-4 h-4 mr-2" /> Tutto funziona, procedi
                       </Button>
-                      <Button
-                        onClick={() => {
-                          toast({ title: "Suggerimento", description: "Controlla che il microfono sia collegato e che il browser abbia i permessi per accedervi.", variant: "destructive" });
-                        }}
-                        variant="outline"
-                        className="flex-1 rounded-xl"
-                        data-testid="button-recording-not-ok"
-                      >
-                        Non mi sento
-                      </Button>
-                    </div>
+                    )}
                   </div>
                 )}
               </div>
