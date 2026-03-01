@@ -14,6 +14,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useLocation, Link } from "wouter";
 import { useCart } from "@/lib/cart-context";
 import { COUNTRIES } from "@shared/countries";
+import { PROVINCES } from "@shared/provinces";
 import {
   Select,
   SelectContent,
@@ -927,7 +928,16 @@ export default function CartCheckout() {
                         {isItaly && (
                           <div className="space-y-2">
                             <Label htmlFor="provincia">Provincia *</Label>
-                            <Input id="provincia" value={provincia} onChange={(e) => setProvincia(e.target.value.toUpperCase())} maxLength={2} placeholder="es. VI" data-testid="input-provincia" />
+                            <Select value={provincia} onValueChange={setProvincia}>
+                              <SelectTrigger data-testid="select-provincia">
+                                <SelectValue placeholder="Seleziona..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {PROVINCES.map((p) => (
+                                  <SelectItem key={p.sigla} value={p.sigla}>{p.sigla} - {p.nome}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </div>
                         )}
                       </div>
