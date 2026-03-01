@@ -35,7 +35,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/bando-detail.tsx` - Individual bando/funded course detail page
 - `src/pages/speakers-corner.tsx` - Speaker's Corner landing page with login
 - `src/pages/speakers-corner-dashboard.tsx` - Subscriber dashboard for booking sessions
-- `src/pages/admin.tsx` - General admin panel (contacts, newsletter, blog, shop orders, materials, General English + Business English adaptive test results, user management)
+- `src/pages/admin.tsx` - General admin panel (contacts, newsletter, blog, shop orders, materials, English adaptive test results, user management)
 - `src/pages/speakers-corner-admin.tsx` - Admin panel for managing subscribers, sessions, email settings
 - `src/pages/blog.tsx` - Blog listing page
 - `src/pages/blog-post.tsx` - Blog post detail page
@@ -43,7 +43,6 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/corsi-italiano.tsx` - Italian for Foreigners page with IT/EN bilingual toggle, course pricing, Vicenza info, contact form
 - `src/pages/language-tests.tsx` - Language test landing page at `/test-di-livello` where users select which language test to take. English is available; Italian, German, French, Spanish shown as "coming soon".
 - `src/pages/english-test.tsx` - General English Adaptive Test at `/english-test` with CAT/IRT engine, 5 MC sections (grammar, vocabulary, use of English, reading, listening), writing + speaking AI-scored tasks, anti-cheating measures. Topics cover daily life, travel, food, health, education, technology, entertainment, sports, environment, and culture. Company field is optional.
-- `src/pages/business-english-test.tsx` - Business English Adaptive Test at `/business-english-test` with same CAT/IRT engine but max 5 questions per section (vs 25 for general). Shorter, faster test (~10 min) using same question bank. Business-themed branding with amber/orange color scheme.
 - `src/pages/cookie-policy.tsx` - GDPR cookie policy
 - `src/pages/privacy-policy.tsx` - GDPR privacy policy
 - `src/components/` - Reusable UI components
@@ -67,8 +66,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `storage.ts` - PostgreSQL database storage (Drizzle ORM)
 - `ai-chat.ts` - AI chat endpoint (OpenAI GPT-4o-mini with full site context)
 - `english-test.ts` - AI scoring for English test (GPT-4o writing/speaking scoring, Whisper transcription)
-- `cat-engine.ts` - CAT/IRT engine (2PL model, EAP Bayesian theta update, Fisher Information SE update, theta ×100). General test: min 5, max 25 questions/section. Business test: max 5 questions/section. SE threshold 40 for early stop. Level stability rule: last 3 consecutive answers must be at the same CEFR level before SE-based early stop is allowed. Detailed [CAT] logging on each answer.
-- `routes.ts` uses `registerTestRoutes()` factory function to register both `/api/english-test/*` (general, max 25) and `/api/business-english-test/*` (business, max 5) routes from same code. Admin results filtered by `testType` column.
+- `cat-engine.ts` - CAT/IRT engine (2PL model, EAP Bayesian theta update, Fisher Information SE update, theta ×100). Min 5, max 25 questions/section. SE threshold 40 for early stop. Level stability rule: last 3 consecutive answers must be at the same CEFR level before SE-based early stop is allowed. Detailed [CAT] logging on each answer.
 - `english-test-questions.ts` - Question bank for General English test (450 questions, 5 skills x 6 levels x 15 per cell, difficulty spread ±40 within each level)
 - `email.ts` - AWS SES email notifications (contact, newsletter, subscription payment, booking confirmation, English test results)
 - `crm.ts` - CRM webhook integration (forwards contact submissions)

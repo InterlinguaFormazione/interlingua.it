@@ -17,7 +17,7 @@ import {
   updateTheta, updateStandardError, thetaToCEFR, selfAssessmentToTheta,
   checkA0HardFail, calculateFinalLevel,
   getWritingPrompt, getSpeakingPrompt, SECTION_SKILLS,
-  shouldEndSection, MAX_QUESTIONS_PER_SECTION, BUSINESS_MAX_QUESTIONS_PER_SECTION, isLevelStable
+  shouldEndSection, MAX_QUESTIONS_PER_SECTION,  isLevelStable
 } from "./cat-engine";
 import { sendEnglishTestResultEmail, sendEnglishTestConfirmationEmail } from "./email";
 import multer from "multer";
@@ -2201,7 +2201,6 @@ export async function registerRoutes(
   } // end registerTestRoutes
 
   registerTestRoutes("/api/english-test", "general", MAX_QUESTIONS_PER_SECTION);
-  registerTestRoutes("/api/business-english-test", "business", BUSINESS_MAX_QUESTIONS_PER_SECTION);
 
   function registerAdminTestResultRoutes(adminPrefix: string, testType: string) {
     app.get(adminPrefix, requireAdmin, async (_req, res) => {
@@ -2251,7 +2250,6 @@ export async function registerRoutes(
   }
 
   registerAdminTestResultRoutes("/api/admin/english-test-results", "general");
-  registerAdminTestResultRoutes("/api/admin/business-english-results", "business");
 
   return httpServer;
 }

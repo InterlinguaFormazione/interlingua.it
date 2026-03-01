@@ -370,7 +370,7 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm" data-testid="table-be-results">
+          <table className="w-full text-sm" data-testid="table-results">
             <thead>
               <tr className="border-b">
                 <th className="text-left py-3 px-2">Candidate</th>
@@ -386,7 +386,7 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
             </thead>
             <tbody>
               {filtered.map(s => (
-                <tr key={s.id} className="border-b hover:bg-muted/50" data-testid={`row-be-result-${s.id}`}>
+                <tr key={s.id} className="border-b hover:bg-muted/50" data-testid={`row-result-${s.id}`}>
                   <td className="py-2 px-2">
                     <div className="font-medium">{s.firstName} {s.lastName}</div>
                     <div className="text-xs text-muted-foreground">{s.email}</div>
@@ -400,225 +400,6 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
                   <td className="text-center px-2 text-xs">{s.completedAt ? new Date(s.completedAt).toLocaleDateString("it-IT") : s.startedAt ? new Date(s.startedAt).toLocaleDateString("it-IT") : "-"}</td>
                   <td className="text-right px-2">
                     <Button variant="ghost" size="sm" onClick={() => setSelectedId(s.id)} data-testid={`button-view-${s.id}`}>
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function BusinessEnglishAdaptiveTab({ token }: { token: string }) {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [filterCompany, setFilterCompany] = useState("");
-  const [filterLevel, setFilterLevel] = useState("");
-
-  const { data: sessions = [], isLoading } = useQuery<BeSession[]>({
-    queryKey: ["/api/admin/business-english-results"],
-    queryFn: async () => {
-      const res = await fetch("/api/admin/business-english-results", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return res.json();
-    },
-  });
-
-  const { data: detail } = useQuery<BeSessionDetail>({
-    queryKey: ["/api/admin/business-english-results", selectedId],
-    queryFn: async () => {
-      const res = await fetch(`/api/admin/business-english-results/${selectedId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return res.json();
-    },
-    enabled: !!selectedId,
-  });
-
-  const filtered = sessions.filter(s => {
-    if (filterCompany && !s.company.toLowerCase().includes(filterCompany.toLowerCase())) return false;
-    if (filterLevel && filterLevel !== "all" && s.finalLevel !== filterLevel) return false;
-    return true;
-  });
-
-  const levelBadge = (level: string | null) => {
-    if (!level) return null;
-    const colors: Record<string, string> = {
-      A0: "bg-gray-500", A1: "bg-red-500", A2: "bg-orange-500",
-      B1: "bg-yellow-500 text-black", B2: "bg-blue-500", C1: "bg-green-600",
-    };
-    return <span className={`px-2 py-0.5 rounded text-white text-xs font-bold ${colors[level] || "bg-gray-500"}`}>{level}</span>;
-  };
-
-  if (selectedId && detail) {
-    return (
-      <div className="space-y-4">
-        <Button variant="outline" onClick={() => setSelectedId(null)} data-testid="button-back-to-biz-list">
-          Back to list
-        </Button>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>{detail.session.firstName} {detail.session.lastName}</CardTitle>
-            <CardDescription>{detail.session.email}{detail.session.company ? ` - ${detail.session.company}` : ""}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="p-3 bg-muted rounded-lg">
-                <div className="text-sm text-muted-foreground">Final Level</div>
-                <div className="text-2xl font-bold mt-1">{levelBadge(detail.session.finalLevel)}</div>
-              </div>
-              <div className="p-3 bg-muted rounded-lg">
-                <div className="text-sm text-muted-foreground">MC Score</div>
-                <div className="text-lg font-bold mt-1">{detail.session.correctAnswers}/{detail.session.totalQuestions}</div>
-              </div>
-              <div className="p-3 bg-muted rounded-lg">
-                <div className="text-sm text-muted-foreground">Status</div>
-                <div className="mt-1"><Badge variant={detail.session.status === "completed" ? "default" : "secondary"}>{detail.session.status}</Badge></div>
-              </div>
-            </div>
-
-            {detail.sectionResults.length > 0 && (
-              <div>
-                <h4 className="font-semibold mb-2">Section Results</h4>
-                <table className="w-full text-sm">
-                  <thead><tr className="border-b"><th className="text-left py-2">Section</th><th className="text-center">Level</th><th className="text-center">Accuracy</th><th className="text-center">Theta</th></tr></thead>
-                  <tbody>
-                    {detail.sectionResults.map((s, i) => (
-                      <tr key={i} className="border-b">
-                        <td className="py-2 capitalize">{s.sectionName.replace(/_/g, " ")}</td>
-                        <td className="text-center">{levelBadge(s.cefrLevel)}</td>
-                        <td className="text-center">{s.accuracyPercentage ?? "-"}%</td>
-                        <td className="text-center">{s.finalTheta ?? "-"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {detail.writingSpeaking.length > 0 && (
-              <div>
-                <h4 className="font-semibold mb-2">Writing / Speaking</h4>
-                {detail.writingSpeaking.map((ws, i) => (
-                  <div key={i} className="p-4 bg-muted rounded-lg mb-3">
-                    <div className="flex justify-between items-center mb-2">
-                      <Badge>{ws.taskType}</Badge>
-                      {levelBadge(ws.aiScore)}
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-1"><strong>Prompt:</strong> {ws.prompt}</p>
-                    <p className="text-sm mb-2"><strong>Response:</strong> {ws.response.substring(0, 200)}{ws.response.length > 200 ? "..." : ""}</p>
-                    {ws.aiGrammarScore !== null && (
-                      <div className="grid grid-cols-4 gap-2 text-xs mb-2">
-                        <div>Grammar: {ws.aiGrammarScore}</div>
-                        <div>Vocabulary: {ws.aiVocabularyScore}</div>
-                        <div>Coherence: {ws.aiCoherenceScore}</div>
-                        <div>Task: {ws.aiTaskCompletionScore}</div>
-                      </div>
-                    )}
-                    {ws.aiFeedback && <p className="text-sm italic text-muted-foreground">{ws.aiFeedback}</p>}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {detail.responses.length > 0 && (
-              <div>
-                <h4 className="font-semibold mb-2">IRT Audit Trail ({detail.responses.length} responses)</h4>
-                <div className="max-h-80 overflow-y-auto">
-                  <table className="w-full text-xs">
-                    <thead><tr className="border-b bg-muted"><th className="text-left py-1 px-2">#</th><th className="text-left px-2">Skill</th><th className="text-left px-2">Question</th><th className="text-center px-2">Correct</th><th className="text-center px-2">Theta</th><th className="text-center px-2">Time</th></tr></thead>
-                    <tbody>
-                      {detail.responses.map((r, i) => (
-                        <tr key={i} className="border-b">
-                          <td className="py-1 px-2">{i + 1}</td>
-                          <td className="px-2 capitalize">{r.skillType?.replace(/_/g, " ") ?? ""}</td>
-                          <td className="px-2 max-w-[200px] truncate">{r.question?.substring(0, 60)}</td>
-                          <td className="text-center px-2">{r.isCorrect ? "Y" : "N"}</td>
-                          <td className="text-center px-2">{r.thetaBefore} → {r.thetaAfter}</td>
-                          <td className="text-center px-2">{r.timeSpent ? `${r.timeSpent}s` : "-"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="flex gap-3">
-        <Input
-          placeholder="Filter by company..."
-          value={filterCompany}
-          onChange={e => setFilterCompany(e.target.value)}
-          className="max-w-xs"
-          data-testid="input-filter-biz-company"
-        />
-        <Select value={filterLevel} onValueChange={setFilterLevel}>
-          <SelectTrigger className="w-[140px]" data-testid="select-filter-biz-level">
-            <SelectValue placeholder="All levels" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All levels</SelectItem>
-            <SelectItem value="A0">A0</SelectItem>
-            <SelectItem value="A1">A1</SelectItem>
-            <SelectItem value="A2">A2</SelectItem>
-            <SelectItem value="B1">B1</SelectItem>
-            <SelectItem value="B2">B2</SelectItem>
-            <SelectItem value="C1">C1</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {isLoading ? (
-        <div className="space-y-3">{[1, 2, 3].map(i => <div key={i} className="h-16 bg-muted rounded animate-pulse" />)}</div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p>No Business English test results yet.</p>
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm" data-testid="table-biz-results">
-            <thead>
-              <tr className="border-b">
-                <th className="text-left py-3 px-2">Candidate</th>
-                <th className="text-left px-2">Company</th>
-                <th className="text-center px-2">Level</th>
-                <th className="text-center px-2">MC</th>
-                <th className="text-center px-2">Writing</th>
-                <th className="text-center px-2">Speaking</th>
-                <th className="text-center px-2">Status</th>
-                <th className="text-center px-2">Date</th>
-                <th className="text-right px-2"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(s => (
-                <tr key={s.id} className="border-b hover:bg-muted/50" data-testid={`row-biz-result-${s.id}`}>
-                  <td className="py-2 px-2">
-                    <div className="font-medium">{s.firstName} {s.lastName}</div>
-                    <div className="text-xs text-muted-foreground">{s.email}</div>
-                  </td>
-                  <td className="px-2">{s.company}</td>
-                  <td className="text-center px-2">{levelBadge(s.finalLevel)}</td>
-                  <td className="text-center px-2">{s.correctAnswers}/{s.totalQuestions}</td>
-                  <td className="text-center px-2">{s.writingScore ? levelBadge(s.writingScore) : "-"}</td>
-                  <td className="text-center px-2">{s.speakingScore ? levelBadge(s.speakingScore) : "-"}</td>
-                  <td className="text-center px-2"><Badge variant={s.status === "completed" ? "default" : "secondary"}>{s.status}</Badge></td>
-                  <td className="text-center px-2 text-xs">{s.completedAt ? new Date(s.completedAt).toLocaleDateString("it-IT") : s.startedAt ? new Date(s.startedAt).toLocaleDateString("it-IT") : "-"}</td>
-                  <td className="text-right px-2">
-                    <Button variant="ghost" size="sm" onClick={() => setSelectedId(s.id)} data-testid={`button-view-biz-${s.id}`}>
                       <Eye className="w-4 h-4" />
                     </Button>
                   </td>
@@ -701,102 +482,58 @@ function CourseMaterialsTab({ token }: { token: string }) {
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Materiali Didattici</CardTitle>
-          <CardDescription>Gestisci i file scaricabili per ogni corso acquistato</CardDescription>
+          <CardDescription>File scaricabili per i corsi acquistati</CardDescription>
         </div>
-        <Button size="sm" onClick={() => setShowForm(!showForm)} data-testid="button-add-material">
-          <Plus className="w-4 h-4 mr-1" />
-          Aggiungi
+        <Button onClick={() => setShowForm(!showForm)} size="sm">
+          {showForm ? "Chiudi" : <><Plus className="w-4 h-4 mr-2" /> Aggiungi</>}
         </Button>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         {showForm && (
-          <form onSubmit={handleAdd} className="border rounded-lg p-4 mb-6 space-y-3 bg-muted/30">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="mat-slug">Slug Prodotto *</Label>
-                <Input
-                  id="mat-slug"
-                  value={newSlug}
-                  onChange={(e) => setNewSlug(e.target.value)}
-                  placeholder="es. ai-senza-segreti"
-                  className="mt-1"
-                  data-testid="input-material-slug"
-                />
+          <form onSubmit={handleAdd} className="p-4 border rounded-lg bg-muted/30 space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Product Slug (es. camclass-selflearning)</Label>
+                <Input value={newSlug} onChange={e => setNewSlug(e.target.value)} required />
               </div>
-              <div>
-                <Label htmlFor="mat-name">Nome File *</Label>
-                <Input
-                  id="mat-name"
-                  value={newFileName}
-                  onChange={(e) => setNewFileName(e.target.value)}
-                  placeholder="es. Dispensa Modulo 1.pdf"
-                  className="mt-1"
-                  data-testid="input-material-name"
-                />
+              <div className="space-y-2">
+                <Label>File Name</Label>
+                <Input value={newFileName} onChange={e => setNewFileName(e.target.value)} required />
               </div>
             </div>
-            <div>
-              <Label htmlFor="mat-url">URL del File *</Label>
-              <Input
-                id="mat-url"
-                value={newFileUrl}
-                onChange={(e) => setNewFileUrl(e.target.value)}
-                placeholder="https://..."
-                className="mt-1"
-                data-testid="input-material-url"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="mat-size">Dimensione</Label>
-                <Input
-                  id="mat-size"
-                  value={newFileSize}
-                  onChange={(e) => setNewFileSize(e.target.value)}
-                  placeholder="es. 2.5 MB"
-                  className="mt-1"
-                  data-testid="input-material-size"
-                />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>File URL</Label>
+                <Input value={newFileUrl} onChange={e => setNewFileUrl(e.target.value)} required />
               </div>
-              <div>
-                <Label htmlFor="mat-desc">Descrizione</Label>
-                <Input
-                  id="mat-desc"
-                  value={newDescription}
-                  onChange={(e) => setNewDescription(e.target.value)}
-                  placeholder="es. Slides lezione 1"
-                  className="mt-1"
-                  data-testid="input-material-desc"
-                />
+              <div className="space-y-2">
+                <Label>File Size (es. 2.4 MB)</Label>
+                <Input value={newFileSize} onChange={e => setNewFileSize(e.target.value)} />
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button type="submit" size="sm" disabled={addMutation.isPending} data-testid="button-save-material">
-                {addMutation.isPending ? "Salvataggio..." : "Salva"}
-              </Button>
-              <Button type="button" variant="outline" size="sm" onClick={() => setShowForm(false)}>
-                Annulla
-              </Button>
+            <div className="space-y-2">
+              <Label>Description</Label>
+              <Input value={newDescription} onChange={e => setNewDescription(e.target.value)} />
             </div>
+            <Button type="submit" disabled={addMutation.isPending} className="w-full">
+              {addMutation.isPending ? "Salvataggio..." : "Salva Materiale"}
+            </Button>
           </form>
         )}
 
         {isLoading ? (
           <div className="text-center py-8 text-muted-foreground">Caricamento...</div>
         ) : materials.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            Nessun materiale caricato. Aggiungi file che i clienti potranno scaricare dalla loro area personale.
-          </div>
+          <div className="text-center py-8 text-muted-foreground">Nessun materiale ancora</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left py-3 px-2 font-medium">Corso (slug)</th>
+                  <th className="text-left py-3 px-2 font-medium">Slug</th>
                   <th className="text-left py-3 px-2 font-medium">Nome File</th>
-                  <th className="text-left py-3 px-2 font-medium">Descrizione</th>
-                  <th className="text-left py-3 px-2 font-medium">Dim.</th>
-                  <th className="text-center py-3 px-2 font-medium">Azioni</th>
+                  <th className="text-left py-3 px-2 font-medium">Size</th>
+                  <th className="text-right py-3 px-2 font-medium">Azioni</th>
                 </tr>
               </thead>
               <tbody>
@@ -804,16 +541,18 @@ function CourseMaterialsTab({ token }: { token: string }) {
                   <tr key={m.id} className="border-b last:border-0" data-testid={`row-material-${m.id}`}>
                     <td className="py-3 px-2 font-mono text-xs">{m.productSlug}</td>
                     <td className="py-3 px-2 font-medium">{m.fileName}</td>
-                    <td className="py-3 px-2 text-muted-foreground text-xs">{m.description || "-"}</td>
-                    <td className="py-3 px-2 text-muted-foreground text-xs">{m.fileSize || "-"}</td>
-                    <td className="py-3 px-2 text-center">
+                    <td className="py-3 px-2 text-muted-foreground">{m.fileSize || "-"}</td>
+                    <td className="py-3 px-2 text-right">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-red-500 hover:text-red-700"
-                        onClick={() => deleteMutation.mutate(m.id)}
+                        onClick={() => {
+                          if (confirm("Eliminare questo materiale?")) {
+                            deleteMutation.mutate(m.id);
+                          }
+                        }}
                         disabled={deleteMutation.isPending}
-                        data-testid={`button-delete-material-${m.id}`}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -829,934 +568,585 @@ function CourseMaterialsTab({ token }: { token: string }) {
   );
 }
 
-interface AdminUser {
-  id: string;
-  username: string;
-  name: string;
-  email: string;
-  role: string;
-  active: boolean | null;
-  createdAt: string | null;
-}
-
-interface ContactSubmission {
-  id: number;
-  name: string;
-  email: string;
-  phone: string | null;
-  company: string | null;
-  message: string;
-  interest: string | null;
-  createdAt: string | null;
-}
-
-interface NewsletterSub {
-  id: number;
-  email: string;
-  createdAt: string | null;
-}
-
-interface BlogPost {
-  id: number;
-  title: string;
-  slug: string;
-  excerpt: string;
-  publishedAt: string | null;
-}
-
-function adminFetch(url: string, token: string, options?: RequestInit) {
-  return fetch(url, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      ...(options?.headers || {}),
-    },
-  });
-}
-
-export default function AdminPage() {
-  const [token, setToken] = useState<string | null>(() => sessionStorage.getItem("admin_token"));
-  const [currentUser, setCurrentUser] = useState<AdminUser | null>(() => {
-    const stored = sessionStorage.getItem("admin_user");
-    return stored ? JSON.parse(stored) : null;
-  });
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [, setLocation] = useLocation();
-  const { toast } = useToast();
-
-  const [newUser, setNewUser] = useState({ username: "", password: "", name: "", email: "", role: "staff" });
-  const [userDialogOpen, setUserDialogOpen] = useState(false);
-  const [editUser, setEditUser] = useState<AdminUser | null>(null);
-  const [editUserData, setEditUserData] = useState({ name: "", email: "", role: "", password: "" });
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-
-  const authenticated = !!token;
-  const isAdmin = currentUser?.role === "admin";
-
-  const loginMutation = useMutation({
-    mutationFn: async (data: { username: string; password: string }) => {
-      const res = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) {
-        const body = await res.json();
-        throw new Error(body.message || "Errore di accesso");
-      }
-      return res.json();
-    },
-    onSuccess: (data) => {
-      setToken(data.token);
-      setCurrentUser(data.user);
-      sessionStorage.setItem("admin_token", data.token);
-      sessionStorage.setItem("admin_user", JSON.stringify(data.user));
-      setUsername("");
-      setPassword("");
-    },
-    onError: (error: Error) => {
-      toast({ title: "Accesso negato", description: error.message, variant: "destructive" });
-    },
-  });
-
-  const { data: adminUsers = [], isLoading: usersLoading } = useQuery<AdminUser[]>({
-    queryKey: ["/api/admin/users"],
-    enabled: authenticated && isAdmin,
-    queryFn: async () => {
-      const res = await adminFetch("/api/admin/users", token!);
-      if (res.status === 401) { handleLogout(); throw new Error("Sessione scaduta"); }
-      if (!res.ok) throw new Error("Errore nel caricamento");
-      return res.json();
-    },
-  });
-
-  const { data: contacts = [], isLoading: contactsLoading } = useQuery<ContactSubmission[]>({
+function ContactsTab({ token }: { token: string }) {
+  const { data: contacts = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/admin/contacts"],
-    enabled: authenticated,
     queryFn: async () => {
-      const res = await adminFetch("/api/admin/contacts", token!);
-      if (res.status === 401) { handleLogout(); throw new Error("Sessione scaduta"); }
-      if (!res.ok) throw new Error("Errore nel caricamento");
+      const res = await fetch("/api/admin/contacts", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       return res.json();
     },
   });
 
-  const { data: newsletter = [], isLoading: newsletterLoading } = useQuery<NewsletterSub[]>({
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Richieste di Contatto</CardTitle>
+        <CardDescription>Messaggi ricevuti dal modulo di contatto</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="text-center py-8">Caricamento...</div>
+        ) : contacts.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">Nessun messaggio ricevuto</div>
+        ) : (
+          <div className="space-y-4">
+            {contacts.map((c) => (
+              <div key={c.id} className="p-4 border rounded-lg bg-muted/30" data-testid={`contact-card-${c.id}`}>
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h3 className="font-bold">{c.name}</h3>
+                    <p className="text-sm text-muted-foreground">{c.email} | {c.phone || "No phone"}</p>
+                  </div>
+                  <Badge variant="outline">{c.courseInterest || "Generale"}</Badge>
+                </div>
+                <p className="text-sm mt-3 border-t pt-3">{c.message}</p>
+                <p className="text-[10px] text-muted-foreground mt-2">Ricevuto: {new Date(c.createdAt).toLocaleString("it-IT")}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function NewsletterTab({ token }: { token: string }) {
+  const { data: subs = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/admin/newsletter"],
-    enabled: authenticated,
     queryFn: async () => {
-      const res = await adminFetch("/api/admin/newsletter", token!);
-      if (res.status === 401) { handleLogout(); throw new Error("Sessione scaduta"); }
-      if (!res.ok) throw new Error("Errore nel caricamento");
+      const res = await fetch("/api/admin/newsletter", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       return res.json();
     },
   });
 
-  const { data: blogPosts = [], isLoading: blogLoading } = useQuery<BlogPost[]>({
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Iscritti Newsletter</CardTitle>
+        <CardDescription>Utenti che desiderano ricevere aggiornamenti</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="text-center py-8">Caricamento...</div>
+        ) : subs.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">Nessun iscritto</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-3 px-2 font-medium">Email</th>
+                  <th className="text-right py-3 px-2 font-medium">Data Iscrizione</th>
+                </tr>
+              </thead>
+              <tbody>
+                {subs.map((s) => (
+                  <tr key={s.id} className="border-b last:border-0" data-testid={`newsletter-row-${s.id}`}>
+                    <td className="py-3 px-2">{s.email}</td>
+                    <td className="py-3 px-2 text-right text-muted-foreground text-xs">
+                      {new Date(s.createdAt).toLocaleDateString("it-IT")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function BlogTab({ token }: { token: string }) {
+  const { data: posts = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/admin/blog"],
-    enabled: authenticated,
     queryFn: async () => {
-      const res = await adminFetch("/api/admin/blog", token!);
-      if (res.status === 401) { handleLogout(); throw new Error("Sessione scaduta"); }
-      if (!res.ok) throw new Error("Errore nel caricamento");
-      return res.json();
-    },
-  });
-
-  const createUserMutation = useMutation({
-    mutationFn: async (data: typeof newUser) => {
-      const res = await adminFetch("/api/admin/users", token!, {
-        method: "POST",
-        body: JSON.stringify(data),
+      const res = await fetch("/api/admin/blog", {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) {
-        const body = await res.json();
-        throw new Error(body.message || "Errore nella creazione");
-      }
       return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      toast({ title: "Utente creato", description: "Il nuovo utente è stato aggiunto." });
-      setNewUser({ username: "", password: "", name: "", email: "", role: "staff" });
-      setUserDialogOpen(false);
-    },
-    onError: (error: Error) => {
-      toast({ title: "Errore", description: error.message, variant: "destructive" });
     },
   });
 
-  const toggleUserMutation = useMutation({
-    mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
-      const res = await adminFetch(`/api/admin/users/${id}`, token!, {
-        method: "PATCH",
-        body: JSON.stringify({ active }),
-      });
-      if (!res.ok) throw new Error("Errore nell'aggiornamento");
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      toast({ title: "Aggiornato", description: "Stato utente aggiornato." });
-    },
-  });
-
-  const updateUserMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Record<string, any> }) => {
-      const payload: Record<string, any> = {};
-      if (data.name) payload.name = data.name;
-      if (data.email !== undefined) payload.email = data.email;
-      if (data.role) payload.role = data.role;
-      if (data.password) payload.password = data.password;
-      const res = await adminFetch(`/api/admin/users/${id}`, token!, {
-        method: "PATCH",
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const body = await res.json();
-        throw new Error(body.message || "Errore nell'aggiornamento");
-      }
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      toast({ title: "Utente aggiornato", description: "Le modifiche sono state salvate." });
-      setEditDialogOpen(false);
-      setEditUser(null);
-    },
-    onError: (error: Error) => {
-      toast({ title: "Errore", description: error.message, variant: "destructive" });
-    },
-  });
-
-  const deleteUserMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const res = await adminFetch(`/api/admin/users/${id}`, token!, { method: "DELETE" });
-      if (!res.ok) {
-        const body = await res.json();
-        throw new Error(body.message || "Errore nell'eliminazione");
-      }
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      toast({ title: "Utente eliminato" });
-    },
-    onError: (error: Error) => {
-      toast({ title: "Errore", description: error.message, variant: "destructive" });
-    },
-  });
-
-  const generateBlogMutation = useMutation({
+  const generateMutation = useMutation({
     mutationFn: async () => {
-      const res = await adminFetch("/api/admin/blog/generate", token!, { method: "POST" });
-      if (res.status === 401) { handleLogout(); throw new Error("Sessione scaduta"); }
-      if (!res.ok) throw new Error("Errore nella generazione");
+      const res = await fetch("/api/admin/blog/generate", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/blog"] });
-      toast({ title: "Articolo generato", description: "Un nuovo articolo del blog è stato creato." });
-    },
-    onError: () => {
-      toast({ title: "Errore", description: "Errore nella generazione dell'articolo.", variant: "destructive" });
     },
   });
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!username || !password) {
-      toast({ title: "Campi obbligatori", description: "Inserisci username e password.", variant: "destructive" });
-      return;
-    }
-    loginMutation.mutate({ username, password });
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>Blog Management</CardTitle>
+          <CardDescription>Gestione post generati dall'AI</CardDescription>
+        </div>
+        <Button 
+          onClick={() => generateMutation.mutate()} 
+          disabled={generateMutation.isPending}
+          size="sm"
+        >
+          {generateMutation.isPending ? "Generando..." : "Genera Nuovo Post"}
+        </Button>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="text-center py-8">Caricamento...</div>
+        ) : posts.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">Nessun post generato</div>
+        ) : (
+          <div className="space-y-4">
+            {posts.map((p) => (
+              <div key={p.id} className="p-4 border rounded-lg bg-muted/30 flex justify-between items-center" data-testid={`blog-post-${p.id}`}>
+                <div>
+                  <h3 className="font-bold">{p.title}</h3>
+                  <p className="text-xs text-muted-foreground">Slug: {p.slug}</p>
+                </div>
+                <Badge variant={p.published ? "default" : "secondary"}>
+                  {p.published ? "Pubblicato" : "Bozza"}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function UsersTab({ token, currentUserId }: { token: string; currentUserId: string }) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<any>(null);
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+    name: "",
+    email: "",
+    role: "staff",
+  });
+  const { toast } = useToast();
+
+  const { data: users = [], isLoading } = useQuery<any[]>({
+    queryKey: ["/api/admin/users"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return res.json();
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: async (data: any) => {
+      const method = editingUser ? "PATCH" : "POST";
+      const url = editingUser ? `/api/admin/users/${editingUser.id}` : "/api/admin/users";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Errore durante il salvataggio");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      setIsDialogOpen(false);
+      setEditingUser(null);
+      setFormData({ username: "", password: "", name: "", email: "", role: "staff" });
+      toast({ title: "Successo", description: "Utente salvato correttamente" });
+    },
+    onError: (error: any) => {
+      toast({ title: "Errore", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/admin/users/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Errore durante l'eliminazione");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      toast({ title: "Successo", description: "Utente eliminato correttamente" });
+    },
+  });
+
+  const handleEdit = (user: any) => {
+    setEditingUser(user);
+    setFormData({
+      username: user.username,
+      password: "",
+      name: user.name,
+      email: user.email || "",
+      role: user.role,
+    });
+    setIsDialogOpen(true);
   };
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>Gestione Utenti</CardTitle>
+          <CardDescription>Amministratori e staff del pannello</CardDescription>
+        </div>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) {
+            setEditingUser(null);
+            setFormData({ username: "", password: "", name: "", email: "", role: "staff" });
+          }
+        }}>
+          <DialogTrigger asChild>
+            <Button size="sm"><UserPlus className="w-4 h-4 mr-2" /> Nuovo Utente</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{editingUser ? "Modifica Utente" : "Crea Nuovo Utente"}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>Nome Completo</Label>
+                <Input 
+                  value={formData.name} 
+                  onChange={e => setFormData({ ...formData, name: e.target.value })} 
+                  placeholder="es. Mario Rossi"
+                  data-testid="input-user-name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Username</Label>
+                <Input 
+                  value={formData.username} 
+                  onChange={e => setFormData({ ...formData, username: e.target.value })} 
+                  disabled={!!editingUser}
+                  placeholder="username"
+                  data-testid="input-user-username"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <Input 
+                  value={formData.email} 
+                  onChange={e => setFormData({ ...formData, email: e.target.value })} 
+                  type="email"
+                  placeholder="email@esempio.it"
+                  data-testid="input-user-email"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>{editingUser ? "Nuova Password (lascia vuoto per non cambiare)" : "Password"}</Label>
+                <Input 
+                  value={formData.password} 
+                  onChange={e => setFormData({ ...formData, password: e.target.value })} 
+                  type="password"
+                  data-testid="input-user-password"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Ruolo</Label>
+                <Select value={formData.role} onValueChange={val => setFormData({ ...formData, role: val })}>
+                  <SelectTrigger data-testid="select-user-role">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="staff">Staff</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button 
+                className="w-full mt-4" 
+                onClick={() => mutation.mutate(formData)}
+                disabled={mutation.isPending}
+                data-testid="button-save-user"
+              >
+                {mutation.isPending ? "Salvataggio..." : "Salva"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="text-center py-8">Caricamento...</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-3 px-2">Nome</th>
+                  <th className="text-left py-3 px-2">Username</th>
+                  <th className="text-left py-3 px-2">Ruolo</th>
+                  <th className="text-left py-3 px-2">Stato</th>
+                  <th className="text-right py-3 px-2">Azioni</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u.id} className="border-b last:border-0" data-testid={`user-row-${u.id}`}>
+                    <td className="py-3 px-2 font-medium">{u.name}</td>
+                    <td className="py-3 px-2 text-muted-foreground">{u.username}</td>
+                    <td className="py-3 px-2">
+                      <Badge variant={u.role === "admin" ? "default" : "outline"}>
+                        {u.role === "admin" ? "Admin" : "Staff"}
+                      </Badge>
+                    </td>
+                    <td className="py-3 px-2">
+                      <Badge variant={u.active ? "success" : "secondary"}>
+                        {u.active ? "Attivo" : "Inattivo"}
+                      </Badge>
+                    </td>
+                    <td className="py-3 px-2 text-right space-x-2">
+                      <Button variant="ghost" size="sm" onClick={() => handleEdit(u)} data-testid={`button-edit-user-${u.id}`}>
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => {
+                          if (confirm("Sei sicuro di voler eliminare questo utente?")) {
+                            deleteMutation.mutate(u.id);
+                          }
+                        }}
+                        disabled={deleteMutation.isPending || u.id === currentUserId}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        data-testid={`button-delete-user-${u.id}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function AdminPage() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [token, setToken] = useState<string | null>(localStorage.getItem("admin_token"));
+  const [user, setUser] = useState<any>(JSON.parse(localStorage.getItem("admin_user") || "null"));
+  const [showPassword, setShowPassword] = useState(false);
+  const { toast } = useToast();
+  const [, setLocation] = useLocation();
+
+  const loginMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      if (!res.ok) throw new Error("Credenziali non valide");
+      return res.json();
+    },
+    onSuccess: (data) => {
+      setToken(data.token);
+      setUser(data.user);
+      localStorage.setItem("admin_token", data.token);
+      localStorage.setItem("admin_user", JSON.stringify(data.user));
+    },
+    onError: () => {
+      toast({
+        title: "Errore di accesso",
+        description: "Username o password non validi",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleLogout = () => {
     setToken(null);
-    setCurrentUser(null);
-    sessionStorage.removeItem("admin_token");
-    sessionStorage.removeItem("admin_user");
+    setUser(null);
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("admin_user");
   };
 
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return "—";
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("it-IT", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  if (!authenticated) {
+  if (!token) {
     return (
-      <div className="min-h-screen">
-        <Navigation />
-        <main className="pt-28 pb-20">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md mx-auto">
-              <Card data-testid="card-admin-login">
-                <CardHeader className="text-center">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Shield className="w-8 h-8 text-primary" />
-                  </div>
-                  <CardTitle>Pannello Amministrazione</CardTitle>
-                  <CardDescription>
-                    Inserisci le tue credenziali per accedere.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleLogin} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="admin-username">Username o Email</Label>
-                      <Input
-                        id="admin-username"
-                        type="text"
-                        placeholder="Username o email"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        data-testid="input-admin-username"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="admin-password">Password</Label>
-                      <div className="relative">
-                        <Input
-                          id="admin-password"
-                          type={showPassword ? "text" : "password"}
-                          placeholder="La tua password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          data-testid="input-admin-password"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                          data-testid="button-toggle-password"
-                        >
-                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </div>
-                    </div>
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={loginMutation.isPending}
-                      data-testid="button-admin-login"
-                    >
-                      <Lock className="w-4 h-4 mr-2" />
-                      {loginMutation.isPending ? "Accesso in corso..." : "Accedi"}
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-xl border-slate-200">
+          <CardHeader className="text-center">
+            <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-200">
+              <Shield className="w-8 h-8 text-white" />
             </div>
-          </div>
-        </main>
-        <Footer />
+            <CardTitle className="text-2xl font-bold">Admin Panel</CardTitle>
+            <CardDescription>Accedi per gestire il sito Interlingua/SkillCraft</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form 
+              onSubmit={(e) => { e.preventDefault(); loginMutation.mutate(); }}
+              className="space-y-4"
+            >
+              <div className="space-y-2">
+                <Label htmlFor="username">Username o Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                  <Input 
+                    id="username" 
+                    value={username} 
+                    onChange={(e) => setUsername(e.target.value)} 
+                    className="pl-10" 
+                    placeholder="admin"
+                    data-testid="input-username"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                  <Input 
+                    id="password" 
+                    type={showPassword ? "text" : "password"} 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    className="pl-10 pr-10" 
+                    placeholder="••••••••"
+                    data-testid="input-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-slate-400 hover:text-slate-600 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              <Button 
+                type="submit" 
+                className="w-full bg-blue-600 hover:bg-blue-700 h-11" 
+                disabled={loginMutation.isPending}
+                data-testid="button-login"
+              >
+                {loginMutation.isPending ? (
+                  <RefreshCw className="w-4 h-4 animate-spin mr-2" />
+                ) : null}
+                Accedi
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full text-slate-500 text-sm"
+                onClick={() => setLocation("/")}
+              >
+                Torna al sito
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  const tabCount = isAdmin ? 4 : 3;
-
   return (
-    <div className="min-h-screen">
-      <Navigation />
-      <main className="pt-28 pb-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <Shield className="w-8 h-8 text-primary" />
-              <div>
-                <h1 className="text-3xl font-bold text-foreground" data-testid="text-admin-title">
-                  Pannello Amministrazione
-                </h1>
-                <p className="text-muted-foreground">
-                  Benvenuto, {currentUser?.name}
-                  <Badge variant="secondary" className="ml-2 text-xs">
-                    {currentUser?.role === "admin" ? "Amministratore" : "Staff"}
-                  </Badge>
-                </p>
-              </div>
+    <div className="min-h-screen bg-slate-50">
+      <div className="bg-white border-b sticky top-0 z-30 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <Shield className="w-4 h-4 text-white" />
             </div>
-            <Button
-              variant="outline"
-              onClick={handleLogout}
-              data-testid="button-admin-logout"
-            >
+            <span className="font-bold text-slate-900">Admin Area</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-medium leading-none">{user?.name}</p>
+              <p className="text-xs text-slate-500 mt-1">{user?.role?.toUpperCase()}</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleLogout} data-testid="button-logout">
               Esci
             </Button>
           </div>
+        </div>
+      </div>
 
-          <div className="grid md:grid-cols-4 gap-4 mb-8">
-            <Card data-testid="card-stat-contacts">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <MessageSquare className="w-5 h-5 text-primary" />
-                  <div>
-                    <p className="text-2xl font-bold">{contacts.length}</p>
-                    <p className="text-sm text-muted-foreground">Messaggi ricevuti</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card data-testid="card-stat-newsletter">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <Mail className="w-5 h-5 text-primary" />
-                  <div>
-                    <p className="text-2xl font-bold">{newsletter.length}</p>
-                    <p className="text-sm text-muted-foreground">Iscritti newsletter</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card data-testid="card-stat-blog">
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <Newspaper className="w-5 h-5 text-primary" />
-                  <div>
-                    <p className="text-2xl font-bold">{blogPosts.length}</p>
-                    <p className="text-sm text-muted-foreground">Articoli blog</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card
-              className="cursor-pointer hover:border-primary/50 transition-colors"
-              onClick={() => setLocation("/speakers-corner/admin")}
-              data-testid="card-link-sc-admin"
-            >
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-3">
-                  <Mic className="w-5 h-5 text-primary" />
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">Speaker's Corner</p>
-                    <p className="text-sm text-muted-foreground">Gestisci iscritti e sessioni</p>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground ml-auto" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Tabs defaultValue="contacts" className="space-y-6">
-            <TabsList className={`grid w-full ${isAdmin ? "grid-cols-8" : "grid-cols-7"}`}>
-              <TabsTrigger value="contacts" data-testid="tab-contacts">
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Messaggi
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        <Tabs defaultValue="contacts" className="space-y-6">
+          <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+            <TabsList className="bg-white border shadow-sm h-auto p-1 flex w-max sm:w-full">
+              <TabsTrigger value="contacts" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" /> Contacts
               </TabsTrigger>
-              <TabsTrigger value="newsletter" data-testid="tab-newsletter">
-                <Mail className="w-4 h-4 mr-2" />
-                Newsletter
+              <TabsTrigger value="newsletter" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
+                <Mail className="w-4 h-4" /> Newsletter
               </TabsTrigger>
-              <TabsTrigger value="orders" data-testid="tab-orders">
-                <ShoppingBag className="w-4 h-4 mr-2" />
-                Ordini
+              <TabsTrigger value="blog" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
+                <Newspaper className="w-4 h-4" /> Blog
               </TabsTrigger>
-              <TabsTrigger value="materials" data-testid="tab-materials">
-                <FileText className="w-4 h-4 mr-2" />
-                Materiali
+              <TabsTrigger value="shop-orders" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
+                <ShoppingBag className="w-4 h-4" /> Shop Orders
               </TabsTrigger>
-              <TabsTrigger value="blog" data-testid="tab-blog">
-                <Newspaper className="w-4 h-4 mr-2" />
-                Blog
+              <TabsTrigger value="materials" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
+                <FileText className="w-4 h-4" /> Materials
               </TabsTrigger>
-              <TabsTrigger value="english-test" data-testid="tab-english-test">
-                <GraduationCap className="w-4 h-4 mr-2" />
-                General Test
+              <TabsTrigger value="english-test" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
+                <GraduationCap className="w-4 h-4" /> English Test
               </TabsTrigger>
-              <TabsTrigger value="business-english-test" data-testid="tab-business-english-test">
-                <Briefcase className="w-4 h-4 mr-2" />
-                Business Test
-              </TabsTrigger>
-              {isAdmin && (
-                <TabsTrigger value="users" data-testid="tab-users">
-                  <Users className="w-4 h-4 mr-2" />
-                  Utenti
+              {user?.role === "admin" && (
+                <TabsTrigger value="users" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
+                  <Users className="w-4 h-4" /> Users
                 </TabsTrigger>
               )}
             </TabsList>
+          </div>
 
-            <TabsContent value="contacts">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Messaggi dal Modulo Contatti</CardTitle>
-                  <CardDescription>Tutti i messaggi ricevuti dal form di contatto del sito</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {contactsLoading ? (
-                    <div className="space-y-3">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-20 bg-muted rounded animate-pulse" />
-                      ))}
-                    </div>
-                  ) : contacts.length === 0 ? (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>Nessun messaggio ricevuto.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {[...contacts].reverse().map((contact) => (
-                        <div
-                          key={contact.id}
-                          className="p-4 rounded-lg border bg-card"
-                          data-testid={`row-contact-${contact.id}`}
-                        >
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                <span className="text-primary font-semibold text-sm">
-                                  {contact.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
-                                </span>
-                              </div>
-                              <div>
-                                <p className="font-medium text-foreground">{contact.name}</p>
-                                <p className="text-sm text-muted-foreground">{contact.email}</p>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xs text-muted-foreground">{formatDate(contact.createdAt)}</p>
-                              {contact.interest && (
-                                <Badge variant="secondary" className="mt-1 text-xs">
-                                  {contact.interest}
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                          {contact.phone && (
-                            <p className="text-sm text-muted-foreground mb-1">
-                              Tel: <a href={`tel:${contact.phone}`} className="text-primary hover:underline">{contact.phone}</a>
-                            </p>
-                          )}
-                          {contact.company && (
-                            <p className="text-sm text-muted-foreground mb-1">
-                              Azienda: {contact.company}
-                            </p>
-                          )}
-                          <p className="text-sm text-foreground mt-2 bg-muted/50 p-3 rounded-md">
-                            {contact.message}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+          <TabsContent value="contacts">
+            <ContactsTab token={token} />
+          </TabsContent>
+          <TabsContent value="newsletter">
+            <NewsletterTab token={token} />
+          </TabsContent>
+          <TabsContent value="blog">
+            <BlogTab token={token} />
+          </TabsContent>
+          <TabsContent value="shop-orders">
+            <ShopOrdersTab token={token} />
+          </TabsContent>
+          <TabsContent value="materials">
+            <CourseMaterialsTab token={token} />
+          </TabsContent>
+          <TabsContent value="english-test">
+            <Card>
+              <CardHeader>
+                <CardTitle>English Adaptive Test Results</CardTitle>
+                <CardDescription>Adaptive test results</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <EnglishAdaptiveTab token={token} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+          {user?.role === "admin" && (
+            <TabsContent value="users">
+              <UsersTab token={token} currentUserId={user.id} />
             </TabsContent>
-
-            <TabsContent value="newsletter">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Iscritti alla Newsletter</CardTitle>
-                  <CardDescription>Elenco di tutti gli iscritti alla newsletter</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {newsletterLoading ? (
-                    <div className="space-y-3">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-12 bg-muted rounded animate-pulse" />
-                      ))}
-                    </div>
-                  ) : newsletter.length === 0 ? (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <Mail className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>Nessun iscritto alla newsletter.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {[...newsletter].reverse().map((sub) => (
-                        <div
-                          key={sub.id}
-                          className="flex items-center justify-between p-3 rounded-lg border bg-card"
-                          data-testid={`row-newsletter-${sub.id}`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                              <Mail className="w-4 h-4 text-primary" />
-                            </div>
-                            <p className="font-medium text-foreground">{sub.email}</p>
-                          </div>
-                          <p className="text-xs text-muted-foreground">{formatDate(sub.createdAt)}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="orders">
-              <ShopOrdersTab token={token} />
-            </TabsContent>
-
-            <TabsContent value="materials">
-              <CourseMaterialsTab token={token} />
-            </TabsContent>
-
-            <TabsContent value="blog">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <div>
-                    <CardTitle>Gestione Blog</CardTitle>
-                    <CardDescription>Articoli pubblicati e generazione automatica</CardDescription>
-                  </div>
-                  <Button
-                    onClick={() => generateBlogMutation.mutate()}
-                    disabled={generateBlogMutation.isPending}
-                    data-testid="button-generate-blog"
-                  >
-                    <RefreshCw className={`w-4 h-4 mr-2 ${generateBlogMutation.isPending ? "animate-spin" : ""}`} />
-                    {generateBlogMutation.isPending ? "Generazione..." : "Genera Articolo"}
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  {blogLoading ? (
-                    <div className="space-y-3">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="h-16 bg-muted rounded animate-pulse" />
-                      ))}
-                    </div>
-                  ) : blogPosts.length === 0 ? (
-                    <div className="text-center py-12 text-muted-foreground">
-                      <Newspaper className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p>Nessun articolo pubblicato. Genera il primo articolo.</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {[...blogPosts].reverse().map((post) => (
-                        <div
-                          key={post.id}
-                          className="flex items-center justify-between p-4 rounded-lg border bg-card"
-                          data-testid={`row-blog-${post.id}`}
-                        >
-                          <div className="flex-1 mr-4">
-                            <p className="font-medium text-foreground">{post.title}</p>
-                            <p className="text-sm text-muted-foreground line-clamp-1">{post.excerpt}</p>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <p className="text-xs text-muted-foreground whitespace-nowrap">
-                              {formatDate(post.publishedAt)}
-                            </p>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setLocation(`/blog/${post.slug}`)}
-                              data-testid={`button-view-blog-${post.id}`}
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="english-test">
-              <Card>
-                <CardHeader>
-                  <CardTitle>General English Adaptive Test Results</CardTitle>
-                  <CardDescription>General English adaptive test results with IRT audit trail</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <EnglishAdaptiveTab token={token} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="business-english-test">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Business English Test Results</CardTitle>
-                  <CardDescription>Business English adaptive test results with IRT audit trail</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <BusinessEnglishAdaptiveTab token={token} />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {isAdmin && (
-              <TabsContent value="users">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <div>
-                      <CardTitle>Gestione Utenti</CardTitle>
-                      <CardDescription>Crea e gestisci utenti admin e staff</CardDescription>
-                    </div>
-                    <Dialog open={userDialogOpen} onOpenChange={setUserDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button data-testid="button-add-user">
-                          <UserPlus className="w-4 h-4 mr-2" />
-                          Nuovo Utente
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Crea Nuovo Utente</DialogTitle>
-                        </DialogHeader>
-                        <form
-                          onSubmit={(e) => {
-                            e.preventDefault();
-                            const pwd = newUser.password;
-                            if (pwd.length < 8 || !/[A-Z]/.test(pwd) || !/[a-z]/.test(pwd) || !/[0-9]/.test(pwd) || !/[^A-Za-z0-9]/.test(pwd)) {
-                              toast({ title: "Password troppo debole", description: "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale.", variant: "destructive" });
-                              return;
-                            }
-                            createUserMutation.mutate(newUser);
-                          }}
-                          className="space-y-4"
-                        >
-                          <div className="space-y-2">
-                            <Label htmlFor="new-user-name">Nome e Cognome</Label>
-                            <Input
-                              id="new-user-name"
-                              value={newUser.name}
-                              onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                              required
-                              data-testid="input-new-user-name"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="new-user-username">Username</Label>
-                            <Input
-                              id="new-user-username"
-                              value={newUser.username}
-                              onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
-                              required
-                              data-testid="input-new-user-username"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="new-user-email">Email</Label>
-                            <Input
-                              id="new-user-email"
-                              type="email"
-                              value={newUser.email}
-                              onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                              data-testid="input-new-user-email"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="new-user-password">Password</Label>
-                            <Input
-                              id="new-user-password"
-                              type="password"
-                              value={newUser.password}
-                              onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                              required
-                              placeholder="Min. 8 caratteri, maiuscola, numero, speciale"
-                              data-testid="input-new-user-password"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="new-user-role">Ruolo</Label>
-                            <Select
-                              value={newUser.role}
-                              onValueChange={(value) => setNewUser({ ...newUser, role: value })}
-                            >
-                              <SelectTrigger data-testid="select-new-user-role">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="staff">Staff</SelectItem>
-                                <SelectItem value="admin">Amministratore</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <Button
-                            type="submit"
-                            className="w-full"
-                            disabled={createUserMutation.isPending}
-                            data-testid="button-create-user"
-                          >
-                            {createUserMutation.isPending ? "Creazione..." : "Crea Utente"}
-                          </Button>
-                        </form>
-                      </DialogContent>
-                    </Dialog>
-                  </CardHeader>
-                  <CardContent>
-                    {usersLoading ? (
-                      <div className="space-y-3">
-                        {[1, 2, 3].map((i) => (
-                          <div key={i} className="h-16 bg-muted rounded animate-pulse" />
-                        ))}
-                      </div>
-                    ) : adminUsers.length === 0 ? (
-                      <div className="text-center py-12 text-muted-foreground">
-                        <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                        <p>Nessun utente trovato.</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {adminUsers.map((user) => (
-                          <div
-                            key={user.id}
-                            className="flex items-center justify-between p-4 rounded-lg border bg-card"
-                            data-testid={`row-user-${user.id}`}
-                          >
-                            <div className="flex items-center gap-4">
-                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                <span className="text-primary font-semibold text-sm">
-                                  {user.name ? user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) : user.username.slice(0, 2).toUpperCase()}
-                                </span>
-                              </div>
-                              <div>
-                                <p className="font-medium text-foreground">{user.name || user.username}</p>
-                                <p className="text-sm text-muted-foreground">@{user.username}{user.email ? ` · ${user.email}` : ""}</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                              <Badge variant={user.role === "admin" ? "default" : "secondary"}>
-                                {user.role === "admin" ? "Admin" : "Staff"}
-                              </Badge>
-                              {user.active ? (
-                                <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                  Attivo
-                                </Badge>
-                              ) : (
-                                <Badge variant="secondary">Disattivo</Badge>
-                              )}
-                              <Switch
-                                checked={user.active ?? true}
-                                onCheckedChange={(checked) => toggleUserMutation.mutate({ id: user.id, active: checked })}
-                                disabled={user.id === currentUser?.id}
-                                data-testid={`switch-user-${user.id}`}
-                              />
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  setEditUser(user);
-                                  setEditUserData({
-                                    name: user.name,
-                                    email: user.email || "",
-                                    role: user.role,
-                                    password: "",
-                                  });
-                                  setEditDialogOpen(true);
-                                }}
-                                data-testid={`button-edit-user-${user.id}`}
-                              >
-                                <Pencil className="w-4 h-4" />
-                              </Button>
-                              {user.id !== currentUser?.id && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    if (confirm("Sei sicuro di voler eliminare questo utente?")) {
-                                      deleteUserMutation.mutate(user.id);
-                                    }
-                                  }}
-                                  data-testid={`button-delete-user-${user.id}`}
-                                >
-                                  <Trash2 className="w-4 h-4 text-destructive" />
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-
-                <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Modifica Utente — @{editUser?.username}</DialogTitle>
-                    </DialogHeader>
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        if (editUserData.password) {
-                          const pwd = editUserData.password;
-                          if (pwd.length < 8 || !/[A-Z]/.test(pwd) || !/[a-z]/.test(pwd) || !/[0-9]/.test(pwd) || !/[^A-Za-z0-9]/.test(pwd)) {
-                            toast({ title: "Password troppo debole", description: "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale.", variant: "destructive" });
-                            return;
-                          }
-                        }
-                        if (editUser) {
-                          updateUserMutation.mutate({ id: editUser.id, data: editUserData });
-                        }
-                      }}
-                      className="space-y-4"
-                    >
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-user-name">Nome e Cognome</Label>
-                        <Input
-                          id="edit-user-name"
-                          value={editUserData.name}
-                          onChange={(e) => setEditUserData({ ...editUserData, name: e.target.value })}
-                          required
-                          data-testid="input-edit-user-name"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-user-email">Email</Label>
-                        <Input
-                          id="edit-user-email"
-                          type="email"
-                          value={editUserData.email}
-                          onChange={(e) => setEditUserData({ ...editUserData, email: e.target.value })}
-                          data-testid="input-edit-user-email"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-user-role">Ruolo</Label>
-                        <Select
-                          value={editUserData.role}
-                          onValueChange={(value) => setEditUserData({ ...editUserData, role: value })}
-                        >
-                          <SelectTrigger data-testid="select-edit-user-role">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="staff">Staff</SelectItem>
-                            <SelectItem value="admin">Amministratore</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="edit-user-password">Nuova Password (lascia vuoto per non cambiarla)</Label>
-                        <Input
-                          id="edit-user-password"
-                          type="password"
-                          value={editUserData.password}
-                          onChange={(e) => setEditUserData({ ...editUserData, password: e.target.value })}
-                          placeholder="Lascia vuoto per non modificare"
-                          data-testid="input-edit-user-password"
-                        />
-                      </div>
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={updateUserMutation.isPending}
-                        data-testid="button-save-user"
-                      >
-                        {updateUserMutation.isPending ? "Salvataggio..." : "Salva Modifiche"}
-                      </Button>
-                    </form>
-                  </DialogContent>
-                </Dialog>
-              </TabsContent>
-            )}
-          </Tabs>
-        </div>
+          )}
+        </Tabs>
       </main>
       <Footer />
     </div>
