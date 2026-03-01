@@ -1666,7 +1666,7 @@ export async function registerRoutes(
       }
       const customer = await storage.getShopCustomerById(session.customerId);
       if (!customer) return res.status(401).json({ success: false, message: "Cliente non trovato." });
-      res.json({ id: customer.id, name: customer.name, email: customer.email, phone: customer.phone || "" });
+      res.json({ id: customer.id, name: customer.name, email: customer.email, phone: customer.phone || "", codiceFiscale: customer.codiceFiscale || "", indirizzo: customer.indirizzo || "", cap: customer.cap || "", citta: customer.citta || "", provincia: customer.provincia || "" });
     } catch (error) {
       console.error("Shop me error:", error);
       res.status(500).json({ success: false, message: "Errore del server." });
@@ -1702,14 +1702,29 @@ export async function registerRoutes(
         return res.status(401).json({ success: false, message: "Sessione scaduta." });
       }
 
-      const { name, phone, currentPassword, newPassword } = req.body;
-      const updateData: Partial<{ name: string; phone: string; password: string }> = {};
+      const { name, phone, codiceFiscale, indirizzo, cap, citta, provincia, currentPassword, newPassword } = req.body;
+      const updateData: Partial<{ name: string; phone: string; password: string; codiceFiscale: string; indirizzo: string; cap: string; citta: string; provincia: string }> = {};
 
       if (name && typeof name === "string" && name.trim()) {
         updateData.name = name.trim();
       }
       if (phone !== undefined) {
         updateData.phone = typeof phone === "string" ? phone.trim() : "";
+      }
+      if (codiceFiscale !== undefined) {
+        updateData.codiceFiscale = typeof codiceFiscale === "string" ? codiceFiscale.trim().toUpperCase() : "";
+      }
+      if (indirizzo !== undefined) {
+        updateData.indirizzo = typeof indirizzo === "string" ? indirizzo.trim() : "";
+      }
+      if (cap !== undefined) {
+        updateData.cap = typeof cap === "string" ? cap.trim() : "";
+      }
+      if (citta !== undefined) {
+        updateData.citta = typeof citta === "string" ? citta.trim() : "";
+      }
+      if (provincia !== undefined) {
+        updateData.provincia = typeof provincia === "string" ? provincia.trim().toUpperCase() : "";
       }
 
       if (newPassword) {
@@ -1737,7 +1752,7 @@ export async function registerRoutes(
       const updated = await storage.updateShopCustomer(session.customerId, updateData);
       if (!updated) return res.status(404).json({ success: false, message: "Cliente non trovato." });
 
-      res.json({ success: true, customer: { id: updated.id, name: updated.name, email: updated.email, phone: updated.phone } });
+      res.json({ success: true, customer: { id: updated.id, name: updated.name, email: updated.email, phone: updated.phone || "", codiceFiscale: updated.codiceFiscale || "", indirizzo: updated.indirizzo || "", cap: updated.cap || "", citta: updated.citta || "", provincia: updated.provincia || "" } });
     } catch (error) {
       console.error("Shop profile update error:", error);
       res.status(500).json({ success: false, message: "Errore del server." });

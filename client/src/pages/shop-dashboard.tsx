@@ -34,6 +34,11 @@ interface CustomerInfo {
   name: string;
   email: string;
   phone?: string;
+  codiceFiscale?: string;
+  indirizzo?: string;
+  cap?: string;
+  citta?: string;
+  provincia?: string;
 }
 
 interface Order {
@@ -66,6 +71,11 @@ export default function ShopDashboard() {
   const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
   const [profileName, setProfileName] = useState("");
   const [profilePhone, setProfilePhone] = useState("");
+  const [profileCF, setProfileCF] = useState("");
+  const [profileIndirizzo, setProfileIndirizzo] = useState("");
+  const [profileCap, setProfileCap] = useState("");
+  const [profileCitta, setProfileCitta] = useState("");
+  const [profileProvincia, setProfileProvincia] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -92,6 +102,11 @@ export default function ShopDashboard() {
         setCustomer(data);
         setProfileName(data.name || "");
         setProfilePhone(data.phone || "");
+        setProfileCF(data.codiceFiscale || "");
+        setProfileIndirizzo(data.indirizzo || "");
+        setProfileCap(data.cap || "");
+        setProfileCitta(data.citta || "");
+        setProfileProvincia(data.provincia || "");
       } else {
         localStorage.removeItem("shop_customer_token");
         setToken(null);
@@ -112,7 +127,7 @@ export default function ShopDashboard() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: profileName, phone: profilePhone }),
+        body: JSON.stringify({ name: profileName, phone: profilePhone, codiceFiscale: profileCF, indirizzo: profileIndirizzo, cap: profileCap, citta: profileCitta, provincia: profileProvincia }),
       });
       const data = await res.json();
       if (data.success) {
@@ -433,20 +448,89 @@ export default function ShopDashboard() {
                       </div>
                     </div>
                   </div>
-                  <div>
-                    <Label htmlFor="profile-email">Email</Label>
-                    <div className="relative mt-1">
-                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="profile-email">Email</Label>
+                      <div className="relative mt-1">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                        <Input
+                          id="profile-email"
+                          value={customer.email}
+                          disabled
+                          className="pl-9 opacity-60"
+                          data-testid="input-profile-email"
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">L'email non può essere modificata</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="profile-cf">Codice Fiscale</Label>
                       <Input
-                        id="profile-email"
-                        value={customer.email}
-                        disabled
-                        className="pl-9 opacity-60"
-                        data-testid="input-profile-email"
+                        id="profile-cf"
+                        value={profileCF}
+                        onChange={(e) => setProfileCF(e.target.value.toUpperCase())}
+                        placeholder="RSSMRA85M01H501Z"
+                        maxLength={16}
+                        className="mt-1 uppercase"
+                        data-testid="input-profile-cf"
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">L'email non può essere modificata</p>
                   </div>
+
+                  <div className="border-t pt-4 mt-2">
+                    <p className="text-sm font-medium mb-3">Indirizzo di Fatturazione</p>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="profile-indirizzo">Indirizzo</Label>
+                        <Input
+                          id="profile-indirizzo"
+                          value={profileIndirizzo}
+                          onChange={(e) => setProfileIndirizzo(e.target.value)}
+                          placeholder="Via Roma, 1"
+                          className="mt-1"
+                          data-testid="input-profile-indirizzo"
+                        />
+                      </div>
+                      <div className="grid grid-cols-3 gap-4">
+                        <div>
+                          <Label htmlFor="profile-cap">CAP</Label>
+                          <Input
+                            id="profile-cap"
+                            value={profileCap}
+                            onChange={(e) => setProfileCap(e.target.value)}
+                            placeholder="36100"
+                            maxLength={5}
+                            className="mt-1"
+                            data-testid="input-profile-cap"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="profile-citta">Città</Label>
+                          <Input
+                            id="profile-citta"
+                            value={profileCitta}
+                            onChange={(e) => setProfileCitta(e.target.value)}
+                            placeholder="Vicenza"
+                            className="mt-1"
+                            data-testid="input-profile-citta"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="profile-provincia">Provincia</Label>
+                          <Input
+                            id="profile-provincia"
+                            value={profileProvincia}
+                            onChange={(e) => setProfileProvincia(e.target.value.toUpperCase())}
+                            placeholder="VI"
+                            maxLength={2}
+                            className="mt-1 uppercase"
+                            data-testid="input-profile-provincia"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   <Button type="submit" disabled={profileLoading} data-testid="button-save-profile">
                     {profileLoading ? (
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />

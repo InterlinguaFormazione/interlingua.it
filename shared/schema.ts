@@ -209,6 +209,11 @@ export const shopCustomers = pgTable("shop_customers", {
   password: text("password").notNull(),
   name: text("name").notNull(),
   phone: text("phone"),
+  codiceFiscale: text("codice_fiscale"),
+  indirizzo: text("indirizzo"),
+  cap: text("cap"),
+  citta: text("citta"),
+  provincia: text("provincia"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
