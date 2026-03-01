@@ -52,6 +52,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { PROVINCES } from "@shared/provinces";
+import { COUNTRIES } from "@shared/countries";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -312,18 +313,40 @@ function CoachingContactForm({ packageTitle, gradient }: { packageTitle: string;
   const [success, setSuccess] = useState(false);
   const [lingua, setLingua] = useState("");
   const [livello, setLivello] = useState("");
+  const [paese, setPaese] = useState("IT");
+  const isItaly = paese === "IT";
   const [provincia, setProvincia] = useState("");
+  const [comuniList, setComuniList] = useState<Array<{ nome: string; cap: string[] }>>([]);
+  const [loadingComuni, setLoadingComuni] = useState(false);
+  const [citta, setCitta] = useState("");
   const [comeConosciuto, setComeConosciuto] = useState("");
   const [newsletter, setNewsletter] = useState(false);
   const [gdpr, setGdpr] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (isItaly && provincia) {
+      setLoadingComuni(true);
+      setCitta("");
+      setComuniList([]);
+      fetch(`/api/comuni/${provincia}`)
+        .then((r) => r.json())
+        .then((data) => setComuniList(data))
+        .catch(() => setComuniList([]))
+        .finally(() => setLoadingComuni(false));
+    } else {
+      setComuniList([]);
+    }
+  }, [provincia, isItaly]);
 
   const mutation = useMutation({
     mutationFn: async (formData: FormData) => {
       const parts = [
         `Lingua: ${lingua}`,
         `Livello: ${livello}`,
-        `Provincia: ${provincia}`,
+        `Paese: ${COUNTRIES.find(c => c.code === paese)?.name || paese}`,
+        isItaly ? `Provincia: ${provincia}` : "",
+        citta ? `Città: ${citta}` : "",
         formData.get("azienda") ? `Azienda: ${formData.get("azienda")}` : "",
         `Come conosciuto: ${comeConosciuto}`,
         newsletter ? "Newsletter: Si" : "",
@@ -361,7 +384,9 @@ function CoachingContactForm({ packageTitle, gradient }: { packageTitle: string;
     if (!fd.get("telefono")) newErrors.telefono = "Campo obbligatorio";
     if (!lingua) newErrors.lingua = "Seleziona una lingua";
     if (!livello) newErrors.livello = "Seleziona un livello";
-    if (!provincia) newErrors.provincia = "Seleziona la provincia";
+    if (isItaly && !provincia) newErrors.provincia = "Seleziona la provincia";
+    if (isItaly && !citta) newErrors.citta = "Seleziona il comune";
+    if (!isItaly && !citta) newErrors.citta = "Inserisci la città";
     if (!comeConosciuto) newErrors.comeConosciuto = "Campo obbligatorio";
     if (!gdpr) newErrors.gdpr = "Devi accettare il trattamento dei dati";
     setErrors(newErrors);
@@ -415,7 +440,7 @@ function CoachingContactForm({ packageTitle, gradient }: { packageTitle: string;
         <Label htmlFor="azienda" className="text-sm font-medium">Azienda (opzionale)</Label>
         <Input id="azienda" name="azienda" placeholder="La tua azienda" data-testid="input-coaching-azienda" />
       </div>
-      <div className="grid sm:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label className="text-sm font-medium">Lingua *</Label>
           <Select value={lingua} onValueChange={(v) => { setLingua(v); if (submitted) setErrors(prev => { const n = {...prev}; delete n.lingua; return n; }); }}>
@@ -444,21 +469,62 @@ function CoachingContactForm({ packageTitle, gradient }: { packageTitle: string;
           </Select>
           {submitted && errors.livello && <p className="text-xs text-destructive">{errors.livello}</p>}
         </div>
-        <div className="space-y-1.5">
-          <Label className="text-sm font-medium">Provincia *</Label>
-          <Select value={provincia} onValueChange={(v) => { setProvincia(v); if (submitted) setErrors(prev => { const n = {...prev}; delete n.provincia; return n; }); }}>
-            <SelectTrigger className={submitted && errors.provincia ? "border-destructive" : ""} data-testid="select-coaching-provincia">
-              <SelectValue placeholder="Seleziona" />
-            </SelectTrigger>
-            <SelectContent>
-              {PROVINCES.map((p) => (
-                <SelectItem key={p.sigla} value={p.sigla}>{p.nome} ({p.sigla})</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {submitted && errors.provincia && <p className="text-xs text-destructive">{errors.provincia}</p>}
-        </div>
       </div>
+      <div className="space-y-1.5">
+        <Label className="text-sm font-medium">Paese *</Label>
+        <Select value={paese} onValueChange={(v) => { setPaese(v); setProvincia(""); setCitta(""); if (submitted) setErrors(prev => { const n = {...prev}; delete n.provincia; delete n.citta; return n; }); }}>
+          <SelectTrigger data-testid="select-coaching-paese">
+            <SelectValue placeholder="Seleziona paese" />
+          </SelectTrigger>
+          <SelectContent>
+            {COUNTRIES.map((c) => (
+              <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      {isItaly ? (
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Provincia *</Label>
+            <Select value={provincia} onValueChange={(v) => { setProvincia(v); setCitta(""); if (submitted) setErrors(prev => { const n = {...prev}; delete n.provincia; return n; }); }}>
+              <SelectTrigger className={submitted && errors.provincia ? "border-destructive" : ""} data-testid="select-coaching-provincia">
+                <SelectValue placeholder="Seleziona" />
+              </SelectTrigger>
+              <SelectContent>
+                {PROVINCES.map((p) => (
+                  <SelectItem key={p.sigla} value={p.sigla}>{p.nome} ({p.sigla})</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {submitted && errors.provincia && <p className="text-xs text-destructive">{errors.provincia}</p>}
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium">Comune *</Label>
+            {provincia && comuniList.length > 0 ? (
+              <Select value={citta} onValueChange={(v) => { setCitta(v); if (submitted) setErrors(prev => { const n = {...prev}; delete n.citta; return n; }); }}>
+                <SelectTrigger className={submitted && errors.citta ? "border-destructive" : ""} data-testid="select-coaching-comune">
+                  <SelectValue placeholder={loadingComuni ? "Caricamento..." : "Seleziona comune"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {comuniList.map((c) => (
+                    <SelectItem key={c.nome} value={c.nome}>{c.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input value={citta} onChange={(e) => { setCitta(e.target.value); if (submitted) setErrors(prev => { const n = {...prev}; delete n.citta; return n; }); }} placeholder={provincia ? "Caricamento comuni..." : "Seleziona prima la provincia"} className={submitted && errors.citta ? "border-destructive" : ""} data-testid="input-coaching-comune" disabled={!provincia || loadingComuni} />
+            )}
+            {submitted && errors.citta && <p className="text-xs text-destructive">{errors.citta}</p>}
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-1.5">
+          <Label className="text-sm font-medium">Città *</Label>
+          <Input value={citta} onChange={(e) => { setCitta(e.target.value); if (submitted) setErrors(prev => { const n = {...prev}; delete n.citta; return n; }); }} placeholder="La tua città" className={submitted && errors.citta ? "border-destructive" : ""} data-testid="input-coaching-citta" />
+          {submitted && errors.citta && <p className="text-xs text-destructive">{errors.citta}</p>}
+        </div>
+      )}
       <div className="space-y-1.5">
         <Label className="text-sm font-medium">Come ci hai conosciuto *</Label>
         <Select value={comeConosciuto} onValueChange={(v) => { setComeConosciuto(v); if (submitted) setErrors(prev => { const n = {...prev}; delete n.comeConosciuto; return n; }); }}>

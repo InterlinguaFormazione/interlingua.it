@@ -49,6 +49,7 @@ import {
   Zap,
   Shield,
 } from "lucide-react";
+import { COUNTRIES } from "@shared/countries";
 import courseItalianImage from "@assets/Learn_Italin_in_Vicenza_1772214851188.png";
 import aboutVicenzaImage from "@assets/vicenza_1772179633305.jpg";
 
@@ -365,6 +366,7 @@ export default function CorsiItalianoPage() {
   const [livello, setLivello] = useState("");
   const [corsoInterest, setCorsoInterest] = useState("");
   const [accommodation, setAccommodation] = useState("");
+  const [nationality, setNationality] = useState("");
   const { toast } = useToast();
 
   const validate = (fd: FormData) => {
@@ -373,7 +375,7 @@ export default function CorsiItalianoPage() {
     if (!fd.get("lname")) errs.lname = t.formRequired;
     const email = fd.get("email") as string;
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = t.formEmailInvalid;
-    if (!fd.get("nationality")) errs.nationality = t.formRequired;
+    if (!nationality) errs.nationality = t.formRequired;
     if (!livello) errs.livello = t.formRequired;
     if (!gdpr) errs.gdpr = t.formGdprRequired;
     return errs;
@@ -388,7 +390,7 @@ export default function CorsiItalianoPage() {
       const courseKey = lang === "it" ? "Corso" : "Course";
       const accommodationKey = lang === "it" ? "Alloggio" : "Accommodation";
       const parts = [
-        `${nationalityLabel}: ${formData.get("nationality")}`,
+        `${nationalityLabel}: ${COUNTRIES.find(c => c.code === nationality)?.name || nationality}`,
         `${levelKey}: ${levelLabel}`,
         corsoInterest ? `${courseKey}: ${courseLabel}` : "",
         accommodation ? `${accommodationKey}: ${accommodation === "si" ? t.yes : t.no}` : "",
@@ -815,8 +817,17 @@ export default function CorsiItalianoPage() {
                     </div>
 
                     <div>
-                      <Label htmlFor="nationality">{t.formNationality} *</Label>
-                      <Input id="nationality" name="nationality" data-testid="input-nationality" className="mt-1" />
+                      <Label>{t.formNationality} *</Label>
+                      <Select value={nationality} onValueChange={setNationality}>
+                        <SelectTrigger className="mt-1" data-testid="select-nationality">
+                          <SelectValue placeholder={lang === "it" ? "Seleziona nazionalità" : "Select nationality"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {COUNTRIES.map(c => (
+                            <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       {submitted && errors.nationality && <p className="text-xs text-destructive mt-1">{errors.nationality}</p>}
                     </div>
 

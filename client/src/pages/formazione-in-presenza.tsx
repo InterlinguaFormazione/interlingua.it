@@ -52,6 +52,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { PROVINCES } from "@shared/provinces";
+import { COUNTRIES } from "@shared/countries";
 import lingueStraniereImage from "@assets/lingue-straniere_1772143318023.webp";
 import languageCoachingImage from "@assets/Language_Coaching_1772143397641.webp";
 import managementImage from "@assets/management-leadership_1772143822898.webp";
@@ -301,6 +302,8 @@ function CourseInfoForm({ courseTitle, showLingua, gradient }: { courseTitle: st
   const [lingua, setLingua] = useState("");
   const [livello, setLivello] = useState("");
   const [comeConosciuto, setComeConosciuto] = useState("");
+  const [paese, setPaese] = useState("IT");
+  const isItaly = paese === "IT";
   const [provincia, setProvincia] = useState("");
   const [comuniList, setComuniList] = useState<Array<{ nome: string; cap: string[] }>>([]);
   const [loadingComuni, setLoadingComuni] = useState(false);
@@ -331,7 +334,7 @@ function CourseInfoForm({ courseTitle, showLingua, gradient }: { courseTitle: st
     if (!formData.get("lname")) errs.lname = "Campo obbligatorio";
     if (!formData.get("email")) errs.email = "Campo obbligatorio";
     if (!citta) errs.city = "Campo obbligatorio";
-    if (!provincia) errs.provincia = "Seleziona una provincia";
+    if (isItaly && !provincia) errs.provincia = "Seleziona una provincia";
     if (!sede) errs.sede = "Seleziona una sede";
     if (!comeConosciuto) errs.comeConosciuto = "Seleziona un'opzione";
     if (showLingua && !lingua) errs.lingua = "Seleziona una lingua";
@@ -347,8 +350,9 @@ function CourseInfoForm({ courseTitle, showLingua, gradient }: { courseTitle: st
         `Sede: ${sede}`,
         showLingua ? `Lingua: ${lingua}` : "",
         showLingua ? `Livello: ${livelloOptions.find(l => l.value === livello)?.label || livello}` : "",
+        `Paese: ${COUNTRIES.find(c => c.code === paese)?.name || paese}`,
         `Citta: ${citta}`,
-        `Provincia: ${provincia}`,
+        isItaly ? `Provincia: ${provincia}` : "",
         `Come ci ha conosciuto: ${comeConosciuto}`,
         newsletter ? "Newsletter: Si" : "",
         formData.get("message") ? `\n${formData.get("message")}` : "",
@@ -432,40 +436,61 @@ function CourseInfoForm({ courseTitle, showLingua, gradient }: { courseTitle: st
           <Input id="phone" name="phone" type="tel" placeholder="Numero di telefono" data-testid="input-fip-phone" />
         </div>
       </div>
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="select-provincia" className="text-sm font-medium">Provincia *</Label>
-          <Select value={provincia} onValueChange={(v) => { setProvincia(v); if (submitted) setErrors(prev => { const n = {...prev}; delete n.provincia; return n; }); }}>
-            <SelectTrigger id="select-provincia" className={submitted && errors.provincia ? "border-destructive" : ""} data-testid="select-fip-provincia">
-              <SelectValue placeholder="Seleziona provincia" />
-            </SelectTrigger>
-            <SelectContent>
-              {PROVINCES.map((p) => (
-                <SelectItem key={p.sigla} value={p.sigla}>{p.nome} ({p.sigla})</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {submitted && errors.provincia && <p className="text-xs text-destructive">{errors.provincia}</p>}
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="city" className="text-sm font-medium">Comune *</Label>
-          {provincia && comuniList.length > 0 ? (
-            <Select value={citta} onValueChange={(v) => { setCitta(v); if (submitted) setErrors(prev => { const n = {...prev}; delete n.city; return n; }); }}>
-              <SelectTrigger id="city" className={submitted && errors.city ? "border-destructive" : ""} data-testid="select-fip-city">
-                <SelectValue placeholder={loadingComuni ? "Caricamento..." : "Seleziona comune"} />
+      <div className="space-y-1.5">
+        <Label htmlFor="select-paese" className="text-sm font-medium">Paese *</Label>
+        <Select value={paese} onValueChange={(v) => { setPaese(v); setProvincia(""); setCitta(""); setComuniList([]); }}>
+          <SelectTrigger id="select-paese" data-testid="select-fip-paese">
+            <SelectValue placeholder="Seleziona paese" />
+          </SelectTrigger>
+          <SelectContent>
+            {COUNTRIES.map((c) => (
+              <SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      {isItaly ? (
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="select-provincia" className="text-sm font-medium">Provincia *</Label>
+            <Select value={provincia} onValueChange={(v) => { setProvincia(v); if (submitted) setErrors(prev => { const n = {...prev}; delete n.provincia; return n; }); }}>
+              <SelectTrigger id="select-provincia" className={submitted && errors.provincia ? "border-destructive" : ""} data-testid="select-fip-provincia">
+                <SelectValue placeholder="Seleziona provincia" />
               </SelectTrigger>
               <SelectContent>
-                {comuniList.map((c) => (
-                  <SelectItem key={c.nome} value={c.nome}>{c.nome}</SelectItem>
+                {PROVINCES.map((p) => (
+                  <SelectItem key={p.sigla} value={p.sigla}>{p.nome} ({p.sigla})</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-          ) : (
-            <Input id="city" name="city" value={citta} onChange={(e) => { setCitta(e.target.value); if (submitted) setErrors(prev => { const n = {...prev}; delete n.city; return n; }); }} placeholder={provincia ? "Caricamento comuni..." : "Seleziona prima la provincia"} className={submitted && errors.city ? "border-destructive" : ""} data-testid="input-fip-city" disabled={!provincia || loadingComuni} />
-          )}
+            {submitted && errors.provincia && <p className="text-xs text-destructive">{errors.provincia}</p>}
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="city" className="text-sm font-medium">Comune *</Label>
+            {provincia && comuniList.length > 0 ? (
+              <Select value={citta} onValueChange={(v) => { setCitta(v); if (submitted) setErrors(prev => { const n = {...prev}; delete n.city; return n; }); }}>
+                <SelectTrigger id="city" className={submitted && errors.city ? "border-destructive" : ""} data-testid="select-fip-city">
+                  <SelectValue placeholder={loadingComuni ? "Caricamento..." : "Seleziona comune"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {comuniList.map((c) => (
+                    <SelectItem key={c.nome} value={c.nome}>{c.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input id="city" name="city" value={citta} onChange={(e) => { setCitta(e.target.value); if (submitted) setErrors(prev => { const n = {...prev}; delete n.city; return n; }); }} placeholder={provincia ? "Caricamento comuni..." : "Seleziona prima la provincia"} className={submitted && errors.city ? "border-destructive" : ""} data-testid="input-fip-city" disabled={!provincia || loadingComuni} />
+            )}
+            {submitted && errors.city && <p className="text-xs text-destructive">{errors.city}</p>}
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-1.5">
+          <Label htmlFor="city" className="text-sm font-medium">Città *</Label>
+          <Input id="city" name="city" value={citta} onChange={(e) => { setCitta(e.target.value); if (submitted) setErrors(prev => { const n = {...prev}; delete n.city; return n; }); }} placeholder="La tua città" className={submitted && errors.city ? "border-destructive" : ""} data-testid="input-fip-city" />
           {submitted && errors.city && <p className="text-xs text-destructive">{errors.city}</p>}
         </div>
-      </div>
+      )}
       <div className="grid sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
           <Label htmlFor="select-sede" className="text-sm font-medium">Sede preferita *</Label>
