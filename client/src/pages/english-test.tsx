@@ -123,6 +123,8 @@ export default function EnglishTestPage() {
   const [audioCheckPassed, setAudioCheckPassed] = useState({ listening: false, mic: false });
   const [testAudioPlaying, setTestAudioPlaying] = useState(false);
   const [micCheckStatus, setMicCheckStatus] = useState<"idle" | "checking" | "granted" | "denied">("idle");
+  const [audioAvailable, setAudioAvailable] = useState(true);
+  const [micAvailable, setMicAvailable] = useState(true);
   const testAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -354,7 +356,25 @@ export default function EnglishTestPage() {
       if (data.success) {
         setWritingScores(data.writingScores);
         setSpeakingPrompt(data.speakingPrompt);
-        setPhase("speaking");
+        if (!micAvailable) {
+          const skipRes = await apiRequest("POST", "/api/english-test/complete-without-speaking", { sessionId });
+          const skipData = await skipRes.json();
+          if (skipData.success) {
+            setResults({
+              finalLevel: skipData.finalLevel,
+              mcLevel: skipData.mcLevel,
+              writingLevel: skipData.writingLevel,
+              sectionResults: skipData.sectionResults || [],
+              writingFeedback: skipData.writingFeedback,
+              competencyReport: skipData.competencyReport,
+            });
+            setPhase("results");
+          } else {
+            toast({ title: "Error", description: skipData.message || "Failed to complete test", variant: "destructive" });
+          }
+        } else {
+          setPhase("speaking");
+        }
       } else {
         toast({ title: "Error", description: data.message || "Failed to submit writing", variant: "destructive" });
       }
@@ -809,8 +829,9 @@ export default function EnglishTestPage() {
                       </Button>
                       <Button
                         onClick={() => {
+                          setAudioAvailable(false);
                           confirmListeningOk();
-                          toast({ title: "Attenzione", description: "La sezione di ascolto richiede l'audio. Potresti non riuscire a rispondere alle domande di listening.", variant: "destructive" });
+                          toast({ title: "Attenzione", description: "Le domande di listening verranno mostrate come testo da leggere.", variant: "destructive" });
                         }}
                         variant="outline"
                         className="flex-1 rounded-xl border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30"
@@ -888,8 +909,9 @@ export default function EnglishTestPage() {
                       <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
                         <button
                           onClick={() => {
+                            setMicAvailable(false);
                             confirmMicOk();
-                            toast({ title: "Attenzione", description: "Senza microfono non potrai completare la sezione di speaking. Potrai comunque saltarla durante il test.", variant: "destructive" });
+                            toast({ title: "Attenzione", description: "La sezione di speaking verrà saltata automaticamente.", variant: "destructive" });
                           }}
                           className="w-full text-center text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors py-1"
                           data-testid="button-skip-mic-check"
@@ -997,7 +1019,7 @@ export default function EnglishTestPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {currentQuestion.skillType === "listening" && currentQuestion.audioUrl && (
+                  {currentQuestion.skillType === "listening" && currentQuestion.audioUrl && audioAvailable && (
                     <div className="rounded-xl p-5 border bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800" data-testid="audio-player-container">
                       <div className="flex items-center gap-2 mb-3">
                         <Volume2 className="w-4 h-4 text-indigo-500" />
@@ -1048,12 +1070,27 @@ export default function EnglishTestPage() {
                     </div>
                   )}
 
-                  {currentQuestion.passage && currentQuestion.skillType !== "listening" && (
-                    <div className="rounded-xl p-4 border bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700" data-testid="text-passage">
+                  {currentQuestion.passage && (currentQuestion.skillType !== "listening" || !audioAvailable) && (
+                    <div className={`rounded-xl p-4 border ${
+                      currentQuestion.skillType === "listening"
+                        ? "bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800"
+                        : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                    }`} data-testid="text-passage">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs uppercase tracking-wider text-slate-500 font-medium">Reading Passage</span>
+                        {currentQuestion.skillType === "listening" ? (
+                          <>
+                            <BookOpen className="w-4 h-4 text-indigo-500" />
+                            <span className="text-xs uppercase tracking-wider text-indigo-500 font-medium">Listening Transcript (Reading Mode)</span>
+                          </>
+                        ) : (
+                          <span className="text-xs uppercase tracking-wider text-slate-500 font-medium">Reading Passage</span>
+                        )}
                       </div>
-                      <div className="text-sm whitespace-pre-line leading-relaxed text-slate-700 dark:text-slate-300">{currentQuestion.passage}</div>
+                      <div className={`text-sm whitespace-pre-line leading-relaxed ${
+                        currentQuestion.skillType === "listening"
+                          ? "text-indigo-900 dark:text-indigo-200 italic"
+                          : "text-slate-700 dark:text-slate-300"
+                      }`}>{currentQuestion.passage}</div>
                     </div>
                   )}
 
