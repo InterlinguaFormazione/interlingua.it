@@ -9,6 +9,7 @@ import { forwardToCRM } from "./crm";
 import { generateBlogPost } from "./blog-generator";
 import { chatWithAI } from "./ai-chat";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalOrder } from "./paypal";
+import { checkVoucher, confirmVoucher, isCartaCulturaAvailable } from "./carta-cultura";
 import { SHOP_PRODUCTS, getProductBySlug, getEffectivePrice } from "@shared/products";
 import { scoreWriting, scoreSpeaking, transcribeAudio } from "./english-test";
 import { getAllQuestions } from "./english-test-questions";
@@ -1863,6 +1864,349 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error validating voucher:", error);
       res.status(500).json({ valid: false, message: "Errore del server" });
+    }
+  });
+
+  app.get("/api/shop/carta-cultura/status", async (_req, res) => {
+    res.json({ available: isCartaCulturaAvailable() });
+  });
+
+  app.post("/api/shop/carta-cultura/check", async (req, res) => {
+    try {
+      const { codiceVoucher } = req.body;
+      if (!codiceVoucher || typeof codiceVoucher !== "string" || codiceVoucher.trim().length < 6) {
+        return res.status(400).json({ success: false, error: "Inserisci un codice voucher valido." });
+      }
+      const result = await checkVoucher(codiceVoucher.trim(), false);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error checking Carta della Cultura voucher:", error);
+      res.status(500).json({ success: false, error: "Errore di comunicazione con il sistema." });
+    }
+  });
+
+  app.post("/api/shop/carta-cultura/purchase", async (req, res) => {
+    try {
+      const {
+        codiceVoucher, productSlug, selectedOptions: selectedOptionsStr,
+        customerFirstName, customerLastName, customerEmail, customerPhone,
+        customerPassword: customerPwd,
+        studentFirstName: stuFirst, studentLastName: stuLast, studentEmail: stuEmail,
+        codiceFiscale, billingCodiceFiscale, billingIndirizzo, billingCap,
+        billingCitta, billingProvincia, billingPartitaIva, billingCodiceSdi, billingPec, notes,
+        discountCode,
+      } = req.body;
+
+      if (!codiceVoucher) {
+        return res.status(400).json({ success: false, message: "Codice voucher Carta della Cultura mancante." });
+      }
+
+      const product = getProductBySlug(productSlug);
+      if (!product) {
+        return res.status(400).json({ success: false, message: "Prodotto non trovato." });
+      }
+
+      let selectedOptions: Record<string, string> = {};
+      try {
+        if (selectedOptionsStr) selectedOptions = JSON.parse(selectedOptionsStr);
+      } catch {}
+
+      if (product.options && product.options.length > 0) {
+        for (const opt of product.options) {
+          const val = selectedOptions[opt.name];
+          if (!val) return res.status(400).json({ success: false, message: `Opzione obbligatoria mancante: ${opt.label}` });
+          if (!opt.values.includes(val)) return res.status(400).json({ success: false, message: `Valore non valido per ${opt.label}: ${val}` });
+        }
+      }
+
+      const expectedPrice = getEffectivePrice(product, selectedOptions);
+      let finalPrice = expectedPrice;
+      let appliedDiscountCode: string | null = null;
+      let appliedDiscountAmount: string | null = null;
+      if (discountCode) {
+        const voucher = await storage.getDiscountVoucherByCode(discountCode.toUpperCase().trim());
+        if (voucher && voucher.active) {
+          const now = new Date();
+          const validTime = (!voucher.validFrom || now >= new Date(voucher.validFrom)) && (!voucher.validUntil || now <= new Date(voucher.validUntil));
+          const validUses = voucher.maxUses === null || (voucher.usedCount || 0) < voucher.maxUses;
+          const validProduct = !voucher.productSlugs || voucher.productSlugs.split(",").map((s: string) => s.trim()).includes(product.slug);
+          const total = parseFloat(expectedPrice);
+          const validMin = !voucher.minOrderAmount || total >= parseFloat(voucher.minOrderAmount);
+          if (validTime && validUses && validProduct && validMin) {
+            let discount = 0;
+            if (voucher.discountType === "percentage") {
+              discount = total * (parseFloat(voucher.discountValue) / 100);
+            } else {
+              discount = parseFloat(voucher.discountValue);
+            }
+            discount = Math.min(discount, total);
+            finalPrice = Math.max(0, total - discount).toFixed(2);
+            appliedDiscountCode = voucher.code;
+            appliedDiscountAmount = discount.toFixed(2);
+          }
+        }
+      }
+
+      const amountToCharge = parseFloat(finalPrice);
+      const checkResult = await checkVoucher(codiceVoucher.trim(), false);
+      if (!checkResult.success) {
+        return res.status(400).json({ success: false, message: checkResult.error || "Voucher non valido." });
+      }
+      if (checkResult.importo !== undefined && checkResult.importo < amountToCharge) {
+        return res.status(400).json({
+          success: false,
+          message: `Il voucher ha un importo di €${checkResult.importo.toFixed(2)}, insufficiente per questo acquisto (€${amountToCharge.toFixed(2)}).`,
+        });
+      }
+
+      const confirmResult = await confirmVoucher(codiceVoucher.trim(), amountToCharge);
+      if (!confirmResult.success) {
+        return res.status(400).json({
+          success: false,
+          message: confirmResult.error || "Errore nella conferma del voucher.",
+        });
+      }
+
+      let customerId: string | null = null;
+      if (customerPwd && customerPwd.length >= 6) {
+        const existingCustomer = await storage.getShopCustomerByEmail(customerEmail);
+        if (existingCustomer) {
+          const passwordMatch = await bcrypt.compare(customerPwd, existingCustomer.password);
+          if (passwordMatch) customerId = existingCustomer.id;
+        } else {
+          const hashedPassword = await bcrypt.hash(customerPwd, 10);
+          const newCustomer = await storage.createShopCustomer({
+            email: customerEmail,
+            password: hashedPassword,
+            name: `${customerFirstName} ${customerLastName}`,
+            phone: customerPhone || null,
+          });
+          customerId = newCustomer.id;
+        }
+      }
+
+      const optionsSummary = Object.entries(selectedOptions).map(([k, v]) => `${k}: ${v}`).join(", ");
+      const productNameWithOptions = optionsSummary ? `${product.name} (${optionsSummary})` : product.name;
+
+      const order = await storage.createShopOrder({
+        productSlug: product.slug,
+        productName: productNameWithOptions,
+        amount: finalPrice,
+        paypalOrderId: `CC-${codiceVoucher.trim().substring(0, 8)}`,
+        customerFirstName,
+        customerLastName,
+        customerEmail,
+        customerPhone: customerPhone || null,
+        customerId,
+        studentFirstName: stuFirst || null,
+        studentLastName: stuLast || null,
+        studentEmail: stuEmail || null,
+        codiceFiscale: codiceFiscale || null,
+        billingCodiceFiscale: billingCodiceFiscale || codiceFiscale || null,
+        billingIndirizzo: billingIndirizzo || null,
+        billingCap: billingCap || null,
+        billingCitta: billingCitta || null,
+        billingProvincia: billingProvincia || null,
+        billingPartitaIva: billingPartitaIva || null,
+        billingCodiceSdi: billingCodiceSdi || null,
+        billingPec: billingPec || null,
+        notes: `[Carta della Cultura - ${checkResult.nominativo || "N/A"}] ${optionsSummary ? `[${optionsSummary}] ` : ""}${notes || ""}`.trim(),
+        status: "completed",
+        discountCode: appliedDiscountCode,
+        discountAmount: appliedDiscountAmount,
+      });
+
+      if (appliedDiscountCode) {
+        const voucher = await storage.getDiscountVoucherByCode(appliedDiscountCode);
+        if (voucher) await storage.incrementVoucherUsage(voucher.id);
+      }
+
+      let customerToken: string | undefined;
+      if (customerId) {
+        customerToken = generateAdminToken();
+        shopCustomerSessions.set(customerToken, { createdAt: Date.now(), customerId });
+      }
+
+      try {
+        await sendContactNotification({
+          name: `${customerFirstName} ${customerLastName}`,
+          email: customerEmail,
+          phone: customerPhone || undefined,
+          courseInterest: `Acquisto: ${productNameWithOptions} (${finalPrice} EUR)`,
+          message: `Ordine completato via Carta della Cultura. Voucher: ${codiceVoucher}. Beneficiario: ${checkResult.nominativo || "N/A"}`,
+        });
+      } catch (emailError) {
+        console.error("Failed to send Carta della Cultura purchase notification:", emailError);
+      }
+
+      res.json({ success: true, order, customerToken, customerId });
+    } catch (error) {
+      console.error("Error processing Carta della Cultura purchase:", error);
+      res.status(500).json({ success: false, message: "Errore durante l'elaborazione dell'acquisto." });
+    }
+  });
+
+  app.post("/api/shop/carta-cultura/purchase-cart", async (req, res) => {
+    try {
+      const {
+        codiceVoucher, items: itemsStr,
+        customerFirstName, customerLastName, customerEmail, customerPhone,
+        customerPassword: customerPwd,
+        codiceFiscale, billingCodiceFiscale, billingIndirizzo, billingCap,
+        billingCitta, billingProvincia, billingPartitaIva, billingCodiceSdi, billingPec, notes,
+        discountCode,
+      } = req.body;
+
+      if (!codiceVoucher) {
+        return res.status(400).json({ success: false, message: "Codice voucher Carta della Cultura mancante." });
+      }
+      if (!customerFirstName || !customerLastName || !customerEmail) {
+        return res.status(400).json({ success: false, message: "Dati cliente mancanti." });
+      }
+
+      let items: Array<{ slug: string; quantity: number; selectedOptions?: Record<string, string> }>;
+      try {
+        items = typeof itemsStr === "string" ? JSON.parse(itemsStr) : itemsStr;
+      } catch {
+        return res.status(400).json({ success: false, message: "Formato carrello non valido." });
+      }
+      if (!Array.isArray(items) || items.length === 0) {
+        return res.status(400).json({ success: false, message: "Carrello vuoto." });
+      }
+
+      const validatedItems: Array<{ product: any; quantity: number; price: string; selectedOptions: Record<string, string> }> = [];
+      let expectedTotal = 0;
+      for (const item of items) {
+        const product = getProductBySlug(item.slug);
+        if (!product) return res.status(400).json({ success: false, message: `Prodotto non trovato: ${item.slug}` });
+        const opts = item.selectedOptions || {};
+        const price = getEffectivePrice(product, opts);
+        validatedItems.push({ product, quantity: item.quantity || 1, price, selectedOptions: opts });
+        expectedTotal += parseFloat(price) * (item.quantity || 1);
+      }
+
+      let finalTotal = expectedTotal;
+      let appliedDiscountCode: string | null = null;
+      let appliedDiscountAmount: string | null = null;
+      if (discountCode) {
+        const voucher = await storage.getDiscountVoucherByCode(discountCode.toUpperCase().trim());
+        if (voucher && voucher.active) {
+          const now = new Date();
+          const validTime = (!voucher.validFrom || now >= new Date(voucher.validFrom)) && (!voucher.validUntil || now <= new Date(voucher.validUntil));
+          const validUses = voucher.maxUses === null || (voucher.usedCount || 0) < voucher.maxUses;
+          const cartSlugs = validatedItems.map(i => i.product.slug);
+          const allowedSlugs = voucher.productSlugs ? voucher.productSlugs.split(",").map((s: string) => s.trim()) : [];
+          const validProduct = !voucher.productSlugs || cartSlugs.every((s: string) => allowedSlugs.includes(s));
+          const validMin = !voucher.minOrderAmount || expectedTotal >= parseFloat(voucher.minOrderAmount);
+          if (validTime && validUses && validProduct && validMin) {
+            let discount = 0;
+            if (voucher.discountType === "percentage") {
+              discount = expectedTotal * (parseFloat(voucher.discountValue) / 100);
+            } else {
+              discount = parseFloat(voucher.discountValue);
+            }
+            discount = Math.min(discount, expectedTotal);
+            finalTotal = Math.max(0, expectedTotal - discount);
+            appliedDiscountCode = voucher.code;
+            appliedDiscountAmount = discount.toFixed(2);
+          }
+        }
+      }
+
+      const checkResult = await checkVoucher(codiceVoucher.trim(), false);
+      if (!checkResult.success) {
+        return res.status(400).json({ success: false, message: checkResult.error || "Voucher non valido." });
+      }
+      if (checkResult.importo !== undefined && checkResult.importo < finalTotal) {
+        return res.status(400).json({
+          success: false,
+          message: `Il voucher ha un importo di €${checkResult.importo.toFixed(2)}, insufficiente per questo acquisto (€${finalTotal.toFixed(2)}).`,
+        });
+      }
+
+      const confirmResult = await confirmVoucher(codiceVoucher.trim(), finalTotal);
+      if (!confirmResult.success) {
+        return res.status(400).json({ success: false, message: confirmResult.error || "Errore nella conferma del voucher." });
+      }
+
+      let customerId: string | null = null;
+      if (customerPwd && customerPwd.length >= 6) {
+        const existingCustomer = await storage.getShopCustomerByEmail(customerEmail);
+        if (existingCustomer) {
+          const passwordMatch = await bcrypt.compare(customerPwd, existingCustomer.password);
+          if (passwordMatch) customerId = existingCustomer.id;
+        } else {
+          const hashedPassword = await bcrypt.hash(customerPwd, 10);
+          const newCustomer = await storage.createShopCustomer({
+            email: customerEmail,
+            password: hashedPassword,
+            name: `${customerFirstName} ${customerLastName}`,
+            phone: customerPhone || null,
+          });
+          customerId = newCustomer.id;
+        }
+      }
+
+      const allProductNames = validatedItems.map(i => {
+        const opts = Object.entries(i.selectedOptions).map(([k, v]) => `${k}: ${v}`).join(", ");
+        return opts ? `${i.product.name} (${opts}) x${i.quantity}` : `${i.product.name} x${i.quantity}`;
+      }).join(", ");
+
+      const order = await storage.createShopOrder({
+        productSlug: validatedItems.map(i => i.product.slug).join(","),
+        productName: allProductNames,
+        amount: finalTotal.toFixed(2),
+        paypalOrderId: `CC-${codiceVoucher.trim().substring(0, 8)}`,
+        customerFirstName,
+        customerLastName,
+        customerEmail,
+        customerPhone: customerPhone || null,
+        customerId,
+        studentFirstName: null,
+        studentLastName: null,
+        studentEmail: null,
+        codiceFiscale: codiceFiscale || null,
+        billingCodiceFiscale: billingCodiceFiscale || codiceFiscale || null,
+        billingIndirizzo: billingIndirizzo || null,
+        billingCap: billingCap || null,
+        billingCitta: billingCitta || null,
+        billingProvincia: billingProvincia || null,
+        billingPartitaIva: billingPartitaIva || null,
+        billingCodiceSdi: billingCodiceSdi || null,
+        billingPec: billingPec || null,
+        notes: `[Carta della Cultura - ${checkResult.nominativo || "N/A"}] ${notes || ""}`.trim(),
+        status: "completed",
+        discountCode: appliedDiscountCode,
+        discountAmount: appliedDiscountAmount,
+      });
+
+      if (appliedDiscountCode) {
+        const voucher = await storage.getDiscountVoucherByCode(appliedDiscountCode);
+        if (voucher) await storage.incrementVoucherUsage(voucher.id);
+      }
+
+      let customerToken: string | undefined;
+      if (customerId) {
+        customerToken = generateAdminToken();
+        shopCustomerSessions.set(customerToken, { createdAt: Date.now(), customerId });
+      }
+
+      try {
+        await sendContactNotification({
+          name: `${customerFirstName} ${customerLastName}`,
+          email: customerEmail,
+          phone: customerPhone || undefined,
+          courseInterest: `Acquisto Carrello: ${allProductNames} (${finalTotal.toFixed(2)} EUR)`,
+          message: `Ordine carrello completato via Carta della Cultura. Voucher: ${codiceVoucher}. Beneficiario: ${checkResult.nominativo || "N/A"}`,
+        });
+      } catch (emailError) {
+        console.error("Failed to send Carta della Cultura cart purchase notification:", emailError);
+      }
+
+      res.json({ success: true, order, customerToken, customerId });
+    } catch (error) {
+      console.error("Error processing Carta della Cultura cart purchase:", error);
+      res.status(500).json({ success: false, message: "Errore durante l'elaborazione dell'acquisto." });
     }
   });
 

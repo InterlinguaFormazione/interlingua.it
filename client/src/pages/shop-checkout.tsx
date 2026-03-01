@@ -38,6 +38,7 @@ import {
   X,
   ChevronDown,
   ChevronUp,
+  Ticket,
 } from "lucide-react";
 
 declare global {
@@ -87,6 +88,12 @@ export default function ShopCheckout() {
   const [processing, setProcessing] = useState(false);
   const paypalInitialized = useRef(false);
 
+  const [paymentMethod, setPaymentMethod] = useState<"paypal" | "cartacultura">("paypal");
+  const [ccVoucherCode, setCcVoucherCode] = useState("");
+  const [ccCheckResult, setCcCheckResult] = useState<{ success: boolean; nominativo?: string; importo?: number; error?: string } | null>(null);
+  const [ccLoading, setCcLoading] = useState(false);
+  const [ccProcessing, setCcProcessing] = useState(false);
+
   const [voucherCode, setVoucherCode] = useState("");
   const [voucherOpen, setVoucherOpen] = useState(true);
   const [voucherLoading, setVoucherLoading] = useState(false);
@@ -134,6 +141,68 @@ export default function ShopCheckout() {
     setVoucherResult(null);
     setAppliedVoucherCode("");
     setVoucherCode("");
+  };
+
+  const handleCcCheck = async () => {
+    if (!ccVoucherCode.trim()) return;
+    setCcLoading(true);
+    setCcCheckResult(null);
+    try {
+      const res = await apiRequest("POST", "/api/shop/carta-cultura/check", {
+        codiceVoucher: ccVoucherCode.trim(),
+      });
+      const data = await res.json();
+      setCcCheckResult(data);
+    } catch {
+      setCcCheckResult({ success: false, error: "Errore di connessione. Riprova." });
+    } finally {
+      setCcLoading(false);
+    }
+  };
+
+  const handleCcPurchase = async () => {
+    setCcProcessing(true);
+    try {
+      const optionsSummary = Object.entries(selectedOptions).map(([k, v]) => `${k}: ${v}`).join(", ");
+      const res = await apiRequest("POST", "/api/shop/carta-cultura/purchase", {
+        codiceVoucher: ccVoucherCode.trim(),
+        productSlug: product!.slug,
+        selectedOptions: JSON.stringify(selectedOptions),
+        customerFirstName,
+        customerLastName,
+        customerEmail,
+        customerPhone,
+        customerPassword,
+        studentFirstName: buyingForOther ? studentFirstName : "",
+        studentLastName: buyingForOther ? studentLastName : "",
+        studentEmail: buyingForOther ? studentEmail : "",
+        codiceFiscale,
+        billingCodiceFiscale: codiceFiscale,
+        billingIndirizzo: indirizzo,
+        billingCap: cap,
+        billingCitta: citta,
+        billingProvincia: provincia,
+        billingPartitaIva: partitaIva,
+        billingCodiceSdi: codiceSdi,
+        billingPec: pec,
+        notes: optionsSummary ? `[${optionsSummary}] ${notes}` : notes,
+        ...(appliedVoucherCode ? { discountCode: appliedVoucherCode } : {}),
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (data.customerToken) {
+          localStorage.setItem("shop_customer_token", data.customerToken);
+        }
+        setStep("success");
+        toast({ title: "Acquisto completato!", description: "Il pagamento con Carta della Cultura è stato elaborato con successo." });
+      } else {
+        toast({ title: "Errore", description: data.message || "Errore durante l'acquisto.", variant: "destructive" });
+      }
+    } catch (error: any) {
+      toast({ title: "Errore", description: error.message || "Errore durante l'acquisto.", variant: "destructive" });
+    } finally {
+      setCcProcessing(false);
+    }
   };
 
   const checkAutoApplyVoucher = async (email: string) => {
@@ -945,11 +1014,11 @@ export default function ShopCheckout() {
                       </div>
                       <div>
                         <h2 className="text-lg font-bold">Pagamento</h2>
-                        <p className="text-sm text-muted-foreground">Paga con PayPal, Visa o Mastercard</p>
+                        <p className="text-sm text-muted-foreground">Scegli il metodo di pagamento</p>
                       </div>
                     </div>
 
-                    {processing ? (
+                    {(processing || ccProcessing) ? (
                       <div className="text-center py-12">
                         <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-4" />
                         <p className="text-lg font-medium">Elaborazione in corso...</p>
@@ -987,30 +1056,127 @@ export default function ShopCheckout() {
                           </div>
                         </div>
 
-                        <div className="flex flex-col items-center gap-4">
-                          {!paypalReady && (
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                              <span className="text-sm">Caricamento PayPal...</span>
-                            </div>
-                          )}
+                        <div className="grid grid-cols-2 gap-3">
                           <button
-                            id="shop-paypal-button"
-                            className={`w-full py-3 px-6 rounded-lg font-semibold text-white transition-all flex items-center justify-center gap-2 ${
-                              paypalReady
-                                ? "bg-[#0070ba] hover:bg-[#003087] cursor-pointer"
-                                : "bg-gray-400 cursor-not-allowed"
+                            type="button"
+                            onClick={() => setPaymentMethod("paypal")}
+                            className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                              paymentMethod === "paypal"
+                                ? "border-primary bg-primary/5"
+                                : "border-muted hover:border-muted-foreground/30"
                             }`}
-                            disabled={!paypalReady}
-                            data-testid="button-paypal-pay"
+                            data-testid="button-select-paypal"
                           >
-                            <SiPaypal className="w-5 h-5" />
-                            Paga &euro;{parseFloat(displayTotal).toFixed(2)} con PayPal
+                            <SiPaypal className="w-6 h-6 text-[#0070ba]" />
+                            <span className="text-xs font-medium">PayPal / Carta</span>
                           </button>
-                          <p className="text-xs text-muted-foreground text-center">
-                            Puoi pagare con il tuo conto PayPal oppure con carta Visa/Mastercard
-                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setPaymentMethod("cartacultura")}
+                            className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                              paymentMethod === "cartacultura"
+                                ? "border-primary bg-primary/5"
+                                : "border-muted hover:border-muted-foreground/30"
+                            }`}
+                            data-testid="button-select-cartacultura"
+                          >
+                            <Ticket className="w-6 h-6 text-amber-600" />
+                            <span className="text-xs font-medium">Carta della Cultura</span>
+                          </button>
                         </div>
+
+                        {paymentMethod === "paypal" && (
+                          <div className="flex flex-col items-center gap-4">
+                            {!paypalReady && (
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span className="text-sm">Caricamento PayPal...</span>
+                              </div>
+                            )}
+                            <button
+                              id="shop-paypal-button"
+                              className={`w-full py-3 px-6 rounded-lg font-semibold text-white transition-all flex items-center justify-center gap-2 ${
+                                paypalReady
+                                  ? "bg-[#0070ba] hover:bg-[#003087] cursor-pointer"
+                                  : "bg-gray-400 cursor-not-allowed"
+                              }`}
+                              disabled={!paypalReady}
+                              data-testid="button-paypal-pay"
+                            >
+                              <SiPaypal className="w-5 h-5" />
+                              Paga &euro;{parseFloat(displayTotal).toFixed(2)} con PayPal
+                            </button>
+                            <p className="text-xs text-muted-foreground text-center">
+                              Puoi pagare con il tuo conto PayPal oppure con carta Visa/Mastercard
+                            </p>
+                          </div>
+                        )}
+
+                        {paymentMethod === "cartacultura" && (
+                          <div className="space-y-4">
+                            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                              <p className="text-sm text-amber-800 dark:text-amber-200">
+                                Inserisci il codice del buono generato dalla tua Carta della Cultura Giovani o Carta del Merito.
+                              </p>
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Codice Voucher</Label>
+                              <div className="flex gap-2">
+                                <Input
+                                  value={ccVoucherCode}
+                                  onChange={(e) => { setCcVoucherCode(e.target.value); setCcCheckResult(null); }}
+                                  placeholder="Inserisci il codice del buono"
+                                  data-testid="input-cc-voucher"
+                                />
+                                <Button
+                                  onClick={handleCcCheck}
+                                  disabled={ccLoading || !ccVoucherCode.trim()}
+                                  variant="outline"
+                                  data-testid="button-cc-check"
+                                >
+                                  {ccLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verifica"}
+                                </Button>
+                              </div>
+                            </div>
+                            {ccCheckResult && (
+                              <div className={`rounded-lg p-4 ${ccCheckResult.success ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800" : "bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800"}`}>
+                                {ccCheckResult.success ? (
+                                  <div className="space-y-1">
+                                    <p className="text-sm font-medium text-green-800 dark:text-green-200">Voucher valido</p>
+                                    {ccCheckResult.nominativo && (
+                                      <p className="text-xs text-green-700 dark:text-green-300">Beneficiario: {ccCheckResult.nominativo}</p>
+                                    )}
+                                    {ccCheckResult.importo !== undefined && (
+                                      <p className="text-xs text-green-700 dark:text-green-300">Importo disponibile: &euro;{ccCheckResult.importo.toFixed(2)}</p>
+                                    )}
+                                    {ccCheckResult.importo !== undefined && ccCheckResult.importo < parseFloat(displayTotal) && (
+                                      <p className="text-xs text-red-600 dark:text-red-400 font-medium mt-1">
+                                        Importo insufficiente per questo acquisto (&euro;{parseFloat(displayTotal).toFixed(2)})
+                                      </p>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <p className="text-sm text-red-800 dark:text-red-200">{ccCheckResult.error || "Voucher non valido."}</p>
+                                )}
+                              </div>
+                            )}
+                            {ccCheckResult?.success && (ccCheckResult.importo === undefined || ccCheckResult.importo >= parseFloat(displayTotal)) && (
+                              <Button
+                                onClick={handleCcPurchase}
+                                className="w-full bg-amber-600 hover:bg-amber-700 text-white"
+                                disabled={ccProcessing}
+                                data-testid="button-cc-purchase"
+                              >
+                                {ccProcessing ? (
+                                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                ) : (
+                                  <Ticket className="w-4 h-4 mr-2" />
+                                )}
+                                Paga &euro;{parseFloat(displayTotal).toFixed(2)} con Carta della Cultura
+                              </Button>
+                            )}
+                          </div>
+                        )}
 
                         <Button
                           type="button"
