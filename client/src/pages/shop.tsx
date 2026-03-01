@@ -43,7 +43,6 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
   const gradientClass = categoryConfig?.color || "from-primary to-blue-400";
   const cart = useCart();
   const { toast } = useToast();
-  const hasOptions = product.options && product.options.length > 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -127,24 +126,22 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
                 </div>
               </div>
               <div className="flex items-center gap-1.5">
-                {!hasOptions && (
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="h-9 w-9 border-border/50 hover:bg-muted"
-                    onClick={handleAddToCart}
-                    data-testid={`button-cart-${product.slug}`}
-                  >
-                    <ShoppingCart className="h-4 w-4" />
-                  </Button>
-                )}
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className="h-9 w-9 border-border/50 hover:bg-muted"
+                  onClick={handleAddToCart}
+                  data-testid={`button-cart-${product.slug}`}
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                </Button>
                 <Link href={`/shop/checkout/${product.slug}`}>
                   <Button
                     size="sm"
                     className={`bg-gradient-to-r ${gradientClass} hover:opacity-90 text-white border-0 shadow-sm transition-all duration-300 group/btn h-9`}
                     data-testid={`button-buy-${product.slug}`}
                   >
-                    {hasOptions ? "Configura" : "Acquista"}
+                    Acquista
                     <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform duration-300 group-hover/btn:translate-x-0.5" />
                   </Button>
                 </Link>
