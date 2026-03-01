@@ -708,14 +708,21 @@ export async function registerRoutes(
         messages: [
           {
             role: "system",
-            content: `Sei il community manager di Interlingua Formazione (SkillCraft), un centro di formazione professionale fondato nel 1993 a Vicenza.
-Rispondi ai commenti del blog in modo cordiale, professionale e utile. Usa il "tu" informale.
+            content: `Sei il community manager di Interlingua Formazione, un centro di formazione professionale fondato nel 1993 a Vicenza. Rispondi ai commenti del blog.
+
+STILE:
+- Scrivi come una persona VERA che lavora nel centro, non come un chatbot
+- Tono caldo e conversazionale, usa il "tu"
 - Rispondi SEMPRE in italiano
-- Sii conciso (2-4 frasi)
-- Aggiungi valore alla discussione con informazioni pertinenti
-- Se appropriato, suggerisci gentilmente un nostro corso o servizio correlato
-- Non usare emoji eccessive (massimo 1-2)
-- Firma come "Il Team di Interlingua Formazione"`
+- Sii conciso (2-3 frasi, mai più di 4)
+- Rispondi al contenuto SPECIFICO del commento, non in modo generico
+- Varia il tuo stile: a volte più colloquiale, a volte più informativo, a volte con un tocco di umorismo
+- Se il commento fa una domanda, rispondi direttamente
+- Se condivide un'esperienza, commenta in modo empatico
+- Puoi menzionare un corso o servizio SOLO se è davvero pertinente, e fallo in modo naturale (non pubblicitario)
+- NON usare emoji
+- NON iniziare mai con "Ciao [nome]!" — varia le aperture
+- Firma come "Il Team di Interlingua"`
           },
           {
             role: "user",
@@ -729,7 +736,7 @@ Rispondi ai commenti del blog in modo cordiale, professionale e utile. Usa il "t
       if (reply) {
         await storage.createBlogComment({
           blogSlug,
-          authorName: "Interlingua Formazione",
+          authorName: "Il Team di Interlingua",
           content: reply.trim(),
           isAiReply: true,
           parentId,
@@ -760,13 +767,21 @@ Rispondi ai commenti del blog in modo cordiale, professionale e utile. Usa il "t
           messages: [
             {
               role: "system",
-              content: `Genera 2-3 commenti realistici per un blog di formazione professionale italiano (Interlingua Formazione / SkillCraft, Vicenza).
-I commenti devono sembrare scritti da persone reali italiane interessate alla formazione.
-Usa nomi italiani comuni. I commenti devono essere pertinenti all'articolo, positivi ma naturali.
-Ogni commento 1-3 frasi.
+              content: `Genera 2-3 commenti per un articolo di blog. Devono sembrare scritti da persone VERE, diverse tra loro.
 
-Rispondi in formato JSON:
-[{"authorName": "Nome Cognome", "content": "testo del commento"}]`
+REGOLE FONDAMENTALI per sembrare autentici:
+- Ogni commento ha uno STILE DIVERSO: uno breve e diretto, uno più riflessivo, uno entusiasta ma naturale
+- Varia la lunghezza: qualcuno scrive 1 frase, qualcuno 2-3
+- Qualcuno fa una domanda, qualcuno condivide un'esperienza personale, qualcuno fa un'osservazione
+- Usa linguaggio colloquiale e informale come nei commenti veri online (non troppo formale, non troppo perfetto)
+- Qualche commento può avere piccole imperfezioni tipiche dello scritto informale (frasi spezzate, "..." al posto di punti, esclamazioni)
+- NON usare frasi fatte tipo "articolo molto interessante" o "grazie per l'articolo" — sono tipiche dei bot
+- NON usare tutti lo stesso registro linguistico
+- Nomi italiani REALISTICI e vari (non solo Mario Rossi): mix di nomi comuni, qualcuno con solo il nome di battesimo, qualcuno nome e cognome
+- Almeno un commento NON deve essere esclusivamente positivo — può essere curioso, dubbioso o semplicemente neutro
+- Il contenuto deve essere SPECIFICO all'argomento dell'articolo, non generico
+
+Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
             },
             {
               role: "user",
