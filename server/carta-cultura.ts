@@ -9,6 +9,7 @@ const PRODUCTION_ENDPOINT = "https://ws-cartegiovani.cultura.gov.it/WSUtilizzoVo
 const TEST_ENDPOINT = "https://wstestcartegiovani.cultura.gov.it/WSUtilizzoVoucherGMWEB/VerificaVoucher";
 const PARTITA_IVA = "03828240246";
 const SOAP_NS = "http://bonus.mic.it/VerificaVoucher/";
+export const ALLOWED_AMBITO = "Corsi di lingua straniera";
 
 function getEndpoint(): string {
   return process.env.NODE_ENV === "production" ? PRODUCTION_ENDPOINT : TEST_ENDPOINT;

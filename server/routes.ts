@@ -9,7 +9,7 @@ import { forwardToCRM } from "./crm";
 import { generateBlogPost } from "./blog-generator";
 import { chatWithAI } from "./ai-chat";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalOrder } from "./paypal";
-import { checkVoucher, confirmVoucher, isCartaCulturaAvailable } from "./carta-cultura";
+import { checkVoucher, confirmVoucher, isCartaCulturaAvailable, ALLOWED_AMBITO } from "./carta-cultura";
 import { SHOP_PRODUCTS, getProductBySlug, getEffectivePrice } from "@shared/products";
 import { scoreWriting, scoreSpeaking, transcribeAudio } from "./english-test";
 import { getAllQuestions } from "./english-test-questions";
@@ -1878,6 +1878,12 @@ export async function registerRoutes(
         return res.status(400).json({ success: false, error: "Inserisci un codice voucher valido." });
       }
       const result = await checkVoucher(codiceVoucher.trim(), false);
+      if (result.success && result.ambito && result.ambito !== ALLOWED_AMBITO) {
+        return res.json({
+          success: false,
+          error: `Questo voucher è per "${result.ambito}" e non è utilizzabile presso il nostro esercizio. Accettiamo solo voucher per "${ALLOWED_AMBITO}".`,
+        });
+      }
       res.json(result);
     } catch (error: any) {
       console.error("Error checking Carta della Cultura voucher:", error);
@@ -1951,6 +1957,9 @@ export async function registerRoutes(
       const checkResult = await checkVoucher(codiceVoucher.trim(), false);
       if (!checkResult.success) {
         return res.status(400).json({ success: false, message: checkResult.error || "Voucher non valido." });
+      }
+      if (checkResult.ambito && checkResult.ambito !== ALLOWED_AMBITO) {
+        return res.status(400).json({ success: false, message: `Questo voucher è per "${checkResult.ambito}" e non è utilizzabile. Accettiamo solo voucher per "${ALLOWED_AMBITO}".` });
       }
 
       const ccAmount = (checkResult.importo !== undefined) ? Math.min(checkResult.importo, amountToCharge) : amountToCharge;
@@ -2143,6 +2152,9 @@ export async function registerRoutes(
       const checkResult = await checkVoucher(codiceVoucher.trim(), false);
       if (!checkResult.success) {
         return res.status(400).json({ success: false, message: checkResult.error || "Voucher non valido." });
+      }
+      if (checkResult.ambito && checkResult.ambito !== ALLOWED_AMBITO) {
+        return res.status(400).json({ success: false, message: `Questo voucher è per "${checkResult.ambito}" e non è utilizzabile. Accettiamo solo voucher per "${ALLOWED_AMBITO}".` });
       }
 
       const ccAmount = (checkResult.importo !== undefined) ? Math.min(checkResult.importo, finalTotal) : finalTotal;
