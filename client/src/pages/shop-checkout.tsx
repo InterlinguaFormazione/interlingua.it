@@ -34,6 +34,10 @@ import {
   ShoppingBag,
   Clock,
   Lock,
+  Tag,
+  X,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 declare global {
@@ -82,10 +86,53 @@ export default function ShopCheckout() {
   const [processing, setProcessing] = useState(false);
   const paypalInitialized = useRef(false);
 
+  const [voucherCode, setVoucherCode] = useState("");
+  const [voucherOpen, setVoucherOpen] = useState(false);
+  const [voucherLoading, setVoucherLoading] = useState(false);
+  const [voucherResult, setVoucherResult] = useState<{
+    valid: boolean;
+    discount?: string;
+    discountedTotal?: string;
+    discountType?: string;
+    discountValue?: string;
+    message?: string;
+  } | null>(null);
+  const [appliedVoucherCode, setAppliedVoucherCode] = useState("");
+
   const effectivePrice = product ? getEffectivePrice(product, selectedOptions) : "0";
+  const displayTotal = voucherResult?.valid && voucherResult.discountedTotal
+    ? voucherResult.discountedTotal
+    : effectivePrice;
   const hasRequiredOptions = product?.options
     ? product.options.every((opt) => selectedOptions[opt.name])
     : true;
+
+  const handleApplyVoucher = async () => {
+    if (!voucherCode.trim()) return;
+    setVoucherLoading(true);
+    try {
+      const res = await apiRequest("POST", "/api/shop/validate-voucher", {
+        code: voucherCode.trim(),
+        cartTotal: effectivePrice,
+        productSlugs: product ? [product.slug] : [],
+      });
+      const data = await res.json();
+      setVoucherResult(data);
+      if (data.valid) {
+        setAppliedVoucherCode(voucherCode.trim().toUpperCase());
+      }
+    } catch {
+      setVoucherResult({ valid: false, message: "Errore di connessione. Riprova." });
+    } finally {
+      setVoucherLoading(false);
+    }
+  };
+
+  const handleRemoveVoucher = () => {
+    setVoucherResult(null);
+    setAppliedVoucherCode("");
+    setVoucherCode("");
+  };
 
   const purchaseMutation = useMutation({
     mutationFn: async (data: Record<string, string>) => {
@@ -119,7 +166,7 @@ export default function ShopCheckout() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: effectivePrice,
+        amount: displayTotal,
         currency: "EUR",
         intent: "CAPTURE",
       }),
@@ -279,6 +326,7 @@ export default function ShopCheckout() {
                   billingCodiceSdi: codiceSdi,
                   billingPec: pec,
                   notes: optionsSummary ? `[${optionsSummary}] ${notes}` : notes,
+                  ...(appliedVoucherCode ? { discountCode: appliedVoucherCode } : {}),
                 });
               } else {
                 setProcessing(false);
@@ -440,13 +488,84 @@ export default function ShopCheckout() {
                           ))}
                         </div>
                       )}
-                      <div className="border-t pt-3 mt-3">
-                        <div className="flex justify-between items-baseline">
-                          <span className="text-sm text-muted-foreground">Totale</span>
-                          <div>
-                            <span className="text-2xl font-bold text-primary">&euro;{parseFloat(effectivePrice).toFixed(2)}</span>
+                      <div className="border-t pt-3 mt-3 space-y-3">
+                        <button
+                          type="button"
+                          onClick={() => setVoucherOpen(!voucherOpen)}
+                          className="flex items-center justify-between w-full text-sm text-muted-foreground"
+                          data-testid="button-toggle-voucher"
+                        >
+                          <span className="flex items-center gap-1.5">
+                            <Tag className="w-3.5 h-3.5" />
+                            Hai un codice sconto?
+                          </span>
+                          {voucherOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                        </button>
+                        {voucherOpen && (
+                          <div className="space-y-2">
+                            {voucherResult?.valid && appliedVoucherCode ? (
+                              <div className="flex items-center justify-between gap-2">
+                                <Badge variant="secondary" className="text-xs" data-testid="badge-voucher-applied">
+                                  <Tag className="w-3 h-3 mr-1" />
+                                  {appliedVoucherCode}
+                                </Badge>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={handleRemoveVoucher}
+                                  data-testid="button-remove-voucher"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </Button>
+                              </div>
+                            ) : (
+                              <div className="flex gap-2">
+                                <Input
+                                  value={voucherCode}
+                                  onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
+                                  placeholder="Codice sconto"
+                                  className="text-xs"
+                                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleApplyVoucher(); } }}
+                                  data-testid="input-voucher-code"
+                                />
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={handleApplyVoucher}
+                                  disabled={voucherLoading || !voucherCode.trim()}
+                                  data-testid="button-apply-voucher"
+                                >
+                                  {voucherLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Applica"}
+                                </Button>
+                              </div>
+                            )}
+                            {voucherResult && (
+                              <p className={`text-xs ${voucherResult.valid ? "text-green-600 dark:text-green-400" : "text-destructive"}`} data-testid="text-voucher-message">
+                                {voucherResult.message}
+                              </p>
+                            )}
                           </div>
+                        )}
+                        <div className="flex justify-between items-baseline">
+                          <span className="text-sm text-muted-foreground">Subtotale</span>
+                          <span className={`text-sm ${voucherResult?.valid ? "line-through text-muted-foreground" : "font-bold text-primary text-2xl"}`}>
+                            &euro;{parseFloat(effectivePrice).toFixed(2)}
+                          </span>
                         </div>
+                        {voucherResult?.valid && voucherResult.discount && (
+                          <div className="flex justify-between items-baseline text-green-600 dark:text-green-400">
+                            <span className="text-sm">Sconto</span>
+                            <span className="text-sm font-medium">-&euro;{parseFloat(voucherResult.discount).toFixed(2)}</span>
+                          </div>
+                        )}
+                        {voucherResult?.valid && (
+                          <div className="flex justify-between items-baseline">
+                            <span className="text-sm font-medium">Totale</span>
+                            <span className="text-2xl font-bold text-primary" data-testid="text-discounted-total">
+                              &euro;{parseFloat(displayTotal).toFixed(2)}
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div className="flex items-center gap-3 pt-2">
                         <SiPaypal className="w-8 h-5 text-[#003087]" />
@@ -804,9 +923,18 @@ export default function ShopCheckout() {
                               ))}
                             </div>
                           )}
+                          {voucherResult?.valid && voucherResult.discount && (
+                            <div className="flex justify-between text-sm text-green-600 dark:text-green-400 border-t pt-2">
+                              <span className="flex items-center gap-1">
+                                <Tag className="w-3 h-3" />
+                                Sconto ({appliedVoucherCode})
+                              </span>
+                              <span>-&euro;{parseFloat(voucherResult.discount).toFixed(2)}</span>
+                            </div>
+                          )}
                           <div className="flex justify-between font-bold border-t pt-2">
                             <span>Totale</span>
-                            <span className="text-primary">&euro;{parseFloat(effectivePrice).toFixed(2)}</span>
+                            <span className="text-primary">&euro;{parseFloat(displayTotal).toFixed(2)}</span>
                           </div>
                         </div>
 
@@ -828,7 +956,7 @@ export default function ShopCheckout() {
                             data-testid="button-paypal-pay"
                           >
                             <SiPaypal className="w-5 h-5" />
-                            Paga &euro;{parseFloat(effectivePrice).toFixed(2)} con PayPal
+                            Paga &euro;{parseFloat(displayTotal).toFixed(2)} con PayPal
                           </button>
                           <p className="text-xs text-muted-foreground text-center">
                             Puoi pagare con il tuo conto PayPal oppure con carta Visa/Mastercard

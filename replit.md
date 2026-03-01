@@ -35,7 +35,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/bando-detail.tsx` - Individual bando/funded course detail page
 - `src/pages/speakers-corner.tsx` - Speaker's Corner landing page with login
 - `src/pages/speakers-corner-dashboard.tsx` - Subscriber dashboard for booking sessions
-- `src/pages/admin.tsx` - General admin panel (contacts, newsletter, blog, shop orders, materials, English adaptive test results, user management)
+- `src/pages/admin.tsx` - General admin panel (contacts, newsletter, blog, shop orders, materials, English adaptive test results, discount vouchers, user management)
 - `src/pages/speakers-corner-admin.tsx` - Admin panel for managing subscribers, sessions, email settings
 - `src/pages/blog.tsx` - Blog listing page
 - `src/pages/blog-post.tsx` - Blog post detail page
@@ -99,7 +99,8 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `sc_email_settings` - Email notification settings (suspend/resume for holidays)
 - `sc_payments` - PayPal payment records (subscriber ID, PayPal order ID, amount, currency, status, payer email)
 - `shop_customers` - Customer accounts created during shop checkout (email, hashed password, name, phone)
-- `shop_orders` - Online shop orders (product slug/name, amount, PayPal order ID, customer first/last name, email, phone, student first/last name + email for third-party purchases, billing info, status, linked to customer account)
+- `shop_orders` - Online shop orders (product slug/name, amount, PayPal order ID, customer first/last name, email, phone, student first/last name + email for third-party purchases, billing info, status, discount_code, discount_amount, linked to customer account)
+- `discount_vouchers` - Discount voucher codes for the shop (code, description, discount_type percentage/fixed, discount_value, min_order_amount, max_uses, used_count, valid_from, valid_until, product_slugs, active)
 - `course_materials` - Downloadable files per course product (slug, file name, URL, size, description)
 
 ## API Endpoints

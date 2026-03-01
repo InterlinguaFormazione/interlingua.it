@@ -245,6 +245,8 @@ export const shopOrders = pgTable("shop_orders", {
   billingCodiceSdi: text("billing_codice_sdi"),
   billingPec: text("billing_pec"),
   notes: text("notes"),
+  discountCode: text("discount_code"),
+  discountAmount: text("discount_amount"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -255,6 +257,30 @@ export const insertShopOrderSchema = createInsertSchema(shopOrders).omit({
 
 export type InsertShopOrder = z.infer<typeof insertShopOrderSchema>;
 export type ShopOrder = typeof shopOrders.$inferSelect;
+
+export const discountVouchers = pgTable("discount_vouchers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  code: text("code").notNull().unique(),
+  description: text("description"),
+  discountType: text("discount_type").notNull(),
+  discountValue: text("discount_value").notNull(),
+  minOrderAmount: text("min_order_amount"),
+  maxUses: integer("max_uses"),
+  usedCount: integer("used_count").notNull().default(0),
+  validFrom: timestamp("valid_from"),
+  validUntil: timestamp("valid_until"),
+  productSlugs: text("product_slugs"),
+  active: boolean("active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertDiscountVoucherSchema = createInsertSchema(discountVouchers).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertDiscountVoucher = z.infer<typeof insertDiscountVoucherSchema>;
+export type DiscountVoucher = typeof discountVouchers.$inferSelect;
 
 export const courseMaterials = pgTable("course_materials", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

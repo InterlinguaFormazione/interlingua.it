@@ -37,6 +37,10 @@ import {
   Trash2,
   Plus,
   Minus,
+  Tag,
+  X,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 declare global {
@@ -79,6 +83,51 @@ export default function CartCheckout() {
   const [processing, setProcessing] = useState(false);
   const paypalInitialized = useRef(false);
 
+  const [voucherCode, setVoucherCode] = useState("");
+  const [voucherOpen, setVoucherOpen] = useState(false);
+  const [voucherLoading, setVoucherLoading] = useState(false);
+  const [voucherResult, setVoucherResult] = useState<{
+    valid: boolean;
+    discount?: string;
+    discountedTotal?: string;
+    discountType?: string;
+    discountValue?: string;
+    message?: string;
+  } | null>(null);
+  const [appliedVoucherCode, setAppliedVoucherCode] = useState("");
+
+  const displayTotal = voucherResult?.valid && voucherResult.discountedTotal
+    ? parseFloat(voucherResult.discountedTotal)
+    : totalPrice;
+
+  const handleApplyVoucher = async () => {
+    if (!voucherCode.trim()) return;
+    setVoucherLoading(true);
+    try {
+      const productSlugs = items.map(item => item.product.slug);
+      const res = await apiRequest("POST", "/api/shop/validate-voucher", {
+        code: voucherCode.trim(),
+        cartTotal: totalPrice.toFixed(2),
+        productSlugs,
+      });
+      const data = await res.json();
+      setVoucherResult(data);
+      if (data.valid) {
+        setAppliedVoucherCode(voucherCode.trim().toUpperCase());
+      }
+    } catch {
+      setVoucherResult({ valid: false, message: "Errore di connessione. Riprova." });
+    } finally {
+      setVoucherLoading(false);
+    }
+  };
+
+  const handleRemoveVoucher = () => {
+    setVoucherResult(null);
+    setAppliedVoucherCode("");
+    setVoucherCode("");
+  };
+
   const purchaseMutation = useMutation({
     mutationFn: async (data: Record<string, string>) => {
       const res = await apiRequest("POST", "/api/shop/purchase-cart", data);
@@ -112,7 +161,7 @@ export default function CartCheckout() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        amount: totalPrice.toFixed(2),
+        amount: displayTotal.toFixed(2),
         currency: "EUR",
         intent: "CAPTURE",
       }),
@@ -260,6 +309,7 @@ export default function CartCheckout() {
                   billingCodiceSdi: codiceSdi,
                   billingPec: pec,
                   notes,
+                  ...(appliedVoucherCode ? { discountCode: appliedVoucherCode } : {}),
                 });
               } else {
                 setProcessing(false);
@@ -655,8 +705,24 @@ export default function CartCheckout() {
                     <div className="rounded-xl border p-4 bg-muted/20 space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-muted-foreground text-sm">{totalItems} {totalItems === 1 ? "articolo" : "articoli"}</span>
-                        <span className="text-2xl font-bold text-primary" data-testid="text-payment-total">&euro;{totalPrice.toFixed(2)}</span>
+                        {voucherResult?.valid ? (
+                          <div className="text-right">
+                            <span className="text-sm line-through text-muted-foreground">&euro;{totalPrice.toFixed(2)}</span>
+                            <span className="text-2xl font-bold text-primary ml-2" data-testid="text-payment-total">&euro;{displayTotal.toFixed(2)}</span>
+                          </div>
+                        ) : (
+                          <span className="text-2xl font-bold text-primary" data-testid="text-payment-total">&euro;{totalPrice.toFixed(2)}</span>
+                        )}
                       </div>
+                      {voucherResult?.valid && voucherResult.discount && (
+                        <div className="flex items-center justify-between text-sm text-green-600 dark:text-green-400">
+                          <span className="flex items-center gap-1">
+                            <Tag className="w-3 h-3" />
+                            Sconto ({appliedVoucherCode})
+                          </span>
+                          <span>-&euro;{parseFloat(voucherResult.discount).toFixed(2)}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="space-y-4">
@@ -691,7 +757,7 @@ export default function CartCheckout() {
                           {paypalReady ? (
                             <span className="flex items-center justify-center gap-2">
                               <Lock className="w-4 h-4" />
-                              Paga &euro;{totalPrice.toFixed(2)} con PayPal
+                              Paga &euro;{displayTotal.toFixed(2)} con PayPal
                             </span>
                           ) : (
                             <span className="flex items-center justify-center gap-2">
@@ -764,11 +830,86 @@ export default function CartCheckout() {
                         </div>
                       ))}
                     </div>
-                    <div className="border-t pt-3">
+                    <div className="border-t pt-3 space-y-3">
+                      <button
+                        type="button"
+                        onClick={() => setVoucherOpen(!voucherOpen)}
+                        className="flex items-center justify-between w-full text-sm text-muted-foreground"
+                        data-testid="button-toggle-voucher"
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <Tag className="w-3.5 h-3.5" />
+                          Hai un codice sconto?
+                        </span>
+                        {voucherOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                      </button>
+                      {voucherOpen && (
+                        <div className="space-y-2">
+                          {voucherResult?.valid && appliedVoucherCode ? (
+                            <div className="flex items-center justify-between gap-2">
+                              <Badge variant="secondary" className="text-xs" data-testid="badge-voucher-applied">
+                                <Tag className="w-3 h-3 mr-1" />
+                                {appliedVoucherCode}
+                              </Badge>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={handleRemoveVoucher}
+                                data-testid="button-remove-voucher"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex gap-2">
+                              <Input
+                                value={voucherCode}
+                                onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
+                                placeholder="Codice sconto"
+                                className="text-xs"
+                                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleApplyVoucher(); } }}
+                                data-testid="input-voucher-code"
+                              />
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={handleApplyVoucher}
+                                disabled={voucherLoading || !voucherCode.trim()}
+                                data-testid="button-apply-voucher"
+                              >
+                                {voucherLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Applica"}
+                              </Button>
+                            </div>
+                          )}
+                          {voucherResult && (
+                            <p className={`text-xs ${voucherResult.valid ? "text-green-600 dark:text-green-400" : "text-destructive"}`} data-testid="text-voucher-message">
+                              {voucherResult.message}
+                            </p>
+                          )}
+                        </div>
+                      )}
                       <div className="flex items-center justify-between">
-                        <span className="font-bold">Totale</span>
-                        <span className="text-xl font-bold text-primary" data-testid="text-summary-total">&euro;{totalPrice.toFixed(2)}</span>
+                        <span className={voucherResult?.valid ? "text-sm text-muted-foreground" : "font-bold"}>
+                          {voucherResult?.valid ? "Subtotale" : "Totale"}
+                        </span>
+                        <span className={`${voucherResult?.valid ? "text-sm line-through text-muted-foreground" : "text-xl font-bold text-primary"}`} data-testid="text-summary-total">
+                          &euro;{totalPrice.toFixed(2)}
+                        </span>
                       </div>
+                      {voucherResult?.valid && voucherResult.discount && (
+                        <div className="flex items-center justify-between text-green-600 dark:text-green-400">
+                          <span className="text-sm">Sconto</span>
+                          <span className="text-sm font-medium">-&euro;{parseFloat(voucherResult.discount).toFixed(2)}</span>
+                        </div>
+                      )}
+                      {voucherResult?.valid && (
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold">Totale</span>
+                          <span className="text-xl font-bold text-primary" data-testid="text-discounted-total">
+                            &euro;{displayTotal.toFixed(2)}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="space-y-2 pt-2">
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">

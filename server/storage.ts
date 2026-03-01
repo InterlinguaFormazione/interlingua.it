@@ -36,6 +36,8 @@ import {
   type InsertBeWritingSpeaking,
   type BeSectionResult,
   type InsertBeSectionResult,
+  type DiscountVoucher,
+  type InsertDiscountVoucher,
   users,
   contactSubmissions,
   newsletterSubscriptions,
@@ -55,9 +57,10 @@ import {
   beResponses,
   beWritingSpeaking,
   beSectionResults,
+  discountVouchers,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gte, lte, desc } from "drizzle-orm";
+import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -153,6 +156,14 @@ export interface IStorage {
 
   createBeSectionResult(result: InsertBeSectionResult): Promise<BeSectionResult>;
   getBeSectionResultsBySession(sessionId: number): Promise<BeSectionResult[]>;
+
+  createDiscountVoucher(voucher: InsertDiscountVoucher): Promise<DiscountVoucher>;
+  getDiscountVouchers(): Promise<DiscountVoucher[]>;
+  getDiscountVoucherByCode(code: string): Promise<DiscountVoucher | undefined>;
+  getDiscountVoucherById(id: string): Promise<DiscountVoucher | undefined>;
+  updateDiscountVoucher(id: string, data: Partial<InsertDiscountVoucher>): Promise<DiscountVoucher | undefined>;
+  deleteDiscountVoucher(id: string): Promise<void>;
+  incrementVoucherUsage(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -536,6 +547,40 @@ export class DatabaseStorage implements IStorage {
 
   async getBeSectionResultsBySession(sessionId: number): Promise<BeSectionResult[]> {
     return db.select().from(beSectionResults).where(eq(beSectionResults.sessionId, sessionId)).orderBy(beSectionResults.sectionIndex);
+  }
+
+  async createDiscountVoucher(voucher: InsertDiscountVoucher): Promise<DiscountVoucher> {
+    const [result] = await db.insert(discountVouchers).values(voucher).returning();
+    return result;
+  }
+
+  async getDiscountVouchers(): Promise<DiscountVoucher[]> {
+    return db.select().from(discountVouchers).orderBy(desc(discountVouchers.createdAt));
+  }
+
+  async getDiscountVoucherByCode(code: string): Promise<DiscountVoucher | undefined> {
+    const [result] = await db.select().from(discountVouchers).where(eq(discountVouchers.code, code.toUpperCase()));
+    return result;
+  }
+
+  async getDiscountVoucherById(id: string): Promise<DiscountVoucher | undefined> {
+    const [result] = await db.select().from(discountVouchers).where(eq(discountVouchers.id, id));
+    return result;
+  }
+
+  async updateDiscountVoucher(id: string, data: Partial<InsertDiscountVoucher>): Promise<DiscountVoucher | undefined> {
+    const [result] = await db.update(discountVouchers).set(data).where(eq(discountVouchers.id, id)).returning();
+    return result;
+  }
+
+  async deleteDiscountVoucher(id: string): Promise<void> {
+    await db.delete(discountVouchers).where(eq(discountVouchers.id, id));
+  }
+
+  async incrementVoucherUsage(id: string): Promise<void> {
+    await db.update(discountVouchers)
+      .set({ usedCount: sql`COALESCE(${discountVouchers.usedCount}, 0) + 1` })
+      .where(eq(discountVouchers.id, id));
   }
 }
 

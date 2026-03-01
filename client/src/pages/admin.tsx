@@ -36,6 +36,9 @@ import {
   GraduationCap,
   ChevronDown,
   ChevronUp,
+  Tag,
+  ToggleLeft,
+  ToggleRight,
 } from "lucide-react";
 
 interface ShopOrder {
@@ -944,6 +947,403 @@ function UsersTab({ token, currentUserId }: { token: string; currentUserId: stri
   );
 }
 
+interface DiscountVoucher {
+  id: string;
+  code: string;
+  description: string | null;
+  discountType: string;
+  discountValue: string;
+  minOrderAmount: string | null;
+  maxUses: number | null;
+  usedCount: number;
+  validFrom: string | null;
+  validUntil: string | null;
+  productSlugs: string | null;
+  active: boolean | null;
+  createdAt: string | null;
+}
+
+function VouchersTab({ token }: { token: string }) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingVoucher, setEditingVoucher] = useState<DiscountVoucher | null>(null);
+  const [formData, setFormData] = useState({
+    code: "",
+    description: "",
+    discountType: "percentage",
+    discountValue: "",
+    minOrderAmount: "",
+    maxUses: "",
+    validFrom: "",
+    validUntil: "",
+    productSlugs: "",
+    active: true,
+  });
+  const { toast } = useToast();
+
+  const { data: vouchers = [], isLoading } = useQuery<DiscountVoucher[]>({
+    queryKey: ["/api/admin/vouchers"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/vouchers", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to fetch vouchers");
+      return res.json();
+    },
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: async (data: Record<string, unknown>) => {
+      const method = editingVoucher ? "PATCH" : "POST";
+      const url = editingVoucher
+        ? `/api/admin/vouchers/${editingVoucher.id}`
+        : "/api/admin/vouchers";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Errore durante il salvataggio");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/vouchers"] });
+      closeDialog();
+      toast({ title: "Successo", description: editingVoucher ? "Voucher aggiornato" : "Voucher creato" });
+    },
+    onError: (error: any) => {
+      toast({ title: "Errore", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/admin/vouchers/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Errore durante l'eliminazione");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/vouchers"] });
+      toast({ title: "Successo", description: "Voucher eliminato" });
+    },
+  });
+
+  const toggleMutation = useMutation({
+    mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
+      const res = await fetch(`/api/admin/vouchers/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ active }),
+      });
+      if (!res.ok) throw new Error("Errore");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/vouchers"] });
+    },
+  });
+
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    setEditingVoucher(null);
+    setFormData({
+      code: "",
+      description: "",
+      discountType: "percentage",
+      discountValue: "",
+      minOrderAmount: "",
+      maxUses: "",
+      validFrom: "",
+      validUntil: "",
+      productSlugs: "",
+      active: true,
+    });
+  };
+
+  const handleEdit = (v: DiscountVoucher) => {
+    setEditingVoucher(v);
+    setFormData({
+      code: v.code,
+      description: v.description || "",
+      discountType: v.discountType,
+      discountValue: v.discountValue,
+      minOrderAmount: v.minOrderAmount || "",
+      maxUses: v.maxUses !== null ? String(v.maxUses) : "",
+      validFrom: v.validFrom ? v.validFrom.slice(0, 16) : "",
+      validUntil: v.validUntil ? v.validUntil.slice(0, 16) : "",
+      productSlugs: v.productSlugs || "",
+      active: v.active !== false,
+    });
+    setIsDialogOpen(true);
+  };
+
+  const handleSubmit = () => {
+    if (!formData.code || !formData.discountValue) {
+      toast({ title: "Errore", description: "Codice e valore sconto sono obbligatori", variant: "destructive" });
+      return;
+    }
+    const payload: Record<string, unknown> = {
+      code: formData.code.toUpperCase().trim(),
+      description: formData.description || null,
+      discountType: formData.discountType,
+      discountValue: formData.discountValue,
+      minOrderAmount: formData.minOrderAmount || null,
+      maxUses: formData.maxUses ? parseInt(formData.maxUses, 10) : null,
+      validFrom: formData.validFrom || null,
+      validUntil: formData.validUntil || null,
+      productSlugs: formData.productSlugs || null,
+      active: formData.active,
+    };
+    saveMutation.mutate(payload);
+  };
+
+  const isExpired = (v: DiscountVoucher) => {
+    if (!v.validUntil) return false;
+    return new Date(v.validUntil) < new Date();
+  };
+
+  const isExhausted = (v: DiscountVoucher) => {
+    if (v.maxUses === null) return false;
+    return v.usedCount >= v.maxUses;
+  };
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between gap-2">
+        <div>
+          <CardTitle>Voucher Sconto</CardTitle>
+          <CardDescription>Gestione codici sconto per lo shop</CardDescription>
+        </div>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => {
+          if (!open) closeDialog();
+          else setIsDialogOpen(true);
+        }}>
+          <DialogTrigger asChild>
+            <Button size="sm" data-testid="button-new-voucher">
+              <Plus className="w-4 h-4 mr-2" /> Nuovo Voucher
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{editingVoucher ? "Modifica Voucher" : "Crea Nuovo Voucher"}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Codice</Label>
+                  <Input
+                    value={formData.code}
+                    onChange={e => setFormData({ ...formData, code: e.target.value })}
+                    placeholder="es. SCONTO10"
+                    data-testid="input-voucher-code"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Tipo Sconto</Label>
+                  <Select value={formData.discountType} onValueChange={val => setFormData({ ...formData, discountType: val })}>
+                    <SelectTrigger data-testid="select-voucher-type">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="percentage">Percentuale (%)</SelectItem>
+                      <SelectItem value="fixed">Fisso (&euro;)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Valore Sconto</Label>
+                  <Input
+                    value={formData.discountValue}
+                    onChange={e => setFormData({ ...formData, discountValue: e.target.value })}
+                    placeholder={formData.discountType === "percentage" ? "es. 10" : "es. 25.00"}
+                    data-testid="input-voucher-value"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Importo Minimo Ordine</Label>
+                  <Input
+                    value={formData.minOrderAmount}
+                    onChange={e => setFormData({ ...formData, minOrderAmount: e.target.value })}
+                    placeholder="es. 50.00 (opzionale)"
+                    data-testid="input-voucher-min-amount"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Descrizione (nota interna)</Label>
+                <Input
+                  value={formData.description}
+                  onChange={e => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="es. Promozione estate 2025"
+                  data-testid="input-voucher-description"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Max Utilizzi</Label>
+                  <Input
+                    type="number"
+                    value={formData.maxUses}
+                    onChange={e => setFormData({ ...formData, maxUses: e.target.value })}
+                    placeholder="Illimitati"
+                    data-testid="input-voucher-max-uses"
+                  />
+                </div>
+                <div className="space-y-2 flex items-end gap-2 pb-1">
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={formData.active}
+                      onCheckedChange={val => setFormData({ ...formData, active: val })}
+                      data-testid="switch-voucher-active"
+                    />
+                    <Label className="mb-0">Attivo</Label>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Valido Da</Label>
+                  <Input
+                    type="datetime-local"
+                    value={formData.validFrom}
+                    onChange={e => setFormData({ ...formData, validFrom: e.target.value })}
+                    data-testid="input-voucher-valid-from"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Valido Fino A</Label>
+                  <Input
+                    type="datetime-local"
+                    value={formData.validUntil}
+                    onChange={e => setFormData({ ...formData, validUntil: e.target.value })}
+                    data-testid="input-voucher-valid-until"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Prodotti (slug separati da virgola, vuoto = tutti)</Label>
+                <Input
+                  value={formData.productSlugs}
+                  onChange={e => setFormData({ ...formData, productSlugs: e.target.value })}
+                  placeholder="es. camclass-selflearning,speakers-corner"
+                  data-testid="input-voucher-product-slugs"
+                />
+              </div>
+              <Button
+                className="w-full mt-4"
+                onClick={handleSubmit}
+                disabled={saveMutation.isPending}
+                data-testid="button-save-voucher"
+              >
+                {saveMutation.isPending ? "Salvataggio..." : "Salva"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="text-center py-8 text-muted-foreground">Caricamento...</div>
+        ) : vouchers.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <Tag className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p>Nessun voucher creato</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm" data-testid="table-vouchers">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left py-3 px-2 font-medium">Codice</th>
+                  <th className="text-left py-3 px-2 font-medium">Descrizione</th>
+                  <th className="text-center py-3 px-2 font-medium">Tipo</th>
+                  <th className="text-center py-3 px-2 font-medium">Valore</th>
+                  <th className="text-center py-3 px-2 font-medium">Utilizzi</th>
+                  <th className="text-center py-3 px-2 font-medium">Scadenza</th>
+                  <th className="text-center py-3 px-2 font-medium">Stato</th>
+                  <th className="text-right py-3 px-2 font-medium">Azioni</th>
+                </tr>
+              </thead>
+              <tbody>
+                {vouchers.map((v) => (
+                  <tr key={v.id} className="border-b last:border-0" data-testid={`row-voucher-${v.id}`}>
+                    <td className="py-3 px-2 font-mono font-bold">{v.code}</td>
+                    <td className="py-3 px-2 text-muted-foreground text-xs max-w-[150px] truncate">{v.description || "-"}</td>
+                    <td className="py-3 px-2 text-center">
+                      <Badge variant="outline" className="text-xs">
+                        {v.discountType === "percentage" ? "%" : "EUR"}
+                      </Badge>
+                    </td>
+                    <td className="py-3 px-2 text-center font-medium">
+                      {v.discountType === "percentage" ? `${v.discountValue}%` : `${parseFloat(v.discountValue).toFixed(2)}`}
+                    </td>
+                    <td className="py-3 px-2 text-center">
+                      {v.usedCount}{v.maxUses !== null ? `/${v.maxUses}` : ""}
+                    </td>
+                    <td className="py-3 px-2 text-center text-xs text-muted-foreground">
+                      {v.validUntil ? new Date(v.validUntil).toLocaleDateString("it-IT") : "-"}
+                    </td>
+                    <td className="py-3 px-2 text-center">
+                      {!v.active ? (
+                        <Badge variant="secondary">Inattivo</Badge>
+                      ) : isExpired(v) ? (
+                        <Badge variant="destructive">Scaduto</Badge>
+                      ) : isExhausted(v) ? (
+                        <Badge variant="secondary">Esaurito</Badge>
+                      ) : (
+                        <Badge variant="default">Attivo</Badge>
+                      )}
+                    </td>
+                    <td className="py-3 px-2 text-right whitespace-nowrap">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => toggleMutation.mutate({ id: v.id, active: !v.active })}
+                        disabled={toggleMutation.isPending}
+                        data-testid={`button-toggle-voucher-${v.id}`}
+                      >
+                        {v.active ? <ToggleRight className="w-4 h-4 text-green-600" /> : <ToggleLeft className="w-4 h-4 text-muted-foreground" />}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(v)}
+                        data-testid={`button-edit-voucher-${v.id}`}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          if (confirm("Sei sicuro di voler eliminare questo voucher?")) {
+                            deleteMutation.mutate(v.id);
+                          }
+                        }}
+                        disabled={deleteMutation.isPending}
+                        className="text-destructive"
+                        data-testid={`button-delete-voucher-${v.id}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function AdminPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -1107,6 +1507,9 @@ export default function AdminPage() {
               <TabsTrigger value="english-test" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
                 <GraduationCap className="w-4 h-4" /> English Test
               </TabsTrigger>
+              <TabsTrigger value="vouchers" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2" data-testid="tab-vouchers">
+                <Tag className="w-4 h-4" /> Vouchers
+              </TabsTrigger>
               {user?.role === "admin" && (
                 <TabsTrigger value="users" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
                   <Users className="w-4 h-4" /> Users
@@ -1140,6 +1543,9 @@ export default function AdminPage() {
                 <EnglishAdaptiveTab token={token} />
               </CardContent>
             </Card>
+          </TabsContent>
+          <TabsContent value="vouchers">
+            <VouchersTab token={token} />
           </TabsContent>
           {user?.role === "admin" && (
             <TabsContent value="users">

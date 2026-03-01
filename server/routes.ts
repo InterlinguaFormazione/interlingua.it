@@ -1248,7 +1248,35 @@ export async function registerRoutes(
 
       const expectedPrice = getEffectivePrice(product, selectedOptions);
 
-      const verification = await verifyPaypalOrder(parsed.data.paypalOrderId, expectedPrice);
+      let finalPrice = expectedPrice;
+      let appliedDiscountCode: string | null = null;
+      let appliedDiscountAmount: string | null = null;
+      const discountCode = req.body.discountCode;
+      if (discountCode) {
+        const voucher = await storage.getDiscountVoucherByCode(discountCode.toUpperCase().trim());
+        if (voucher && voucher.active) {
+          const now = new Date();
+          const validTime = (!voucher.validFrom || now >= new Date(voucher.validFrom)) && (!voucher.validUntil || now <= new Date(voucher.validUntil));
+          const validUses = voucher.maxUses === null || (voucher.usedCount || 0) < voucher.maxUses;
+          const validProduct = !voucher.productSlugs || voucher.productSlugs.split(",").map((s: string) => s.trim()).includes(product.slug);
+          const total = parseFloat(expectedPrice);
+          const validMin = !voucher.minOrderAmount || total >= parseFloat(voucher.minOrderAmount);
+          if (validTime && validUses && validProduct && validMin) {
+            let discount = 0;
+            if (voucher.discountType === "percentage") {
+              discount = total * (parseFloat(voucher.discountValue) / 100);
+            } else {
+              discount = parseFloat(voucher.discountValue);
+            }
+            discount = Math.min(discount, total);
+            finalPrice = Math.max(0, total - discount).toFixed(2);
+            appliedDiscountCode = voucher.code;
+            appliedDiscountAmount = discount.toFixed(2);
+          }
+        }
+      }
+
+      const verification = await verifyPaypalOrder(parsed.data.paypalOrderId, finalPrice);
       if (!verification.verified) {
         console.error("PayPal order verification failed for shop:", verification);
         return res.status(400).json({
@@ -1285,9 +1313,16 @@ export async function registerRoutes(
       const order = await storage.createShopOrder({
         ...parsed.data,
         productName: productNameWithOptions,
-        amount: expectedPrice,
+        amount: finalPrice,
         customerId: customerId,
+        discountCode: appliedDiscountCode,
+        discountAmount: appliedDiscountAmount,
       });
+
+      if (appliedDiscountCode) {
+        const voucher = await storage.getDiscountVoucherByCode(appliedDiscountCode);
+        if (voucher) await storage.incrementVoucherUsage(voucher.id);
+      }
 
       let customerToken: string | undefined;
       if (customerId) {
@@ -1355,7 +1390,36 @@ export async function registerRoutes(
         validatedItems.push({ product, selectedOptions: item.selectedOptions || {}, quantity: qty, unitPrice: price });
       }
 
-      const verification = await verifyPaypalOrder(paypalOrderId, expectedTotal.toFixed(2));
+      let finalTotal = expectedTotal;
+      let appliedDiscountCode: string | null = null;
+      let appliedDiscountAmount: string | null = null;
+      const discountCode = req.body.discountCode;
+      if (discountCode) {
+        const voucher = await storage.getDiscountVoucherByCode(discountCode.toUpperCase().trim());
+        if (voucher && voucher.active) {
+          const now = new Date();
+          const validTime = (!voucher.validFrom || now >= new Date(voucher.validFrom)) && (!voucher.validUntil || now <= new Date(voucher.validUntil));
+          const validUses = voucher.maxUses === null || (voucher.usedCount || 0) < voucher.maxUses;
+          const cartSlugs = validatedItems.map(i => i.product.slug);
+          const allowedSlugs = voucher.productSlugs ? voucher.productSlugs.split(",").map((s: string) => s.trim()) : [];
+          const validProduct = !voucher.productSlugs || cartSlugs.every((s: string) => allowedSlugs.includes(s));
+          const validMin = !voucher.minOrderAmount || expectedTotal >= parseFloat(voucher.minOrderAmount);
+          if (validTime && validUses && validProduct && validMin) {
+            let discount = 0;
+            if (voucher.discountType === "percentage") {
+              discount = expectedTotal * (parseFloat(voucher.discountValue) / 100);
+            } else {
+              discount = parseFloat(voucher.discountValue);
+            }
+            discount = Math.min(discount, expectedTotal);
+            finalTotal = Math.max(0, expectedTotal - discount);
+            appliedDiscountCode = voucher.code;
+            appliedDiscountAmount = discount.toFixed(2);
+          }
+        }
+      }
+
+      const verification = await verifyPaypalOrder(paypalOrderId, finalTotal.toFixed(2));
       if (!verification.verified) {
         console.error("PayPal order verification failed for cart purchase:", verification);
         return res.status(400).json({
@@ -1414,8 +1478,15 @@ export async function registerRoutes(
           billingPec: billingPec || null,
           notes: notes || null,
           customerId: customerId,
+          discountCode: appliedDiscountCode,
+          discountAmount: appliedDiscountAmount,
         });
         orders.push(order);
+      }
+
+      if (appliedDiscountCode) {
+        const voucher = await storage.getDiscountVoucherByCode(appliedDiscountCode);
+        if (voucher) await storage.incrementVoucherUsage(voucher.id);
       }
 
       let customerToken: string | undefined;
@@ -1430,8 +1501,8 @@ export async function registerRoutes(
           name: `${customerFirstName} ${customerLastName}`,
           email: customerEmail,
           phone: customerPhone || undefined,
-          courseInterest: `Acquisto carrello: ${itemsSummary} (${expectedTotal.toFixed(2)} EUR)`,
-          message: `Ordine carrello completato via PayPal. ID: ${paypalOrderId}`,
+          courseInterest: `Acquisto carrello: ${itemsSummary} (${finalTotal.toFixed(2)} EUR)`,
+          message: `Ordine carrello completato via PayPal. ID: ${paypalOrderId}${appliedDiscountCode ? ` — Sconto: ${appliedDiscountCode} (-€${appliedDiscountAmount})` : ""}`,
         });
       } catch (emailError) {
         console.error("Failed to send cart purchase notification:", emailError);
@@ -1572,6 +1643,147 @@ export async function registerRoutes(
     } catch (error) {
       console.error("Error fetching shop orders:", error);
       res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.get("/api/admin/vouchers", requireAuth, async (_req, res) => {
+    try {
+      const vouchers = await storage.getDiscountVouchers();
+      res.json(vouchers);
+    } catch (error) {
+      console.error("Error fetching vouchers:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/admin/vouchers", requireAuth, async (req, res) => {
+    try {
+      const { code, description, discountType, discountValue, minOrderAmount, maxUses, validFrom, validUntil, productSlugs, active } = req.body;
+      if (!code || !discountType || !discountValue) {
+        return res.status(400).json({ success: false, message: "Codice, tipo e valore sconto sono obbligatori." });
+      }
+      if (!["percentage", "fixed"].includes(discountType)) {
+        return res.status(400).json({ success: false, message: "Tipo sconto non valido." });
+      }
+      const numValue = parseFloat(discountValue);
+      if (isNaN(numValue) || numValue <= 0) {
+        return res.status(400).json({ success: false, message: "Il valore dello sconto deve essere un numero positivo." });
+      }
+      if (discountType === "percentage" && numValue > 100) {
+        return res.status(400).json({ success: false, message: "La percentuale di sconto non può superare il 100%." });
+      }
+      const existing = await storage.getDiscountVoucherByCode(code.toUpperCase());
+      if (existing) {
+        return res.status(400).json({ success: false, message: "Un voucher con questo codice esiste già." });
+      }
+      const voucher = await storage.createDiscountVoucher({
+        code: code.toUpperCase().trim(),
+        description: description || null,
+        discountType,
+        discountValue: String(discountValue),
+        minOrderAmount: minOrderAmount ? String(minOrderAmount) : null,
+        maxUses: maxUses ? parseInt(maxUses) : null,
+        usedCount: 0,
+        validFrom: validFrom ? new Date(validFrom) : null,
+        validUntil: validUntil ? new Date(validUntil) : null,
+        productSlugs: productSlugs || null,
+        active: active !== false,
+      });
+      res.json({ success: true, voucher });
+    } catch (error) {
+      console.error("Error creating voucher:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.patch("/api/admin/vouchers/:id", requireAuth, async (req, res) => {
+    try {
+      const { code, description, discountType, discountValue, minOrderAmount, maxUses, validFrom, validUntil, productSlugs, active } = req.body;
+      const updateData: any = {};
+      if (code !== undefined) updateData.code = code.toUpperCase().trim();
+      if (description !== undefined) updateData.description = description || null;
+      if (discountType !== undefined) updateData.discountType = discountType;
+      if (discountValue !== undefined) updateData.discountValue = String(discountValue);
+      if (minOrderAmount !== undefined) updateData.minOrderAmount = minOrderAmount ? String(minOrderAmount) : null;
+      if (maxUses !== undefined) updateData.maxUses = maxUses ? parseInt(maxUses) : null;
+      if (validFrom !== undefined) updateData.validFrom = validFrom ? new Date(validFrom) : null;
+      if (validUntil !== undefined) updateData.validUntil = validUntil ? new Date(validUntil) : null;
+      if (productSlugs !== undefined) updateData.productSlugs = productSlugs || null;
+      if (active !== undefined) updateData.active = active;
+      const voucher = await storage.updateDiscountVoucher(req.params.id, updateData);
+      if (!voucher) {
+        return res.status(404).json({ success: false, message: "Voucher non trovato." });
+      }
+      res.json({ success: true, voucher });
+    } catch (error) {
+      console.error("Error updating voucher:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.delete("/api/admin/vouchers/:id", requireAuth, async (req, res) => {
+    try {
+      await storage.deleteDiscountVoucher(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting voucher:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/shop/validate-voucher", async (req, res) => {
+    try {
+      const { code, cartTotal, productSlugs: reqProductSlugs } = req.body;
+      if (!code) {
+        return res.status(400).json({ valid: false, message: "Inserisci un codice sconto." });
+      }
+      const voucher = await storage.getDiscountVoucherByCode(code.toUpperCase().trim());
+      if (!voucher || !voucher.active) {
+        return res.json({ valid: false, message: "Codice sconto non valido o scaduto." });
+      }
+      const now = new Date();
+      if (voucher.validFrom && now < new Date(voucher.validFrom)) {
+        return res.json({ valid: false, message: "Questo codice sconto non è ancora attivo." });
+      }
+      if (voucher.validUntil && now > new Date(voucher.validUntil)) {
+        return res.json({ valid: false, message: "Questo codice sconto è scaduto." });
+      }
+      if (voucher.maxUses !== null && (voucher.usedCount || 0) >= voucher.maxUses) {
+        return res.json({ valid: false, message: "Questo codice sconto ha raggiunto il limite di utilizzi." });
+      }
+      if (voucher.productSlugs && reqProductSlugs) {
+        const allowedSlugs = voucher.productSlugs.split(",").map((s: string) => s.trim());
+        const requestedSlugs = Array.isArray(reqProductSlugs) ? reqProductSlugs : [reqProductSlugs];
+        const allAllowed = requestedSlugs.every((s: string) => allowedSlugs.includes(s));
+        if (!allAllowed) {
+          return res.json({ valid: false, message: "Questo codice sconto non è valido per i prodotti selezionati." });
+        }
+      }
+      const total = parseFloat(cartTotal || "0");
+      if (voucher.minOrderAmount && total < parseFloat(voucher.minOrderAmount)) {
+        return res.json({ valid: false, message: `Ordine minimo di €${parseFloat(voucher.minOrderAmount).toFixed(2)} richiesto per questo codice.` });
+      }
+      let discount = 0;
+      if (voucher.discountType === "percentage") {
+        discount = total * (parseFloat(voucher.discountValue) / 100);
+      } else {
+        discount = parseFloat(voucher.discountValue);
+      }
+      discount = Math.min(discount, total);
+      const discountedTotal = Math.max(0, total - discount).toFixed(2);
+      res.json({
+        valid: true,
+        discount: discount.toFixed(2),
+        discountedTotal,
+        discountType: voucher.discountType,
+        discountValue: voucher.discountValue,
+        message: voucher.discountType === "percentage"
+          ? `Sconto del ${voucher.discountValue}% applicato!`
+          : `Sconto di €${parseFloat(voucher.discountValue).toFixed(2)} applicato!`,
+      });
+    } catch (error) {
+      console.error("Error validating voucher:", error);
+      res.status(500).json({ valid: false, message: "Errore del server" });
     }
   });
 
