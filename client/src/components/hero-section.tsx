@@ -257,7 +257,7 @@ export function HeroSection() {
             className="text-base sm:text-lg text-white/60 mb-10 max-w-2xl mx-auto leading-relaxed"
             data-testid="hero-description"
           >
-            Corsi di lingua con docenti madrelingua, Full Immersion, Language Coaching,
+            Corsi di lingua, Full Immersion, Language Coaching,
             competenze digitali, AI, soft skills e management.
             In presenza a Vicenza e Thiene, online o in modalità blended.
           </motion.p>
