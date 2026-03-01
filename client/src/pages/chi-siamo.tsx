@@ -514,31 +514,187 @@ export default function ChiSiamoPage() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-6"
+          >
+            <h3 className="text-2xl font-bold mb-2 flex items-center gap-2">
+              <Building2 className="w-6 h-6 text-primary" />
+              Staff Amministrativo
+            </h3>
+            <p className="text-muted-foreground mb-6">La direzione e il team che gestisce le attività formative</p>
+          </motion.div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
             {[
               {
-                name: "Dott.ssa Silvia Rossi",
-                role: "Direttrice Generale",
-                bio: "Oltre 25 anni nella formazione aziendale. Specializzata in strategia formativa e sviluppo organizzativo.",
-                color: "from-purple-500 to-purple-600"
+                name: "Giulia Ciampalini",
+                role: "CEO e Direttrice",
+                bio: "Interlingua Vicenza, Corsi online e Traduzioni",
+                image: "/images/team/giulia-vicenza.webp",
               },
               {
-                name: "Prof. Marco Bianchi",
-                role: "Responsabile Area AI & Digitale",
-                bio: "Esperto di intelligenza artificiale applicata. Docente certificato su ChatGPT, Copilot e automazione.",
-                color: "from-blue-500 to-blue-600"
+                name: "Elena",
+                role: "Responsabile Sede Thiene",
+                bio: "Interlingua Thiene e Corsi online",
+                image: "/images/team/elena-thiene.webp",
               },
               {
-                name: "Dott.ssa Elena Moretti",
-                role: "Coordinatrice Soft Skills",
-                bio: "Psicologa del lavoro con specializzazione in comunicazione efficace e leadership coaching.",
-                color: "from-teal-500 to-teal-600"
+                name: "Giulia",
+                role: "Formazione Corporate e Finanziata",
+                bio: "Gestione dei percorsi formativi aziendali e della formazione finanziata",
+                image: "/images/team/giulia-corporate.webp",
               },
               {
-                name: "James Mitchell",
-                role: "Head Teacher - Languages",
-                bio: "Madrelingua inglese con certificazione CELTA. 15 anni di esperienza nell'insegnamento interculturale.",
-                color: "from-orange-500 to-orange-600"
+                name: "Michela",
+                role: "Formazione Corporate e Finanziata",
+                bio: "Coordinamento dei progetti formativi aziendali e dei bandi di formazione finanziata",
+                image: "/images/team/michela-corporate.webp",
+              },
+            ].map((member, index) => (
+              <motion.div
+                key={member.name + member.role}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className="p-6 h-full text-center hover-elevate" data-testid={`card-admin-${index}`}>
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
+                  />
+                  <h3 className="font-bold text-lg mb-1">{member.name}</h3>
+                  <Badge variant="secondary" className="mb-3">{member.role}</Badge>
+                  <p className="text-sm text-muted-foreground">{member.bio}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-6"
+          >
+            <h3 className="text-2xl font-bold mb-2 flex items-center gap-2">
+              <GraduationCap className="w-6 h-6 text-primary" />
+              Team Docenti
+            </h3>
+            <p className="text-muted-foreground mb-6">I nostri insegnanti madrelingua e formatori qualificati</p>
+          </motion.div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            {[
+              {
+                name: "Mark",
+                role: "Tutor di Inglese e Coordinatore Tutors",
+                image: "/images/team/docenti/mark.jpg",
+              },
+              {
+                name: "Giulia",
+                role: "Tutor di Inglese e Italiano e Formatore CLIL",
+                image: "/images/team/docenti/giulia-docente.jpg",
+              },
+              {
+                name: "James",
+                role: "Tutor di Inglese",
+                image: "/images/team/docenti/james.jpg",
+              },
+              {
+                name: "Will",
+                role: "Tutor di Inglese e Coach certificato",
+                image: "/images/team/docenti/will.jpg",
+              },
+              {
+                name: "Stephanie Vella",
+                role: "Coach e Formatore CLIL",
+                image: "/images/team/docenti/stephanie.jpg",
+              },
+              {
+                name: "Marcus",
+                role: "Tutor di Inglese e Formatore CLIL",
+                image: "/images/team/docenti/marcus.jpg",
+              },
+              {
+                name: "Ruben",
+                role: "Tutor di Spagnolo",
+                image: "/images/team/docenti/ruben.jpg",
+              },
+              {
+                name: "Magalì",
+                role: "Tutor di Francese",
+                image: "/images/team/docenti/magali.jpg",
+              },
+              {
+                name: "Paola",
+                role: "Tutor di Tedesco Commerciale",
+                image: "/images/team/docenti/paola.jpg",
+              },
+              {
+                name: "Mara",
+                role: "Tutor di Tedesco e Italiano",
+                image: "/images/team/docenti/mara.jpg",
+              },
+              {
+                name: "Laila",
+                role: "Tutor di Portoghese",
+                image: "/images/team/docenti/laila.jpg",
+              },
+            ].map((member, index) => (
+              <motion.div
+                key={member.name + member.role}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <Card className="p-6 h-full text-center hover-elevate" data-testid={`card-teacher-${index}`}>
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    className="w-20 h-20 rounded-full mx-auto mb-4 object-cover"
+                  />
+                  <h3 className="font-bold text-lg mb-1">{member.name}</h3>
+                  <Badge variant="secondary" className="mb-3">{member.role}</Badge>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-6"
+          >
+            <h3 className="text-2xl font-bold mb-2 flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-primary" />
+              I Nostri Esperti
+            </h3>
+            <p className="text-muted-foreground mb-6">Professionisti specializzati in competenze digitali, trasversali e gestionali</p>
+          </motion.div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                name: "Valentino Spolaore",
+                role: "Digital Skills & Data Analytics",
+                bio: "Appassionato di tecnologia e formazione, Valentino trasforma dati in insight e idee in progetti concreti. Docente universitario e formatore aziendale specializzato in Excel Avanzato, Google Suite, UX/UI Design e Power BI.",
+                color: "from-blue-500 to-cyan-500",
+              },
+              {
+                name: "Maurizia Moltoni Sartori",
+                role: "Competenze Trasversali & Coaching",
+                bio: "Da oltre vent'anni si dedica alla formazione e allo sviluppo del potenziale degli adulti. Specializzata in comunicazione, leadership, team building e gestione delle emozioni con metodologie esperienziali coinvolgenti.",
+                color: "from-purple-500 to-pink-500",
+              },
+              {
+                name: "Ampelia Berto",
+                role: "Lean Management & Continuous Improvement",
+                bio: "Laureata in statistica con quasi 30 anni di esperienza manageriale, insegna Lean, Six Sigma, Agile e Scrum con un approccio pragmatico. Per lei, queste non sono solo metodologie, ma un mindset che trasforma il modo di lavorare e innovare.",
+                color: "from-teal-500 to-green-500",
               },
             ].map((member, index) => (
               <motion.div
@@ -548,9 +704,9 @@ export default function ChiSiamoPage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="p-6 h-full text-center hover-elevate" data-testid={`card-team-${index}`}>
+                <Card className="p-6 h-full text-center hover-elevate" data-testid={`card-expert-${index}`}>
                   <div className={`w-20 h-20 rounded-full bg-gradient-to-br ${member.color} mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold`}>
-                    {member.name.split(" ").slice(-1)[0][0]}
+                    {member.name.split(" ")[0][0]}{member.name.split(" ").slice(-1)[0][0]}
                   </div>
                   <h3 className="font-bold text-lg mb-1">{member.name}</h3>
                   <Badge variant="secondary" className="mb-3">{member.role}</Badge>
