@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SiPaypal, SiVisa, SiMastercard } from "react-icons/si";
+import cartaCulturaLogo from "@assets/carte-cultura-1200x675_1772388120185.avif";
 import {
   CheckCircle,
   CreditCard,
@@ -987,7 +988,7 @@ export default function CartCheckout() {
                             }`}
                             data-testid="button-select-cartacultura-cart"
                           >
-                            <Ticket className="w-6 h-6 text-amber-600" />
+                            <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-8 w-auto object-contain" />
                             <span className="text-xs font-medium">Carta della Cultura</span>
                           </button>
                         </div>
