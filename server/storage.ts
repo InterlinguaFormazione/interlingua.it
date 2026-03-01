@@ -141,6 +141,7 @@ export interface IStorage {
   getBeQuestionsBySkillAndLevel(skillType: string, level: string): Promise<BeQuestion[]>;
   getBeQuestionById(id: number): Promise<BeQuestion | undefined>;
   getBeQuestionCount(): Promise<number>;
+  updateBeQuestionAudioUrl(id: number, audioUrl: string): Promise<void>;
 
   createBeResponse(response: InsertBeResponse): Promise<BeResponse>;
   getBeResponsesBySession(sessionId: number): Promise<BeResponse[]>;
@@ -493,6 +494,10 @@ export class DatabaseStorage implements IStorage {
   async getBeQuestionCount(): Promise<number> {
     const results = await db.select().from(beQuestions);
     return results.length;
+  }
+
+  async updateBeQuestionAudioUrl(id: number, audioUrl: string): Promise<void> {
+    await db.update(beQuestions).set({ audioUrl }).where(eq(beQuestions.id, id));
   }
 
   async createBeResponse(response: InsertBeResponse): Promise<BeResponse> {

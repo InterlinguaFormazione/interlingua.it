@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { GraduationCap, CheckCircle, ChevronRight, Loader2, Mic, MicOff, PenTool, Volume2, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight, User, Mail, Phone, Building2, MapPin, Map } from "lucide-react";
+import { GraduationCap, CheckCircle, ChevronRight, Loader2, Mic, MicOff, PenTool, Volume2, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight, User, Mail, Phone, Building2, MapPin, Map, Play, Pause, RotateCcw } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
 type Phase = "registration" | "self-assessment" | "mc-questions" | "writing" | "speaking" | "results";
@@ -80,6 +80,12 @@ const SKILL_ICONS: Record<string, typeof Brain> = {
   use_of_english: MessageSquare,
 };
 
+function formatAudioTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
+}
+
 export default function EnglishTestPage() {
   const [phase, setPhase] = useState<Phase>("registration");
   const [sessionId, setSessionId] = useState<number | null>(null);
@@ -106,6 +112,12 @@ export default function EnglishTestPage() {
   const [tabSwitchCount, setTabSwitchCount] = useState(0);
   const [sectionTransition, setSectionTransition] = useState<string | null>(null);
   const [registrationData, setRegistrationData] = useState<any>(null);
+
+  const [listeningPlaysLeft, setListeningPlaysLeft] = useState(2);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [audioProgress, setAudioProgress] = useState(0);
+  const [audioDuration, setAudioDuration] = useState(0);
+  const listeningAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -147,6 +159,57 @@ export default function EnglishTestPage() {
     }
   }, [phase]);
 
+  const resetListeningAudio = useCallback(() => {
+    if (listeningAudioRef.current) {
+      listeningAudioRef.current.pause();
+      listeningAudioRef.current.removeAttribute("src");
+      listeningAudioRef.current.load();
+      listeningAudioRef.current = null;
+    }
+    setListeningPlaysLeft(2);
+    setIsAudioPlaying(false);
+    setAudioProgress(0);
+    setAudioDuration(0);
+  }, []);
+
+  const playListeningAudio = useCallback(() => {
+    if (!currentQuestion?.audioUrl || listeningPlaysLeft <= 0) return;
+
+    if (listeningAudioRef.current && isAudioPlaying) {
+      listeningAudioRef.current.pause();
+      setIsAudioPlaying(false);
+      return;
+    }
+
+    if (!listeningAudioRef.current) {
+      const audio = new Audio(currentQuestion.audioUrl);
+      audio.addEventListener("loadedmetadata", () => {
+        setAudioDuration(audio.duration);
+      });
+      audio.addEventListener("timeupdate", () => {
+        setAudioProgress(audio.currentTime);
+      });
+      audio.addEventListener("ended", () => {
+        setIsAudioPlaying(false);
+        setListeningPlaysLeft(prev => prev - 1);
+        setAudioProgress(0);
+      });
+      audio.addEventListener("error", () => {
+        toast({ title: "Audio Error", description: "Could not load the audio file.", variant: "destructive" });
+        setIsAudioPlaying(false);
+      });
+      listeningAudioRef.current = audio;
+    } else {
+      listeningAudioRef.current.currentTime = 0;
+    }
+
+    listeningAudioRef.current.play().then(() => {
+      setIsAudioPlaying(true);
+    }).catch(() => {
+      toast({ title: "Audio Error", description: "Could not play audio. Check your browser settings.", variant: "destructive" });
+    });
+  }, [currentQuestion, listeningPlaysLeft, isAudioPlaying, toast]);
+
   const handleRegistration = async (data: z.infer<typeof registrationSchema>) => {
     setRegistrationData(data);
     setPhase("self-assessment");
@@ -168,6 +231,7 @@ export default function EnglishTestPage() {
         setCurrentSkill(data.currentSkill);
         setCurrentSectionIndex(data.currentSectionIndex);
         setQuestionStartTime(Date.now());
+        resetListeningAudio();
         setPhase("mc-questions");
       } else {
         toast({ title: "Error", description: data.message || "Failed to start the test", variant: "destructive" });
@@ -211,6 +275,7 @@ export default function EnglishTestPage() {
           setCurrentSectionIndex(data.currentSectionIndex);
           setSelectedAnswer(null);
           setQuestionStartTime(Date.now());
+          resetListeningAudio();
         }
       } else {
         toast({ title: "Error", description: data.message || "Failed to submit answer", variant: "destructive" });
@@ -713,27 +778,63 @@ export default function EnglishTestPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {currentQuestion.passage && (
-                    <div className={`rounded-xl p-4 border ${
-                      currentQuestion.skillType === "listening"
-                        ? "bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800"
-                        : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700"
-                    }`} data-testid="text-passage">
-                      <div className="flex items-center gap-2 mb-2">
-                        {currentQuestion.skillType === "listening" ? (
-                          <>
-                            <Volume2 className="w-4 h-4 text-indigo-500" />
-                            <span className="text-xs uppercase tracking-wider text-indigo-500 font-medium">Listening Transcript</span>
-                          </>
-                        ) : (
-                          <span className="text-xs uppercase tracking-wider text-slate-500 font-medium">Reading Passage</span>
-                        )}
+                  {currentQuestion.skillType === "listening" && currentQuestion.audioUrl && (
+                    <div className="rounded-xl p-5 border bg-indigo-50 dark:bg-indigo-950/30 border-indigo-200 dark:border-indigo-800" data-testid="audio-player-container">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Volume2 className="w-4 h-4 text-indigo-500" />
+                        <span className="text-xs uppercase tracking-wider text-indigo-500 font-medium">Listening Comprehension</span>
+                        <span className="ml-auto text-xs text-indigo-400 font-medium" data-testid="text-plays-remaining">
+                          {listeningPlaysLeft} play{listeningPlaysLeft !== 1 ? "s" : ""} remaining
+                        </span>
                       </div>
-                      <div className={`text-sm whitespace-pre-line leading-relaxed ${
-                        currentQuestion.skillType === "listening"
-                          ? "text-indigo-900 dark:text-indigo-200 italic"
-                          : "text-slate-700 dark:text-slate-300"
-                      }`}>{currentQuestion.passage}</div>
+
+                      <div className="flex items-center gap-4">
+                        <button
+                          onClick={playListeningAudio}
+                          disabled={listeningPlaysLeft <= 0 && !isAudioPlaying}
+                          className={`flex-shrink-0 w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-md ${
+                            listeningPlaysLeft <= 0 && !isAudioPlaying
+                              ? "bg-slate-300 dark:bg-slate-600 cursor-not-allowed"
+                              : "bg-indigo-600 hover:bg-indigo-700 active:scale-95 cursor-pointer"
+                          }`}
+                          data-testid="button-play-audio"
+                        >
+                          {isAudioPlaying ? (
+                            <Pause className="w-6 h-6 text-white" />
+                          ) : (
+                            <Play className="w-6 h-6 text-white ml-0.5" />
+                          )}
+                        </button>
+
+                        <div className="flex-1 space-y-1">
+                          <div className="w-full bg-indigo-200 dark:bg-indigo-800 rounded-full h-2 overflow-hidden">
+                            <div
+                              className="bg-indigo-500 h-2 rounded-full transition-all duration-200"
+                              style={{ width: audioDuration > 0 ? `${(audioProgress / audioDuration) * 100}%` : "0%" }}
+                              data-testid="audio-progress-bar"
+                            />
+                          </div>
+                          <div className="flex justify-between text-xs text-indigo-400">
+                            <span>{formatAudioTime(audioProgress)}</span>
+                            <span>{formatAudioTime(audioDuration)}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {listeningPlaysLeft <= 0 && !isAudioPlaying && (
+                        <p className="text-xs text-amber-600 dark:text-amber-400 mt-3 text-center font-medium" data-testid="text-no-plays">
+                          You have used all your plays. Please answer the question.
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {currentQuestion.passage && currentQuestion.skillType !== "listening" && (
+                    <div className="rounded-xl p-4 border bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700" data-testid="text-passage">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs uppercase tracking-wider text-slate-500 font-medium">Reading Passage</span>
+                      </div>
+                      <div className="text-sm whitespace-pre-line leading-relaxed text-slate-700 dark:text-slate-300">{currentQuestion.passage}</div>
                     </div>
                   )}
 

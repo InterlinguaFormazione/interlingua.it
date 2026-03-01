@@ -42,7 +42,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/language-coaching.tsx` - Premium language coaching page (1-to-1, 30% premium pricing, Milton Method copy)
 - `src/pages/corsi-italiano.tsx` - Italian for Foreigners page with IT/EN bilingual toggle, course pricing, Vicenza info, contact form
 - `src/pages/language-tests.tsx` - Language test landing page at `/test-di-livello` where users select which language test to take. English is available; Italian, German, French, Spanish shown as "coming soon".
-- `src/pages/english-test.tsx` - English Adaptive Test at `/english-test` with CAT/IRT engine, 5 MC sections (grammar, vocabulary, use of English, reading, listening), writing + speaking AI-scored tasks, anti-cheating measures. Topics cover daily life, travel, food, health, education, technology, entertainment, sports, environment, and culture. Company field is optional.
+- `src/pages/english-test.tsx` - English Adaptive Test at `/english-test` with CAT/IRT engine, 5 MC sections (grammar, vocabulary, use of English, reading, listening), writing + speaking AI-scored tasks, anti-cheating measures. Topics cover daily life, travel, food, health, education, technology, entertainment, sports, environment, and culture. Company field is optional. Listening comprehension uses real audio playback (90 MP3 files, 6 OpenAI TTS voices for accent variety, 2 plays per question).
 - `src/pages/cookie-policy.tsx` - GDPR cookie policy
 - `src/pages/privacy-policy.tsx` - GDPR privacy policy
 - `src/components/` - Reusable UI components
@@ -67,7 +67,8 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `ai-chat.ts` - AI chat endpoint (OpenAI GPT-4o-mini with full site context)
 - `english-test.ts` - AI scoring for English test (GPT-4o writing/speaking scoring, Whisper transcription)
 - `cat-engine.ts` - CAT/IRT engine (2PL model, EAP Bayesian theta update, Fisher Information SE update, theta ×100). Min 5, max 25 questions/section. SE threshold 40 for early stop. Level stability rule: last 3 consecutive answers must be at the same CEFR level before SE-based early stop is allowed. Detailed [CAT] logging on each answer.
-- `english-test-questions.ts` - Question bank for General English test (450 questions, 5 skills x 6 levels x 15 per cell, difficulty spread ±40 within each level)
+- `english-test-questions.ts` - Question bank for General English test (450 questions, 5 skills x 6 levels x 15 per cell, difficulty spread ±40 within each level). Listening questions auto-assign audioUrl paths to MP3 files in `client/public/audio/listening/`
+- `generate-listening-audio.ts` - One-time TTS script (OpenAI tts-1-hd) that generated 90 MP3 files for listening comprehension using 6 diverse voices (alloy, echo, fable, onyx, nova, shimmer)
 - `email.ts` - AWS SES email notifications (contact, newsletter, subscription payment, booking confirmation, English test results)
 - `crm.ts` - CRM webhook integration (forwards contact submissions)
 - `blog-generator.ts` - Automated blog generation

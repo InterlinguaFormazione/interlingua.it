@@ -790,22 +790,30 @@ const listeningQuestions: QuestionDef[] = [
 
 export function getEnglishTestQuestions(): InsertBeQuestion[] {
   const all = [...grammarQuestions, ...vocabularyQuestions, ...useOfEnglishQuestions, ...readingQuestions, ...listeningQuestions];
-  return all.map(q => ({
-    level: q.level,
-    skillType: q.skillType,
-    section: q.skillType,
-    topic: q.topic,
-    question: q.question,
-    options: JSON.stringify(q.options),
-    correctAnswer: q.correctAnswer,
-    passage: q.passage || null,
-    audioUrl: null,
-    explanation: null,
-    difficulty: q.difficulty,
-    discrimination: q.discrimination,
-    calibrationStatus: "calibrated",
-    calibrationNotes: null,
-  }));
+  let listeningIdx = 0;
+  return all.map(q => {
+    let audioUrl: string | null = null;
+    if (q.skillType === "listening") {
+      const idx = listeningIdx++;
+      audioUrl = `/audio/listening/listening_${q.level}_${idx.toString().padStart(3, "0")}.mp3`;
+    }
+    return {
+      level: q.level,
+      skillType: q.skillType,
+      section: q.skillType,
+      topic: q.topic,
+      question: q.question,
+      options: JSON.stringify(q.options),
+      correctAnswer: q.correctAnswer,
+      passage: q.passage || null,
+      audioUrl,
+      explanation: null,
+      difficulty: q.difficulty,
+      discrimination: q.discrimination,
+      calibrationStatus: "calibrated",
+      calibrationNotes: null,
+    };
+  });
 }
 
 export function getAllQuestions(): InsertBeQuestion[] {

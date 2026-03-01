@@ -1456,6 +1456,19 @@ export async function registerRoutes(
         for (const q of questions) {
           await storage.createBeQuestion(q);
         }
+      } else {
+        const existingQuestions = await storage.getBeQuestions();
+        const listeningWithoutAudio = existingQuestions.filter(q => q.skillType === "listening" && !q.audioUrl);
+        if (listeningWithoutAudio.length > 0) {
+          const freshQuestions = getAllQuestions();
+          const freshListening = freshQuestions.filter(q => q.skillType === "listening");
+          for (const dbQ of listeningWithoutAudio) {
+            const match = freshListening.find(fq => fq.question === dbQ.question && fq.level === dbQ.level);
+            if (match?.audioUrl) {
+              await storage.updateBeQuestionAudioUrl(dbQ.id, match.audioUrl);
+            }
+          }
+        }
       }
 
       const startingTheta = selfAssessmentToTheta(selfAssessedLevel);
