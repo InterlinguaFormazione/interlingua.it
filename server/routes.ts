@@ -723,7 +723,8 @@ STILE:
 - NON usare MAI emoji di nessun tipo
 - NON iniziare mai con "Ciao [nome]!" — varia le aperture
 - NON aggiungere una firma alla fine della risposta — il sistema la aggiunge automaticamente
-- NON usare espressioni entusiastiche artificiose come "È fantastico!" o "Wow!"`
+- NON usare espressioni entusiastiche artificiose come "È fantastico!" o "Wow!"
+- IMPORTANTE: Scrivi in italiano del NORD ITALIA. NON usare MAI il passato remoto (feci, andai, dissi). Usa SEMPRE il passato prossimo (ho fatto, sono andato, ho detto). Siamo a Vicenza, nel Veneto.`
           },
           {
             role: "user",
@@ -778,7 +779,8 @@ REGOLE FONDAMENTALI per sembrare autentici:
 - Qualche commento può avere piccole imperfezioni tipiche dello scritto informale (frasi spezzate, "..." al posto di punti, esclamazioni)
 - NON usare frasi fatte tipo "articolo molto interessante" o "grazie per l'articolo" — sono tipiche dei bot
 - NON usare tutti lo stesso registro linguistico
-- Nomi italiani REALISTICI e vari: EVITA cognomi generici e ovvi come Rossi, Bianchi, Ferrari, Esposito, Russo, Romano. Usa cognomi meno comuni ma plausibili (es. Marchetti, Trevisan, Colombo, Zanetti, Pellegrini, Damiani, Moretti, Galli, Ferrero, Cattaneo, Baroni, Venturi). Mix di formati: qualcuno con solo il nome, qualcuno nome e iniziale del cognome (es. "Marco T."), qualcuno nome e cognome completo
+- Nomi italiani REALISTICI e vari: EVITA cognomi generici e ovvi come Rossi, Bianchi, Ferrari, Esposito, Russo, Romano. Includi SEMPRE almeno un nome dal Veneto/Nord-Est (es. Trevisan, Zanetti, Sartori, Dalla Valle, Bortolotto, Visentin, Pavan, Brunello, Meneghin, Carraro, Zago, Tessari, Tonon, Fantinato). Alterna con cognomi del Nord Italia plausibili (es. Marchetti, Colombo, Pellegrini, Cattaneo, Baroni, Venturi, Galli, Moretti, Ferrero). Mix di formati: qualcuno con solo il nome, qualcuno nome e iniziale del cognome (es. "Marco T."), qualcuno nome e cognome completo
+- IMPORTANTE: Scrivi SEMPRE in italiano del NORD ITALIA. NON usare MAI il passato remoto (feci, andai, dissi, capii, lessi). Usa SEMPRE il passato prossimo (ho fatto, sono andato, ho detto, ho capito, ho letto). Il passato remoto si usa solo al Sud.
 - Almeno un commento NON deve essere esclusivamente positivo — può essere curioso, dubbioso o semplicemente neutro
 - Il contenuto deve essere SPECIFICO all'argomento dell'articolo, non generico
 
