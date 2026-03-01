@@ -39,6 +39,7 @@ import SpanishTestPage from "@/pages/spanish-test";
 import LanguageTestsPage from "@/pages/language-tests";
 import SediPage from "@/pages/sedi";
 import TerminiECondizioniPage from "@/pages/termini-e-condizioni";
+import CodiceEticoPage from "@/pages/codice-etico";
 import CartCheckoutPage from "@/pages/shop-cart-checkout";
 import NotFound from "@/pages/not-found";
 import { CartProvider } from "@/lib/cart-context";
@@ -86,6 +87,7 @@ function Router() {
       <Route path="/sedi" component={SediPage} />
       <Route path="/privacy-policy" component={PrivacyPolicyPage} />
       <Route path="/termini-e-condizioni" component={TerminiECondizioniPage} />
+      <Route path="/codice-etico" component={CodiceEticoPage} />
       <Route component={NotFound} />
     </Switch>
   );

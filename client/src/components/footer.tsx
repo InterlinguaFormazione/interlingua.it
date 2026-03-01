@@ -26,6 +26,7 @@ const footerLinks = {
     { label: "Cookie Policy", href: "/cookie-policy" },
     { label: "Privacy Policy", href: "/privacy-policy" },
     { label: "Termini e Condizioni", href: "/termini-e-condizioni" },
+    { label: "Codice Etico", href: "/codice-etico" },
   ],
 };
 

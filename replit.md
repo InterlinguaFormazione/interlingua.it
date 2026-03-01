@@ -218,6 +218,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `/cookie-policy` - Cookie policy (GDPR)
 - `/privacy-policy` - Privacy policy (GDPR)
 - `/termini-e-condizioni` - Terms and conditions (e-commerce)
+- `/codice-etico` - Codice Etico (D.Lgs. 231/2001 compliance, ethical code)
 
 ## Bandi e Corsi Finanziati
 - Data source: `client/src/data/bandi-data.ts`
