@@ -82,7 +82,7 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
       <Card
         className="h-full group relative overflow-hidden border border-border/50 bg-card hover:shadow-xl hover:border-primary/30 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
         data-testid={`card-product-${product.slug}`}
-        onClick={() => setLocation(`/shop/product/${product.slug}`)}
+        onClick={() => setLocation(product.pageLink)}
       >
         <div className={`relative h-28 bg-gradient-to-br ${gradientClass} overflow-hidden`}>
           <div className="absolute inset-0 opacity-10"
@@ -119,13 +119,20 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
             </h3>
 
             {reviews.length > 0 && (
-              <div className="flex items-center gap-1.5 mb-2">
+              <div
+                className="flex items-center gap-1.5 mb-2 cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLocation(`${product.pageLink}#reviews`);
+                }}
+                data-testid={`link-reviews-${product.slug}`}
+              >
                 <div className="flex items-center gap-0.5">
                   {[1, 2, 3, 4, 5].map((s) => (
                     <Star key={s} className={`w-3 h-3 ${s <= Math.round(avgRating) ? "fill-amber-400 text-amber-400" : "fill-muted text-muted-foreground/30"}`} />
                   ))}
                 </div>
-                <span className="text-[11px] text-muted-foreground">
+                <span className="text-[11px] text-muted-foreground underline decoration-dotted">
                   ({reviews.length})
                 </span>
               </div>

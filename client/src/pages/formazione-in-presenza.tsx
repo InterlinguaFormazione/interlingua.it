@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { ProductReviewsSection } from "@/components/product-reviews";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -1075,6 +1076,7 @@ export default function FormazioneInPresenzaPage() {
             </AnimatedSection>
           </div>
         </section>
+        <ProductReviewsSection productSlugs={["corsi-gruppo", "individuali-presenza", "individuale-blended", "corso-booster", "office-senza-segreti", "ai-senza-segreti", "experiential-workshop"]} />
       </main>
       <Footer />
     </div>

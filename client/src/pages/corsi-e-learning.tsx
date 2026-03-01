@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { ProductReviewsSection } from "@/components/product-reviews";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -972,6 +973,7 @@ export default function CorsiELearningPage() {
             </AnimatedSection>
           </div>
         </section>
+        <ProductReviewsSection productSlugs={["camclass-selflearning", "camclass-gruppo", "camclass-individuale", "preparazione-certificazione", "conversazione-individuale", "camclass-minigruppi"]} />
       </main>
       <Footer />
     </div>

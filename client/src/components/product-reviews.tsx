@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQueries, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { motion, AnimatePresence } from "framer-motion";
 import { SHOP_PRODUCTS } from "@shared/products";
@@ -255,12 +255,26 @@ function ReviewForm({ productSlugs, onSuccess }: { productSlugs: string[]; onSuc
 
 export function ProductReviewsSection({ productSlugs }: { productSlugs: string[] }) {
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
-  const reviewQueries = productSlugs.map(slug =>
-    useQuery<ProductReview[]>({
+  useEffect(() => {
+    if (window.location.hash === "#reviews" && sectionRef.current) {
+      setTimeout(() => {
+        sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 300);
+    }
+  }, []);
+
+  const reviewQueries = useQueries({
+    queries: productSlugs.map(slug => ({
       queryKey: [`/api/shop/reviews/${slug}`],
-    })
-  );
+      queryFn: async () => {
+        const res = await fetch(`/api/shop/reviews/${slug}`);
+        if (!res.ok) throw new Error("Failed to fetch reviews");
+        return res.json() as Promise<ProductReview[]>;
+      },
+    })),
+  });
 
   const allReviews = reviewQueries
     .flatMap(q => q.data || [])
@@ -281,7 +295,7 @@ export function ProductReviewsSection({ productSlugs }: { productSlugs: string[]
   }));
 
   return (
-    <section className="py-16" id="reviews">
+    <section className="py-16" id="reviews" ref={sectionRef}>
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-8">

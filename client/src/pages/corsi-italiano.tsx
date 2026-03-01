@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { ProductReviewsSection } from "@/components/product-reviews";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -896,6 +897,7 @@ export default function CorsiItalianoPage() {
             </AnimatedSection>
           </div>
         </section>
+        <ProductReviewsSection productSlugs={["italiano-intensivo-15", "italiano-intensivo-20"]} />
       </main>
       <Footer />
     </div>
