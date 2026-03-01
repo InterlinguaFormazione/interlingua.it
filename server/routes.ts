@@ -720,9 +720,10 @@ STILE:
 - Se il commento fa una domanda, rispondi direttamente
 - Se condivide un'esperienza, commenta in modo empatico
 - Puoi menzionare un corso o servizio SOLO se è davvero pertinente, e fallo in modo naturale (non pubblicitario)
-- NON usare emoji
+- NON usare MAI emoji di nessun tipo
 - NON iniziare mai con "Ciao [nome]!" — varia le aperture
-- Firma come "Il Team di Interlingua"`
+- NON aggiungere una firma alla fine della risposta — il sistema la aggiunge automaticamente
+- NON usare espressioni entusiastiche artificiose come "È fantastico!" o "Wow!"`
           },
           {
             role: "user",
