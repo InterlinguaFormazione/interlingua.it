@@ -701,7 +701,7 @@ export default function ChiSiamoPage() {
                 name: "Andrea",
                 role: "Intelligenza Artificiale & AI Ambassador",
                 bio: "Esperto di Intelligenza Artificiale e AI Ambassador presso SkillCraft. Si occupa di applicazioni pratiche dell'AI per aziende e professionisti, aiutando a integrare queste tecnologie nei processi aziendali per migliorarne l'efficienza e l'innovazione.",
-                color: "from-orange-500 to-amber-500",
+                image: "/images/team/docenti/andrea.jpg",
               },
               {
                 name: "Laura Bau",
