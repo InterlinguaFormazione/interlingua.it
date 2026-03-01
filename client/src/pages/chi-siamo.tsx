@@ -676,7 +676,7 @@ export default function ChiSiamoPage() {
             </h3>
             <p className="text-muted-foreground mb-6">Professionisti specializzati in competenze digitali, trasversali e gestionali</p>
           </motion.div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
                 name: "Valentino Spolaore",
@@ -695,6 +695,12 @@ export default function ChiSiamoPage() {
                 role: "Lean Management & Continuous Improvement",
                 bio: "Laureata in statistica con quasi 30 anni di esperienza manageriale, insegna Lean, Six Sigma, Agile e Scrum con un approccio pragmatico. Per lei, queste non sono solo metodologie, ma un mindset che trasforma il modo di lavorare e innovare.",
                 color: "from-teal-500 to-green-500",
+              },
+              {
+                name: "Andrea",
+                role: "Intelligenza Artificiale & AI Ambassador",
+                bio: "Esperto di Intelligenza Artificiale e AI Ambassador presso SkillCraft. Si occupa di applicazioni pratiche dell'AI per aziende e professionisti, aiutando a integrare queste tecnologie nei processi aziendali per migliorarne l'efficienza e l'innovazione.",
+                color: "from-orange-500 to-amber-500",
               },
             ].map((member, index) => (
               <motion.div
