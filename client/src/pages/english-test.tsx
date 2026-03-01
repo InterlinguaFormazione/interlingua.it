@@ -14,7 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { GraduationCap, CheckCircle, ChevronRight, Loader2, Mic, MicOff, PenTool, Volume2, BookOpen, Brain, MessageSquare, Shield, Clock, ArrowRight, User, Mail, Phone, Building2, MapPin, Map, Play, Pause, RotateCcw } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
-type Phase = "registration" | "self-assessment" | "mc-questions" | "writing" | "speaking" | "results";
+type Phase = "registration" | "audio-check" | "self-assessment" | "mc-questions" | "writing" | "speaking" | "results";
 
 interface QuestionData {
   id: number;
@@ -119,6 +119,21 @@ export default function EnglishTestPage() {
   const [audioDuration, setAudioDuration] = useState(0);
   const listeningAudioRef = useRef<HTMLAudioElement | null>(null);
 
+  const [audioCheckStep, setAudioCheckStep] = useState<"listening" | "recording" | "playback" | "done">("listening");
+  const [audioCheckPassed, setAudioCheckPassed] = useState({ listening: false, recording: false });
+  const [testAudioPlaying, setTestAudioPlaying] = useState(false);
+  const [testRecording, setTestRecording] = useState(false);
+  const [testRecordingBlob, setTestRecordingBlob] = useState<Blob | null>(null);
+  const [testPlaybackPlaying, setTestPlaybackPlaying] = useState(false);
+  const [testMicLevel, setTestMicLevel] = useState(0);
+  const testAudioRef = useRef<HTMLAudioElement | null>(null);
+  const testMediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const testAudioChunksRef = useRef<Blob[]>([]);
+  const testPlaybackRef = useRef<HTMLAudioElement | null>(null);
+  const testAnalyserRef = useRef<AnalyserNode | null>(null);
+  const testAnimFrameRef = useRef<number>(0);
+  const testStreamRef = useRef<MediaStream | null>(null);
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -212,8 +227,129 @@ export default function EnglishTestPage() {
 
   const handleRegistration = async (data: z.infer<typeof registrationSchema>) => {
     setRegistrationData(data);
-    setPhase("self-assessment");
+    setPhase("audio-check");
   };
+
+  const playTestAudio = useCallback(() => {
+    if (testAudioRef.current) {
+      testAudioRef.current.pause();
+      testAudioRef.current = null;
+    }
+    const audio = new Audio("/audio/listening/listening_A0_000.mp3");
+    audio.addEventListener("ended", () => {
+      setTestAudioPlaying(false);
+    });
+    audio.addEventListener("error", () => {
+      setTestAudioPlaying(false);
+      toast({ title: "Audio Error", description: "Could not play the test audio. Check your speakers or headphones.", variant: "destructive" });
+    });
+    testAudioRef.current = audio;
+    audio.play().then(() => {
+      setTestAudioPlaying(true);
+    }).catch(() => {
+      toast({ title: "Audio Error", description: "Your browser blocked audio playback. Please allow audio.", variant: "destructive" });
+    });
+  }, [toast]);
+
+  const confirmListeningOk = useCallback(() => {
+    if (testAudioRef.current) {
+      testAudioRef.current.pause();
+      testAudioRef.current = null;
+    }
+    setTestAudioPlaying(false);
+    setAudioCheckPassed(prev => ({ ...prev, listening: true }));
+    setAudioCheckStep("recording");
+  }, []);
+
+  const startTestRecording = useCallback(async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      testStreamRef.current = stream;
+      const audioCtx = new AudioContext();
+      const source = audioCtx.createMediaStreamSource(stream);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      testAnalyserRef.current = analyser;
+
+      const updateLevel = () => {
+        if (!testAnalyserRef.current) return;
+        const data = new Uint8Array(testAnalyserRef.current.frequencyBinCount);
+        testAnalyserRef.current.getByteFrequencyData(data);
+        const avg = data.reduce((a, b) => a + b, 0) / data.length;
+        setTestMicLevel(Math.min(100, avg * 2));
+        testAnimFrameRef.current = requestAnimationFrame(updateLevel);
+      };
+      updateLevel();
+
+      const recorder = new MediaRecorder(stream);
+      testAudioChunksRef.current = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) testAudioChunksRef.current.push(e.data);
+      };
+      recorder.onstop = () => {
+        const blob = new Blob(testAudioChunksRef.current, { type: "audio/webm" });
+        setTestRecordingBlob(blob);
+        cancelAnimationFrame(testAnimFrameRef.current);
+        testAnalyserRef.current = null;
+        if (testStreamRef.current) {
+          testStreamRef.current.getTracks().forEach(t => t.stop());
+          testStreamRef.current = null;
+        }
+        setTestRecording(false);
+        setTestMicLevel(0);
+        setAudioCheckStep("playback");
+      };
+      testMediaRecorderRef.current = recorder;
+      recorder.start();
+      setTestRecording(true);
+
+      setTimeout(() => {
+        if (testMediaRecorderRef.current?.state === "recording") {
+          testMediaRecorderRef.current.stop();
+        }
+      }, 5000);
+    } catch {
+      toast({ title: "Microphone Error", description: "Could not access your microphone. Please grant permission and try again.", variant: "destructive" });
+    }
+  }, [toast]);
+
+  const stopTestRecording = useCallback(() => {
+    if (testMediaRecorderRef.current?.state === "recording") {
+      testMediaRecorderRef.current.stop();
+    }
+  }, []);
+
+  const playTestRecording = useCallback(() => {
+    if (!testRecordingBlob) return;
+    if (testPlaybackRef.current) {
+      testPlaybackRef.current.pause();
+      testPlaybackRef.current = null;
+      setTestPlaybackPlaying(false);
+      return;
+    }
+    const url = URL.createObjectURL(testRecordingBlob);
+    const audio = new Audio(url);
+    audio.addEventListener("ended", () => {
+      setTestPlaybackPlaying(false);
+      testPlaybackRef.current = null;
+      URL.revokeObjectURL(url);
+    });
+    testPlaybackRef.current = audio;
+    audio.play();
+    setTestPlaybackPlaying(true);
+  }, [testRecordingBlob]);
+
+  const confirmRecordingOk = useCallback(() => {
+    if (testPlaybackRef.current) {
+      testPlaybackRef.current.pause();
+      testPlaybackRef.current = null;
+    }
+    setTestPlaybackPlaying(false);
+    setAudioCheckPassed(prev => ({ ...prev, recording: true }));
+    setAudioCheckStep("done");
+    setPhase("self-assessment");
+  }, []);
 
   const handleSelfAssessment = async (level: string) => {
     setIsSubmitting(true);
@@ -475,7 +611,7 @@ export default function EnglishTestPage() {
         <div className="absolute -bottom-20 right-1/4 w-72 h-72 bg-violet-200/20 dark:bg-violet-800/10 rounded-full blur-3xl" />
       </div>
       <div className="relative container mx-auto px-4 py-10 max-w-4xl">
-        {(phase === "registration" || phase === "self-assessment") && (
+        {(phase === "registration" || phase === "audio-check" || phase === "self-assessment") && (
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-blue-700 dark:text-blue-300 px-5 py-2 rounded-full text-sm font-medium mb-5 border border-blue-100 dark:border-blue-800/40 shadow-sm">
               <GraduationCap className="w-4 h-4" />
@@ -489,7 +625,7 @@ export default function EnglishTestPage() {
             </p>
           </div>
         )}
-        {phase !== "registration" && phase !== "self-assessment" && (
+        {phase !== "registration" && phase !== "audio-check" && phase !== "self-assessment" && (
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white" data-testid="text-page-title">
               Test di Inglese
@@ -497,7 +633,7 @@ export default function EnglishTestPage() {
           </div>
         )}
 
-        {phase !== "registration" && phase !== "self-assessment" && phase !== "results" && (
+        {phase !== "registration" && phase !== "audio-check" && phase !== "self-assessment" && phase !== "results" && (
           <div className="mb-6 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-xl p-4 border border-slate-200 dark:border-slate-700">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-4">
@@ -681,6 +817,195 @@ export default function EnglishTestPage() {
                     </p>
                   </form>
                 </Form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {phase === "audio-check" && (
+          <div className="max-w-xl mx-auto" data-testid="card-audio-check">
+            <div className="rounded-3xl bg-white/80 dark:bg-slate-800/70 backdrop-blur-xl border border-white/90 dark:border-slate-700/60 shadow-2xl shadow-blue-900/5 dark:shadow-black/20 overflow-hidden">
+              <div className="px-8 pt-8 pb-4 text-center">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-100 to-blue-100 dark:from-indigo-900/50 dark:to-blue-900/50 flex items-center justify-center">
+                  <Volume2 className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                </div>
+                <h2 className="text-xl font-bold text-slate-800 dark:text-white">Controllo Audio e Microfono</h2>
+                <p className="text-slate-400 dark:text-slate-500 text-sm mt-2">
+                  Prima di iniziare, verifichiamo che il tuo audio e microfono funzionino correttamente.
+                </p>
+              </div>
+
+              <div className="px-8 pb-4">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${
+                    audioCheckStep === "listening" ? "bg-blue-600 text-white" : audioCheckPassed.listening ? "bg-green-500 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-400"
+                  }`}>
+                    {audioCheckPassed.listening ? <CheckCircle className="w-4 h-4" /> : "1"}
+                  </div>
+                  <div className={`flex-1 h-1 rounded-full ${audioCheckPassed.listening ? "bg-green-500" : "bg-slate-200 dark:bg-slate-700"}`} />
+                  <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${
+                    audioCheckStep === "recording" || audioCheckStep === "playback" ? "bg-blue-600 text-white" : audioCheckPassed.recording ? "bg-green-500 text-white" : "bg-slate-200 dark:bg-slate-700 text-slate-400"
+                  }`}>
+                    {audioCheckPassed.recording ? <CheckCircle className="w-4 h-4" /> : "2"}
+                  </div>
+                </div>
+              </div>
+
+              <div className="px-8 pb-8">
+                {audioCheckStep === "listening" && (
+                  <div className="space-y-5" data-testid="audio-check-listening">
+                    <div className="rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-800 p-5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Volume2 className="w-4 h-4 text-indigo-500" />
+                        <span className="text-sm font-medium text-indigo-700 dark:text-indigo-300">Step 1: Test Audio</span>
+                      </div>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                        Clicca il pulsante per riprodurre un audio di prova. Assicurati di sentirlo chiaramente.
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={playTestAudio}
+                          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all ${
+                            testAudioPlaying
+                              ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-700"
+                              : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-md active:scale-95"
+                          }`}
+                          data-testid="button-test-audio"
+                        >
+                          {testAudioPlaying ? (
+                            <><Volume2 className="w-4 h-4 animate-pulse" /> In riproduzione...</>
+                          ) : (
+                            <><Play className="w-4 h-4" /> Riproduci Audio</>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={confirmListeningOk}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-xl"
+                        data-testid="button-audio-ok"
+                      >
+                        <CheckCircle className="w-4 h-4 mr-2" /> Sento l'audio
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          toast({ title: "Suggerimento", description: "Controlla le cuffie/altoparlanti e il volume del dispositivo, poi riprova.", variant: "destructive" });
+                        }}
+                        variant="outline"
+                        className="flex-1 rounded-xl"
+                        data-testid="button-audio-not-ok"
+                      >
+                        Non sento nulla
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {audioCheckStep === "recording" && (
+                  <div className="space-y-5" data-testid="audio-check-recording">
+                    <div className="rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Mic className="w-4 h-4 text-emerald-500" />
+                        <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Step 2: Test Microfono</span>
+                      </div>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                        Clicca il pulsante e parla per qualche secondo. Verifica che il microfono rilevi la tua voce.
+                      </p>
+                      {!testRecording ? (
+                        <button
+                          onClick={startTestRecording}
+                          className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-all active:scale-95"
+                          data-testid="button-start-test-recording"
+                        >
+                          <Mic className="w-4 h-4" /> Inizia Registrazione
+                        </button>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+                            <span className="text-sm font-medium text-red-600 dark:text-red-400">Registrazione in corso...</span>
+                            <button
+                              onClick={stopTestRecording}
+                              className="ml-auto flex items-center gap-2 px-4 py-2 rounded-xl text-sm bg-red-600 hover:bg-red-700 text-white transition-all active:scale-95"
+                              data-testid="button-stop-test-recording"
+                            >
+                              <MicOff className="w-4 h-4" /> Stop
+                            </button>
+                          </div>
+                          <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
+                            <div
+                              className="bg-emerald-500 h-3 rounded-full transition-all duration-100"
+                              style={{ width: `${testMicLevel}%` }}
+                              data-testid="mic-level-bar"
+                            />
+                          </div>
+                          <p className="text-xs text-slate-500">Parla chiaramente — la barra sopra mostra il livello del microfono</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {audioCheckStep === "playback" && (
+                  <div className="space-y-5" data-testid="audio-check-playback">
+                    <div className="rounded-2xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 p-5">
+                      <div className="flex items-center gap-2 mb-3">
+                        <CheckCircle className="w-4 h-4 text-emerald-500" />
+                        <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Step 2: Riascolto</span>
+                      </div>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                        Riascolta la tua registrazione per verificare che il microfono funzioni bene.
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={playTestRecording}
+                          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all ${
+                            testPlaybackPlaying
+                              ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700"
+                              : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md active:scale-95"
+                          }`}
+                          data-testid="button-play-test-recording"
+                        >
+                          {testPlaybackPlaying ? (
+                            <><Pause className="w-4 h-4" /> Pausa</>
+                          ) : (
+                            <><Play className="w-4 h-4" /> Riascolta</>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setTestRecordingBlob(null);
+                            setAudioCheckStep("recording");
+                          }}
+                          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all"
+                          data-testid="button-redo-recording"
+                        >
+                          <RotateCcw className="w-4 h-4" /> Riprova
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={confirmRecordingOk}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-xl"
+                        data-testid="button-recording-ok"
+                      >
+                        <CheckCircle className="w-4 h-4 mr-2" /> Mi sento bene, procedi
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          toast({ title: "Suggerimento", description: "Controlla che il microfono sia collegato e che il browser abbia i permessi per accedervi.", variant: "destructive" });
+                        }}
+                        variant="outline"
+                        className="flex-1 rounded-xl"
+                        data-testid="button-recording-not-ok"
+                      >
+                        Non mi sento
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
