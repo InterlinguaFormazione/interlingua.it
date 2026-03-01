@@ -689,7 +689,7 @@ export default function ChiSiamoPage() {
                 name: "Ampelia Berto",
                 role: "Lean Management & Continuous Improvement",
                 bio: "Laureata in statistica con quasi 30 anni di esperienza manageriale, insegna Lean, Six Sigma, Agile e Scrum con un approccio pragmatico. Per lei, queste non sono solo metodologie, ma un mindset che trasforma il modo di lavorare e innovare.",
-                color: "from-teal-500 to-green-500",
+                image: "/images/team/docenti/ampelia.jpg",
               },
               {
                 name: "Stephanie Vella",
