@@ -655,28 +655,28 @@ function PackageCard({ pkg, index }: { pkg: typeof packages[0]; index: number })
                   {formOpen ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
                 </Button>
               </div>
+              <AnimatePresence>
+                {formOpen && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
+                    className="overflow-hidden"
+                  >
+                    <div className={`rounded-xl mt-4 ${pkg.accentBg} border border-border/30`}>
+                      <div className="max-w-3xl mx-auto">
+                        <CoachingContactForm packageTitle={pkg.title} gradient={pkg.gradient} />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               {pkg.reviewSlug && (
                 <CourseReviewsInline productSlug={pkg.reviewSlug} />
               )}
             </div>
           </div>
-          <AnimatePresence>
-            {formOpen && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
-                className="overflow-hidden"
-              >
-                <div className={`border-t border-border/50 ${pkg.accentBg}`}>
-                  <div className="max-w-3xl mx-auto">
-                    <CoachingContactForm packageTitle={pkg.title} gradient={pkg.gradient} />
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </CardContent>
       </Card>
     </AnimatedSection>
