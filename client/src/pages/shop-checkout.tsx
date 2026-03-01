@@ -62,6 +62,7 @@ export default function ShopCheckout() {
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerPassword, setCustomerPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [buyingForOther, setBuyingForOther] = useState(false);
   const [studentFirstName, setStudentFirstName] = useState("");
   const [studentLastName, setStudentLastName] = useState("");
@@ -87,7 +88,7 @@ export default function ShopCheckout() {
   const paypalInitialized = useRef(false);
 
   const [voucherCode, setVoucherCode] = useState("");
-  const [voucherOpen, setVoucherOpen] = useState(false);
+  const [voucherOpen, setVoucherOpen] = useState(true);
   const [voucherLoading, setVoucherLoading] = useState(false);
   const [voucherResult, setVoucherResult] = useState<{
     valid: boolean;
@@ -199,6 +200,10 @@ export default function ShopCheckout() {
     }
     if (customerPassword && customerPassword.length < 6) {
       toast({ title: "Password troppo corta", description: "La password deve avere almeno 6 caratteri.", variant: "destructive" });
+      return;
+    }
+    if (customerPassword && customerPassword !== confirmPassword) {
+      toast({ title: "Le password non coincidono", description: "La password e la conferma devono essere uguali.", variant: "destructive" });
       return;
     }
     setStep("billing");
@@ -748,6 +753,23 @@ export default function ShopCheckout() {
                           className="mt-1"
                           data-testid="input-customer-password"
                         />
+                        {customerPassword && (
+                          <div className="mt-2">
+                            <Label htmlFor="confirmPassword">Conferma password</Label>
+                            <Input
+                              id="confirmPassword"
+                              type="password"
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              placeholder="Ripeti la password"
+                              className="mt-1"
+                              data-testid="input-confirm-password"
+                            />
+                            {confirmPassword && customerPassword !== confirmPassword && (
+                              <p className="text-xs text-destructive mt-1">Le password non coincidono</p>
+                            )}
+                          </div>
+                        )}
                       </div>
                       <div>
                         <Label htmlFor="notes">Note aggiuntive</Label>
