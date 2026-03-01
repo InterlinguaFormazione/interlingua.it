@@ -808,25 +808,16 @@ export default function EnglishTestPage() {
                         <CheckCircle className="w-4 h-4 mr-2" /> Sento l'audio
                       </Button>
                       <Button
-                        onClick={playTestAudio}
-                        variant="outline"
-                        className="flex-1 rounded-xl"
-                        data-testid="button-audio-retry"
-                      >
-                        <RotateCcw className="w-4 h-4 mr-2" /> Riprova
-                      </Button>
-                    </div>
-                    <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-                      <button
                         onClick={() => {
                           confirmListeningOk();
                           toast({ title: "Attenzione", description: "La sezione di ascolto richiede l'audio. Potresti non riuscire a rispondere alle domande di listening.", variant: "destructive" });
                         }}
-                        className="w-full text-center text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors py-1"
-                        data-testid="button-skip-audio-check"
+                        variant="outline"
+                        className="flex-1 rounded-xl border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30"
+                        data-testid="button-no-audio"
                       >
-                        Non riesco a sentire l'audio — procedi comunque →
-                      </button>
+                        <Volume2 className="w-4 h-4 mr-2" /> Non ho l'audio
+                      </Button>
                     </div>
                   </div>
                 )}
