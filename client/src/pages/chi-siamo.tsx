@@ -193,12 +193,12 @@ export default function ChiSiamoPage() {
                 <img 
                   src={aboutTeamImage} 
                   alt="Il nostro team" 
-                  className="w-full h-[400px] object-cover"
+                  className="w-full h-auto"
                   loading="lazy"
                   decoding="async"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute bottom-6 left-6 right-6">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
                   <p className="text-white text-lg font-medium">
                     Un team di esperti al tuo servizio
                   </p>
