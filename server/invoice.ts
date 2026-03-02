@@ -9,19 +9,24 @@ const IVA_RATE = 0.22;
 
 const COMPANY = {
   name: "Interlingua Formazione S.r.l.",
+  sdiName: "Interlingua Formazione srl",
   brandName: "SkillCraft",
   address: "Viale Giuseppe Mazzini 27",
+  sdiAddress: "Viale Mazzini 27",
   cap: "36100",
   city: "Vicenza",
   province: "VI",
   country: "Italia",
   piva: "03828240246",
   cf: "03828240246",
-  rea: "VI-357313",
+  reaUfficio: "VI",
+  reaNumero: "VI-357313",
   sdi: "M5UXCR1",
   email: "infocorsi@skillcraft.interlingua.it",
+  sdiEmail: "amministrazione@interlingua.it",
   pec: "postpec@pec.interlingua.it",
   phone: "+39 0444 321601",
+  sdiPhone: "0444321601",
   website: "skillcraft.interlingua.it",
 };
 
@@ -67,7 +72,7 @@ export function generateInvoicePDF(order: ShopOrder, invoiceNumber: string, invo
   doc.fontSize(8).font("Helvetica").fillColor("#555")
     .text(`${COMPANY.address} - ${COMPANY.cap} ${COMPANY.city} (${COMPANY.province})`, 50, headerY, { align: "center", width: pageWidth });
   headerY += 11;
-  doc.text(`P.IVA: ${COMPANY.piva} — C.F.: ${COMPANY.cf} — REA: ${COMPANY.rea}`, 50, headerY, { align: "center", width: pageWidth });
+  doc.text(`P.IVA: ${COMPANY.piva} — C.F.: ${COMPANY.cf} — REA: ${COMPANY.reaNumero}`, 50, headerY, { align: "center", width: pageWidth });
   headerY += 11;
   doc.text(`Tel: ${COMPANY.phone} — Email: ${COMPANY.email}`, 50, headerY, { align: "center", width: pageWidth });
   headerY += 11;
@@ -252,7 +257,7 @@ function formatDecimal(n: number, decimals = 2): string {
   return n.toFixed(decimals);
 }
 
-export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoiceDate: Date, progressivoInvio: string): string {
+export async function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoiceDate: Date, progressivoInvio: string): Promise<string> {
   const totalAmount = parseFloat(order.amount);
   const discountAmt = order.discountAmount ? parseFloat(order.discountAmount) : 0;
   const imponibile = totalAmount / (1 + IVA_RATE);
@@ -265,8 +270,6 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
 
   const codiceDestinatario = order.billingCodiceSdi || "0000000";
 
-  const invoiceNum = invoiceNumber.split("/")[0] || invoiceNumber;
-
   let pecDestinatario = "";
   if (codiceDestinatario === "0000000" && order.billingPec) {
     pecDestinatario = `\n        <PECDestinatario>${escapeXml(order.billingPec)}</PECDestinatario>`;
@@ -275,48 +278,63 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
   let cessionarioAnagrafici = "";
   if (isB2B && order.billingPartitaIva) {
     cessionarioAnagrafici = `
-        <DatiAnagrafici>
-          <IdFiscaleIVA>
-            <IdPaese>${escapeXml(customerPaese)}</IdPaese>
-            <IdCodice>${escapeXml(order.billingPartitaIva)}</IdCodice>
-          </IdFiscaleIVA>${order.billingCodiceFiscale ? `\n          <CodiceFiscale>${escapeXml(order.billingCodiceFiscale)}</CodiceFiscale>` : ""}
-          <Anagrafica>
-            <Denominazione>${escapeXml(sanitizeLatinString(`${order.customerFirstName} ${order.customerLastName}`))}</Denominazione>
-          </Anagrafica>
-        </DatiAnagrafici>`;
+      <DatiAnagrafici>
+        <IdFiscaleIVA>
+          <IdPaese>${escapeXml(customerPaese)}</IdPaese>
+          <IdCodice>${escapeXml(order.billingPartitaIva)}</IdCodice>
+        </IdFiscaleIVA>${order.billingCodiceFiscale ? `\n        <CodiceFiscale>${escapeXml(order.billingCodiceFiscale)}</CodiceFiscale>` : ""}
+        <Anagrafica>
+          <Denominazione>${escapeXml(sanitizeLatinString(`${order.customerFirstName} ${order.customerLastName}`))}</Denominazione>
+        </Anagrafica>
+      </DatiAnagrafici>`;
   } else {
     const cfBlock = order.billingCodiceFiscale
-      ? `\n          <CodiceFiscale>${escapeXml(order.billingCodiceFiscale)}</CodiceFiscale>`
-      : (isItalianCustomer ? `\n          <CodiceFiscale>0000000000000000</CodiceFiscale>` : "");
+      ? `\n        <CodiceFiscale>${escapeXml(order.billingCodiceFiscale)}</CodiceFiscale>`
+      : (isItalianCustomer ? `\n        <CodiceFiscale>0000000000000000</CodiceFiscale>` : "");
     cessionarioAnagrafici = `
-        <DatiAnagrafici>${cfBlock}
-          <Anagrafica>
-            <Nome>${escapeXml(sanitizeLatinString(order.customerFirstName))}</Nome>
-            <Cognome>${escapeXml(sanitizeLatinString(order.customerLastName))}</Cognome>
-          </Anagrafica>
-        </DatiAnagrafici>`;
+      <DatiAnagrafici>${cfBlock}
+        <Anagrafica>
+          <Nome>${escapeXml(sanitizeLatinString(order.customerFirstName))}</Nome>
+          <Cognome>${escapeXml(sanitizeLatinString(order.customerLastName))}</Cognome>
+        </Anagrafica>
+      </DatiAnagrafici>`;
   }
 
   const provincia = isItalianCustomer && order.billingProvincia
-    ? `\n          <Provincia>${escapeXml(order.billingProvincia)}</Provincia>`
+    ? `\n        <Provincia>${escapeXml(order.billingProvincia)}</Provincia>`
     : "";
 
   const customerCap = order.billingCap || (isItalianCustomer ? "00000" : "00000");
   const customerIndirizzo = sanitizeLatinString(order.billingIndirizzo || (isItalianCustomer ? "Non specificato" : "N/A"));
-  const customerComune = sanitizeLatinString((order.billingCitta || (isItalianCustomer ? "Non specificato" : "N/A")).toUpperCase());
+  const customerComune = sanitizeLatinString(order.billingCitta || (isItalianCustomer ? "Non specificato" : "N/A"));
 
-  let scontoBlock = "";
+  let scontoLineBlock = "";
   if (discountAmt > 0) {
     const scontoImponibile = discountAmt / (1 + IVA_RATE);
-    scontoBlock = `
+    scontoLineBlock = `
         <ScontoMaggiorazione>
           <Tipo>SC</Tipo>
           <Importo>${formatDecimal(scontoImponibile)}</Importo>
         </ScontoMaggiorazione>`;
   }
 
+  let pdfAttachment = "";
+  try {
+    const pdfBuffer = await generateInvoicePDF(order, invoiceNumber, invoiceDate);
+    const pdfBase64 = pdfBuffer.toString("base64");
+    const attachName = sanitizeLatinString(`Fattura_${invoiceNumber}.pdf`);
+    pdfAttachment = `
+    <Allegati>
+      <NomeAttachment>${escapeXml(attachName)}</NomeAttachment>
+      <FormatoAttachment>PDF</FormatoAttachment>
+      <Attachment>${pdfBase64}</Attachment>
+    </Allegati>`;
+  } catch (err) {
+    console.error("Failed to generate PDF attachment for FatturaPA:", err);
+  }
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<p:FatturaElettronica versione="FPR12" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:p="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2 http://www.fatturapa.gov.it/export/fatturazione/sdi/fatturapa/v1.2/Schema_del_file_xml_FatturaPA_versione_1.2.xsd">
+<p:FatturaElettronica xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:p="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" versione="FPR12" xsi:schemaLocation="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2 http://www.fatturapa.gov.it/export/fatturazione/sdi/fatturapa/v1.2/Schema_del_file_xml_FatturaPA_versione_1.2.xsd">
   <FatturaElettronicaHeader>
     <DatiTrasmissione>
       <IdTrasmittente>
@@ -333,22 +351,26 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
           <IdPaese>IT</IdPaese>
           <IdCodice>${escapeXml(COMPANY.piva)}</IdCodice>
         </IdFiscaleIVA>
-        <CodiceFiscale>${escapeXml(COMPANY.cf)}</CodiceFiscale>
         <Anagrafica>
-          <Denominazione>${escapeXml(COMPANY.name)}</Denominazione>
+          <Denominazione>${escapeXml(COMPANY.sdiName)}</Denominazione>
         </Anagrafica>
         <RegimeFiscale>RF01</RegimeFiscale>
       </DatiAnagrafici>
       <Sede>
-        <Indirizzo>${escapeXml(COMPANY.address)}</Indirizzo>
+        <Indirizzo>${escapeXml(COMPANY.sdiAddress)}</Indirizzo>
         <CAP>${escapeXml(COMPANY.cap)}</CAP>
-        <Comune>${escapeXml(COMPANY.city.toUpperCase())}</Comune>
+        <Comune>${escapeXml(COMPANY.city)}</Comune>
         <Provincia>${escapeXml(COMPANY.province)}</Provincia>
         <Nazione>IT</Nazione>
       </Sede>
+      <IscrizioneREA>
+        <Ufficio>${escapeXml(COMPANY.reaUfficio)}</Ufficio>
+        <NumeroREA>${escapeXml(COMPANY.reaNumero)}</NumeroREA>
+        <StatoLiquidazione>LN</StatoLiquidazione>
+      </IscrizioneREA>
       <Contatti>
-        <Telefono>${sanitizePhone(COMPANY.phone)}</Telefono>
-        <Email>${escapeXml(COMPANY.email)}</Email>
+        <Telefono>${COMPANY.sdiPhone}</Telefono>
+        <Email>${escapeXml(COMPANY.sdiEmail)}</Email>
       </Contatti>
     </CedentePrestatore>
     <CessionarioCommittente>${cessionarioAnagrafici}
@@ -366,9 +388,8 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
         <TipoDocumento>TD01</TipoDocumento>
         <Divisa>EUR</Divisa>
         <Data>${formatDateISO(invoiceDate)}</Data>
-        <Numero>${escapeXml(invoiceNum)}</Numero>${scontoBlock}
+        <Numero>${escapeXml(invoiceNumber)}</Numero>
         <ImportoTotaleDocumento>${formatDecimal(totalAmount)}</ImportoTotaleDocumento>
-        <Causale>${escapeXml(sanitizeLatinString(`Fattura N. ${invoiceNumber} - ${order.productName}`))}</Causale>
       </DatiGeneraliDocumento>
     </DatiGenerali>
     <DatiBeniServizi>
@@ -376,7 +397,7 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
         <NumeroLinea>1</NumeroLinea>
         <Descrizione>${escapeXml(sanitizeLatinString(order.productName))}</Descrizione>
         <Quantita>${formatDecimal(1, 2)}</Quantita>
-        <PrezzoUnitario>${formatDecimal(grossUnitPrice)}</PrezzoUnitario>
+        <PrezzoUnitario>${formatDecimal(grossUnitPrice, 3)}</PrezzoUnitario>${scontoLineBlock}
         <PrezzoTotale>${formatDecimal(imponibile)}</PrezzoTotale>
         <AliquotaIVA>${formatDecimal(IVA_RATE * 100)}</AliquotaIVA>
       </DettaglioLinee>
@@ -391,10 +412,9 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
       <CondizioniPagamento>TP02</CondizioniPagamento>
       <DettaglioPagamento>
         <ModalitaPagamento>MP08</ModalitaPagamento>
-        <DataScadenzaPagamento>${formatDateISO(invoiceDate)}</DataScadenzaPagamento>
         <ImportoPagamento>${formatDecimal(totalAmount)}</ImportoPagamento>
       </DettaglioPagamento>
-    </DatiPagamento>
+    </DatiPagamento>${pdfAttachment}
   </FatturaElettronicaBody>
 </p:FatturaElettronica>`;
 
