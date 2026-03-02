@@ -522,7 +522,7 @@ export class DatabaseStorage implements IStorage {
     let maxSeq = 0;
     for (const r of results) {
       if (r.invoiceNumber) {
-        const num = parseInt(r.invoiceNumber.split("/")[0], 10);
+        const num = parseInt(r.invoiceNumber.split("/")[0].replace(/\D/g, ""), 10);
         if (!isNaN(num) && num > maxSeq) maxSeq = num;
       }
     }
