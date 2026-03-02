@@ -296,6 +296,7 @@ const ORDER_STATUSES = [
 
 function ShopOrdersTab({ token }: { token: string }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const { toast } = useToast();
   const { data: orders = [], isLoading } = useQuery<ShopOrder[]>({
     queryKey: ["/api/admin/shop/orders"],
@@ -327,6 +328,45 @@ function ShopOrdersTab({ token }: { token: string }) {
     },
   });
 
+  const bulkStatusMutation = useMutation({
+    mutationFn: async (status: string) => {
+      const ids = Array.from(selectedIds);
+      for (const id of ids) {
+        const res = await fetch(`/api/admin/shop/orders/${id}/status`, {
+          method: "PATCH",
+          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        });
+        if (!res.ok) throw new Error("Failed");
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/shop/orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard"] });
+      setSelectedIds(new Set());
+      toast({ title: "Stato aggiornato per tutti gli ordini selezionati" });
+    },
+    onError: () => {
+      toast({ title: "Errore nell'aggiornamento", variant: "destructive" });
+    },
+  });
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    if (selectedIds.size === orders.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(orders.map(o => o.id)));
+    }
+  };
+
   const DetailRow = ({ label, value }: { label: string; value: string | null | undefined }) => {
     if (!value) return null;
     return (
@@ -341,7 +381,7 @@ function ShopOrdersTab({ token }: { token: string }) {
     <Card>
       <CardHeader>
         <CardTitle>Ordini Shop</CardTitle>
-        <CardDescription>Tutti gli acquisti effettuati online — clicca su un ordine per i dettagli</CardDescription>
+        <CardDescription>Clicca su un ordine per i dettagli, usa le caselle per azioni in blocco</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -349,18 +389,71 @@ function ShopOrdersTab({ token }: { token: string }) {
         ) : orders.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">Nessun ordine ancora</div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
+            {selectedIds.size > 0 && (
+              <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg" data-testid="bulk-actions-bar">
+                <span className="text-sm font-medium text-blue-800">{selectedIds.size} selezionati</span>
+                <span className="text-blue-300">|</span>
+                <span className="text-xs text-blue-600">Cambia stato:</span>
+                {ORDER_STATUSES.map(s => (
+                  <Button
+                    key={s.value}
+                    size="sm"
+                    variant="outline"
+                    className={`text-xs h-7 ${s.color} border-0`}
+                    onClick={() => {
+                      if (confirm(`Impostare ${selectedIds.size} ordini come "${s.label}"?`)) {
+                        bulkStatusMutation.mutate(s.value);
+                      }
+                    }}
+                    disabled={bulkStatusMutation.isPending}
+                    data-testid={`button-bulk-${s.value}`}
+                  >
+                    {s.label}
+                  </Button>
+                ))}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-xs h-7 ml-auto"
+                  onClick={() => setSelectedIds(new Set())}
+                  data-testid="button-bulk-deselect"
+                >
+                  Deseleziona
+                </Button>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 px-4 py-2 border-b">
+              <input
+                type="checkbox"
+                checked={orders.length > 0 && selectedIds.size === orders.length}
+                onChange={toggleAll}
+                className="w-4 h-4 rounded border-gray-300 accent-blue-600 cursor-pointer"
+                data-testid="checkbox-select-all"
+              />
+              <span className="text-xs text-muted-foreground">Seleziona tutti</span>
+            </div>
+
             {orders.map((order) => {
               const isExpanded = expandedId === order.id;
+              const isSelected = selectedIds.has(order.id);
               return (
-                <div key={order.id} className={`border rounded-lg transition-all ${isExpanded ? "ring-1 ring-blue-200 border-blue-300" : "hover:border-gray-300"}`} data-testid={`row-order-${order.id}`}>
-                  <button
-                    type="button"
-                    className="w-full text-left px-4 py-3 flex items-center gap-3 cursor-pointer"
-                    onClick={() => setExpandedId(isExpanded ? null : order.id)}
-                    data-testid={`button-expand-order-${order.id}`}
-                  >
-                    <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-2 items-center">
+                <div key={order.id} className={`border rounded-lg transition-all ${isExpanded ? "ring-1 ring-blue-200 border-blue-300" : isSelected ? "border-blue-200 bg-blue-50/30" : "hover:border-gray-300"}`} data-testid={`row-order-${order.id}`}>
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleSelect(order.id)}
+                      className="w-4 h-4 rounded border-gray-300 accent-blue-600 cursor-pointer shrink-0"
+                      data-testid={`checkbox-order-${order.id}`}
+                    />
+                    <button
+                      type="button"
+                      className="flex-1 text-left grid grid-cols-2 md:grid-cols-4 gap-2 items-center cursor-pointer"
+                      onClick={() => setExpandedId(isExpanded ? null : order.id)}
+                      data-testid={`button-expand-order-${order.id}`}
+                    >
                       <div>
                         <p className="text-xs text-muted-foreground">
                           {order.createdAt ? new Date(order.createdAt).toLocaleDateString("it-IT") : "-"}
@@ -374,13 +467,27 @@ function ShopOrdersTab({ token }: { token: string }) {
                         <p className="font-semibold">&euro;{parseFloat(order.amount).toFixed(2)}</p>
                       </div>
                       <div className="flex items-center justify-end gap-2">
-                        <Badge variant={order.status === "completed" ? "default" : order.status === "cancelled" || order.status === "refunded" ? "destructive" : "secondary"}>
-                          {ORDER_STATUSES.find(s => s.value === order.status)?.label || order.status}
-                        </Badge>
                         {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                       </div>
-                    </div>
-                  </button>
+                    </button>
+                    <Select
+                      value={order.status}
+                      onValueChange={(newStatus) => statusMutation.mutate({ id: order.id, status: newStatus })}
+                    >
+                      <SelectTrigger className="w-[130px] h-8 text-xs shrink-0" data-testid={`select-quick-status-${order.id}`}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ORDER_STATUSES.map(s => (
+                          <SelectItem key={s.value} value={s.value}>
+                            <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${s.color}`}>
+                              {s.label}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
                   {isExpanded && (
                     <div className="px-4 pb-4 border-t bg-slate-50/50">
@@ -430,27 +537,6 @@ function ShopOrdersTab({ token }: { token: string }) {
                               <DetailRow label="Sconto" value={order.discountAmount ? `€${parseFloat(order.discountAmount).toFixed(2)}` : null} />
                             </>
                           )}
-                        </div>
-
-                        <div>
-                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Stato Ordine</h4>
-                          <Select
-                            value={order.status}
-                            onValueChange={(newStatus) => statusMutation.mutate({ id: order.id, status: newStatus })}
-                          >
-                            <SelectTrigger className="w-full" data-testid={`select-order-status-${order.id}`}>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {ORDER_STATUSES.map(s => (
-                                <SelectItem key={s.value} value={s.value}>
-                                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${s.color}`}>
-                                    {s.label}
-                                  </span>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
                         </div>
 
                         {order.notes && (
