@@ -2005,13 +2005,24 @@ export default function AdminPage() {
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <div className="hidden md:block overflow-x-auto pb-2">
-            <TabsList className="bg-white border shadow-sm h-auto p-1 flex flex-wrap gap-1">
+          <div className="hidden md:block">
+            <TabsList className="bg-transparent h-auto p-0 grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
               {adminTabs.filter(t => !('adminOnly' in t && t.adminOnly) || user?.role === "admin").map(t => {
                 const Icon = t.icon;
+                const isActive = activeTab === t.value;
                 return (
-                  <TabsTrigger key={t.value} value={t.value} className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-3 flex items-center gap-2" data-testid={`tab-${t.value}`}>
-                    <Icon className="w-4 h-4" /> {t.label}
+                  <TabsTrigger
+                    key={t.value}
+                    value={t.value}
+                    className={`flex flex-col items-center gap-2 rounded-xl border p-4 shadow-sm transition-all hover:shadow-md cursor-pointer h-auto ${
+                      isActive
+                        ? "bg-blue-50 border-blue-300 text-blue-700 shadow-md ring-1 ring-blue-200"
+                        : "bg-white border-gray-200 text-gray-600 hover:border-gray-300"
+                    }`}
+                    data-testid={`tab-${t.value}`}
+                  >
+                    <Icon className={`w-6 h-6 ${isActive ? "text-blue-600" : "text-gray-400"}`} />
+                    <span className="text-sm font-medium">{t.label}</span>
                   </TabsTrigger>
                 );
               })}
