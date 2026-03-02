@@ -421,9 +421,15 @@ export async function generateFatturaPA(order: ShopOrder, invoiceNumber: string,
   return xml;
 }
 
-export function generateFatturaFilename(order: ShopOrder, invoiceNumber: string): string {
-  const countryCode = "IT";
-  const piva = COMPANY.piva;
-  const seq = invoiceNumber.split("/")[0].padStart(5, "0");
-  return `${countryCode}${piva}_${seq}.xml`;
+export function generateProgressivoInvio(): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let result = "";
+  for (let i = 0; i < 5; i++) {
+    result += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return result;
+}
+
+export function generateFatturaFilename(progressivoInvio: string): string {
+  return `IT${COMPANY.piva}_${progressivoInvio}.xml`;
 }

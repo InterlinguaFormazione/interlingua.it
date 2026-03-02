@@ -5,7 +5,7 @@ import { insertContactSchema, insertNewsletterSchema, insertCookieConsentSchema,
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendSubscriptionConfirmation, sendBookingConfirmation, sendInvoiceEmail } from "./email";
-import { generateInvoicePDF, generateInvoiceNumber, generateFatturaPA, generateFatturaFilename } from "./invoice";
+import { generateInvoicePDF, generateInvoiceNumber, generateFatturaPA, generateFatturaFilename, generateProgressivoInvio } from "./invoice";
 import { forwardToCRM, forwardPurchaseToCRM, forwardTestToCRM, forwardNewsletterToCRM } from "./crm";
 import { generateBlogPost } from "./blog-generator";
 import { chatWithAI } from "./ai-chat";
@@ -2072,10 +2072,9 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         return res.status(404).json({ success: false, message: "Fattura non disponibile." });
       }
       const invoiceDate = order.invoiceDate ? new Date(order.invoiceDate) : new Date();
-      const seq = order.invoiceNumber.split("/")[0].padStart(5, "0");
-      const progressivoInvio = seq;
+      const progressivoInvio = generateProgressivoInvio();
       const xml = await generateFatturaPA(order, order.invoiceNumber, invoiceDate, progressivoInvio);
-      const filename = generateFatturaFilename(order, order.invoiceNumber);
+      const filename = generateFatturaFilename(progressivoInvio);
       res.setHeader("Content-Type", "application/xml; charset=utf-8");
       res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
       res.send(xml);
