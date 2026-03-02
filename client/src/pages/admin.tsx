@@ -756,6 +756,35 @@ function ShopOrdersTab({ token }: { token: string }) {
                                   onClick={async () => {
                                     try {
                                       const tkn = localStorage.getItem("admin_token");
+                                      const r = await fetch(`/api/admin/orders/${order.id}/fatturapa`, {
+                                        headers: { Authorization: `Bearer ${tkn}` },
+                                      });
+                                      if (!r.ok) throw new Error("Download failed");
+                                      const blob = await r.blob();
+                                      const url = URL.createObjectURL(blob);
+                                      const a = document.createElement("a");
+                                      a.href = url;
+                                      const seq = (order.invoiceNumber || "1").split("/")[0].padStart(5, "0");
+                                      a.download = `IT03828240246_${seq}.xml`;
+                                      document.body.appendChild(a);
+                                      a.click();
+                                      document.body.removeChild(a);
+                                      URL.revokeObjectURL(url);
+                                    } catch {
+                                      toast({ title: "Errore", description: "Errore durante il download XML.", variant: "destructive" });
+                                    }
+                                  }}
+                                  data-testid={`button-download-fatturapa-${order.id}`}
+                                >
+                                  <FileDown className="w-3 h-3 mr-1" /> XML SDI
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 text-xs"
+                                  onClick={async () => {
+                                    try {
+                                      const tkn = localStorage.getItem("admin_token");
                                       const r = await fetch(`/api/admin/orders/${order.id}/invoice/resend`, {
                                         method: "POST",
                                         headers: { Authorization: `Bearer ${tkn}` },

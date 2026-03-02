@@ -219,3 +219,176 @@ export function generateInvoicePDF(order: ShopOrder, invoiceNumber: string, invo
   doc.end();
   });
 }
+
+function escapeXml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function formatDateISO(d: Date): string {
+  return d.toISOString().split("T")[0];
+}
+
+function formatDecimal(n: number, decimals = 2): string {
+  return n.toFixed(decimals);
+}
+
+export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoiceDate: Date, progressivoInvio: string): string {
+  const totalAmount = parseFloat(order.amount);
+  const discountAmt = order.discountAmount ? parseFloat(order.discountAmount) : 0;
+  const imponibile = totalAmount / (1 + IVA_RATE);
+  const ivaAmount = totalAmount - imponibile;
+  const grossUnitPrice = discountAmt > 0 ? (totalAmount + discountAmt) / (1 + IVA_RATE) : imponibile;
+
+  const isB2B = !!order.billingPartitaIva;
+  const customerPaese = order.billingPaese || "IT";
+  const isItalianCustomer = customerPaese === "IT";
+
+  const codiceDestinatario = order.billingCodiceSdi || "0000000";
+
+  const invoiceNum = invoiceNumber.split("/")[0] || invoiceNumber;
+
+  let pecDestinatario = "";
+  if (codiceDestinatario === "0000000" && order.billingPec) {
+    pecDestinatario = `\n        <PECDestinatario>${escapeXml(order.billingPec)}</PECDestinatario>`;
+  }
+
+  let cessionarioAnagrafici = "";
+  if (isB2B && order.billingPartitaIva) {
+    cessionarioAnagrafici = `
+        <DatiAnagrafici>
+          <IdFiscaleIVA>
+            <IdPaese>${escapeXml(customerPaese)}</IdPaese>
+            <IdCodice>${escapeXml(order.billingPartitaIva)}</IdCodice>
+          </IdFiscaleIVA>${order.billingCodiceFiscale ? `\n          <CodiceFiscale>${escapeXml(order.billingCodiceFiscale)}</CodiceFiscale>` : ""}
+          <Anagrafica>
+            <Denominazione>${escapeXml(`${order.customerFirstName} ${order.customerLastName}`)}</Denominazione>
+          </Anagrafica>
+        </DatiAnagrafici>`;
+  } else {
+    const cfBlock = order.billingCodiceFiscale
+      ? `\n          <CodiceFiscale>${escapeXml(order.billingCodiceFiscale)}</CodiceFiscale>`
+      : (isItalianCustomer ? `\n          <CodiceFiscale>0000000000000000</CodiceFiscale>` : "");
+    cessionarioAnagrafici = `
+        <DatiAnagrafici>${cfBlock}
+          <Anagrafica>
+            <Nome>${escapeXml(order.customerFirstName)}</Nome>
+            <Cognome>${escapeXml(order.customerLastName)}</Cognome>
+          </Anagrafica>
+        </DatiAnagrafici>`;
+  }
+
+  const provincia = isItalianCustomer && order.billingProvincia
+    ? `\n          <Provincia>${escapeXml(order.billingProvincia)}</Provincia>`
+    : "";
+
+  const customerCap = order.billingCap || (isItalianCustomer ? "00000" : "00000");
+  const customerIndirizzo = order.billingIndirizzo || (isItalianCustomer ? "Non specificato" : "N/A");
+  const customerComune = (order.billingCitta || (isItalianCustomer ? "Non specificato" : "N/A")).toUpperCase();
+
+  let scontoBlock = "";
+  if (discountAmt > 0) {
+    const scontoImponibile = discountAmt / (1 + IVA_RATE);
+    scontoBlock = `
+        <ScontoMaggiorazione>
+          <Tipo>SC</Tipo>
+          <Importo>${formatDecimal(scontoImponibile)}</Importo>
+        </ScontoMaggiorazione>`;
+  }
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<p:FatturaElettronica versione="FPR12" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:p="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2 http://www.fatturapa.gov.it/export/fatturazione/sdi/fatturapa/v1.2/Schema_del_file_xml_FatturaPA_versione_1.2.xsd">
+  <FatturaElettronicaHeader>
+    <DatiTrasmissione>
+      <IdTrasmittente>
+        <IdPaese>IT</IdPaese>
+        <IdCodice>${escapeXml(COMPANY.piva)}</IdCodice>
+      </IdTrasmittente>
+      <ProgressivoInvio>${escapeXml(progressivoInvio)}</ProgressivoInvio>
+      <FormatoTrasmissione>FPR12</FormatoTrasmissione>
+      <CodiceDestinatario>${escapeXml(codiceDestinatario)}</CodiceDestinatario>${pecDestinatario}
+    </DatiTrasmissione>
+    <CedentePrestatore>
+      <DatiAnagrafici>
+        <IdFiscaleIVA>
+          <IdPaese>IT</IdPaese>
+          <IdCodice>${escapeXml(COMPANY.piva)}</IdCodice>
+        </IdFiscaleIVA>
+        <CodiceFiscale>${escapeXml(COMPANY.cf)}</CodiceFiscale>
+        <Anagrafica>
+          <Denominazione>${escapeXml(COMPANY.name)}</Denominazione>
+        </Anagrafica>
+        <RegimeFiscale>RF01</RegimeFiscale>
+      </DatiAnagrafici>
+      <Sede>
+        <Indirizzo>${escapeXml(COMPANY.address)}</Indirizzo>
+        <CAP>${escapeXml(COMPANY.cap)}</CAP>
+        <Comune>${escapeXml(COMPANY.city.toUpperCase())}</Comune>
+        <Provincia>${escapeXml(COMPANY.province)}</Provincia>
+        <Nazione>IT</Nazione>
+      </Sede>
+      <Contatti>
+        <Telefono>${escapeXml(COMPANY.phone)}</Telefono>
+        <Email>${escapeXml(COMPANY.email)}</Email>
+      </Contatti>
+    </CedentePrestatore>
+    <CessionarioCommittente>${cessionarioAnagrafici}
+      <Sede>
+        <Indirizzo>${escapeXml(customerIndirizzo)}</Indirizzo>
+        <CAP>${escapeXml(customerCap)}</CAP>
+        <Comune>${escapeXml(customerComune)}</Comune>${provincia}
+        <Nazione>${escapeXml(customerPaese)}</Nazione>
+      </Sede>
+    </CessionarioCommittente>
+  </FatturaElettronicaHeader>
+  <FatturaElettronicaBody>
+    <DatiGenerali>
+      <DatiGeneraliDocumento>
+        <TipoDocumento>TD01</TipoDocumento>
+        <Divisa>EUR</Divisa>
+        <Data>${formatDateISO(invoiceDate)}</Data>
+        <Numero>${escapeXml(invoiceNum)}</Numero>${scontoBlock}
+        <ImportoTotaleDocumento>${formatDecimal(totalAmount)}</ImportoTotaleDocumento>
+        <Causale>Fattura N. ${escapeXml(invoiceNumber)} - ${escapeXml(order.productName)}</Causale>
+      </DatiGeneraliDocumento>
+    </DatiGenerali>
+    <DatiBeniServizi>
+      <DettaglioLinee>
+        <NumeroLinea>1</NumeroLinea>
+        <Descrizione>${escapeXml(order.productName)}</Descrizione>
+        <Quantita>${formatDecimal(1, 2)}</Quantita>
+        <PrezzoUnitario>${formatDecimal(grossUnitPrice)}</PrezzoUnitario>
+        <PrezzoTotale>${formatDecimal(imponibile)}</PrezzoTotale>
+        <AliquotaIVA>${formatDecimal(IVA_RATE * 100)}</AliquotaIVA>
+      </DettaglioLinee>
+      <DatiRiepilogo>
+        <AliquotaIVA>${formatDecimal(IVA_RATE * 100)}</AliquotaIVA>
+        <ImponibileImporto>${formatDecimal(imponibile)}</ImponibileImporto>
+        <Imposta>${formatDecimal(ivaAmount)}</Imposta>
+        <EsigibilitaIVA>I</EsigibilitaIVA>
+      </DatiRiepilogo>
+    </DatiBeniServizi>
+    <DatiPagamento>
+      <CondizioniPagamento>TP02</CondizioniPagamento>
+      <DettaglioPagamento>
+        <ModalitaPagamento>MP08</ModalitaPagamento>
+        <DataScadenzaPagamento>${formatDateISO(invoiceDate)}</DataScadenzaPagamento>
+        <ImportoPagamento>${formatDecimal(totalAmount)}</ImportoPagamento>
+      </DettaglioPagamento>
+    </DatiPagamento>
+  </FatturaElettronicaBody>
+</p:FatturaElettronica>`;
+
+  return xml;
+}
+
+export function generateFatturaFilename(order: ShopOrder, invoiceNumber: string): string {
+  const countryCode = "IT";
+  const piva = COMPANY.piva;
+  const seq = invoiceNumber.split("/")[0].padStart(5, "0");
+  return `${countryCode}${piva}_${seq}.xml`;
+}

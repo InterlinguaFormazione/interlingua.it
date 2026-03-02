@@ -5,7 +5,7 @@ import { insertContactSchema, insertNewsletterSchema, insertCookieConsentSchema,
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendSubscriptionConfirmation, sendBookingConfirmation, sendInvoiceEmail } from "./email";
-import { generateInvoicePDF, generateInvoiceNumber } from "./invoice";
+import { generateInvoicePDF, generateInvoiceNumber, generateFatturaPA, generateFatturaFilename } from "./invoice";
 import { forwardToCRM, forwardPurchaseToCRM, forwardTestToCRM, forwardNewsletterToCRM } from "./crm";
 import { generateBlogPost } from "./blog-generator";
 import { chatWithAI } from "./ai-chat";
@@ -2056,6 +2056,31 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       res.send(pdfBuffer);
     } catch (error) {
       console.error("Admin invoice download error:", error);
+      res.status(500).json({ success: false, message: "Errore del server." });
+    }
+  });
+
+  app.get("/api/admin/orders/:orderId/fatturapa", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.replace("Bearer ", "");
+      const session = getAdminSession(token);
+      if (!session) return res.status(401).json({ success: false, message: "Non autorizzato" });
+      const order = await storage.getShopOrderById(req.params.orderId);
+      if (!order) return res.status(404).json({ success: false, message: "Ordine non trovato." });
+      if (!order.invoiceNumber) {
+        return res.status(404).json({ success: false, message: "Fattura non disponibile." });
+      }
+      const invoiceDate = order.invoiceDate ? new Date(order.invoiceDate) : new Date();
+      const seq = order.invoiceNumber.split("/")[0].padStart(5, "0");
+      const progressivoInvio = seq;
+      const xml = generateFatturaPA(order, order.invoiceNumber, invoiceDate, progressivoInvio);
+      const filename = generateFatturaFilename(order, order.invoiceNumber);
+      res.setHeader("Content-Type", "application/xml; charset=utf-8");
+      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+      res.send(xml);
+    } catch (error) {
+      console.error("FatturaPA XML download error:", error);
       res.status(500).json({ success: false, message: "Errore del server." });
     }
   });

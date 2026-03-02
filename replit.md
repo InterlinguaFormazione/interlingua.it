@@ -170,6 +170,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `GET /api/shop/my-orders/:orderId/invoice` - Download invoice PDF for customer order (auth required)
 - `GET /api/admin/shop/orders` - List all shop orders (admin)
 - `GET /api/admin/orders/:orderId/invoice` - Download invoice PDF (admin auth)
+- `GET /api/admin/orders/:orderId/fatturapa` - Download FatturaPA XML (SDI electronic invoice, FPR12 v1.2 format) (admin auth)
 - `POST /api/admin/orders/:orderId/invoice/resend` - Resend invoice email (admin auth)
 - `POST /api/admin/orders/:orderId/invoice/generate` - Generate invoice for order without one (admin auth)
 - `GET /api/admin/shop/materials` - List all course materials (admin)
