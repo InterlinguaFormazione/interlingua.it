@@ -626,7 +626,7 @@ function ShopOrdersTab({ token }: { token: string }) {
                     >
                       <div>
                         <p className="text-xs text-muted-foreground">
-                          {order.createdAt ? new Date(order.createdAt).toLocaleDateString("it-IT") : "-"}
+                          <span className="font-mono">#{order.id}</span> &middot; {order.createdAt ? new Date(order.createdAt).toLocaleDateString("it-IT") : "-"}
                         </p>
                         <p className="font-medium text-sm">{order.customerFirstName} {order.customerLastName}</p>
                       </div>
