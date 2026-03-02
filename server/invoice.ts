@@ -10,7 +10,7 @@ const IVA_RATE = 0.22;
 const COMPANY = {
   name: "Interlingua Formazione S.r.l.",
   brandName: "SkillCraft",
-  address: "Viale Trieste, 31/C",
+  address: "Viale Giuseppe Mazzini 27",
   cap: "36100",
   city: "Vicenza",
   province: "VI",
@@ -20,7 +20,7 @@ const COMPANY = {
   rea: "VI-357313",
   sdi: "M5UXCR1",
   email: "infocorsi@skillcraft.interlingua.it",
-  pec: "interlinguaformazione@pec.it",
+  pec: "postpec@pec.interlingua.it",
   phone: "+39 0444 321601",
   website: "skillcraft.interlingua.it",
 };
