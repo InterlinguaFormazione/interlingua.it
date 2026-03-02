@@ -2010,6 +2010,96 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
     }
   });
 
+  app.get("/api/shop/my-orders/:orderId/invoice", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.replace("Bearer ", "");
+      if (!token) return res.status(401).json({ success: false, message: "Non autorizzato." });
+      const session = shopCustomerSessions.get(token);
+      if (!session || Date.now() - session.createdAt > SHOP_SESSION_DURATION) {
+        if (session) shopCustomerSessions.delete(token);
+        return res.status(401).json({ success: false, message: "Sessione scaduta." });
+      }
+      const order = await storage.getShopOrderById(req.params.orderId);
+      if (!order || order.customerId !== session.customerId) {
+        return res.status(404).json({ success: false, message: "Ordine non trovato." });
+      }
+      if (!order.invoiceNumber) {
+        return res.status(404).json({ success: false, message: "Fattura non disponibile." });
+      }
+      const pdfBuffer = generateInvoicePDF(order, order.invoiceNumber, order.invoiceDate ? new Date(order.invoiceDate) : new Date());
+      const safeFilename = `Fattura_${order.invoiceNumber.replace("/", "_")}.pdf`;
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename="${safeFilename}"`);
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("Customer invoice download error:", error);
+      res.status(500).json({ success: false, message: "Errore del server." });
+    }
+  });
+
+  app.get("/api/admin/orders/:orderId/invoice", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.replace("Bearer ", "");
+      const session = getAdminSession(token);
+      if (!session) return res.status(401).json({ success: false, message: "Non autorizzato" });
+      const order = await storage.getShopOrderById(req.params.orderId);
+      if (!order) return res.status(404).json({ success: false, message: "Ordine non trovato." });
+      if (!order.invoiceNumber) {
+        return res.status(404).json({ success: false, message: "Fattura non disponibile." });
+      }
+      const pdfBuffer = generateInvoicePDF(order, order.invoiceNumber, order.invoiceDate ? new Date(order.invoiceDate) : new Date());
+      const safeFilename = `Fattura_${order.invoiceNumber.replace("/", "_")}.pdf`;
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename="${safeFilename}"`);
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error("Admin invoice download error:", error);
+      res.status(500).json({ success: false, message: "Errore del server." });
+    }
+  });
+
+  app.post("/api/admin/orders/:orderId/invoice/resend", requireAuth, async (req, res) => {
+    try {
+      const order = await storage.getShopOrderById(req.params.orderId);
+      if (!order) return res.status(404).json({ success: false, message: "Ordine non trovato." });
+      if (!order.invoiceNumber) {
+        return res.status(400).json({ success: false, message: "Nessuna fattura da reinviare." });
+      }
+      const pdfBuffer = generateInvoicePDF(order, order.invoiceNumber, order.invoiceDate ? new Date(order.invoiceDate) : new Date());
+      await sendInvoiceEmail({
+        customerName: `${order.customerFirstName} ${order.customerLastName}`,
+        customerEmail: order.customerEmail,
+        invoiceNumber: order.invoiceNumber,
+        amount: order.amount,
+        productName: order.productName,
+        pdfBuffer,
+      });
+      await storage.markInvoiceSent(order.id);
+      res.json({ success: true, message: "Fattura reinviata." });
+    } catch (error) {
+      console.error("Resend invoice error:", error);
+      res.status(500).json({ success: false, message: "Errore durante il reinvio." });
+    }
+  });
+
+  app.post("/api/admin/orders/:orderId/invoice/generate", requireAuth, async (req, res) => {
+    try {
+      const order = await storage.getShopOrderById(req.params.orderId);
+      if (!order) return res.status(404).json({ success: false, message: "Ordine non trovato." });
+      if (order.invoiceNumber) {
+        return res.status(400).json({ success: false, message: "Fattura già generata." });
+      }
+      await generateAndSendInvoice(order.id);
+      const updated = await storage.getShopOrderById(order.id);
+      res.json({ success: true, message: "Fattura generata.", invoiceNumber: updated?.invoiceNumber });
+    } catch (error) {
+      console.error("Generate invoice error:", error);
+      res.status(500).json({ success: false, message: "Errore durante la generazione." });
+    }
+  });
+
   app.patch("/api/shop/profile", async (req, res) => {
     try {
       const authHeader = req.headers.authorization;

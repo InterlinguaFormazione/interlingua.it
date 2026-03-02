@@ -57,6 +57,7 @@ interface Order {
   amount: string;
   status: string;
   createdAt: string | null;
+  invoiceNumber?: string | null;
 }
 
 interface Material {
@@ -445,6 +446,7 @@ export default function ShopDashboard() {
                           <th className="text-left py-2 px-2 font-medium">Corso</th>
                           <th className="text-right py-2 px-2 font-medium">Importo</th>
                           <th className="text-center py-2 px-2 font-medium">Stato</th>
+                          <th className="text-center py-2 px-2 font-medium">Fattura</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -461,6 +463,40 @@ export default function ShopDashboard() {
                               <Badge variant={order.status === "completed" ? "default" : "secondary"}>
                                 {order.status === "completed" ? "Completato" : order.status}
                               </Badge>
+                            </td>
+                            <td className="py-2 px-2 text-center">
+                              {order.invoiceNumber ? (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-7 text-xs gap-1"
+                                  onClick={async () => {
+                                    try {
+                                      const tkn = localStorage.getItem("shop_customer_token");
+                                      const r = await fetch(`/api/shop/my-orders/${order.id}/invoice`, {
+                                        headers: { Authorization: `Bearer ${tkn}` },
+                                      });
+                                      if (!r.ok) throw new Error("Download failed");
+                                      const blob = await r.blob();
+                                      const url = URL.createObjectURL(blob);
+                                      const a = document.createElement("a");
+                                      a.href = url;
+                                      a.download = `Fattura_${(order.invoiceNumber || "").replace("/", "_")}.pdf`;
+                                      document.body.appendChild(a);
+                                      a.click();
+                                      document.body.removeChild(a);
+                                      URL.revokeObjectURL(url);
+                                    } catch {
+                                      toast({ title: "Errore", description: "Errore durante il download della fattura." , variant: "destructive" });
+                                    }
+                                  }}
+                                  data-testid={`button-download-invoice-${order.id}`}
+                                >
+                                  <Download className="w-3 h-3" /> PDF
+                                </Button>
+                              ) : (
+                                <span className="text-xs text-muted-foreground">—</span>
+                              )}
                             </td>
                           </tr>
                         ))}

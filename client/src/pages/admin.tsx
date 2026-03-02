@@ -713,6 +713,102 @@ function ShopOrdersTab({ token }: { token: string }) {
                           )}
                         </div>
 
+                        <div>
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Fattura</h4>
+                          {order.invoiceNumber ? (
+                            <>
+                              <DetailRow label="N. Fattura" value={order.invoiceNumber} />
+                              <DetailRow label="Data" value={order.invoiceDate ? new Date(order.invoiceDate).toLocaleDateString("it-IT") : "-"} />
+                              <DetailRow label="Inviata" value={order.invoiceSent ? "Si" : "No"} />
+                              <div className="flex gap-2 mt-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 text-xs"
+                                  onClick={async () => {
+                                    try {
+                                      const tkn = localStorage.getItem("admin_token");
+                                      const r = await fetch(`/api/admin/orders/${order.id}/invoice`, {
+                                        headers: { Authorization: `Bearer ${tkn}` },
+                                      });
+                                      if (!r.ok) throw new Error("Download failed");
+                                      const blob = await r.blob();
+                                      const url = URL.createObjectURL(blob);
+                                      const a = document.createElement("a");
+                                      a.href = url;
+                                      a.download = `Fattura_${(order.invoiceNumber || "").replace("/", "_")}.pdf`;
+                                      document.body.appendChild(a);
+                                      a.click();
+                                      document.body.removeChild(a);
+                                      URL.revokeObjectURL(url);
+                                    } catch {
+                                      toast({ title: "Errore", description: "Errore durante il download.", variant: "destructive" });
+                                    }
+                                  }}
+                                  data-testid={`button-download-invoice-${order.id}`}
+                                >
+                                  <FileDown className="w-3 h-3 mr-1" /> Scarica PDF
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 text-xs"
+                                  onClick={async () => {
+                                    try {
+                                      const tkn = localStorage.getItem("admin_token");
+                                      const r = await fetch(`/api/admin/orders/${order.id}/invoice/resend`, {
+                                        method: "POST",
+                                        headers: { Authorization: `Bearer ${tkn}` },
+                                      });
+                                      const d = await r.json();
+                                      if (d.success) {
+                                        toast({ title: "Fattura reinviata", description: `Inviata a ${order.customerEmail}` });
+                                      } else {
+                                        toast({ title: "Errore", description: d.message, variant: "destructive" });
+                                      }
+                                    } catch {
+                                      toast({ title: "Errore", description: "Errore durante il reinvio.", variant: "destructive" });
+                                    }
+                                  }}
+                                  data-testid={`button-resend-invoice-${order.id}`}
+                                >
+                                  <Mail className="w-3 h-3 mr-1" /> Reinvia
+                                </Button>
+                              </div>
+                            </>
+                          ) : (
+                            <div>
+                              <p className="text-sm text-muted-foreground italic mb-2">Nessuna fattura generata</p>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-7 text-xs"
+                                onClick={async () => {
+                                  try {
+                                    const tkn = localStorage.getItem("admin_token");
+                                    const r = await fetch(`/api/admin/orders/${order.id}/invoice/generate`, {
+                                      method: "POST",
+                                      headers: { Authorization: `Bearer ${tkn}` },
+                                    });
+                                    const d = await r.json();
+                                    if (d.success) {
+                                      toast({ title: "Fattura generata", description: `N. ${d.invoiceNumber}` });
+                                      queryClient.invalidateQueries({ queryKey: ["/api/admin/orders"] });
+                                    } else {
+                                      toast({ title: "Errore", description: d.message, variant: "destructive" });
+                                    }
+                                  } catch {
+                                    toast({ title: "Errore", description: "Errore durante la generazione.", variant: "destructive" });
+                                  }
+                                }}
+                                data-testid={`button-generate-invoice-${order.id}`}
+                              >
+                                <FileText className="w-3 h-3 mr-1" /> Genera Fattura
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+
                         {order.notes && (
                           <div>
                             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Note Cliente</h4>
