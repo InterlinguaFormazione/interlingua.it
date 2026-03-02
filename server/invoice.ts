@@ -41,7 +41,7 @@ function formatCurrency(n: number): string {
 }
 
 export function generateInvoiceNumber(year: number, seq: number): string {
-  return `${seq}/${year}`;
+  return `SK-${seq}/${year}`;
 }
 
 export function generateInvoicePDF(order: ShopOrder, invoiceNumber: string, invoiceDate: Date): Promise<Buffer> {
