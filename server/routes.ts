@@ -117,7 +117,7 @@ async function generateAndSendInvoice(orderId: string) {
     const updatedOrder = await storage.getShopOrderById(orderId);
     if (!updatedOrder) return;
 
-    const pdfBuffer = generateInvoicePDF(updatedOrder, invoiceNum, now);
+    const pdfBuffer = await generateInvoicePDF(updatedOrder, invoiceNum, now);
 
     try {
       await sendInvoiceEmail({
@@ -2027,7 +2027,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       if (!order.invoiceNumber) {
         return res.status(404).json({ success: false, message: "Fattura non disponibile." });
       }
-      const pdfBuffer = generateInvoicePDF(order, order.invoiceNumber, order.invoiceDate ? new Date(order.invoiceDate) : new Date());
+      const pdfBuffer = await generateInvoicePDF(order, order.invoiceNumber, order.invoiceDate ? new Date(order.invoiceDate) : new Date());
       const safeFilename = `Fattura_${order.invoiceNumber.replace("/", "_")}.pdf`;
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader("Content-Disposition", `attachment; filename="${safeFilename}"`);
@@ -2049,7 +2049,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       if (!order.invoiceNumber) {
         return res.status(404).json({ success: false, message: "Fattura non disponibile." });
       }
-      const pdfBuffer = generateInvoicePDF(order, order.invoiceNumber, order.invoiceDate ? new Date(order.invoiceDate) : new Date());
+      const pdfBuffer = await generateInvoicePDF(order, order.invoiceNumber, order.invoiceDate ? new Date(order.invoiceDate) : new Date());
       const safeFilename = `Fattura_${order.invoiceNumber.replace("/", "_")}.pdf`;
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader("Content-Disposition", `attachment; filename="${safeFilename}"`);
@@ -2067,7 +2067,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       if (!order.invoiceNumber) {
         return res.status(400).json({ success: false, message: "Nessuna fattura da reinviare." });
       }
-      const pdfBuffer = generateInvoicePDF(order, order.invoiceNumber, order.invoiceDate ? new Date(order.invoiceDate) : new Date());
+      const pdfBuffer = await generateInvoicePDF(order, order.invoiceNumber, order.invoiceDate ? new Date(order.invoiceDate) : new Date());
       await sendInvoiceEmail({
         customerName: `${order.customerFirstName} ${order.customerLastName}`,
         customerEmail: order.customerEmail,

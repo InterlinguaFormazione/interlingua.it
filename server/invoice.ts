@@ -33,11 +33,14 @@ export function generateInvoiceNumber(year: number, seq: number): string {
   return `${seq}/${year}`;
 }
 
-export function generateInvoicePDF(order: ShopOrder, invoiceNumber: string, invoiceDate: Date): Buffer {
+export function generateInvoicePDF(order: ShopOrder, invoiceNumber: string, invoiceDate: Date): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
   const chunks: Buffer[] = [];
   const doc = new PDFDocument({ size: "A4", margin: 50, bufferPages: true });
 
   doc.on("data", (chunk: Buffer) => chunks.push(chunk));
+  doc.on("end", () => resolve(Buffer.concat(chunks)));
+  doc.on("error", (err: Error) => reject(err));
 
   const totalAmount = parseFloat(order.amount);
   const imponibile = totalAmount / (1 + IVA_RATE);
@@ -196,6 +199,5 @@ export function generateInvoicePDF(order: ShopOrder, invoiceNumber: string, invo
     .text(`${COMPANY.name} — ${COMPANY.address}, ${COMPANY.cap} ${COMPANY.city} (${COMPANY.province}) — P.IVA ${COMPANY.piva} — ${COMPANY.website}`, 50, bottomY, { align: "center", width: pageWidth });
 
   doc.end();
-
-  return Buffer.concat(chunks);
+  });
 }
