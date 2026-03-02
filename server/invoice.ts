@@ -32,6 +32,12 @@ const COMPANY = {
 
 const INTERMEDIARIO_ARUBA = "01879020517";
 
+const EU_COUNTRIES = new Set([
+  "IT", "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI",
+  "FR", "DE", "GR", "HU", "IE", "LV", "LT", "LU", "MT", "NL",
+  "PL", "PT", "RO", "SK", "SI", "ES", "SE",
+]);
+
 function formatDate(d: Date): string {
   return d.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
@@ -54,9 +60,12 @@ export function generateInvoicePDF(order: ShopOrder, invoiceNumber: string, invo
   doc.on("error", (err: Error) => reject(err));
 
   const totalAmount = parseFloat(order.amount);
-  const imponibile = totalAmount / (1 + IVA_RATE);
-  const ivaAmount = totalAmount - imponibile;
   const discountAmt = order.discountAmount ? parseFloat(order.discountAmount) : 0;
+  const customerPaese = order.billingPaese || "IT";
+  const isNonEU = !EU_COUNTRIES.has(customerPaese);
+  const effectiveIvaRate = isNonEU ? 0 : IVA_RATE;
+  const imponibile = isNonEU ? totalAmount : totalAmount / (1 + IVA_RATE);
+  const ivaAmount = isNonEU ? 0 : totalAmount - imponibile;
 
   const pageWidth = doc.page.width - 100;
 
@@ -188,7 +197,7 @@ export function generateInvoicePDF(order: ShopOrder, invoiceNumber: string, invo
     doc.fillColor("#333");
   }
 
-  doc.text(`IVA (${(IVA_RATE * 100).toFixed(0)}%):`, labelX, summaryY, { width: 95, align: "right" });
+  doc.text(`IVA (${(effectiveIvaRate * 100).toFixed(0)}%):`, labelX, summaryY, { width: 95, align: "right" });
   doc.text(`€ ${formatCurrency(ivaAmount)}`, valueX, summaryY, { width: valueW, align: "right" });
   summaryY += 20;
 
@@ -214,9 +223,15 @@ export function generateInvoicePDF(order: ShopOrder, invoiceNumber: string, invo
   doc.fontSize(8).fillColor("#888");
   doc.text("Documento emesso ai sensi dell'art. 21 del D.P.R. 633/72.", 50, summaryY);
   summaryY += 12;
-  doc.text("Imposta assolta ai sensi della normativa vigente.", 50, summaryY);
-  summaryY += 12;
-  doc.text("Operazione soggetta a IVA — Regime ordinario.", 50, summaryY);
+  if (isNonEU) {
+    doc.text("Operazione non soggetta ad IVA ai sensi dell'art. 7-ter del D.P.R. 633/72.", 50, summaryY);
+  } else {
+    doc.text("Imposta assolta ai sensi della normativa vigente.", 50, summaryY);
+  }
+  if (!isNonEU) {
+    summaryY += 12;
+    doc.text("Operazione soggetta a IVA — Regime ordinario.", 50, summaryY);
+  }
 
   const bottomY = doc.page.height - 60;
   doc.moveTo(50, bottomY - 10).lineTo(50 + pageWidth, bottomY - 10).strokeColor("#ddd").lineWidth(0.5).stroke();
@@ -262,13 +277,17 @@ function formatDecimal(n: number, decimals = 2): string {
 export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoiceDate: Date, progressivoInvio: string): string {
   const totalAmount = parseFloat(order.amount);
   const discountAmt = order.discountAmount ? parseFloat(order.discountAmount) : 0;
-  const imponibile = totalAmount / (1 + IVA_RATE);
-  const ivaAmount = totalAmount - imponibile;
-  const grossUnitPrice = discountAmt > 0 ? (totalAmount + discountAmt) / (1 + IVA_RATE) : imponibile;
-
-  const isB2B = !!order.billingPartitaIva;
   const customerPaese = order.billingPaese || "IT";
   const isItalianCustomer = customerPaese === "IT";
+  const isNonEU = !EU_COUNTRIES.has(customerPaese);
+  const effectiveIvaRate = isNonEU ? 0 : IVA_RATE;
+  const imponibile = isNonEU ? totalAmount : totalAmount / (1 + IVA_RATE);
+  const ivaAmount = isNonEU ? 0 : totalAmount - imponibile;
+  const grossUnitPrice = discountAmt > 0
+    ? (isNonEU ? totalAmount + discountAmt : (totalAmount + discountAmt) / (1 + IVA_RATE))
+    : imponibile;
+
+  const isB2B = !!order.billingPartitaIva;
 
   const codiceDestinatario = isItalianCustomer
     ? (order.billingCodiceSdi || "0000000")
@@ -412,12 +431,15 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
         <Quantita>${formatDecimal(1, 2)}</Quantita>
         <PrezzoUnitario>${formatDecimal(grossUnitPrice, 2)}</PrezzoUnitario>${scontoLineBlock}
         <PrezzoTotale>${formatDecimal(imponibile)}</PrezzoTotale>
-        <AliquotaIVA>${formatDecimal(IVA_RATE * 100)}</AliquotaIVA>
+        <AliquotaIVA>${formatDecimal(effectiveIvaRate * 100)}</AliquotaIVA>${isNonEU ? `
+        <Natura>N2.1</Natura>` : ""}
       </DettaglioLinee>
       <DatiRiepilogo>
-        <AliquotaIVA>${formatDecimal(IVA_RATE * 100)}</AliquotaIVA>
+        <AliquotaIVA>${formatDecimal(effectiveIvaRate * 100)}</AliquotaIVA>${isNonEU ? `
+        <Natura>N2.1</Natura>` : ""}
         <ImponibileImporto>${formatDecimal(imponibile)}</ImponibileImporto>
-        <Imposta>${formatDecimal(ivaAmount)}</Imposta>
+        <Imposta>${formatDecimal(ivaAmount)}</Imposta>${isNonEU ? `
+        <RiferimentoNormativo>Art. 7-ter D.P.R. 633/72</RiferimentoNormativo>` : ""}
       </DatiRiepilogo>
     </DatiBeniServizi>
     <DatiPagamento>
