@@ -1,5 +1,9 @@
 import PDFDocument from "pdfkit";
+import path from "path";
+import fs from "fs";
 import { ShopOrder } from "@shared/schema";
+
+const LOGO_PATH = path.resolve("attached_assets/SKILLCRAFT-INTERLINGUA_1769354785857.png");
 
 const IVA_RATE = 0.22;
 
@@ -49,15 +53,20 @@ export function generateInvoicePDF(order: ShopOrder, invoiceNumber: string, invo
 
   const pageWidth = doc.page.width - 100;
 
-  doc.fontSize(18).font("Helvetica-Bold").fillColor("#1e3a5f")
-    .text(COMPANY.name, 50, 50);
+  const logoHeight = 60;
+  const textX = 170;
+  if (fs.existsSync(LOGO_PATH)) {
+    doc.image(LOGO_PATH, 50, 40, { height: logoHeight });
+  }
+  doc.fontSize(14).font("Helvetica-Bold").fillColor("#1e3a5f")
+    .text(COMPANY.name, textX, 45);
   doc.fontSize(9).font("Helvetica").fillColor("#555")
-    .text(`${COMPANY.address} - ${COMPANY.cap} ${COMPANY.city} (${COMPANY.province})`, 50, 72)
-    .text(`P.IVA: ${COMPANY.piva} — C.F.: ${COMPANY.cf} — REA: ${COMPANY.rea}`, 50, 84)
-    .text(`Tel: ${COMPANY.phone} — Email: ${COMPANY.email}`, 50, 96)
-    .text(`PEC: ${COMPANY.pec} — SDI: ${COMPANY.sdi}`, 50, 108);
+    .text(`${COMPANY.address} - ${COMPANY.cap} ${COMPANY.city} (${COMPANY.province})`, textX, 63)
+    .text(`P.IVA: ${COMPANY.piva} — C.F.: ${COMPANY.cf} — REA: ${COMPANY.rea}`, textX, 75)
+    .text(`Tel: ${COMPANY.phone} — Email: ${COMPANY.email}`, textX, 87)
+    .text(`PEC: ${COMPANY.pec} — SDI: ${COMPANY.sdi}`, textX, 99);
 
-  doc.moveTo(50, 126).lineTo(50 + pageWidth, 126).strokeColor("#1e3a5f").lineWidth(2).stroke();
+  doc.moveTo(50, 116).lineTo(50 + pageWidth, 116).strokeColor("#1e3a5f").lineWidth(2).stroke();
 
   doc.fontSize(16).font("Helvetica-Bold").fillColor("#1e3a5f")
     .text("FATTURA", 50, 140);
