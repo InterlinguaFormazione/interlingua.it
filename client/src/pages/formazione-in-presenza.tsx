@@ -314,6 +314,12 @@ function CourseInfoForm({ courseTitle, showLingua, gradient }: { courseTitle: st
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
+    if (!isItaly) {
+      setProvincia("");
+      setCitta("");
+      setComuniList([]);
+      return;
+    }
     if (provincia) {
       setLoadingComuni(true);
       setCitta("");
@@ -326,7 +332,7 @@ function CourseInfoForm({ courseTitle, showLingua, gradient }: { courseTitle: st
     } else {
       setComuniList([]);
     }
-  }, [provincia]);
+  }, [provincia, isItaly]);
 
   const validate = (formData: FormData): Record<string, string> => {
     const errs: Record<string, string> = {};

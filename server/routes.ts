@@ -2144,6 +2144,114 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
     }
   });
 
+  app.patch("/api/admin/shop/orders/:id/notes", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { adminNotes } = req.body;
+      if (typeof adminNotes !== "string") {
+        return res.status(400).json({ success: false, message: "Note non valide" });
+      }
+      await storage.updateShopOrderNotes(id, adminNotes);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating order notes:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.get("/api/admin/shop/orders/export", (req, res, next) => {
+    if (req.query.token) {
+      req.headers.authorization = `Bearer ${req.query.token}`;
+    }
+    requireAuth(req, res, next);
+  }, async (_req, res) => {
+    try {
+      const ExcelJS = (await import("exceljs")).default;
+      const allOrders = await storage.getShopOrders();
+
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "SkillCraft Admin";
+      const sheet = workbook.addWorksheet("Ordini");
+
+      sheet.columns = [
+        { header: "Data", key: "data", width: 14 },
+        { header: "ID Ordine", key: "id", width: 20 },
+        { header: "Prodotto", key: "prodotto", width: 30 },
+        { header: "Importo (€)", key: "importo", width: 14 },
+        { header: "Stato", key: "stato", width: 14 },
+        { header: "Nome Cliente", key: "nomeCliente", width: 20 },
+        { header: "Cognome Cliente", key: "cognomeCliente", width: 20 },
+        { header: "Email Cliente", key: "emailCliente", width: 28 },
+        { header: "Telefono", key: "telefono", width: 18 },
+        { header: "Nome Studente", key: "nomeStudente", width: 20 },
+        { header: "Cognome Studente", key: "cognomeStudente", width: 20 },
+        { header: "Email Studente", key: "emailStudente", width: 28 },
+        { header: "Paese", key: "paese", width: 10 },
+        { header: "Indirizzo", key: "indirizzo", width: 30 },
+        { header: "CAP", key: "cap", width: 8 },
+        { header: "Città", key: "citta", width: 18 },
+        { header: "Provincia", key: "provincia", width: 8 },
+        { header: "Codice Fiscale", key: "cf", width: 20 },
+        { header: "Partita IVA", key: "piva", width: 16 },
+        { header: "Codice SDI", key: "sdi", width: 10 },
+        { header: "PEC", key: "pec", width: 28 },
+        { header: "PayPal ID", key: "paypal", width: 22 },
+        { header: "Codice Sconto", key: "codiceSconto", width: 16 },
+        { header: "Sconto (€)", key: "sconto", width: 12 },
+        { header: "Note Cliente", key: "noteCliente", width: 30 },
+        { header: "Note Admin", key: "noteAdmin", width: 30 },
+      ];
+
+      const headerRow = sheet.getRow(1);
+      headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+      headerRow.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF2563EB" } };
+      headerRow.alignment = { vertical: "middle", horizontal: "center" };
+
+      const statusLabels: Record<string, string> = { pending: "In attesa", completed: "Completato", cancelled: "Annullato", refunded: "Rimborsato" };
+
+      for (const o of allOrders) {
+        sheet.addRow({
+          data: o.createdAt ? new Date(o.createdAt).toLocaleDateString("it-IT") : "",
+          id: o.id,
+          prodotto: o.productName,
+          importo: parseFloat(o.amount),
+          stato: statusLabels[o.status] || o.status,
+          nomeCliente: o.customerFirstName,
+          cognomeCliente: o.customerLastName,
+          emailCliente: o.customerEmail,
+          telefono: o.customerPhone || "",
+          nomeStudente: o.studentFirstName || "",
+          cognomeStudente: o.studentLastName || "",
+          emailStudente: o.studentEmail || "",
+          paese: o.billingPaese || "",
+          indirizzo: o.billingIndirizzo || "",
+          cap: o.billingCap || "",
+          citta: o.billingCitta || "",
+          provincia: o.billingProvincia || "",
+          cf: o.billingCodiceFiscale || "",
+          piva: o.billingPartitaIva || "",
+          sdi: o.billingCodiceSdi || "",
+          pec: o.billingPec || "",
+          paypal: o.paypalOrderId,
+          codiceSconto: o.discountCode || "",
+          sconto: o.discountAmount ? parseFloat(o.discountAmount) : "",
+          noteCliente: o.notes || "",
+          noteAdmin: o.adminNotes || "",
+        });
+      }
+
+      sheet.autoFilter = { from: "A1", to: `Z${allOrders.length + 1}` };
+
+      res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      res.setHeader("Content-Disposition", `attachment; filename=ordini_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      await workbook.xlsx.write(res);
+      res.end();
+    } catch (error) {
+      console.error("Error exporting orders:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
   app.get("/api/admin/vouchers", requireAuth, async (_req, res) => {
     try {
       const vouchers = await storage.getDiscountVouchers();

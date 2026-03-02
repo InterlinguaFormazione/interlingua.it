@@ -133,6 +133,7 @@ export interface IStorage {
   getShopOrdersByCustomerId(customerId: string): Promise<ShopOrder[]>;
   getShopOrderByPaypalId(paypalOrderId: string): Promise<ShopOrder | undefined>;
   updateShopOrderStatus(id: string, status: string): Promise<ShopOrder | undefined>;
+  updateShopOrderNotes(id: string, adminNotes: string): Promise<ShopOrder | undefined>;
   hasCompletedOrdersByEmail(email: string): Promise<boolean>;
 
   createCourseMaterial(material: InsertCourseMaterial): Promise<CourseMaterial>;
@@ -491,6 +492,11 @@ export class DatabaseStorage implements IStorage {
 
   async updateShopOrderStatus(id: string, status: string): Promise<ShopOrder | undefined> {
     const [result] = await db.update(shopOrders).set({ status }).where(eq(shopOrders.id, id)).returning();
+    return result;
+  }
+
+  async updateShopOrderNotes(id: string, adminNotes: string): Promise<ShopOrder | undefined> {
+    const [result] = await db.update(shopOrders).set({ adminNotes }).where(eq(shopOrders.id, id)).returning();
     return result;
   }
 

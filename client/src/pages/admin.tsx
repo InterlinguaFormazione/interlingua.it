@@ -49,6 +49,10 @@ import {
   TrendingUp,
   Euro,
   ClipboardList,
+  FileDown,
+  StickyNote,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 interface DashboardStats {
@@ -282,6 +286,7 @@ interface ShopOrder {
   billingPec: string | null;
   billingPaese: string | null;
   notes: string | null;
+  adminNotes: string | null;
   discountCode: string | null;
   discountAmount: string | null;
   createdAt: string | null;
@@ -294,10 +299,26 @@ const ORDER_STATUSES = [
   { value: "refunded", label: "Rimborsato", color: "bg-purple-100 text-purple-800" },
 ];
 
+const ORDERS_PER_PAGE = 15;
+
+type SortField = "date" | "amount" | "status" | "name";
+type SortDir = "asc" | "desc";
+
 function ShopOrdersTab({ token }: { token: string }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [productFilter, setProductFilter] = useState("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [sortField, setSortField] = useState<SortField>("date");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [page, setPage] = useState(1);
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [noteText, setNoteText] = useState("");
   const { toast } = useToast();
+
   const { data: orders = [], isLoading } = useQuery<ShopOrder[]>({
     queryKey: ["/api/admin/shop/orders"],
     queryFn: async () => {
@@ -351,6 +372,25 @@ function ShopOrdersTab({ token }: { token: string }) {
     },
   });
 
+  const notesMutation = useMutation({
+    mutationFn: async ({ id, adminNotes }: { id: string; adminNotes: string }) => {
+      const res = await fetch(`/api/admin/shop/orders/${id}/notes`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ adminNotes }),
+      });
+      if (!res.ok) throw new Error("Failed");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/shop/orders"] });
+      setEditingNoteId(null);
+      toast({ title: "Note salvate" });
+    },
+    onError: () => {
+      toast({ title: "Errore nel salvataggio", variant: "destructive" });
+    },
+  });
+
   const toggleSelect = (id: string) => {
     setSelectedIds(prev => {
       const next = new Set(prev);
@@ -359,13 +399,73 @@ function ShopOrdersTab({ token }: { token: string }) {
     });
   };
 
-  const toggleAll = () => {
-    if (selectedIds.size === orders.length) {
-      setSelectedIds(new Set());
+  const productNames = [...new Set(orders.map(o => o.productName))].sort();
+
+  const filtered = orders.filter(o => {
+    if (search) {
+      const s = search.toLowerCase();
+      const match = `${o.customerFirstName} ${o.customerLastName} ${o.customerEmail} ${o.id} ${o.paypalOrderId}`.toLowerCase().includes(s);
+      if (!match) return false;
+    }
+    if (statusFilter !== "all" && o.status !== statusFilter) return false;
+    if (productFilter !== "all" && o.productName !== productFilter) return false;
+    if (dateFrom && o.createdAt && new Date(o.createdAt) < new Date(dateFrom)) return false;
+    if (dateTo && o.createdAt && new Date(o.createdAt) > new Date(dateTo + "T23:59:59")) return false;
+    return true;
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    let cmp = 0;
+    if (sortField === "date") {
+      cmp = (new Date(a.createdAt || 0).getTime()) - (new Date(b.createdAt || 0).getTime());
+    } else if (sortField === "amount") {
+      cmp = parseFloat(a.amount) - parseFloat(b.amount);
+    } else if (sortField === "status") {
+      cmp = a.status.localeCompare(b.status);
+    } else if (sortField === "name") {
+      cmp = `${a.customerLastName} ${a.customerFirstName}`.localeCompare(`${b.customerLastName} ${b.customerFirstName}`);
+    }
+    return sortDir === "desc" ? -cmp : cmp;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / ORDERS_PER_PAGE));
+  const paginated = sorted.slice((page - 1) * ORDERS_PER_PAGE, page * ORDERS_PER_PAGE);
+
+  useEffect(() => { setPage(1); }, [search, statusFilter, productFilter, dateFrom, dateTo]);
+
+  const toggleSort = (field: SortField) => {
+    if (sortField === field) setSortDir(d => d === "asc" ? "desc" : "asc");
+    else { setSortField(field); setSortDir("desc"); }
+  };
+
+  const toggleAllFiltered = () => {
+    const filteredIds = paginated.map(o => o.id);
+    const allSelected = filteredIds.every(id => selectedIds.has(id));
+    if (allSelected) {
+      setSelectedIds(prev => { const next = new Set(prev); filteredIds.forEach(id => next.delete(id)); return next; });
     } else {
-      setSelectedIds(new Set(orders.map(o => o.id)));
+      setSelectedIds(prev => { const next = new Set(prev); filteredIds.forEach(id => next.add(id)); return next; });
     }
   };
+
+  const filteredRevenue = filtered.filter(o => o.status === "completed").reduce((sum, o) => sum + parseFloat(o.amount), 0);
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayRevenue = orders.filter(o => o.status === "completed" && o.createdAt?.startsWith(todayStr)).reduce((sum, o) => sum + parseFloat(o.amount), 0);
+  const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+  const weekRevenue = orders.filter(o => o.status === "completed" && o.createdAt && new Date(o.createdAt) >= weekAgo).reduce((sum, o) => sum + parseFloat(o.amount), 0);
+  const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+  const monthRevenue = orders.filter(o => o.status === "completed" && o.createdAt && new Date(o.createdAt) >= monthStart).reduce((sum, o) => sum + parseFloat(o.amount), 0);
+
+  const handleExport = () => {
+    window.open(`/api/admin/shop/orders/export?token=${token}`, "_blank");
+  };
+
+  const SortButton = ({ field, label }: { field: SortField; label: string }) => (
+    <button type="button" className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground cursor-pointer" onClick={() => toggleSort(field)}>
+      {label}
+      {sortField === field && (sortDir === "desc" ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />)}
+    </button>
+  );
 
   const DetailRow = ({ label, value }: { label: string; value: string | null | undefined }) => {
     if (!value) return null;
@@ -380,62 +480,132 @@ function ShopOrdersTab({ token }: { token: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Ordini Shop</CardTitle>
-        <CardDescription>Clicca su un ordine per i dettagli, usa le caselle per azioni in blocco</CardDescription>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <CardTitle>Ordini Shop</CardTitle>
+            <CardDescription>{orders.length} ordini totali · {filtered.length} visualizzati</CardDescription>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleExport} data-testid="button-export-excel">
+            <FileDown className="w-4 h-4 mr-2" /> Esporta Excel
+          </Button>
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="p-3 bg-blue-50 rounded-lg text-center">
+            <p className="text-xs text-muted-foreground">Oggi</p>
+            <p className="text-lg font-bold text-blue-700">&euro;{todayRevenue.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</p>
+          </div>
+          <div className="p-3 bg-indigo-50 rounded-lg text-center">
+            <p className="text-xs text-muted-foreground">Ultimi 7 giorni</p>
+            <p className="text-lg font-bold text-indigo-700">&euro;{weekRevenue.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</p>
+          </div>
+          <div className="p-3 bg-emerald-50 rounded-lg text-center">
+            <p className="text-xs text-muted-foreground">Questo mese</p>
+            <p className="text-lg font-bold text-emerald-700">&euro;{monthRevenue.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</p>
+          </div>
+          <div className="p-3 bg-amber-50 rounded-lg text-center">
+            <p className="text-xs text-muted-foreground">Filtro attuale</p>
+            <p className="text-lg font-bold text-amber-700">&euro;{filteredRevenue.toLocaleString("it-IT", { minimumFractionDigits: 2 })}</p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <div className="flex-1 min-w-[200px]">
+            <Input
+              placeholder="Cerca per nome, email, ID ordine..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="h-9"
+              data-testid="input-order-search"
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[140px] h-9" data-testid="select-order-status-filter">
+              <SelectValue placeholder="Tutti gli stati" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tutti gli stati</SelectItem>
+              {ORDER_STATUSES.map(s => (
+                <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={productFilter} onValueChange={setProductFilter}>
+            <SelectTrigger className="w-[180px] h-9" data-testid="select-order-product-filter">
+              <SelectValue placeholder="Tutti i prodotti" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tutti i prodotti</SelectItem>
+              {productNames.map(p => (
+                <SelectItem key={p} value={p}>{p.length > 30 ? p.substring(0, 30) + "..." : p}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-[140px] h-9" placeholder="Da" data-testid="input-date-from" />
+          <Input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-[140px] h-9" placeholder="A" data-testid="input-date-to" />
+          {(search || statusFilter !== "all" || productFilter !== "all" || dateFrom || dateTo) && (
+            <Button variant="ghost" size="sm" className="h-9" onClick={() => { setSearch(""); setStatusFilter("all"); setProductFilter("all"); setDateFrom(""); setDateTo(""); }} data-testid="button-clear-filters">
+              Pulisci filtri
+            </Button>
+          )}
+        </div>
+
+        {selectedIds.size > 0 && (
+          <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg flex-wrap" data-testid="bulk-actions-bar">
+            <span className="text-sm font-medium text-blue-800">{selectedIds.size} selezionati</span>
+            <span className="text-blue-300">|</span>
+            <span className="text-xs text-blue-600">Cambia stato:</span>
+            {ORDER_STATUSES.map(s => (
+              <Button
+                key={s.value}
+                size="sm"
+                variant="outline"
+                className={`text-xs h-7 ${s.color} border-0`}
+                onClick={() => {
+                  if (confirm(`Impostare ${selectedIds.size} ordini come "${s.label}"?`)) {
+                    bulkStatusMutation.mutate(s.value);
+                  }
+                }}
+                disabled={bulkStatusMutation.isPending}
+                data-testid={`button-bulk-${s.value}`}
+              >
+                {s.label}
+              </Button>
+            ))}
+            <Button size="sm" variant="ghost" className="text-xs h-7 ml-auto" onClick={() => setSelectedIds(new Set())} data-testid="button-bulk-deselect">
+              Deseleziona
+            </Button>
+          </div>
+        )}
+
         {isLoading ? (
           <div className="text-center py-8 text-muted-foreground">Caricamento...</div>
-        ) : orders.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">Nessun ordine ancora</div>
+        ) : sorted.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <ShoppingBag className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p>{orders.length === 0 ? "Nessun ordine ancora" : "Nessun ordine corrisponde ai filtri"}</p>
+          </div>
         ) : (
-          <div className="space-y-3">
-            {selectedIds.size > 0 && (
-              <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg" data-testid="bulk-actions-bar">
-                <span className="text-sm font-medium text-blue-800">{selectedIds.size} selezionati</span>
-                <span className="text-blue-300">|</span>
-                <span className="text-xs text-blue-600">Cambia stato:</span>
-                {ORDER_STATUSES.map(s => (
-                  <Button
-                    key={s.value}
-                    size="sm"
-                    variant="outline"
-                    className={`text-xs h-7 ${s.color} border-0`}
-                    onClick={() => {
-                      if (confirm(`Impostare ${selectedIds.size} ordini come "${s.label}"?`)) {
-                        bulkStatusMutation.mutate(s.value);
-                      }
-                    }}
-                    disabled={bulkStatusMutation.isPending}
-                    data-testid={`button-bulk-${s.value}`}
-                  >
-                    {s.label}
-                  </Button>
-                ))}
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-xs h-7 ml-auto"
-                  onClick={() => setSelectedIds(new Set())}
-                  data-testid="button-bulk-deselect"
-                >
-                  Deseleziona
-                </Button>
-              </div>
-            )}
-
-            <div className="flex items-center gap-2 px-4 py-2 border-b">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3 px-4 py-2 border-b text-xs">
               <input
                 type="checkbox"
-                checked={orders.length > 0 && selectedIds.size === orders.length}
-                onChange={toggleAll}
+                checked={paginated.length > 0 && paginated.every(o => selectedIds.has(o.id))}
+                onChange={toggleAllFiltered}
                 className="w-4 h-4 rounded border-gray-300 accent-blue-600 cursor-pointer"
                 data-testid="checkbox-select-all"
               />
-              <span className="text-xs text-muted-foreground">Seleziona tutti</span>
+              <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-2 items-center">
+                <SortButton field="date" label="Data / Cliente" />
+                <SortButton field="name" label="Prodotto" />
+                <SortButton field="amount" label="Importo" />
+                <SortButton field="status" label="Stato" />
+              </div>
+              <div className="w-[130px]" />
             </div>
 
-            {orders.map((order) => {
+            {paginated.map((order) => {
               const isExpanded = expandedId === order.id;
               const isSelected = selectedIds.has(order.id);
               return (
@@ -461,12 +631,13 @@ function ShopOrdersTab({ token }: { token: string }) {
                         <p className="font-medium text-sm">{order.customerFirstName} {order.customerLastName}</p>
                       </div>
                       <div>
-                        <p className="text-sm">{order.productName}</p>
+                        <p className="text-sm truncate">{order.productName}</p>
                       </div>
                       <div className="text-right md:text-left">
                         <p className="font-semibold">&euro;{parseFloat(order.amount).toFixed(2)}</p>
                       </div>
                       <div className="flex items-center justify-end gap-2">
+                        {order.adminNotes && <StickyNote className="w-3.5 h-3.5 text-amber-500" />}
                         {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                       </div>
                     </button>
@@ -491,7 +662,10 @@ function ShopOrdersTab({ token }: { token: string }) {
 
                   {isExpanded && (
                     <div className="px-4 pb-4 border-t bg-slate-50/50">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+                      <div className="flex items-center gap-2 pt-3 pb-2 text-xs text-muted-foreground">
+                        <span>ID: {order.id}</span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
                         <div>
                           <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Cliente</h4>
                           <DetailRow label="Nome" value={`${order.customerFirstName} ${order.customerLastName}`} />
@@ -541,16 +715,85 @@ function ShopOrdersTab({ token }: { token: string }) {
 
                         {order.notes && (
                           <div>
-                            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Note</h4>
+                            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Note Cliente</h4>
                             <p className="text-sm bg-white border rounded-lg p-3">{order.notes}</p>
                           </div>
                         )}
+
+                        <div>
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Note Admin</h4>
+                          {editingNoteId === order.id ? (
+                            <div className="space-y-2">
+                              <textarea
+                                className="w-full text-sm border rounded-lg p-3 min-h-[80px] resize-y"
+                                value={noteText}
+                                onChange={e => setNoteText(e.target.value)}
+                                placeholder="Aggiungi note interne..."
+                                data-testid={`textarea-admin-notes-${order.id}`}
+                              />
+                              <div className="flex gap-2">
+                                <Button size="sm" className="h-7 text-xs" onClick={() => notesMutation.mutate({ id: order.id, adminNotes: noteText })} disabled={notesMutation.isPending} data-testid={`button-save-notes-${order.id}`}>
+                                  Salva
+                                </Button>
+                                <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setEditingNoteId(null)}>
+                                  Annulla
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              {order.adminNotes ? (
+                                <p className="text-sm bg-amber-50 border border-amber-200 rounded-lg p-3 mb-2">{order.adminNotes}</p>
+                              ) : (
+                                <p className="text-sm text-muted-foreground italic mb-2">Nessuna nota</p>
+                              )}
+                              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => { setEditingNoteId(order.id); setNoteText(order.adminNotes || ""); }} data-testid={`button-edit-notes-${order.id}`}>
+                                <Pencil className="w-3 h-3 mr-1" /> {order.adminNotes ? "Modifica" : "Aggiungi nota"}
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   )}
                 </div>
               );
             })}
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between pt-4 border-t">
+                <p className="text-xs text-muted-foreground">
+                  Pagina {page} di {totalPages} · {sorted.length} ordini
+                </p>
+                <div className="flex gap-1">
+                  <Button size="sm" variant="outline" className="h-8" disabled={page <= 1} onClick={() => setPage(p => p - 1)} data-testid="button-prev-page">
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                    let pageNum: number;
+                    if (totalPages <= 7) pageNum = i + 1;
+                    else if (page <= 4) pageNum = i + 1;
+                    else if (page >= totalPages - 3) pageNum = totalPages - 6 + i;
+                    else pageNum = page - 3 + i;
+                    return (
+                      <Button
+                        key={pageNum}
+                        size="sm"
+                        variant={pageNum === page ? "default" : "outline"}
+                        className="h-8 w-8 p-0"
+                        onClick={() => setPage(pageNum)}
+                        data-testid={`button-page-${pageNum}`}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                  <Button size="sm" variant="outline" className="h-8" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)} data-testid="button-next-page">
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </CardContent>
