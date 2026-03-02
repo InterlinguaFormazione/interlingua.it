@@ -270,10 +270,12 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
   const customerPaese = order.billingPaese || "IT";
   const isItalianCustomer = customerPaese === "IT";
 
-  const codiceDestinatario = order.billingCodiceSdi || "0000000";
+  const codiceDestinatario = isItalianCustomer
+    ? (order.billingCodiceSdi || "0000000")
+    : "XXXXXXX";
 
   let pecDestinatario = "";
-  if (codiceDestinatario === "0000000" && order.billingPec) {
+  if (isItalianCustomer && codiceDestinatario === "0000000" && order.billingPec) {
     pecDestinatario = `\n        <PECDestinatario>${escapeXml(order.billingPec)}</PECDestinatario>`;
   }
 
@@ -289,12 +291,24 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
           <Denominazione>${escapeXml(sanitizeLatinString(`${order.customerFirstName} ${order.customerLastName}`))}</Denominazione>
         </Anagrafica>
       </DatiAnagrafici>`;
-  } else {
+  } else if (isItalianCustomer) {
     const cfBlock = order.billingCodiceFiscale
       ? `\n        <CodiceFiscale>${escapeXml(order.billingCodiceFiscale)}</CodiceFiscale>`
-      : (isItalianCustomer ? `\n        <CodiceFiscale>0000000000000000</CodiceFiscale>` : "");
+      : `\n        <CodiceFiscale>0000000000000000</CodiceFiscale>`;
     cessionarioAnagrafici = `
       <DatiAnagrafici>${cfBlock}
+        <Anagrafica>
+          <Nome>${escapeXml(sanitizeLatinString(order.customerFirstName))}</Nome>
+          <Cognome>${escapeXml(sanitizeLatinString(order.customerLastName))}</Cognome>
+        </Anagrafica>
+      </DatiAnagrafici>`;
+  } else {
+    cessionarioAnagrafici = `
+      <DatiAnagrafici>
+        <IdFiscaleIVA>
+          <IdPaese>${escapeXml(customerPaese)}</IdPaese>
+          <IdCodice>99999999999</IdCodice>
+        </IdFiscaleIVA>
         <Anagrafica>
           <Nome>${escapeXml(sanitizeLatinString(order.customerFirstName))}</Nome>
           <Cognome>${escapeXml(sanitizeLatinString(order.customerLastName))}</Cognome>
