@@ -2128,6 +2128,22 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
     }
   });
 
+  app.patch("/api/admin/shop/orders/:id/status", requireAuth, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+      const validStatuses = ["pending", "completed", "cancelled", "refunded"];
+      if (!status || !validStatuses.includes(status)) {
+        return res.status(400).json({ success: false, message: "Stato non valido" });
+      }
+      await storage.updateShopOrderStatus(id, status);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
   app.get("/api/admin/vouchers", requireAuth, async (_req, res) => {
     try {
       const vouchers = await storage.getDiscountVouchers();

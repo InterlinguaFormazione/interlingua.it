@@ -287,8 +287,16 @@ interface ShopOrder {
   createdAt: string | null;
 }
 
+const ORDER_STATUSES = [
+  { value: "pending", label: "In attesa", color: "bg-yellow-100 text-yellow-800" },
+  { value: "completed", label: "Completato", color: "bg-green-100 text-green-800" },
+  { value: "cancelled", label: "Annullato", color: "bg-red-100 text-red-800" },
+  { value: "refunded", label: "Rimborsato", color: "bg-purple-100 text-purple-800" },
+];
+
 function ShopOrdersTab({ token }: { token: string }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const { toast } = useToast();
   const { data: orders = [], isLoading } = useQuery<ShopOrder[]>({
     queryKey: ["/api/admin/shop/orders"],
     queryFn: async () => {
@@ -297,6 +305,25 @@ function ShopOrdersTab({ token }: { token: string }) {
       });
       if (!res.ok) throw new Error("Failed to fetch orders");
       return res.json();
+    },
+  });
+
+  const statusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const res = await fetch(`/api/admin/shop/orders/${id}/status`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error("Failed");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/shop/orders"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/dashboard"] });
+      toast({ title: "Stato aggiornato" });
+    },
+    onError: () => {
+      toast({ title: "Errore nell'aggiornamento", variant: "destructive" });
     },
   });
 
@@ -347,8 +374,8 @@ function ShopOrdersTab({ token }: { token: string }) {
                         <p className="font-semibold">&euro;{parseFloat(order.amount).toFixed(2)}</p>
                       </div>
                       <div className="flex items-center justify-end gap-2">
-                        <Badge variant={order.status === "completed" ? "default" : "secondary"}>
-                          {order.status === "completed" ? "Completato" : order.status}
+                        <Badge variant={order.status === "completed" ? "default" : order.status === "cancelled" || order.status === "refunded" ? "destructive" : "secondary"}>
+                          {ORDER_STATUSES.find(s => s.value === order.status)?.label || order.status}
                         </Badge>
                         {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                       </div>
@@ -405,8 +432,29 @@ function ShopOrdersTab({ token }: { token: string }) {
                           )}
                         </div>
 
+                        <div>
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Stato Ordine</h4>
+                          <Select
+                            value={order.status}
+                            onValueChange={(newStatus) => statusMutation.mutate({ id: order.id, status: newStatus })}
+                          >
+                            <SelectTrigger className="w-full" data-testid={`select-order-status-${order.id}`}>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {ORDER_STATUSES.map(s => (
+                                <SelectItem key={s.value} value={s.value}>
+                                  <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${s.color}`}>
+                                    {s.label}
+                                  </span>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
                         {order.notes && (
-                          <div className="md:col-span-2">
+                          <div>
                             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Note</h4>
                             <p className="text-sm bg-white border rounded-lg p-3">{order.notes}</p>
                           </div>
