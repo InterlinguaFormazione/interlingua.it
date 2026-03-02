@@ -2073,7 +2073,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       }
       const invoiceDate = order.invoiceDate ? new Date(order.invoiceDate) : new Date();
       const progressivoInvio = generateProgressivoInvio();
-      const xml = await generateFatturaPA(order, order.invoiceNumber, invoiceDate, progressivoInvio);
+      const xml = generateFatturaPA(order, order.invoiceNumber, invoiceDate, progressivoInvio);
       const filename = generateFatturaFilename(progressivoInvio);
       res.setHeader("Content-Type", "application/xml; charset=utf-8");
       res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);

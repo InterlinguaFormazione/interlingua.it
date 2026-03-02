@@ -257,7 +257,7 @@ function formatDecimal(n: number, decimals = 2): string {
   return n.toFixed(decimals);
 }
 
-export async function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoiceDate: Date, progressivoInvio: string): Promise<string> {
+export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoiceDate: Date, progressivoInvio: string): string {
   const totalAmount = parseFloat(order.amount);
   const discountAmt = order.discountAmount ? parseFloat(order.discountAmount) : 0;
   const imponibile = totalAmount / (1 + IVA_RATE);
@@ -316,21 +316,6 @@ export async function generateFatturaPA(order: ShopOrder, invoiceNumber: string,
           <Tipo>SC</Tipo>
           <Importo>${formatDecimal(scontoImponibile)}</Importo>
         </ScontoMaggiorazione>`;
-  }
-
-  let pdfAttachment = "";
-  try {
-    const pdfBuffer = await generateInvoicePDF(order, invoiceNumber, invoiceDate);
-    const pdfBase64 = pdfBuffer.toString("base64");
-    const attachName = sanitizeLatinString(`Fattura_${invoiceNumber}.pdf`);
-    pdfAttachment = `
-    <Allegati>
-      <NomeAttachment>${escapeXml(attachName)}</NomeAttachment>
-      <FormatoAttachment>PDF</FormatoAttachment>
-      <Attachment>${pdfBase64}</Attachment>
-    </Allegati>`;
-  } catch (err) {
-    console.error("Failed to generate PDF attachment for FatturaPA:", err);
   }
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -414,7 +399,7 @@ export async function generateFatturaPA(order: ShopOrder, invoiceNumber: string,
         <ModalitaPagamento>MP08</ModalitaPagamento>
         <ImportoPagamento>${formatDecimal(totalAmount)}</ImportoPagamento>
       </DettaglioPagamento>
-    </DatiPagamento>${pdfAttachment}
+    </DatiPagamento>
   </FatturaElettronicaBody>
 </p:FatturaElettronica>`;
 

@@ -761,11 +761,13 @@ function ShopOrdersTab({ token }: { token: string }) {
                                       });
                                       if (!r.ok) throw new Error("Download failed");
                                       const blob = await r.blob();
+                                      const disposition = r.headers.get("Content-Disposition") || "";
+                                      const filenameMatch = disposition.match(/filename="?([^";\s]+)"?/);
+                                      const downloadName = filenameMatch ? filenameMatch[1] : `IT03828240246_${Date.now()}.xml`;
                                       const url = URL.createObjectURL(blob);
                                       const a = document.createElement("a");
                                       a.href = url;
-                                      const seq = (order.invoiceNumber || "1").split("/")[0].padStart(5, "0");
-                                      a.download = `IT03828240246_${seq}.xml`;
+                                      a.download = downloadName;
                                       document.body.appendChild(a);
                                       a.click();
                                       document.body.removeChild(a);
