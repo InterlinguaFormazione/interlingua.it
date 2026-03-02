@@ -30,6 +30,8 @@ const COMPANY = {
   website: "skillcraft.interlingua.it",
 };
 
+const INTERMEDIARIO_ARUBA = "01879020517";
+
 function formatDate(d: Date): string {
   return d.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
@@ -324,7 +326,7 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
     <DatiTrasmissione>
       <IdTrasmittente>
         <IdPaese>IT</IdPaese>
-        <IdCodice>${escapeXml(COMPANY.piva)}</IdCodice>
+        <IdCodice>${escapeXml(INTERMEDIARIO_ARUBA)}</IdCodice>
       </IdTrasmittente>
       <ProgressivoInvio>${escapeXml(progressivoInvio)}</ProgressivoInvio>
       <FormatoTrasmissione>FPR12</FormatoTrasmissione>
@@ -416,5 +418,5 @@ export function generateProgressivoInvio(): string {
 }
 
 export function generateFatturaFilename(progressivoInvio: string): string {
-  return `IT${COMPANY.piva}_${progressivoInvio}.xml`;
+  return `IT${INTERMEDIARIO_ARUBA}_${progressivoInvio}.xml`;
 }
