@@ -2072,9 +2072,9 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         return res.status(404).json({ success: false, message: "Fattura non disponibile." });
       }
       const invoiceDate = order.invoiceDate ? new Date(order.invoiceDate) : new Date();
-      const progressivoInvio = generateProgressivoInvio();
+      const progressivoInvio = generateProgressivoInvio(order.invoiceNumber);
       const xml = generateFatturaPA(order, order.invoiceNumber, invoiceDate, progressivoInvio);
-      const filename = generateFatturaFilename(progressivoInvio);
+      const filename = generateFatturaFilename();
       res.setHeader("Content-Type", "application/xml; charset=utf-8");
       res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
       res.send(xml);

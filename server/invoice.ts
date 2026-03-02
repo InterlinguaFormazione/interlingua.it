@@ -320,9 +320,9 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
         </ScontoMaggiorazione>`;
   }
 
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<p:FatturaElettronica xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:p="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" versione="FPR12" xsi:schemaLocation="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2 http://www.fatturapa.gov.it/export/fatturazione/sdi/fatturapa/v1.2/Schema_del_file_xml_FatturaPA_versione_1.2.xsd">
-  <FatturaElettronicaHeader>
+  const xml = `<?xml version="1.0" encoding="utf-8"?>
+<FatturaElettronica versione="FPR12" xmlns="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2">
+  <FatturaElettronicaHeader xmlns="">
     <DatiTrasmissione>
       <IdTrasmittente>
         <IdPaese>IT</IdPaese>
@@ -338,21 +338,33 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
           <IdPaese>IT</IdPaese>
           <IdCodice>${escapeXml(COMPANY.piva)}</IdCodice>
         </IdFiscaleIVA>
+        <CodiceFiscale>${escapeXml(COMPANY.cf)}</CodiceFiscale>
         <Anagrafica>
           <Denominazione>${escapeXml(COMPANY.sdiName)}</Denominazione>
         </Anagrafica>
         <RegimeFiscale>RF01</RegimeFiscale>
       </DatiAnagrafici>
       <Sede>
-        <Indirizzo>${escapeXml(COMPANY.sdiAddress)}</Indirizzo>
+        <Indirizzo>Viale Mazzini</Indirizzo>
+        <NumeroCivico>27</NumeroCivico>
         <CAP>${escapeXml(COMPANY.cap)}</CAP>
         <Comune>${escapeXml(COMPANY.city)}</Comune>
         <Provincia>${escapeXml(COMPANY.province)}</Provincia>
         <Nazione>IT</Nazione>
       </Sede>
+      <StabileOrganizzazione>
+        <Indirizzo>Viale Giuseppe Mazzini</Indirizzo>
+        <NumeroCivico>27</NumeroCivico>
+        <CAP>${escapeXml(COMPANY.cap)}</CAP>
+        <Comune>${escapeXml(COMPANY.city)}</Comune>
+        <Provincia>${escapeXml(COMPANY.province)}</Provincia>
+        <Nazione>IT</Nazione>
+      </StabileOrganizzazione>
       <IscrizioneREA>
         <Ufficio>${escapeXml(COMPANY.reaUfficio)}</Ufficio>
         <NumeroREA>${escapeXml(COMPANY.reaNumero)}</NumeroREA>
+        <CapitaleSociale>10000.00</CapitaleSociale>
+        <SocioUnico>SU</SocioUnico>
         <StatoLiquidazione>LN</StatoLiquidazione>
       </IscrizioneREA>
       <Contatti>
@@ -369,7 +381,7 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
       </Sede>
     </CessionarioCommittente>
   </FatturaElettronicaHeader>
-  <FatturaElettronicaBody>
+  <FatturaElettronicaBody xmlns="">
     <DatiGenerali>
       <DatiGeneraliDocumento>
         <TipoDocumento>TD01</TipoDocumento>
@@ -384,7 +396,7 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
         <NumeroLinea>1</NumeroLinea>
         <Descrizione>${escapeXml(sanitizeLatinString(order.productName))}</Descrizione>
         <Quantita>${formatDecimal(1, 2)}</Quantita>
-        <PrezzoUnitario>${formatDecimal(grossUnitPrice, 3)}</PrezzoUnitario>${scontoLineBlock}
+        <PrezzoUnitario>${formatDecimal(grossUnitPrice, 2)}</PrezzoUnitario>${scontoLineBlock}
         <PrezzoTotale>${formatDecimal(imponibile)}</PrezzoTotale>
         <AliquotaIVA>${formatDecimal(IVA_RATE * 100)}</AliquotaIVA>
       </DettaglioLinee>
@@ -392,31 +404,30 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
         <AliquotaIVA>${formatDecimal(IVA_RATE * 100)}</AliquotaIVA>
         <ImponibileImporto>${formatDecimal(imponibile)}</ImponibileImporto>
         <Imposta>${formatDecimal(ivaAmount)}</Imposta>
-        <EsigibilitaIVA>I</EsigibilitaIVA>
       </DatiRiepilogo>
     </DatiBeniServizi>
     <DatiPagamento>
       <CondizioniPagamento>TP02</CondizioniPagamento>
       <DettaglioPagamento>
         <ModalitaPagamento>MP08</ModalitaPagamento>
+        <DataScadenzaPagamento>${formatDateISO(invoiceDate)}</DataScadenzaPagamento>
         <ImportoPagamento>${formatDecimal(totalAmount)}</ImportoPagamento>
       </DettaglioPagamento>
     </DatiPagamento>
   </FatturaElettronicaBody>
-</p:FatturaElettronica>`;
+</FatturaElettronica>`;
 
   return xml;
 }
 
-export function generateProgressivoInvio(): string {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let result = "";
-  for (let i = 0; i < 5; i++) {
-    result += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return result;
+export function generateProgressivoInvio(invoiceNumber: string): string {
+  return invoiceNumber.split("/")[0];
 }
 
-export function generateFatturaFilename(progressivoInvio: string): string {
-  return `IT${INTERMEDIARIO_ARUBA}_${progressivoInvio}.xml`;
+export function generateFatturaFilename(): string {
+  const now = new Date();
+  const pad = (n: number, len = 2) => n.toString().padStart(len, "0");
+  const dateStr = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+  const timeStr = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  return `TD01_${dateStr}_${timeStr}.xml`;
 }
