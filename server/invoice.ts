@@ -229,6 +229,21 @@ function escapeXml(str: string): string {
     .replace(/'/g, "&apos;");
 }
 
+function sanitizeLatinString(str: string): string {
+  return str
+    .replace(/[\u2013\u2014]/g, "-")
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/\u2026/g, "...")
+    .replace(/[^\x20-\x7E\u00C0-\u00FF\u0100-\u017F]/g, " ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+function sanitizePhone(phone: string): string {
+  return phone.replace(/[^0-9]/g, "");
+}
+
 function formatDateISO(d: Date): string {
   return d.toISOString().split("T")[0];
 }
@@ -266,7 +281,7 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
             <IdCodice>${escapeXml(order.billingPartitaIva)}</IdCodice>
           </IdFiscaleIVA>${order.billingCodiceFiscale ? `\n          <CodiceFiscale>${escapeXml(order.billingCodiceFiscale)}</CodiceFiscale>` : ""}
           <Anagrafica>
-            <Denominazione>${escapeXml(`${order.customerFirstName} ${order.customerLastName}`)}</Denominazione>
+            <Denominazione>${escapeXml(sanitizeLatinString(`${order.customerFirstName} ${order.customerLastName}`))}</Denominazione>
           </Anagrafica>
         </DatiAnagrafici>`;
   } else {
@@ -276,8 +291,8 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
     cessionarioAnagrafici = `
         <DatiAnagrafici>${cfBlock}
           <Anagrafica>
-            <Nome>${escapeXml(order.customerFirstName)}</Nome>
-            <Cognome>${escapeXml(order.customerLastName)}</Cognome>
+            <Nome>${escapeXml(sanitizeLatinString(order.customerFirstName))}</Nome>
+            <Cognome>${escapeXml(sanitizeLatinString(order.customerLastName))}</Cognome>
           </Anagrafica>
         </DatiAnagrafici>`;
   }
@@ -287,8 +302,8 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
     : "";
 
   const customerCap = order.billingCap || (isItalianCustomer ? "00000" : "00000");
-  const customerIndirizzo = order.billingIndirizzo || (isItalianCustomer ? "Non specificato" : "N/A");
-  const customerComune = (order.billingCitta || (isItalianCustomer ? "Non specificato" : "N/A")).toUpperCase();
+  const customerIndirizzo = sanitizeLatinString(order.billingIndirizzo || (isItalianCustomer ? "Non specificato" : "N/A"));
+  const customerComune = sanitizeLatinString((order.billingCitta || (isItalianCustomer ? "Non specificato" : "N/A")).toUpperCase());
 
   let scontoBlock = "";
   if (discountAmt > 0) {
@@ -332,7 +347,7 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
         <Nazione>IT</Nazione>
       </Sede>
       <Contatti>
-        <Telefono>${escapeXml(COMPANY.phone)}</Telefono>
+        <Telefono>${sanitizePhone(COMPANY.phone)}</Telefono>
         <Email>${escapeXml(COMPANY.email)}</Email>
       </Contatti>
     </CedentePrestatore>
@@ -353,13 +368,13 @@ export function generateFatturaPA(order: ShopOrder, invoiceNumber: string, invoi
         <Data>${formatDateISO(invoiceDate)}</Data>
         <Numero>${escapeXml(invoiceNum)}</Numero>${scontoBlock}
         <ImportoTotaleDocumento>${formatDecimal(totalAmount)}</ImportoTotaleDocumento>
-        <Causale>Fattura N. ${escapeXml(invoiceNumber)} - ${escapeXml(order.productName)}</Causale>
+        <Causale>${escapeXml(sanitizeLatinString(`Fattura N. ${invoiceNumber} - ${order.productName}`))}</Causale>
       </DatiGeneraliDocumento>
     </DatiGenerali>
     <DatiBeniServizi>
       <DettaglioLinee>
         <NumeroLinea>1</NumeroLinea>
-        <Descrizione>${escapeXml(order.productName)}</Descrizione>
+        <Descrizione>${escapeXml(sanitizeLatinString(order.productName))}</Descrizione>
         <Quantita>${formatDecimal(1, 2)}</Quantita>
         <PrezzoUnitario>${formatDecimal(grossUnitPrice)}</PrezzoUnitario>
         <PrezzoTotale>${formatDecimal(imponibile)}</PrezzoTotale>
