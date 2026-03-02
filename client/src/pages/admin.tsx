@@ -1848,7 +1848,6 @@ function ReviewsTab({ token }: { token: string }) {
 }
 
 const adminTabs = [
-  { value: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { value: "contacts", label: "Contatti", icon: MessageSquare },
   { value: "newsletter", label: "Newsletter", icon: Mail },
   { value: "blog", label: "Blog", icon: Newspaper },
@@ -1867,7 +1866,7 @@ export default function AdminPage() {
   const [token, setToken] = useState<string | null>(localStorage.getItem("admin_token"));
   const [user, setUser] = useState<any>(JSON.parse(localStorage.getItem("admin_user") || "null"));
   const [showPassword, setShowPassword] = useState(false);
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState("contacts");
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -2012,10 +2011,12 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        <DashboardTab token={token!} />
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="hidden md:block">
-            <TabsList className="bg-transparent h-auto p-0 grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+            <TabsList className="bg-transparent h-auto p-0 grid grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
               {adminTabs.filter(t => !('adminOnly' in t && t.adminOnly) || user?.role === "admin").map(t => {
                 const Icon = t.icon;
                 const isActive = activeTab === t.value;
@@ -2058,9 +2059,6 @@ export default function AdminPage() {
             </Select>
           </div>
 
-          <TabsContent value="dashboard">
-            <DashboardTab token={token} />
-          </TabsContent>
           <TabsContent value="contacts">
             <ContactsTab token={token} />
           </TabsContent>
