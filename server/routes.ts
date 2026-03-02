@@ -284,6 +284,61 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/admin/dashboard", requireAuth, async (_req, res) => {
+    try {
+      const [contacts, newsletter, posts, orders, reviews, testResults, comments] = await Promise.all([
+        storage.getContactSubmissions(),
+        storage.getNewsletterSubscriptions(),
+        storage.getBlogPosts(),
+        storage.getShopOrders(),
+        storage.getAllProductReviews(),
+        storage.getEnglishTestResults(),
+        storage.getAllBlogComments(),
+      ]);
+      const totalRevenue = orders
+        .filter((o: any) => o.status === "completed")
+        .reduce((sum: number, o: any) => sum + parseFloat(o.amount || "0"), 0);
+      const pendingReviews = reviews.filter((r: any) => !r.approved).length;
+      const completedTests = testResults.filter((t: any) => t.status === "completed").length;
+      const userComments = comments.filter((c: any) => !c.isAiReply).length;
+      res.json({
+        contacts: contacts.length,
+        newsletter: newsletter.length,
+        blogPosts: posts.length,
+        orders: orders.length,
+        totalRevenue: totalRevenue.toFixed(2),
+        reviews: reviews.length,
+        pendingReviews,
+        completedTests,
+        totalTests: testResults.length,
+        blogComments: userComments,
+      });
+    } catch (error) {
+      console.error("Error fetching dashboard:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/admin/blog-comments", requireAuth, async (_req, res) => {
+    try {
+      const comments = await storage.getAllBlogComments();
+      res.json(comments);
+    } catch (error) {
+      console.error("Error fetching blog comments:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/admin/blog-comments/:id", requireAuth, async (req, res) => {
+    try {
+      await storage.deleteBlogComment(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting blog comment:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
   app.get("/api/admin/contacts", requireAuth, async (_req, res) => {
     try {
       const submissions = await storage.getContactSubmissions();

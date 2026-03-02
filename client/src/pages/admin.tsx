@@ -44,7 +44,218 @@ import {
   Star,
   CheckCircle,
   XCircle,
+  LayoutDashboard,
+  MessagesSquare,
+  TrendingUp,
+  Euro,
+  ClipboardList,
 } from "lucide-react";
+
+interface DashboardStats {
+  contacts: number;
+  newsletter: number;
+  blogPosts: number;
+  orders: number;
+  totalRevenue: string;
+  reviews: number;
+  pendingReviews: number;
+  completedTests: number;
+  totalTests: number;
+  blogComments: number;
+}
+
+function DashboardTab({ token }: { token: string }) {
+  const { data: stats, isLoading } = useQuery<DashboardStats>({
+    queryKey: ["/api/admin/dashboard"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/dashboard", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+  });
+
+  if (isLoading || !stats) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {[...Array(10)].map((_, i) => (
+          <div key={i} className="h-28 bg-muted rounded-xl animate-pulse" />
+        ))}
+      </div>
+    );
+  }
+
+  const cards = [
+    { label: "Richieste Contatto", value: stats.contacts, icon: MessageSquare, color: "text-blue-600", bg: "bg-blue-50" },
+    { label: "Iscritti Newsletter", value: stats.newsletter, icon: Mail, color: "text-indigo-600", bg: "bg-indigo-50" },
+    { label: "Ordini Shop", value: stats.orders, icon: ShoppingBag, color: "text-emerald-600", bg: "bg-emerald-50" },
+    { label: "Fatturato Totale", value: `\u20AC${parseFloat(stats.totalRevenue).toLocaleString("it-IT", { minimumFractionDigits: 2 })}`, icon: Euro, color: "text-green-600", bg: "bg-green-50" },
+    { label: "Test Completati", value: `${stats.completedTests}/${stats.totalTests}`, icon: GraduationCap, color: "text-purple-600", bg: "bg-purple-50" },
+    { label: "Articoli Blog", value: stats.blogPosts, icon: Newspaper, color: "text-sky-600", bg: "bg-sky-50" },
+    { label: "Commenti Blog", value: stats.blogComments, icon: MessagesSquare, color: "text-cyan-600", bg: "bg-cyan-50" },
+    { label: "Recensioni Totali", value: stats.reviews, icon: Star, color: "text-amber-600", bg: "bg-amber-50" },
+    { label: "Recensioni in Attesa", value: stats.pendingReviews, icon: ClipboardList, color: stats.pendingReviews > 0 ? "text-red-600" : "text-slate-500", bg: stats.pendingReviews > 0 ? "bg-red-50" : "bg-slate-50" },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-slate-900 mb-1" data-testid="text-dashboard-title">Panoramica</h2>
+        <p className="text-sm text-muted-foreground">Riepilogo attività del sito</p>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+        {cards.map((card, i) => {
+          const Icon = card.icon;
+          return (
+            <Card key={i} className="border shadow-sm hover:shadow-md transition-shadow" data-testid={`card-stat-${i}`}>
+              <CardContent className="p-4 flex items-start gap-3">
+                <div className={`w-10 h-10 rounded-lg ${card.bg} flex items-center justify-center shrink-0`}>
+                  <Icon className={`w-5 h-5 ${card.color}`} />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-muted-foreground truncate">{card.label}</p>
+                  <p className={`text-xl font-bold ${card.color} mt-0.5`}>{card.value}</p>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+interface BlogCommentAdmin {
+  id: string;
+  blogSlug: string;
+  authorName: string;
+  content: string;
+  isAiReply: boolean | null;
+  parentId: string | null;
+  approved: boolean | null;
+  createdAt: string | null;
+}
+
+function BlogCommentsTab({ token }: { token: string }) {
+  const { toast } = useToast();
+  const [filter, setFilter] = useState<"all" | "user" | "staff">("all");
+
+  const { data: comments = [], isLoading } = useQuery<BlogCommentAdmin[]>({
+    queryKey: ["/api/admin/blog-comments"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/blog-comments", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await fetch(`/api/admin/blog-comments/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/blog-comments"] });
+      toast({ title: "Commento eliminato" });
+    },
+  });
+
+  const filtered = comments.filter(c => {
+    if (filter === "user") return !c.isAiReply;
+    if (filter === "staff") return c.isAiReply;
+    return true;
+  });
+
+  const userCount = comments.filter(c => !c.isAiReply).length;
+  const staffCount = comments.filter(c => c.isAiReply).length;
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <MessagesSquare className="w-5 h-5" /> Commenti Blog
+            </CardTitle>
+            <CardDescription>{userCount} commenti utenti, {staffCount} risposte staff</CardDescription>
+          </div>
+          <div className="flex gap-2">
+            <Select value={filter} onValueChange={(v: "all" | "user" | "staff") => setFilter(v)}>
+              <SelectTrigger className="w-[160px]" data-testid="select-comment-filter">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tutti ({comments.length})</SelectItem>
+                <SelectItem value="user">Solo utenti ({userCount})</SelectItem>
+                <SelectItem value="staff">Solo staff ({staffCount})</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="text-center py-8 text-muted-foreground">Caricamento...</div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            <MessagesSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
+            <p>Nessun commento</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map((comment) => (
+              <div
+                key={comment.id}
+                className={`border rounded-lg p-4 ${comment.isAiReply ? "border-blue-200 bg-blue-50/30" : "border-border"} ${comment.parentId ? "ml-6" : ""}`}
+                data-testid={`comment-row-${comment.id}`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-grow min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="font-semibold text-sm">{comment.authorName}</span>
+                      {comment.isAiReply && (
+                        <Badge variant="secondary" className="text-[10px] text-blue-600">Staff AI</Badge>
+                      )}
+                      {comment.parentId && (
+                        <Badge variant="outline" className="text-[10px]">Risposta</Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground mb-1">
+                      Articolo: <span className="font-medium">{comment.blogSlug.replace(/-/g, " ").replace(/^\d{4}\s\d{2}\s\d{2}\s/, "").substring(0, 50)}</span>
+                      {" · "}
+                      {comment.createdAt ? new Date(comment.createdAt).toLocaleDateString("it-IT") : ""}
+                    </p>
+                    <p className="text-sm text-muted-foreground">{comment.content}</p>
+                  </div>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50 shrink-0"
+                    onClick={() => {
+                      if (confirm("Eliminare questo commento?")) {
+                        deleteMutation.mutate(comment.id);
+                      }
+                    }}
+                    disabled={deleteMutation.isPending}
+                    title="Elimina"
+                    data-testid={`button-delete-comment-${comment.id}`}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 interface ShopOrder {
   id: string;
@@ -249,7 +460,7 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
     return (
       <div className="space-y-4">
         <Button variant="outline" onClick={() => setSelectedId(null)} data-testid="button-back-to-list">
-          Back to list
+          Torna alla lista
         </Button>
 
         <Card>
@@ -260,24 +471,24 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
           <CardContent className="space-y-6">
             <div className="grid grid-cols-3 gap-4 text-center">
               <div className="p-3 bg-muted rounded-lg">
-                <div className="text-sm text-muted-foreground">Final Level</div>
+                <div className="text-sm text-muted-foreground">Livello Finale</div>
                 <div className="text-2xl font-bold mt-1">{levelBadge(detail.session.finalLevel)}</div>
               </div>
               <div className="p-3 bg-muted rounded-lg">
-                <div className="text-sm text-muted-foreground">MC Score</div>
+                <div className="text-sm text-muted-foreground">Punteggio MC</div>
                 <div className="text-lg font-bold mt-1">{detail.session.correctAnswers}/{detail.session.totalQuestions}</div>
               </div>
               <div className="p-3 bg-muted rounded-lg">
-                <div className="text-sm text-muted-foreground">Status</div>
+                <div className="text-sm text-muted-foreground">Stato</div>
                 <div className="mt-1"><Badge variant={detail.session.status === "completed" ? "default" : "secondary"}>{detail.session.status}</Badge></div>
               </div>
             </div>
 
             {detail.sectionResults.length > 0 && (
               <div>
-                <h4 className="font-semibold mb-2">Section Results</h4>
+                <h4 className="font-semibold mb-2">Risultati per Sezione</h4>
                 <table className="w-full text-sm">
-                  <thead><tr className="border-b"><th className="text-left py-2">Section</th><th className="text-center">Level</th><th className="text-center">Accuracy</th><th className="text-center">Theta</th></tr></thead>
+                  <thead><tr className="border-b"><th className="text-left py-2">Sezione</th><th className="text-center">Livello</th><th className="text-center">Precisione</th><th className="text-center">Theta</th></tr></thead>
                   <tbody>
                     {detail.sectionResults.map((s, i) => (
                       <tr key={i} className="border-b">
@@ -294,7 +505,7 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
 
             {detail.writingSpeaking.length > 0 && (
               <div>
-                <h4 className="font-semibold mb-2">Writing / Speaking</h4>
+                <h4 className="font-semibold mb-2">Scrittura / Parlato</h4>
                 {detail.writingSpeaking.map((ws, i) => (
                   <div key={i} className="p-4 bg-muted rounded-lg mb-3">
                     <div className="flex justify-between items-center mb-2">
@@ -319,10 +530,10 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
 
             {detail.responses.length > 0 && (
               <div>
-                <h4 className="font-semibold mb-2">IRT Audit Trail ({detail.responses.length} responses)</h4>
+                <h4 className="font-semibold mb-2">Traccia IRT ({detail.responses.length} risposte)</h4>
                 <div className="max-h-80 overflow-y-auto">
                   <table className="w-full text-xs">
-                    <thead><tr className="border-b bg-muted"><th className="text-left py-1 px-2">#</th><th className="text-left px-2">Skill</th><th className="text-left px-2">Question</th><th className="text-center px-2">Correct</th><th className="text-center px-2">Theta</th><th className="text-center px-2">Time</th></tr></thead>
+                    <thead><tr className="border-b bg-muted"><th className="text-left py-1 px-2">#</th><th className="text-left px-2">Abilità</th><th className="text-left px-2">Domanda</th><th className="text-center px-2">Corretto</th><th className="text-center px-2">Theta</th><th className="text-center px-2">Tempo</th></tr></thead>
                     <tbody>
                       {detail.responses.map((r, i) => (
                         <tr key={i} className="border-b">
@@ -349,7 +560,7 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
     <div className="space-y-4">
       <div className="flex gap-3">
         <Input
-          placeholder="Filter by company..."
+          placeholder="Filtra per azienda..."
           value={filterCompany}
           onChange={e => setFilterCompany(e.target.value)}
           className="max-w-xs"
@@ -357,10 +568,10 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
         />
         <Select value={filterLevel} onValueChange={setFilterLevel}>
           <SelectTrigger className="w-[140px]" data-testid="select-filter-level">
-            <SelectValue placeholder="All levels" />
+            <SelectValue placeholder="Tutti i livelli" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All levels</SelectItem>
+            <SelectItem value="all">Tutti i livelli</SelectItem>
             <SelectItem value="A0">A0</SelectItem>
             <SelectItem value="A1">A1</SelectItem>
             <SelectItem value="A2">A2</SelectItem>
@@ -376,21 +587,21 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
       ) : filtered.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
           <Briefcase className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p>No English test results yet.</p>
+          <p>Nessun risultato test ancora.</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm" data-testid="table-results">
             <thead>
               <tr className="border-b">
-                <th className="text-left py-3 px-2">Candidate</th>
-                <th className="text-left px-2">Company</th>
-                <th className="text-center px-2">Level</th>
+                <th className="text-left py-3 px-2">Candidato</th>
+                <th className="text-left px-2">Azienda</th>
+                <th className="text-center px-2">Livello</th>
                 <th className="text-center px-2">MC</th>
-                <th className="text-center px-2">Writing</th>
-                <th className="text-center px-2">Speaking</th>
-                <th className="text-center px-2">Status</th>
-                <th className="text-center px-2">Date</th>
+                <th className="text-center px-2">Scrittura</th>
+                <th className="text-center px-2">Parlato</th>
+                <th className="text-center px-2">Stato</th>
+                <th className="text-center px-2">Data</th>
                 <th className="text-right px-2"></th>
               </tr>
             </thead>
@@ -715,8 +926,8 @@ function BlogTab({ token }: { token: string }) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
         <div>
-          <CardTitle>Blog Management</CardTitle>
-          <CardDescription>Gestione post generati dall'AI</CardDescription>
+          <CardTitle>Gestione Blog</CardTitle>
+          <CardDescription>Articoli generati dall'AI</CardDescription>
         </div>
         <div className="flex gap-2">
           <Button 
@@ -1636,12 +1847,27 @@ function ReviewsTab({ token }: { token: string }) {
   );
 }
 
+const adminTabs = [
+  { value: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { value: "contacts", label: "Contatti", icon: MessageSquare },
+  { value: "newsletter", label: "Newsletter", icon: Mail },
+  { value: "blog", label: "Blog", icon: Newspaper },
+  { value: "blog-comments", label: "Commenti Blog", icon: MessagesSquare },
+  { value: "shop-orders", label: "Ordini Shop", icon: ShoppingBag },
+  { value: "materials", label: "Materiali", icon: FileText },
+  { value: "english-test", label: "Test Inglese", icon: GraduationCap },
+  { value: "vouchers", label: "Voucher", icon: Tag },
+  { value: "reviews", label: "Recensioni", icon: Star },
+  { value: "users", label: "Utenti", icon: Users, adminOnly: true },
+] as const;
+
 export default function AdminPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState<string | null>(localStorage.getItem("admin_token"));
   const [user, setUser] = useState<any>(JSON.parse(localStorage.getItem("admin_user") || "null"));
   const [showPassword, setShowPassword] = useState(false);
+  const [activeTab, setActiveTab] = useState("dashboard");
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -1778,41 +2004,43 @@ export default function AdminPage() {
       </div>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <Tabs defaultValue="contacts" className="space-y-6">
-          <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-            <TabsList className="bg-white border shadow-sm h-auto p-1 flex w-max sm:w-full">
-              <TabsTrigger value="contacts" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
-                <MessageSquare className="w-4 h-4" /> Contacts
-              </TabsTrigger>
-              <TabsTrigger value="newsletter" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
-                <Mail className="w-4 h-4" /> Newsletter
-              </TabsTrigger>
-              <TabsTrigger value="blog" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
-                <Newspaper className="w-4 h-4" /> Blog
-              </TabsTrigger>
-              <TabsTrigger value="shop-orders" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
-                <ShoppingBag className="w-4 h-4" /> Shop Orders
-              </TabsTrigger>
-              <TabsTrigger value="materials" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
-                <FileText className="w-4 h-4" /> Materials
-              </TabsTrigger>
-              <TabsTrigger value="english-test" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
-                <GraduationCap className="w-4 h-4" /> English Test
-              </TabsTrigger>
-              <TabsTrigger value="vouchers" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2" data-testid="tab-vouchers">
-                <Tag className="w-4 h-4" /> Vouchers
-              </TabsTrigger>
-              <TabsTrigger value="reviews" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2" data-testid="tab-reviews">
-                <Star className="w-4 h-4" /> Recensioni
-              </TabsTrigger>
-              {user?.role === "admin" && (
-                <TabsTrigger value="users" className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-4 flex items-center gap-2">
-                  <Users className="w-4 h-4" /> Users
-                </TabsTrigger>
-              )}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <div className="hidden md:block overflow-x-auto pb-2">
+            <TabsList className="bg-white border shadow-sm h-auto p-1 flex flex-wrap gap-1">
+              {adminTabs.filter(t => !('adminOnly' in t && t.adminOnly) || user?.role === "admin").map(t => {
+                const Icon = t.icon;
+                return (
+                  <TabsTrigger key={t.value} value={t.value} className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700 py-2 px-3 flex items-center gap-2" data-testid={`tab-${t.value}`}>
+                    <Icon className="w-4 h-4" /> {t.label}
+                  </TabsTrigger>
+                );
+              })}
             </TabsList>
           </div>
 
+          <div className="md:hidden">
+            <Select value={activeTab} onValueChange={setActiveTab}>
+              <SelectTrigger className="bg-white border shadow-sm h-12" data-testid="select-mobile-tab">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {adminTabs.filter(t => !('adminOnly' in t && t.adminOnly) || user?.role === "admin").map(t => {
+                  const Icon = t.icon;
+                  return (
+                    <SelectItem key={t.value} value={t.value}>
+                      <span className="flex items-center gap-2">
+                        <Icon className="w-4 h-4" /> {t.label}
+                      </span>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <TabsContent value="dashboard">
+            <DashboardTab token={token} />
+          </TabsContent>
           <TabsContent value="contacts">
             <ContactsTab token={token} />
           </TabsContent>
@@ -1821,6 +2049,9 @@ export default function AdminPage() {
           </TabsContent>
           <TabsContent value="blog">
             <BlogTab token={token} />
+          </TabsContent>
+          <TabsContent value="blog-comments">
+            <BlogCommentsTab token={token} />
           </TabsContent>
           <TabsContent value="shop-orders">
             <ShopOrdersTab token={token} />
@@ -1831,8 +2062,8 @@ export default function AdminPage() {
           <TabsContent value="english-test">
             <Card>
               <CardHeader>
-                <CardTitle>English Adaptive Test Results</CardTitle>
-                <CardDescription>Adaptive test results</CardDescription>
+                <CardTitle>Risultati Test Inglese</CardTitle>
+                <CardDescription>Test adattivi completati</CardDescription>
               </CardHeader>
               <CardContent>
                 <EnglishAdaptiveTab token={token} />
