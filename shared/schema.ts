@@ -274,6 +274,9 @@ export const shopOrders = pgTable("shop_orders", {
   adminNotes: text("admin_notes"),
   discountCode: text("discount_code"),
   discountAmount: text("discount_amount"),
+  invoiceNumber: text("invoice_number"),
+  invoiceDate: timestamp("invoice_date"),
+  invoiceSent: boolean("invoice_sent").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

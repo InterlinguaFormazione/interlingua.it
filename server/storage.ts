@@ -134,6 +134,10 @@ export interface IStorage {
   getShopOrderByPaypalId(paypalOrderId: string): Promise<ShopOrder | undefined>;
   updateShopOrderStatus(id: string, status: string): Promise<ShopOrder | undefined>;
   updateShopOrderNotes(id: string, adminNotes: string): Promise<ShopOrder | undefined>;
+  updateShopOrderInvoice(id: string, invoiceNumber: string, invoiceDate: Date): Promise<ShopOrder | undefined>;
+  markInvoiceSent(id: string): Promise<ShopOrder | undefined>;
+  getNextInvoiceSequence(year: number): Promise<number>;
+  getShopOrderById(id: string): Promise<ShopOrder | undefined>;
   hasCompletedOrdersByEmail(email: string): Promise<boolean>;
 
   createCourseMaterial(material: InsertCourseMaterial): Promise<CourseMaterial>;
@@ -497,6 +501,36 @@ export class DatabaseStorage implements IStorage {
 
   async updateShopOrderNotes(id: string, adminNotes: string): Promise<ShopOrder | undefined> {
     const [result] = await db.update(shopOrders).set({ adminNotes }).where(eq(shopOrders.id, id)).returning();
+    return result;
+  }
+
+  async updateShopOrderInvoice(id: string, invoiceNumber: string, invoiceDate: Date): Promise<ShopOrder | undefined> {
+    const [result] = await db.update(shopOrders).set({ invoiceNumber, invoiceDate }).where(eq(shopOrders.id, id)).returning();
+    return result;
+  }
+
+  async markInvoiceSent(id: string): Promise<ShopOrder | undefined> {
+    const [result] = await db.update(shopOrders).set({ invoiceSent: true }).where(eq(shopOrders.id, id)).returning();
+    return result;
+  }
+
+  async getNextInvoiceSequence(year: number): Promise<number> {
+    const yearPattern = `/${year}`;
+    const results = await db.select({ invoiceNumber: shopOrders.invoiceNumber })
+      .from(shopOrders)
+      .where(sql`${shopOrders.invoiceNumber} LIKE ${'%' + yearPattern}`);
+    let maxSeq = 0;
+    for (const r of results) {
+      if (r.invoiceNumber) {
+        const num = parseInt(r.invoiceNumber.split("/")[0], 10);
+        if (!isNaN(num) && num > maxSeq) maxSeq = num;
+      }
+    }
+    return maxSeq + 1;
+  }
+
+  async getShopOrderById(id: string): Promise<ShopOrder | undefined> {
+    const [result] = await db.select().from(shopOrders).where(eq(shopOrders.id, id));
     return result;
   }
 

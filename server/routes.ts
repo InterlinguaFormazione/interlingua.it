@@ -4,7 +4,8 @@ import { storage } from "./storage";
 import { insertContactSchema, insertNewsletterSchema, insertCookieConsentSchema, insertShopOrderSchema, insertCourseMaterialSchema, insertBlogCommentSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendSubscriptionConfirmation, sendBookingConfirmation } from "./email";
+import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendSubscriptionConfirmation, sendBookingConfirmation, sendInvoiceEmail } from "./email";
+import { generateInvoicePDF, generateInvoiceNumber } from "./invoice";
 import { forwardToCRM, forwardPurchaseToCRM, forwardTestToCRM, forwardNewsletterToCRM } from "./crm";
 import { generateBlogPost } from "./blog-generator";
 import { chatWithAI } from "./ai-chat";
@@ -92,6 +93,49 @@ function requireAdmin(req: any, res: any, next: any) {
   }
   req.adminSession = session;
   next();
+}
+
+async function generateAndSendInvoice(orderId: string) {
+  try {
+    const order = await storage.getShopOrderById(orderId);
+    if (!order) {
+      console.error(`Invoice: order ${orderId} not found`);
+      return;
+    }
+    if (order.invoiceNumber) {
+      console.log(`Invoice: order ${orderId} already has invoice ${order.invoiceNumber}`);
+      return;
+    }
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const seq = await storage.getNextInvoiceSequence(year);
+    const invoiceNum = generateInvoiceNumber(year, seq);
+
+    await storage.updateShopOrderInvoice(orderId, invoiceNum, now);
+
+    const updatedOrder = await storage.getShopOrderById(orderId);
+    if (!updatedOrder) return;
+
+    const pdfBuffer = generateInvoicePDF(updatedOrder, invoiceNum, now);
+
+    try {
+      await sendInvoiceEmail({
+        customerName: `${updatedOrder.customerFirstName} ${updatedOrder.customerLastName}`,
+        customerEmail: updatedOrder.customerEmail,
+        invoiceNumber: invoiceNum,
+        amount: updatedOrder.amount,
+        productName: updatedOrder.productName,
+        pdfBuffer,
+      });
+      await storage.markInvoiceSent(orderId);
+      console.log(`Invoice ${invoiceNum} sent to ${updatedOrder.customerEmail}`);
+    } catch (emailError) {
+      console.error(`Failed to send invoice ${invoiceNum}:`, emailError);
+    }
+  } catch (error) {
+    console.error(`Error generating invoice for order ${orderId}:`, error);
+  }
 }
 
 const MIN_SUBMIT_TIME_MS = 3000;
@@ -1641,6 +1685,8 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         discountCode: appliedDiscountCode,
         discountAmount: appliedDiscountAmount,
       });
+
+      generateAndSendInvoice(order.id).catch(err => console.error("Invoice generation error:", err));
 
       if (appliedDiscountCode) {
         const voucher = await storage.getDiscountVoucherByCode(appliedDiscountCode);

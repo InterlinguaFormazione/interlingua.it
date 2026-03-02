@@ -1,4 +1,4 @@
-import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
+import { SESClient, SendEmailCommand, SendRawEmailCommand } from "@aws-sdk/client-ses";
 
 function createSESClient(): SESClient | null {
   const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
@@ -775,6 +775,83 @@ export async function sendEnglishTestConfirmationEmail(email: string, firstName:
       Subject: { Data: `Test Adattivo di Inglese — Risultati${subjectSuffix}`, Charset: "UTF-8" },
       Body: { Html: { Data: htmlBody, Charset: "UTF-8" } },
     },
+  });
+
+  await ses.send(command);
+}
+
+export async function sendInvoiceEmail(data: {
+  customerName: string;
+  customerEmail: string;
+  invoiceNumber: string;
+  amount: string;
+  productName: string;
+  pdfBuffer: Buffer;
+}) {
+  if (!ses) {
+    console.log("Email sending disabled — skipping invoice email");
+    return;
+  }
+
+  const boundary = `----=_Part_${Date.now()}_${Math.random().toString(36).substring(2)}`;
+  const safeFilename = `Fattura_${data.invoiceNumber.replace("/", "_")}.pdf`;
+
+  const htmlBody = `
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #1e3a5f, #2d5aa0); padding: 24px; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 22px;">Fattura n. ${data.invoiceNumber}</h1>
+        <p style="color: rgba(255,255,255,0.85); margin: 8px 0 0; font-size: 14px;">Interlingua Formazione S.r.l. — SkillCraft</p>
+      </div>
+      <div style="background: white; padding: 24px; border-radius: 0 0 12px 12px; border: 1px solid #e5e7eb; border-top: none;">
+        <p style="color: #4b5563; line-height: 1.6;">Gentile <strong>${data.customerName}</strong>,</p>
+        <p style="color: #4b5563; line-height: 1.6;">In allegato trovi la fattura relativa al tuo acquisto:</p>
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 16px; margin: 16px 0;">
+          <table style="width: 100%; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 6px 0; font-weight: 600; color: #374151; width: 140px;">Fattura n.</td>
+              <td style="padding: 6px 0; color: #4b5563;">${data.invoiceNumber}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; font-weight: 600; color: #374151;">Prodotto</td>
+              <td style="padding: 6px 0; color: #4b5563;">${data.productName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; font-weight: 600; color: #374141;">Importo</td>
+              <td style="padding: 6px 0; color: #16a34a; font-weight: 700;">&euro;${data.amount}</td>
+            </tr>
+          </table>
+        </div>
+        <p style="color: #4b5563; line-height: 1.6;">Se hai domande sulla fattura, contattaci a <a href="mailto:infocorsi@skillcraft.interlingua.it" style="color: #1e3a5f; font-weight: 600;">infocorsi@skillcraft.interlingua.it</a></p>
+        <p style="color: #9ca3af; font-size: 12px; margin-top: 24px;">Questa è un'email automatica. La fattura è allegata in formato PDF.</p>
+      </div>
+    </div>
+  `;
+
+  const rawMessage = [
+    `From: ${FROM_EMAIL}`,
+    `To: ${data.customerEmail}`,
+    `Subject: Fattura n. ${data.invoiceNumber} — Interlingua Formazione`,
+    `MIME-Version: 1.0`,
+    `Content-Type: multipart/mixed; boundary="${boundary}"`,
+    ``,
+    `--${boundary}`,
+    `Content-Type: text/html; charset=UTF-8`,
+    `Content-Transfer-Encoding: 7bit`,
+    ``,
+    htmlBody,
+    ``,
+    `--${boundary}`,
+    `Content-Type: application/pdf; name="${safeFilename}"`,
+    `Content-Disposition: attachment; filename="${safeFilename}"`,
+    `Content-Transfer-Encoding: base64`,
+    ``,
+    data.pdfBuffer.toString("base64").replace(/(.{76})/g, "$1\n"),
+    ``,
+    `--${boundary}--`,
+  ].join("\r\n");
+
+  const command = new SendRawEmailCommand({
+    RawMessage: { Data: Buffer.from(rawMessage) },
   });
 
   await ses.send(command);
