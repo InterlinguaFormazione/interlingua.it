@@ -272,10 +272,23 @@ interface ShopOrder {
   studentFirstName: string | null;
   studentLastName: string | null;
   studentEmail: string | null;
+  billingCodiceFiscale: string | null;
+  billingIndirizzo: string | null;
+  billingCap: string | null;
+  billingCitta: string | null;
+  billingProvincia: string | null;
+  billingPartitaIva: string | null;
+  billingCodiceSdi: string | null;
+  billingPec: string | null;
+  billingPaese: string | null;
+  notes: string | null;
+  discountCode: string | null;
+  discountAmount: string | null;
   createdAt: string | null;
 }
 
 function ShopOrdersTab({ token }: { token: string }) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const { data: orders = [], isLoading } = useQuery<ShopOrder[]>({
     queryKey: ["/api/admin/shop/orders"],
     queryFn: async () => {
@@ -287,11 +300,21 @@ function ShopOrdersTab({ token }: { token: string }) {
     },
   });
 
+  const DetailRow = ({ label, value }: { label: string; value: string | null | undefined }) => {
+    if (!value) return null;
+    return (
+      <div className="flex justify-between py-1.5 border-b border-dashed border-gray-100 last:border-0">
+        <span className="text-xs text-muted-foreground">{label}</span>
+        <span className="text-sm font-medium text-right max-w-[60%] break-words">{value}</span>
+      </div>
+    );
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Ordini Shop</CardTitle>
-        <CardDescription>Tutti gli acquisti effettuati online</CardDescription>
+        <CardDescription>Tutti gli acquisti effettuati online — clicca su un ordine per i dettagli</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -299,45 +322,101 @@ function ShopOrdersTab({ token }: { token: string }) {
         ) : orders.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">Nessun ordine ancora</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left py-3 px-2 font-medium">Data</th>
-                  <th className="text-left py-3 px-2 font-medium">Corso</th>
-                  <th className="text-left py-3 px-2 font-medium">Cliente</th>
-                  <th className="text-left py-3 px-2 font-medium">Studente</th>
-                  <th className="text-left py-3 px-2 font-medium">Email Cliente</th>
-                  <th className="text-right py-3 px-2 font-medium">Importo</th>
-                  <th className="text-center py-3 px-2 font-medium">Stato</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((order) => (
-                  <tr key={order.id} className="border-b last:border-0" data-testid={`row-order-${order.id}`}>
-                    <td className="py-3 px-2 text-muted-foreground whitespace-nowrap">
-                      {order.createdAt ? new Date(order.createdAt).toLocaleDateString("it-IT") : "-"}
-                    </td>
-                    <td className="py-3 px-2 font-medium">{order.productName}</td>
-                    <td className="py-3 px-2">{order.customerFirstName} {order.customerLastName}</td>
-                    <td className="py-3 px-2 text-muted-foreground">
-                      {order.studentFirstName ? (
-                        <span>{order.studentFirstName} {order.studentLastName}{order.studentEmail ? ` (${order.studentEmail})` : ""}</span>
-                      ) : (
-                        <span className="text-xs italic">stesso</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-2 text-muted-foreground">{order.customerEmail}</td>
-                    <td className="py-3 px-2 text-right font-medium">&euro;{parseFloat(order.amount).toFixed(2)}</td>
-                    <td className="py-3 px-2 text-center">
-                      <Badge variant={order.status === "completed" ? "default" : "secondary"}>
-                        {order.status === "completed" ? "Completato" : order.status}
-                      </Badge>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="space-y-2">
+            {orders.map((order) => {
+              const isExpanded = expandedId === order.id;
+              return (
+                <div key={order.id} className={`border rounded-lg transition-all ${isExpanded ? "ring-1 ring-blue-200 border-blue-300" : "hover:border-gray-300"}`} data-testid={`row-order-${order.id}`}>
+                  <button
+                    type="button"
+                    className="w-full text-left px-4 py-3 flex items-center gap-3 cursor-pointer"
+                    onClick={() => setExpandedId(isExpanded ? null : order.id)}
+                    data-testid={`button-expand-order-${order.id}`}
+                  >
+                    <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-2 items-center">
+                      <div>
+                        <p className="text-xs text-muted-foreground">
+                          {order.createdAt ? new Date(order.createdAt).toLocaleDateString("it-IT") : "-"}
+                        </p>
+                        <p className="font-medium text-sm">{order.customerFirstName} {order.customerLastName}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm">{order.productName}</p>
+                      </div>
+                      <div className="text-right md:text-left">
+                        <p className="font-semibold">&euro;{parseFloat(order.amount).toFixed(2)}</p>
+                      </div>
+                      <div className="flex items-center justify-end gap-2">
+                        <Badge variant={order.status === "completed" ? "default" : "secondary"}>
+                          {order.status === "completed" ? "Completato" : order.status}
+                        </Badge>
+                        {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                      </div>
+                    </div>
+                  </button>
+
+                  {isExpanded && (
+                    <div className="px-4 pb-4 border-t bg-slate-50/50">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+                        <div>
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Cliente</h4>
+                          <DetailRow label="Nome" value={`${order.customerFirstName} ${order.customerLastName}`} />
+                          <DetailRow label="Email" value={order.customerEmail} />
+                          <DetailRow label="Telefono" value={order.customerPhone} />
+                        </div>
+
+                        <div>
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Studente</h4>
+                          {order.studentFirstName ? (
+                            <>
+                              <DetailRow label="Nome" value={`${order.studentFirstName} ${order.studentLastName}`} />
+                              <DetailRow label="Email" value={order.studentEmail} />
+                            </>
+                          ) : (
+                            <p className="text-sm text-muted-foreground italic">Stesso del cliente</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Fatturazione</h4>
+                          <DetailRow label="Paese" value={order.billingPaese} />
+                          <DetailRow label="Indirizzo" value={order.billingIndirizzo} />
+                          <DetailRow label="CAP" value={order.billingCap} />
+                          <DetailRow label="Città" value={order.billingCitta} />
+                          <DetailRow label="Provincia" value={order.billingProvincia} />
+                          <DetailRow label="Codice Fiscale" value={order.billingCodiceFiscale} />
+                          <DetailRow label="Partita IVA" value={order.billingPartitaIva} />
+                          <DetailRow label="Codice SDI" value={order.billingCodiceSdi} />
+                          <DetailRow label="PEC" value={order.billingPec} />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4 pt-4 border-t">
+                        <div>
+                          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Ordine</h4>
+                          <DetailRow label="Prodotto" value={order.productName} />
+                          <DetailRow label="Importo" value={`€${parseFloat(order.amount).toFixed(2)}`} />
+                          <DetailRow label="PayPal ID" value={order.paypalOrderId} />
+                          {order.discountCode && (
+                            <>
+                              <DetailRow label="Codice Sconto" value={order.discountCode} />
+                              <DetailRow label="Sconto" value={order.discountAmount ? `€${parseFloat(order.discountAmount).toFixed(2)}` : null} />
+                            </>
+                          )}
+                        </div>
+
+                        {order.notes && (
+                          <div className="md:col-span-2">
+                            <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Note</h4>
+                            <p className="text-sm bg-white border rounded-lg p-3">{order.notes}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </CardContent>
