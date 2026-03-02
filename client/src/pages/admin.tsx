@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
@@ -1896,12 +1896,21 @@ export default function AdminPage() {
     },
   });
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     setToken(null);
     setUser(null);
     localStorage.removeItem("admin_token");
     localStorage.removeItem("admin_user");
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!token) return;
+    fetch("/api/admin/dashboard", {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then(res => {
+      if (res.status === 401) handleLogout();
+    }).catch(() => {});
+  }, [token, handleLogout]);
 
   if (!token) {
     return (
