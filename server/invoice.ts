@@ -53,34 +53,43 @@ export function generateInvoicePDF(order: ShopOrder, invoiceNumber: string, invo
 
   const pageWidth = doc.page.width - 100;
 
-  const logoHeight = 60;
-  const textX = 170;
+  let headerY = 40;
+  const logoWidth = 180;
   if (fs.existsSync(LOGO_PATH)) {
-    doc.image(LOGO_PATH, 50, 40, { height: logoHeight });
+    const logoX = (doc.page.width - logoWidth) / 2;
+    doc.image(LOGO_PATH, logoX, headerY, { width: logoWidth });
+    headerY += 60;
   }
-  doc.fontSize(14).font("Helvetica-Bold").fillColor("#1e3a5f")
-    .text(COMPANY.name, textX, 45);
-  doc.fontSize(9).font("Helvetica").fillColor("#555")
-    .text(`${COMPANY.address} - ${COMPANY.cap} ${COMPANY.city} (${COMPANY.province})`, textX, 63)
-    .text(`P.IVA: ${COMPANY.piva} — C.F.: ${COMPANY.cf} — REA: ${COMPANY.rea}`, textX, 75)
-    .text(`Tel: ${COMPANY.phone} — Email: ${COMPANY.email}`, textX, 87)
-    .text(`PEC: ${COMPANY.pec} — SDI: ${COMPANY.sdi}`, textX, 99);
 
-  doc.moveTo(50, 116).lineTo(50 + pageWidth, 116).strokeColor("#1e3a5f").lineWidth(2).stroke();
+  doc.fontSize(12).font("Helvetica-Bold").fillColor("#1e3a5f")
+    .text(COMPANY.name, 50, headerY, { align: "center", width: pageWidth });
+  headerY += 16;
+  doc.fontSize(8).font("Helvetica").fillColor("#555")
+    .text(`${COMPANY.address} - ${COMPANY.cap} ${COMPANY.city} (${COMPANY.province})`, 50, headerY, { align: "center", width: pageWidth });
+  headerY += 11;
+  doc.text(`P.IVA: ${COMPANY.piva} — C.F.: ${COMPANY.cf} — REA: ${COMPANY.rea}`, 50, headerY, { align: "center", width: pageWidth });
+  headerY += 11;
+  doc.text(`Tel: ${COMPANY.phone} — Email: ${COMPANY.email}`, 50, headerY, { align: "center", width: pageWidth });
+  headerY += 11;
+  doc.text(`PEC: ${COMPANY.pec} — SDI: ${COMPANY.sdi}`, 50, headerY, { align: "center", width: pageWidth });
+  headerY += 14;
+
+  doc.moveTo(50, headerY).lineTo(50 + pageWidth, headerY).strokeColor("#1e3a5f").lineWidth(2).stroke();
+  headerY += 12;
 
   doc.fontSize(16).font("Helvetica-Bold").fillColor("#1e3a5f")
-    .text("FATTURA", 50, 140);
+    .text("FATTURA", 50, headerY);
   doc.fontSize(10).font("Helvetica").fillColor("#333");
-  const infoY = 140;
-  doc.text(`N. ${invoiceNumber}`, 350, infoY, { align: "right", width: pageWidth - 300 });
-  doc.text(`Data: ${formatDate(invoiceDate)}`, 350, infoY + 16, { align: "right", width: pageWidth - 300 });
+  doc.text(`N. ${invoiceNumber}`, 350, headerY, { align: "right", width: pageWidth - 300 });
+  doc.text(`Data: ${formatDate(invoiceDate)}`, 350, headerY + 16, { align: "right", width: pageWidth - 300 });
+  headerY += 40;
 
   const isB2B = !!order.billingPartitaIva;
 
   doc.fontSize(10).font("Helvetica-Bold").fillColor("#1e3a5f")
-    .text("Destinatario:", 50, 180);
+    .text("Destinatario:", 50, headerY);
   doc.fontSize(10).font("Helvetica").fillColor("#333");
-  let destY = 196;
+  let destY = headerY + 16;
 
   if (isB2B && order.billingPartitaIva) {
     doc.font("Helvetica-Bold").text(`${order.customerFirstName} ${order.customerLastName}`, 50, destY);
