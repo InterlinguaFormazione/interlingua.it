@@ -348,18 +348,18 @@ export default function ShopDashboard() {
                         type={showLoginPassword ? "text" : "password"}
                         value={loginPassword}
                         onChange={(e) => setLoginPassword(e.target.value)}
+                        className="pr-10"
                         data-testid="input-login-password"
                       />
-                      <Button
+                      <button
                         type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-0 top-0 h-full px-3"
+                        className="absolute right-0 top-0 h-full px-3 text-muted-foreground"
                         onClick={() => setShowLoginPassword(!showLoginPassword)}
+                        tabIndex={-1}
                         data-testid="button-toggle-login-password"
                       >
                         {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </Button>
+                      </button>
                     </div>
                   </div>
                   <Button type="submit" className="w-full" disabled={loginLoading} data-testid="button-login">

@@ -329,18 +329,18 @@ export default function ConvenzioniPage() {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="Minimo 6 caratteri"
+                          className="pr-10"
                           data-testid="input-password"
                         />
-                        <Button
+                        <button
                           type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="absolute right-0 top-0 h-full px-3"
+                          className="absolute right-0 top-0 h-full px-3 text-muted-foreground"
                           onClick={() => setShowPassword(!showPassword)}
+                          tabIndex={-1}
                           data-testid="button-toggle-password"
                         >
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </Button>
+                        </button>
                       </div>
                     </div>
                     <div>
@@ -351,18 +351,18 @@ export default function ConvenzioniPage() {
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
                           placeholder="Ripeti la password"
+                          className="pr-10"
                           data-testid="input-confirm-password"
                         />
-                        <Button
+                        <button
                           type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="absolute right-0 top-0 h-full px-3"
+                          className="absolute right-0 top-0 h-full px-3 text-muted-foreground"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          tabIndex={-1}
                           data-testid="button-toggle-confirm-password"
                         >
                           {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </Button>
+                        </button>
                       </div>
                     </div>
                   </div>
