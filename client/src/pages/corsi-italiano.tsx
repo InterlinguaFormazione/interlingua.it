@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { CourseReviewsInline } from "@/components/product-reviews";
+import { useSEO } from "@/hooks/use-seo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -50,6 +51,7 @@ import {
   Shield,
 } from "lucide-react";
 import { COUNTRIES } from "@shared/countries";
+import { CorsiItalianoSchema } from "@/components/seo-schemas";
 import courseItalianImage from "@assets/course-italiano-per-stranieri.png";
 import aboutVicenzaImage from "@assets/vicenza_1772179633305.jpg";
 
@@ -420,6 +422,15 @@ const testimonials = [
 export default function CorsiItalianoPage() {
   const [lang, setLang] = useState<Lang>("it");
   const t = content[lang];
+  useSEO({
+    title: lang === "it"
+      ? "Corsi di Italiano per Stranieri Vicenza | Italian Courses Vicenza | SkillCraft-Interlingua"
+      : "Italian Courses for Foreigners Vicenza | Learn Italian in Italy | SkillCraft-Interlingua",
+    description: lang === "it"
+      ? "Corsi di italiano per stranieri a Vicenza e online. Intensivo 15 e 20 ore, individuale in presenza e online. Scuola di lingue dal 1993."
+      : "Italian courses for foreigners in Vicenza and online. Intensive 15 and 20 hours, individual in person and online. Language school since 1993.",
+    canonical: "/corsi-italiano",
+  });
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
@@ -535,6 +546,7 @@ export default function CorsiItalianoPage() {
 
   return (
     <div className="min-h-screen relative">
+      <CorsiItalianoSchema />
       <Navigation />
       <main>
         <div className="fixed top-32 right-4 z-40">

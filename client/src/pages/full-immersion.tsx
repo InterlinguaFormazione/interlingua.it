@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ProductReviewsSection } from "@/components/product-reviews";
+import { useSEO } from "@/hooks/use-seo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +39,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import fullImmersionImage from "@assets/course-full-immersion.png";
+import { FullImmersionSchema } from "@/components/seo-schemas";
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -173,6 +175,11 @@ const formats = [
 ];
 
 export default function FullImmersionPage() {
+  useSEO({
+    title: "Full Immersion Inglese Vicenza | Corso Intensivo | SkillCraft-Interlingua",
+    description: "Corso Full Immersion di inglese a Vicenza. Formato intensivo collettivo, semi-individuale e individuale. Progressi rapidi con insegnanti qualificati.",
+    canonical: "/full-immersion",
+  });
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
@@ -191,6 +198,7 @@ export default function FullImmersionPage() {
 
   return (
     <div className="min-h-screen relative">
+      <FullImmersionSchema />
       <Navigation />
       <main>
         <section ref={heroRef} className="relative pt-32 pb-28 overflow-hidden min-h-[90vh] flex items-center">

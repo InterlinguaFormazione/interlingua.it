@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { CourseReviewsInline } from "@/components/product-reviews";
+import { useSEO } from "@/hooks/use-seo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +55,7 @@ import {
 import { Link } from "wouter";
 import { PROVINCES } from "@shared/provinces";
 import { COUNTRIES } from "@shared/countries";
+import { CorsiELearningSchema } from "@/components/seo-schemas";
 import corsoOnlineImage from "@assets/course-digitale.png";
 import categoryOnline from "@/assets/images/category-online.jpg";
 import courseIndividual from "@/assets/images/course-individual.jpg";
@@ -729,6 +731,11 @@ function CourseCard({ course, index }: { course: typeof courses[0]; index: numbe
 }
 
 export default function CorsiELearningPage() {
+  useSEO({
+    title: "Corsi di Lingue Online | E-Learning con Tutor Qualificato | SkillCraft-Interlingua",
+    description: "Corsi di lingue online con tutor qualificato. Inglese, tedesco, francese, spagnolo e russo. Piattaforma e-learning, lezioni live, orari flessibili.",
+    canonical: "/corsi-e-learning",
+  });
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
@@ -747,6 +754,7 @@ export default function CorsiELearningPage() {
 
   return (
     <div className="min-h-screen relative">
+      <CorsiELearningSchema />
       <Navigation />
       <main>
         <section ref={heroRef} className="relative pt-32 pb-28 overflow-hidden min-h-[85vh] flex items-center">

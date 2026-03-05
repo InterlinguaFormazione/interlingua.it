@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { useSEO } from "@/hooks/use-seo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -50,6 +51,11 @@ declare global {
 }
 
 export default function SpeakersCornerPurchase() {
+  useSEO({
+    title: "Acquista Speaker's Corner | Abbonamento Conversazione Inglese | SkillCraft-Interlingua",
+    description: "Acquista l'abbonamento Speaker's Corner per praticare la conversazione in inglese a Vicenza. Sessioni settimanali con insegnanti qualificati.",
+    canonical: "/speakers-corner/acquista",
+  });
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const [nome, setNome] = useState("");

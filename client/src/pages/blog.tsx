@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useSEO } from "@/hooks/use-seo";
 import { ArrowLeft, Calendar, Tag, ChevronRight, BookOpen, Newspaper, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -214,6 +215,11 @@ function EmptyState() {
 }
 
 export default function BlogPage() {
+  useSEO({
+    title: "Blog | Consigli e Risorse per Imparare le Lingue | SkillCraft-Interlingua",
+    description: "Blog di SkillCraft-Interlingua: articoli, consigli e risorse per imparare inglese, tedesco, francese, spagnolo e italiano. Approfondimenti linguistici dal 1993.",
+    canonical: "/blog",
+  });
   const { data: posts, isLoading } = useQuery<BlogPost[]>({
     queryKey: ["/api/blog"],
   });

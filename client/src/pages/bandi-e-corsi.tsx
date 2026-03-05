@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import { useSEO } from "@/hooks/use-seo";
 import { ArrowLeft, ArrowRight, ExternalLink, CheckCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -15,6 +16,11 @@ const fadeInUp = {
 };
 
 export default function BandiECorsiPage() {
+  useSEO({
+    title: "Bandi e Corsi Finanziati | Formazione Linguistica Finanziata | SkillCraft-Interlingua",
+    description: "Bandi e corsi di lingue finanziati a Vicenza e Veneto. Scopri le opportunità di formazione linguistica gratuita o agevolata per privati e aziende.",
+    canonical: "/bandi-e-corsi-finanziati",
+  });
   const activeBandi = bandiCards.filter(b => b.status === "active");
   const expiredBandi = bandiCards.filter(b => b.status === "expired");
 

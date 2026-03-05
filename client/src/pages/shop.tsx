@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { useSEO } from "@/hooks/use-seo";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -203,6 +204,11 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
 }
 
 export default function ShopPage() {
+  useSEO({
+    title: "Acquista Corsi di Lingue Online e in Presenza | SkillCraft-Interlingua",
+    description: "Acquista corsi di lingue online e in presenza a Vicenza. Inglese, tedesco, francese, spagnolo, italiano per stranieri. Pagamento sicuro con PayPal.",
+    canonical: "/shop",
+  });
   const [, setLocation] = useLocation();
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Tutti");

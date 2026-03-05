@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Link, useParams } from "wouter";
 import { SHOP_PRODUCTS } from "@shared/products";
+import { ShopProductSchema } from "@/components/seo-schemas";
 import { useCart } from "@/lib/cart-context";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -304,6 +305,13 @@ export default function ShopProductPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <ShopProductSchema
+        name={product.name}
+        description={product.description}
+        price={product.price}
+        slug={product.slug}
+        category={product.category}
+      />
       <Navigation />
 
       <section className={`relative pt-28 pb-16 overflow-hidden`}>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useSEO } from "@/hooks/use-seo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -87,6 +88,11 @@ function formatAudioTime(seconds: number): string {
 }
 
 export default function GermanTestPage() {
+  useSEO({
+    title: "Test di Tedesco Gratuito Online | Livello CEFR | SkillCraft-Interlingua",
+    description: "Test di livello di tedesco gratuito online. Valutazione adattiva CAT/IRT per scoprire il tuo livello CEFR (A1-C2) in pochi minuti. Risultati immediati.",
+    canonical: "/test-di-livello/tedesco",
+  });
   const [phase, setPhase] = useState<Phase>("registration");
   const [gdprAccepted, setGdprAccepted] = useState(false);
   const [gdprError, setGdprError] = useState(false);

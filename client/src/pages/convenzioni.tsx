@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useSEO } from "@/hooks/use-seo";
 import { Handshake, Search, CheckCircle, Gift, ArrowRight, ArrowLeft, Building2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -39,6 +40,11 @@ const fadeInUp = {
 };
 
 export default function ConvenzioniPage() {
+  useSEO({
+    title: "Convenzioni Aziendali | Corsi di Lingue per Aziende | SkillCraft-Interlingua",
+    description: "Convenzioni aziendali per corsi di lingue a Vicenza e online. Sconti esclusivi per dipendenti. Inglese, tedesco, francese, spagnolo per le aziende del Veneto.",
+    canonical: "/convenzioni",
+  });
   const { toast } = useToast();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [companyCode, setCompanyCode] = useState("");

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useSEO } from "@/hooks/use-seo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -86,6 +87,11 @@ function formatAudioTime(seconds: number): string {
 }
 
 export default function ItalianTestPage() {
+  useSEO({
+    title: "Test di Italiano Gratuito Online | Italian Level Test | SkillCraft-Interlingua",
+    description: "Free Italian level test online. Adaptive CAT/IRT assessment to discover your CEFR level (A1-C2). Immediate results. Test di italiano gratuito.",
+    canonical: "/test-di-livello/italiano",
+  });
   const [phase, setPhase] = useState<Phase>("registration");
   const [gdprAccepted, setGdprAccepted] = useState(false);
   const [gdprError, setGdprError] = useState(false);

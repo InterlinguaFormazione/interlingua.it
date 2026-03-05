@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import { useSEO } from "@/hooks/use-seo";
 import { 
   ArrowLeft, 
   Award, 
@@ -27,6 +28,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { ChiSiamoSchema } from "@/components/seo-schemas";
 
 import aboutTeamImage from "@/assets/images/about-team.jpg";
 import aboutTeachingImage from "@assets/Metodologia_Innovativa_1772393171969.png";
@@ -130,8 +132,14 @@ const clientCategories = [
 ];
 
 export default function ChiSiamoPage() {
+  useSEO({
+    title: "Chi Siamo | Scuola di Lingue Vicenza dal 1993 | SkillCraft-Interlingua",
+    description: "SkillCraft-Interlingua Formazione: scuola di lingue a Vicenza dal 1993. Oltre 15.000 studenti formati. Corsi di inglese, tedesco, francese, spagnolo e italiano per stranieri.",
+    canonical: "/chi-siamo",
+  });
   return (
     <div className="min-h-screen bg-background">
+      <ChiSiamoSchema />
       <Navigation />
       
       <section className="relative pt-28 md:pt-32 overflow-hidden">

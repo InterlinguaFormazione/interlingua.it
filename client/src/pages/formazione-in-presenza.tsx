@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { CourseReviewsInline } from "@/components/product-reviews";
+import { useSEO } from "@/hooks/use-seo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -53,6 +54,7 @@ import {
 import { Link } from "wouter";
 import { PROVINCES } from "@shared/provinces";
 import { COUNTRIES } from "@shared/countries";
+import { FormazionePresenzaSchema } from "@/components/seo-schemas";
 import lingueStraniereImage from "@assets/course-lingue-straniere.png";
 import languageCoachingImage from "@assets/course-language-coaching.png";
 import managementImage from "@assets/course-management.png";
@@ -775,6 +777,11 @@ function CourseCard({ course, index }: { course: typeof courses[0]; index: numbe
 }
 
 export default function FormazioneInPresenzaPage() {
+  useSEO({
+    title: "Corsi di Lingue in Presenza Vicenza e Thiene | SkillCraft-Interlingua",
+    description: "Corsi di lingue in presenza a Vicenza e Thiene: inglese, tedesco, francese, spagnolo, russo. Gruppi, individuali, blended e in azienda. Insegnanti qualificati.",
+    canonical: "/formazione-in-presenza",
+  });
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
@@ -793,6 +800,7 @@ export default function FormazioneInPresenzaPage() {
 
   return (
     <div className="min-h-screen relative">
+      <FormazionePresenzaSchema />
       <Navigation />
       <main>
         <section ref={heroRef} className="relative pt-32 pb-28 overflow-hidden min-h-[85vh] flex items-center">

@@ -7,8 +7,14 @@ import { AboutSection } from "@/components/about-section";
 import { ContactSection } from "@/components/contact-section";
 import { NewsletterSection } from "@/components/newsletter-section";
 import { Footer } from "@/components/footer";
+import { useSEO } from "@/hooks/use-seo";
 
 export default function Home() {
+  useSEO({
+    title: "Corsi di Lingue Vicenza e Online | Scuola di Lingue dal 1993 | SkillCraft-Interlingua",
+    description: "Scuola di lingue a Vicenza e Thiene dal 1993. Corsi di inglese, tedesco, francese, spagnolo, russo e italiano per stranieri. In presenza e online. Oltre 15.000 studenti formati.",
+    canonical: "/",
+  });
   return (
     <div className="min-h-screen">
       <Navigation />

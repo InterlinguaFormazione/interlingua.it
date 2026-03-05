@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { CourseReviewsInline } from "@/components/product-reviews";
+import { useSEO } from "@/hooks/use-seo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -684,6 +685,11 @@ function PackageCard({ pkg, index }: { pkg: typeof packages[0]; index: number })
 }
 
 export default function LanguageCoachingPage() {
+  useSEO({
+    title: "Language Coaching Individuale Vicenza e Online | SkillCraft-Interlingua",
+    description: "Language Coaching individuale a Vicenza e online. Percorsi personalizzati di inglese, tedesco, francese, spagnolo con insegnanti qualificati. Risultati garantiti.",
+    canonical: "/language-coaching",
+  });
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);

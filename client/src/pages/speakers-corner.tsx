@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ProductReviewsSection } from "@/components/product-reviews";
+import { useSEO } from "@/hooks/use-seo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,11 @@ import {
 const speakersCornerImage = "/images/speakers-corner.png";
 
 export default function SpeakersCornerPage() {
+  useSEO({
+    title: "Speaker's Corner | Conversazione Inglese Vicenza | SkillCraft-Interlingua",
+    description: "Speaker's Corner: pratica la conversazione in inglese a Vicenza. Sessioni settimanali con insegnanti qualificati. Migliora il tuo speaking in modo naturale.",
+    canonical: "/speakers-corner",
+  });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [, setLocation] = useLocation();

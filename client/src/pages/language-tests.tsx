@@ -1,9 +1,11 @@
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { useSEO } from "@/hooks/use-seo";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { GraduationCap, ArrowRight, Globe, CheckCircle, Clock } from "lucide-react";
+import { LanguageTestsPageSchema } from "@/components/seo-schemas";
 
 function FlagGB() {
   return (
@@ -119,8 +121,14 @@ const languageTests = [
 ];
 
 export default function LanguageTestsPage() {
+  useSEO({
+    title: "Test di Livello Gratuito | Inglese, Tedesco, Francese, Spagnolo | SkillCraft-Interlingua",
+    description: "Test di livello gratuito online: inglese, tedesco, francese, spagnolo e italiano. Valutazione adattiva CAT/IRT. Scopri il tuo livello CEFR in pochi minuti.",
+    canonical: "/test-di-livello",
+  });
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50/50 to-violet-50 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950">
+      <LanguageTestsPageSchema />
       <Navigation />
 
       <main className="container mx-auto px-4 pt-28 pb-20">

@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import DOMPurify from "dompurify";
 import type { BlogPost, BlogComment } from "@shared/schema";
+import { BlogPostSchema } from "@/components/seo-schemas";
 
 const categoryColors: Record<string, string> = {
   "Intelligenza Artificiale": "from-blue-500 to-blue-600",
@@ -262,6 +263,13 @@ export default function BlogPostPage() {
               </Button>
             </Link>
 
+            <BlogPostSchema
+              title={post.title}
+              excerpt={post.excerpt}
+              slug={post.slug}
+              category={post.category}
+              createdAt={new Date(post.createdAt!).toISOString()}
+            />
             <div className="flex flex-wrap items-center gap-3 mb-4">
               <Badge className={`bg-gradient-to-r ${categoryColors[post.category] || "from-gray-500 to-gray-600"} text-white border-0`}>
                 {post.category}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { useSEO } from "@/hooks/use-seo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -111,6 +112,11 @@ const highlights = [
 ];
 
 export default function SediPage() {
+  useSEO({
+    title: "Le Nostre Sedi | Vicenza e Thiene | SkillCraft-Interlingua",
+    description: "Sedi SkillCraft-Interlingua: Viale Mazzini 27, Vicenza e Thiene. Scuola di lingue dal 1993. Raggiungi facilmente le nostre aule per i corsi di lingue.",
+    canonical: "/sedi",
+  });
   const heroRef = useRef(null);
   const prefersReducedMotion = usePrefersReducedMotion();
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
