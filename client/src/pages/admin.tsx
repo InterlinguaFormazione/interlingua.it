@@ -2000,6 +2000,7 @@ interface DiscountVoucher {
   validFrom: string | null;
   validUntil: string | null;
   productSlugs: string | null;
+  excludedProductSlugs: string | null;
   productOptions: string | null;
   active: boolean | null;
   firstTimeBuyerOnly: boolean | null;
@@ -2021,6 +2022,7 @@ function VouchersTab({ token }: { token: string }) {
     validFrom: "",
     validUntil: "",
     productSlugs: "",
+    excludedProductSlugs: "",
     productOptions: "" as string,
     firstTimeBuyerOnly: false,
     autoApply: false,
@@ -2113,6 +2115,7 @@ function VouchersTab({ token }: { token: string }) {
       validFrom: "",
       validUntil: "",
       productSlugs: "",
+      excludedProductSlugs: "",
       productOptions: "",
       firstTimeBuyerOnly: false,
       autoApply: false,
@@ -2134,6 +2137,7 @@ function VouchersTab({ token }: { token: string }) {
       validFrom: v.validFrom ? v.validFrom.slice(0, 16) : "",
       validUntil: v.validUntil ? v.validUntil.slice(0, 16) : "",
       productSlugs: v.productSlugs || "",
+      excludedProductSlugs: v.excludedProductSlugs || "",
       productOptions: v.productOptions || "",
       firstTimeBuyerOnly: v.firstTimeBuyerOnly || false,
       autoApply: v.autoApply || false,
@@ -2184,6 +2188,7 @@ function VouchersTab({ token }: { token: string }) {
       validFrom: formData.validFrom || null,
       validUntil: formData.validUntil || null,
       productSlugs: formData.productSlugs || null,
+      excludedProductSlugs: formData.excludedProductSlugs || null,
       productOptions: formData.productOptions || null,
       firstTimeBuyerOnly: formData.firstTimeBuyerOnly,
       autoApply: formData.autoApply,
@@ -2554,6 +2559,60 @@ function VouchersTab({ token }: { token: string }) {
                   );
                 })()}
               </div>
+              <div className="space-y-2">
+                <Label>Prodotti esclusi (non possono usare questo sconto)</Label>
+                <Select value="__trigger__" onValueChange={(slug) => {
+                  if (slug === "__clear__") {
+                    setFormData({ ...formData, excludedProductSlugs: "" });
+                    return;
+                  }
+                  const current = formData.excludedProductSlugs ? formData.excludedProductSlugs.split(",").map(s => s.trim()).filter(Boolean) : [];
+                  if (current.includes(slug)) {
+                    setFormData({ ...formData, excludedProductSlugs: current.filter(s => s !== slug).join(",") });
+                  } else {
+                    setFormData({ ...formData, excludedProductSlugs: [...current, slug].join(",") });
+                  }
+                }}>
+                  <SelectTrigger data-testid="select-voucher-excluded-products">
+                    <span className="truncate text-left">
+                      {formData.excludedProductSlugs
+                        ? formData.excludedProductSlugs.split(",").map(s => s.trim()).filter(Boolean).map(s => SHOP_PRODUCTS.find(p => p.slug === s)?.name || s).join(", ")
+                        : "Nessun prodotto escluso"}
+                    </span>
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    <SelectItem value="__clear__" className="text-muted-foreground italic">
+                      Nessuna esclusione
+                    </SelectItem>
+                    {SHOP_PRODUCTS.map(product => {
+                      const selected = formData.excludedProductSlugs ? formData.excludedProductSlugs.split(",").map(s => s.trim()).includes(product.slug) : false;
+                      return (
+                        <SelectItem key={product.slug} value={product.slug}>
+                          <span className="flex items-center gap-2">
+                            <span className={`w-3.5 h-3.5 rounded border flex items-center justify-center text-[10px] ${selected ? "bg-destructive border-destructive text-destructive-foreground" : "border-muted-foreground"}`}>
+                              {selected ? "✕" : ""}
+                            </span>
+                            <span className="truncate">{product.name}</span>
+                          </span>
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+                {formData.excludedProductSlugs && (
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {formData.excludedProductSlugs.split(",").map(s => s.trim()).filter(Boolean).map(slug => (
+                      <Badge key={slug} variant="destructive" className="text-xs cursor-pointer" onClick={() => {
+                        const current = formData.excludedProductSlugs.split(",").map(s => s.trim()).filter(Boolean);
+                        setFormData({ ...formData, excludedProductSlugs: current.filter(s => s !== slug).join(",") });
+                      }}>
+                        {SHOP_PRODUCTS.find(p => p.slug === slug)?.name || slug}
+                        <span className="ml-1">&times;</span>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
               <Button
                 className="w-full mt-4"
                 onClick={handleSubmit}
@@ -2630,6 +2689,13 @@ function VouchersTab({ token }: { token: string }) {
                         </div>
                       ) : (
                         <span className="text-muted-foreground italic">Tutti</span>
+                      )}
+                      {v.excludedProductSlugs && (
+                        <div className="mt-1 space-y-0.5">
+                          {v.excludedProductSlugs.split(",").map(s => s.trim()).filter(Boolean).map(slug => (
+                            <div key={slug} className="truncate text-destructive">✕ {SHOP_PRODUCTS.find(p => p.slug === slug)?.name || slug}</div>
+                          ))}
+                        </div>
                       )}
                     </td>
                     <td className="py-3 px-2 text-center">
