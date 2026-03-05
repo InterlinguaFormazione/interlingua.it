@@ -53,9 +53,9 @@ import {
 import { Link } from "wouter";
 import { PROVINCES } from "@shared/provinces";
 import { COUNTRIES } from "@shared/countries";
-import lingueStraniereImage from "@assets/course-lingue-straniere.png";
-import languageCoachingImage from "@assets/course-language-coaching.png";
-import managementImage from "@assets/course-management.png";
+import lingueStraniereImage from "@assets/lingue-straniere_1772143318023.webp";
+import languageCoachingImage from "@assets/Language_Coaching_1772143397641.webp";
+import managementImage from "@assets/management-leadership_1772143822898.webp";
 import categoryPresence from "@/assets/images/category-presence.jpg";
 import courseIndividual from "@/assets/images/course-individual.jpg";
 import courseExcel from "@/assets/images/course-excel.jpg";

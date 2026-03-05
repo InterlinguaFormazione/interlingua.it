@@ -56,7 +56,7 @@ import { COUNTRIES } from "@shared/countries";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import languageCoachingImage from "@assets/course-language-coaching.png";
+import languageCoachingImage from "@assets/Language_Coaching_1772143397641.webp";
 import courseIndividual from "@/assets/images/course-individual.jpg";
 import courseConversation from "@/assets/images/course-conversation.jpg";
 import categorySoftSkills from "@/assets/images/category-soft-skills.jpg";

@@ -37,7 +37,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { Link } from "wouter";
-import fullImmersionImage from "@assets/course-full-immersion.png";
+import fullImmersionImage from "@assets/Full-Immersion-Workshop-di-Lingua-Inglese_1772143747179.jpg";
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
