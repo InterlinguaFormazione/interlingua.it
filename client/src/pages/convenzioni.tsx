@@ -88,8 +88,8 @@ export default function ConvenzioniPage() {
     }
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRegister = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) e.preventDefault();
 
     if (honeypot) return;
 
@@ -248,7 +248,7 @@ export default function ConvenzioniPage() {
 
                 <h3 className="font-semibold mb-4">Compila i tuoi dati per ricevere il codice sconto</h3>
 
-                <form onSubmit={handleRegister} className="space-y-4">
+                <form onSubmit={(e) => { e.preventDefault(); handleRegister(e); }} className="space-y-4">
                   <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true">
                     <input
                       type="text"
@@ -267,7 +267,6 @@ export default function ConvenzioniPage() {
                         id="firstName"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
-                        required
                         className="mt-1.5"
                         data-testid="input-first-name"
                       />
@@ -278,7 +277,6 @@ export default function ConvenzioniPage() {
                         id="lastName"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
-                        required
                         className="mt-1.5"
                         data-testid="input-last-name"
                       />
@@ -292,7 +290,6 @@ export default function ConvenzioniPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      required
                       className="mt-1.5"
                       data-testid="input-email"
                     />
@@ -333,10 +330,11 @@ export default function ConvenzioniPage() {
                       Indietro
                     </Button>
                     <Button
-                      type="submit"
+                      type="button"
                       disabled={submitLoading}
                       className="flex-1"
                       data-testid="button-register"
+                      onClick={handleRegister}
                     >
                       {submitLoading ? "Registrazione in corso..." : "Registrati e Ottieni Sconto"}
                       {!submitLoading && <ArrowRight className="w-4 h-4 ml-2" />}
