@@ -1516,6 +1516,7 @@ function ContactsTab({ token }: { token: string }) {
 function NewsletterTab({ token }: { token: string }) {
   const [searchEmail, setSearchEmail] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "unsubscribed">("all");
+  const { toast } = useToast();
 
   const { data: subs = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/admin/newsletter"],
@@ -1583,6 +1584,7 @@ function NewsletterTab({ token }: { token: string }) {
                   <th className="text-left py-3 px-2 font-medium">Email</th>
                   <th className="text-center py-3 px-2 font-medium">Stato</th>
                   <th className="text-right py-3 px-2 font-medium">Data Iscrizione</th>
+                  <th className="text-right py-3 px-2 font-medium"></th>
                 </tr>
               </thead>
               <tbody>
@@ -1596,6 +1598,29 @@ function NewsletterTab({ token }: { token: string }) {
                     </td>
                     <td className="py-3 px-2 text-right text-muted-foreground text-xs">
                       {new Date(s.createdAt).toLocaleDateString("it-IT")}
+                    </td>
+                    <td className="py-3 px-2 text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className={s.subscribed ? "text-destructive hover:text-destructive" : "text-green-600 hover:text-green-600"}
+                        data-testid={`button-toggle-newsletter-${s.id}`}
+                        onClick={async () => {
+                          try {
+                            const res = await fetch(`/api/admin/newsletter/${s.id}`, {
+                              method: "PATCH",
+                              headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+                              body: JSON.stringify({ subscribed: !s.subscribed }),
+                            });
+                            if (!res.ok) throw new Error("Errore");
+                            queryClient.invalidateQueries({ queryKey: ["/api/admin/newsletter"] });
+                          } catch (e: any) {
+                            toast({ title: "Errore", description: e.message, variant: "destructive" });
+                          }
+                        }}
+                      >
+                        {s.subscribed ? <ToggleRight className="w-5 h-5" /> : <ToggleLeft className="w-5 h-5" />}
+                      </Button>
                     </td>
                   </tr>
                 ))}

@@ -84,6 +84,7 @@ export interface IStorage {
   getNewsletterSubscriptionByEmail(email: string): Promise<NewsletterSubscription | undefined>;
   getNewsletterSubscriptions(): Promise<NewsletterSubscription[]>;
   unsubscribeNewsletter(email: string): Promise<boolean>;
+  updateNewsletterStatus(id: string, subscribed: boolean): Promise<boolean>;
   isActiveNewsletterSubscriber(email: string): Promise<boolean>;
 
   createCookieConsent(consent: InsertCookieConsent): Promise<CookieConsent>;
@@ -257,6 +258,14 @@ export class DatabaseStorage implements IStorage {
     const results = await db.update(newsletterSubscriptions)
       .set({ subscribed: false })
       .where(eq(newsletterSubscriptions.email, email))
+      .returning();
+    return results.length > 0;
+  }
+
+  async updateNewsletterStatus(id: string, subscribed: boolean): Promise<boolean> {
+    const results = await db.update(newsletterSubscriptions)
+      .set({ subscribed })
+      .where(eq(newsletterSubscriptions.id, id))
       .returning();
     return results.length > 0;
   }

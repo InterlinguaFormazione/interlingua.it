@@ -403,6 +403,20 @@ export async function registerRoutes(
     }
   });
 
+  app.patch("/api/admin/newsletter/:id", requireAdmin, async (req, res) => {
+    try {
+      const { subscribed } = req.body;
+      if (typeof subscribed !== "boolean") {
+        return res.status(400).json({ success: false, message: "subscribed field required" });
+      }
+      const updated = await storage.updateNewsletterStatus(req.params.id, subscribed);
+      if (!updated) return res.status(404).json({ success: false, message: "Subscriber not found" });
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
   app.get("/api/admin/blog", requireAuth, async (_req, res) => {
     try {
       const posts = await storage.getBlogPosts();
