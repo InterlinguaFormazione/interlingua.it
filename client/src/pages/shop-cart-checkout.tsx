@@ -269,11 +269,17 @@ export default function CartCheckout() {
       const res = await apiRequest("POST", "/api/conventions/check-email", { email });
       const data = await res.json();
       if (data.found && data.discounts) {
-        const discountsList = data.discounts as Array<{ productSlug: string; discountType: "percentage" | "fixed"; discountValue: number }>;
+        const discountsList = data.discounts as Array<{ productSlug: string; productOptions?: Record<string, string>; discountType: "percentage" | "fixed"; discountValue: number }>;
         const itemDiscounts: Array<{ productSlug: string; discountAmount: number; discountType: "percentage" | "fixed"; discountValue: number }> = [];
         let totalDisc = 0;
         for (const item of items) {
-          const matching = discountsList.find((d) => d.productSlug === item.product.slug);
+          const matching = discountsList.find((d) => {
+            if (d.productSlug !== item.product.slug) return false;
+            if (d.productOptions && Object.keys(d.productOptions).length > 0) {
+              return Object.entries(d.productOptions).every(([k, v]) => item.selectedOptions[k] === v);
+            }
+            return true;
+          });
           if (matching) {
             const itemPrice = parseFloat(item.effectivePrice) * item.quantity;
             let amt = 0;

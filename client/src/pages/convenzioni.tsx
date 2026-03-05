@@ -250,7 +250,12 @@ export default function ConvenzioniPage() {
                         const product = getProductBySlug(d.productSlug);
                         return (
                           <div key={i} className="flex items-center justify-between text-sm" data-testid={`text-discount-preview-${i}`}>
-                            <span>{product?.title || d.productSlug}</span>
+                            <span>
+                              {product?.name || d.productSlug}
+                              {d.productOptions && Object.keys(d.productOptions).length > 0 && (
+                                <span className="text-muted-foreground ml-1">({Object.values(d.productOptions).join(", ")})</span>
+                              )}
+                            </span>
                             <Badge variant="secondary">
                               {d.discountType === "percentage" ? `-${d.discountValue}%` : `-€${d.discountValue.toFixed(2)}`}
                             </Badge>
@@ -363,7 +368,12 @@ export default function ConvenzioniPage() {
                         const product = getProductBySlug(d.productSlug);
                         return (
                           <div key={i} className="flex items-center justify-between text-sm border-b pb-2 last:border-0 last:pb-0" data-testid={`text-result-discount-${i}`}>
-                            <span>{product?.title || d.productSlug}</span>
+                            <span>
+                              {product?.name || d.productSlug}
+                              {d.productOptions && Object.keys(d.productOptions).length > 0 && (
+                                <span className="text-muted-foreground ml-1">({Object.values(d.productOptions).join(", ")})</span>
+                              )}
+                            </span>
                             <Badge variant="secondary" className="font-semibold">
                               {d.discountType === "percentage" ? `-${d.discountValue}%` : `-€${d.discountValue.toFixed(2)}`}
                             </Badge>

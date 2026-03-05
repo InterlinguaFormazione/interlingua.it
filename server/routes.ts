@@ -1704,8 +1704,14 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
           if (!conv.active) continue;
           const reg = await storage.getRegistrationByEmail(conv.id, parsed.data.customerEmail.toLowerCase().trim());
           if (reg && conv.discounts) {
-            const discountsArr = conv.discounts as Array<{ productSlug: string; discountType: "percentage" | "fixed"; discountValue: number }>;
-            const match = discountsArr.find(d => d.productSlug === product.slug);
+            const discountsArr = conv.discounts as Array<{ productSlug: string; productOptions?: Record<string, string>; discountType: "percentage" | "fixed"; discountValue: number }>;
+            const match = discountsArr.find(d => {
+              if (d.productSlug !== product.slug) return false;
+              if (d.productOptions && Object.keys(d.productOptions).length > 0) {
+                return Object.entries(d.productOptions).every(([k, v]) => selectedOptions[k] === v);
+              }
+              return true;
+            });
             if (match) {
               const price = parseFloat(expectedPrice);
               let discount = 0;
@@ -1914,10 +1920,16 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
           if (!conv.active) continue;
           const reg = await storage.getRegistrationByEmail(conv.id, customerEmail.toLowerCase().trim());
           if (reg && conv.discounts) {
-            const discountsArr = conv.discounts as Array<{ productSlug: string; discountType: "percentage" | "fixed"; discountValue: number }>;
+            const discountsArr = conv.discounts as Array<{ productSlug: string; productOptions?: Record<string, string>; discountType: "percentage" | "fixed"; discountValue: number }>;
             let totalConvDiscount = 0;
             for (const item of validatedItems) {
-              const match = discountsArr.find(d => d.productSlug === item.product.slug);
+              const match = discountsArr.find(d => {
+                if (d.productSlug !== item.product.slug) return false;
+                if (d.productOptions && Object.keys(d.productOptions).length > 0) {
+                  return Object.entries(d.productOptions).every(([k, v]) => item.selectedOptions[k] === v);
+                }
+                return true;
+              });
               if (match) {
                 const itemTotal = parseFloat(item.unitPrice) * item.quantity;
                 let disc = 0;

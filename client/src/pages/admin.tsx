@@ -2790,11 +2790,9 @@ function ConventionDiscountRow({ idx, discount, onUpdate, onRemove }: {
   onRemove: (index: number) => void;
 }) {
   const [productOpen, setProductOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const selectedProduct = SHOP_PRODUCTS.find(p => p.slug === discount.productSlug);
-  const filteredProducts = SHOP_PRODUCTS.filter(p =>
-    p && p.title && p.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const productOptions = selectedProduct?.options || [];
+  const currentOpts = discount.productOptions || {};
 
   return (
     <div className="border rounded-md p-3 space-y-2 bg-muted/20">
@@ -2806,44 +2804,27 @@ function ConventionDiscountRow({ idx, discount, onUpdate, onRemove }: {
             className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm cursor-pointer hover:bg-accent/50"
             onClick={() => setProductOpen(!productOpen)}
           >
-            <span className={selectedProduct ? "" : "text-muted-foreground"}>
-              {selectedProduct ? selectedProduct.title : "Seleziona prodotto..."}
+            <span className={selectedProduct ? "truncate" : "text-muted-foreground"}>
+              {selectedProduct ? selectedProduct.name : "Seleziona prodotto..."}
             </span>
-            <ChevronDown className={`h-4 w-4 opacity-50 transition-transform ${productOpen ? "rotate-180" : ""}`} />
+            <ChevronDown className={`h-4 w-4 opacity-50 shrink-0 transition-transform ${productOpen ? "rotate-180" : ""}`} />
           </div>
           {productOpen && (
-            <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg">
-              <div className="p-2 border-b">
-                <Input
-                  placeholder="Cerca prodotto..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="h-8 text-sm"
-                  autoFocus
-                  data-testid={`input-search-product-${idx}`}
-                />
-              </div>
-              <div className="max-h-48 overflow-y-auto p-1">
-                {filteredProducts.length === 0 ? (
-                  <div className="text-sm text-muted-foreground py-2 px-3">Nessun prodotto trovato</div>
-                ) : (
-                  filteredProducts.map((p) => (
-                    <div
-                      key={p.slug}
-                      className={`flex items-center gap-2 rounded-sm px-3 py-1.5 text-sm cursor-pointer hover:bg-accent ${discount.productSlug === p.slug ? "bg-accent font-medium" : ""}`}
-                      data-testid={`option-product-${p.slug}-${idx}`}
-                      onClick={() => {
-                        onUpdate(idx, { productSlug: p.slug });
-                        setProductOpen(false);
-                        setSearchTerm("");
-                      }}
-                    >
-                      {discount.productSlug === p.slug && <Check className="w-3 h-3" />}
-                      {p.title}
-                    </div>
-                  ))
-                )}
-              </div>
+            <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg max-h-56 overflow-y-auto">
+              {SHOP_PRODUCTS.map((p) => (
+                <div
+                  key={p.slug}
+                  className={`flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-accent ${discount.productSlug === p.slug ? "bg-accent font-medium" : ""}`}
+                  data-testid={`option-product-${p.slug}-${idx}`}
+                  onClick={() => {
+                    onUpdate(idx, { productSlug: p.slug, productOptions: {} });
+                    setProductOpen(false);
+                  }}
+                >
+                  {discount.productSlug === p.slug && <Check className="w-3 h-3 shrink-0" />}
+                  <span className="truncate">{p.name}</span>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -2851,6 +2832,35 @@ function ConventionDiscountRow({ idx, discount, onUpdate, onRemove }: {
           <Trash2 className="w-4 h-4 text-red-500" />
         </Button>
       </div>
+
+      {productOptions.length > 0 && (
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Opzioni prodotto (lascia vuoto = tutte)</Label>
+          <div className="grid grid-cols-2 gap-2">
+            {productOptions.map((opt) => (
+              <div key={opt.name}>
+                <Label className="text-xs">{opt.label}</Label>
+                <OptionDropdown
+                  idx={idx}
+                  optionName={opt.name}
+                  values={opt.values}
+                  selected={currentOpts[opt.name] || ""}
+                  onSelect={(val) => {
+                    const newOpts = { ...currentOpts };
+                    if (val) {
+                      newOpts[opt.name] = val;
+                    } else {
+                      delete newOpts[opt.name];
+                    }
+                    onUpdate(idx, { productOptions: newOpts });
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-2">
         <div>
           <Label className="text-xs">Tipo Sconto</Label>
@@ -2863,7 +2873,7 @@ function ConventionDiscountRow({ idx, discount, onUpdate, onRemove }: {
               data-testid={`button-discount-type-percentage-${idx}`}
               onClick={() => onUpdate(idx, { discountType: "percentage" })}
             >
-              Percentuale (%)
+              % Percentuale
             </Button>
             <Button
               type="button"
@@ -2873,7 +2883,7 @@ function ConventionDiscountRow({ idx, discount, onUpdate, onRemove }: {
               data-testid={`button-discount-type-fixed-${idx}`}
               onClick={() => onUpdate(idx, { discountType: "fixed" })}
             >
-              Fisso (€)
+              € Fisso
             </Button>
           </div>
         </div>
@@ -2899,6 +2909,50 @@ function ConventionDiscountRow({ idx, discount, onUpdate, onRemove }: {
           placeholder="Es. Sconto riservato dipendenti"
         />
       </div>
+    </div>
+  );
+}
+
+function OptionDropdown({ idx, optionName, values, selected, onSelect }: {
+  idx: number;
+  optionName: string;
+  values: string[];
+  selected: string;
+  onSelect: (val: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative">
+      <div
+        data-testid={`select-option-${optionName}-${idx}`}
+        className="flex h-8 w-full items-center justify-between rounded-md border border-input bg-background px-2 py-1 text-xs cursor-pointer hover:bg-accent/50"
+        onClick={() => setOpen(!open)}
+      >
+        <span className={selected ? "truncate" : "text-muted-foreground truncate"}>
+          {selected || "Tutte"}
+        </span>
+        <ChevronDown className={`h-3 w-3 opacity-50 shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
+      </div>
+      {open && (
+        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg max-h-40 overflow-y-auto">
+          <div
+            className={`px-2 py-1.5 text-xs cursor-pointer hover:bg-accent ${!selected ? "bg-accent font-medium" : ""}`}
+            onClick={() => { onSelect(""); setOpen(false); }}
+          >
+            Tutte
+          </div>
+          {values.map((v) => (
+            <div
+              key={v}
+              className={`px-2 py-1.5 text-xs cursor-pointer hover:bg-accent ${selected === v ? "bg-accent font-medium" : ""}`}
+              data-testid={`option-${optionName}-${v}-${idx}`}
+              onClick={() => { onSelect(v); setOpen(false); }}
+            >
+              {v}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

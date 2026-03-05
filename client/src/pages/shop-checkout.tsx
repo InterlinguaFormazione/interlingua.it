@@ -285,8 +285,14 @@ export default function ShopCheckout() {
       const res = await apiRequest("POST", "/api/conventions/check-email", { email });
       const data = await res.json();
       if (data.found && data.discounts) {
-        const matching = (data.discounts as Array<{ productSlug: string; discountType: "percentage" | "fixed"; discountValue: number; description?: string }>)
-          .find((d) => d.productSlug === product.slug);
+        const matching = (data.discounts as Array<{ productSlug: string; productOptions?: Record<string, string>; discountType: "percentage" | "fixed"; discountValue: number; description?: string }>)
+          .find((d) => {
+            if (d.productSlug !== product.slug) return false;
+            if (d.productOptions && Object.keys(d.productOptions).length > 0) {
+              return Object.entries(d.productOptions).every(([k, v]) => selectedOptions[k] === v);
+            }
+            return true;
+          });
         if (matching) {
           const price = parseFloat(effectivePrice);
           let discountAmt = 0;
