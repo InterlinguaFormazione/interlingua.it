@@ -61,6 +61,7 @@ import {
   Hash,
   Percent,
   UserCheck,
+  Copy,
 } from "lucide-react";
 
 interface DashboardStats {
@@ -3088,6 +3089,21 @@ function ConventionsTab({ token }: { token: string }) {
     setIsDialogOpen(true);
   };
 
+  const cloneConvention = (c: ConventionRow) => {
+    setEditingConvention(null);
+    setFormData({
+      companyName: "",
+      companyCode: "",
+      discounts: c.discounts ? JSON.parse(JSON.stringify(c.discounts)) : [],
+      contactPerson: "",
+      contactEmail: "",
+      contactPhone: "",
+      maxRegistrations: c.maxRegistrations ? String(c.maxRegistrations) : "",
+      active: true,
+    });
+    setIsDialogOpen(true);
+  };
+
   const addDiscount = () => {
     setFormData({
       ...formData,
@@ -3305,6 +3321,15 @@ function ConventionsTab({ token }: { token: string }) {
                           title={conv.active ? "Disattiva" : "Attiva"}
                         >
                           {conv.active ? <ToggleRight className="w-4 h-4 text-green-600" /> : <ToggleLeft className="w-4 h-4" />}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          data-testid={`button-clone-convention-${conv.id}`}
+                          onClick={(e) => { e.stopPropagation(); cloneConvention(conv); }}
+                          title="Duplica convenzione"
+                        >
+                          <Copy className="w-4 h-4" />
                         </Button>
                         <Button
                           variant="ghost"
