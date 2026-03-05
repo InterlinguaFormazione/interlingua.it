@@ -24,13 +24,13 @@ import categorySpeakers from "@/assets/images/category-speakers.jpg";
 import categoryImmersion from "@/assets/images/category-immersion.jpg";
 import categoryDigital from "@/assets/images/category-digital.jpg";
 import courseIndividual from "@/assets/images/course-individual.jpg";
-import lingueStraniereImage from "@assets/lingue-straniere_1772143318023.webp";
-import languageCoachingImage from "@assets/Language_Coaching_1772143397641.webp";
-import corsoOnlineImage from "@assets/corso-lingua-online_1772143586662.jpg";
-import speakersCornerCourseImage from "@assets/Speakers-Corner-Conversazione-in-lingua-Inglese_1772143640698.jpg";
-import fullImmersionImage from "@assets/Full-Immersion-Workshop-di-Lingua-Inglese_1772143747179.jpg";
-import managementImage from "@assets/management-leadership_1772143822898.webp";
-import courseItalianImage from "@assets/Learn_Italin_in_Vicenza_1772214851188.png";
+import lingueStraniereImage from "@assets/course-lingue-straniere.png";
+import languageCoachingImage from "@assets/course-language-coaching.png";
+import corsoOnlineImage from "@assets/course-digitale.png";
+import speakersCornerCourseImage from "@assets/course-speakers-corner.png";
+import fullImmersionImage from "@assets/course-full-immersion.png";
+import managementImage from "@assets/course-management.png";
+import courseItalianImage from "@assets/course-italiano-per-stranieri.png";
 
 const categories = [
   {

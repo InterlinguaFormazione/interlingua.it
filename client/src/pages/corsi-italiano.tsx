@@ -50,7 +50,7 @@ import {
   Shield,
 } from "lucide-react";
 import { COUNTRIES } from "@shared/countries";
-import courseItalianImage from "@assets/Learn_Italin_in_Vicenza_1772214851188.png";
+import courseItalianImage from "@assets/course-italiano-per-stranieri.png";
 import aboutVicenzaImage from "@assets/vicenza_1772179633305.jpg";
 
 function usePrefersReducedMotion() {

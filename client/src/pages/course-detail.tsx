@@ -30,12 +30,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 import cartaCulturaLogo from "@assets/carte-cultura-1200x675_1772388120185.avif";
-import categoryLanguages from "@assets/lingue-straniere_1771623311454.webp";
-import categorySoftSkills from "@assets/internazionalizzazione-business-development_1771623434911.webp";
-import categoryManagement from "@/assets/images/category-management.jpg";
-import categoryBusiness from "@assets/management-leadership_1771623365629.webp";
-import categoryDigitalSkills from "@assets/intelligenza-artificiale_1771623256532.webp";
-import categoryExperiential from "@assets/competenze-trasversali_1771623339669.webp";
+import categoryLanguages from "@assets/course-lingue-straniere.png";
+import categorySoftSkills from "@assets/course-competenze-trasversali.png";
+import categoryManagement from "@assets/course-management.png";
+import categoryBusiness from "@assets/course-business.png";
+import categoryDigitalSkills from "@assets/course-digitale.png";
+import categoryExperiential from "@assets/course-formazione-esperienziale.png";
 
 const categoryImages: Record<string, string> = {
   lingue: categoryLanguages,
