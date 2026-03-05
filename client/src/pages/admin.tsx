@@ -1467,6 +1467,27 @@ function CourseMaterialsTab({ token }: { token: string }) {
   );
 }
 
+function getContactColor(interest: string | null): { border: string; badgeBg: string; badgeText: string } {
+  const s = (interest || "").toLowerCase();
+  if (s.includes("inglese") || s.includes("english") || s.includes("full immersion"))
+    return { border: "border-l-blue-500", badgeBg: "bg-blue-50 dark:bg-blue-950/40", badgeText: "text-blue-700 dark:text-blue-300" };
+  if (s.includes("tedesco") || s.includes("german"))
+    return { border: "border-l-amber-500", badgeBg: "bg-amber-50 dark:bg-amber-950/40", badgeText: "text-amber-700 dark:text-amber-300" };
+  if (s.includes("francese") || s.includes("french"))
+    return { border: "border-l-indigo-500", badgeBg: "bg-indigo-50 dark:bg-indigo-950/40", badgeText: "text-indigo-700 dark:text-indigo-300" };
+  if (s.includes("spagnolo") || s.includes("spanish"))
+    return { border: "border-l-orange-500", badgeBg: "bg-orange-50 dark:bg-orange-950/40", badgeText: "text-orange-700 dark:text-orange-300" };
+  if (s.includes("italiano") || s.includes("italian") || s.includes("stranieri"))
+    return { border: "border-l-green-500", badgeBg: "bg-green-50 dark:bg-green-950/40", badgeText: "text-green-700 dark:text-green-300" };
+  if (s.includes("coaching"))
+    return { border: "border-l-violet-500", badgeBg: "bg-violet-50 dark:bg-violet-950/40", badgeText: "text-violet-700 dark:text-violet-300" };
+  if (s.includes("aziendal") || s.includes("corporate") || s.includes("multilingua"))
+    return { border: "border-l-rose-500", badgeBg: "bg-rose-50 dark:bg-rose-950/40", badgeText: "text-rose-700 dark:text-rose-300" };
+  if (s.includes("e-learning") || s.includes("online"))
+    return { border: "border-l-teal-500", badgeBg: "bg-teal-50 dark:bg-teal-950/40", badgeText: "text-teal-700 dark:text-teal-300" };
+  return { border: "border-l-gray-400", badgeBg: "bg-gray-50 dark:bg-gray-800/40", badgeText: "text-gray-700 dark:text-gray-300" };
+}
+
 function ContactsTab({ token }: { token: string }) {
   const { data: contacts = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/admin/contacts"],
@@ -1484,7 +1505,7 @@ function ContactsTab({ token }: { token: string }) {
     <Card>
       <CardHeader>
         <CardTitle>Richieste di Contatto</CardTitle>
-        <CardDescription>Messaggi ricevuti dal modulo di contatto</CardDescription>
+        <CardDescription>Messaggi ricevuti dal modulo di contatto — {contacts.length} richieste</CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -1493,19 +1514,24 @@ function ContactsTab({ token }: { token: string }) {
           <div className="text-center py-8 text-muted-foreground">Nessun messaggio ricevuto</div>
         ) : (
           <div className="space-y-4">
-            {contacts.map((c) => (
-              <div key={c.id} className="p-4 border rounded-lg bg-muted/30" data-testid={`contact-card-${c.id}`}>
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <h3 className="font-bold">{c.name}</h3>
-                    <p className="text-sm text-muted-foreground">{c.email} | {c.phone || "No phone"}</p>
+            {contacts.map((c) => {
+              const colors = getContactColor(c.courseInterest);
+              return (
+                <div key={c.id} className={`p-4 border rounded-lg border-l-4 ${colors.border} bg-muted/30`} data-testid={`contact-card-${c.id}`}>
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h3 className="font-bold">{c.name}</h3>
+                      <p className="text-sm text-muted-foreground">{c.email} | {c.phone || "No phone"}</p>
+                    </div>
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${colors.badgeBg} ${colors.badgeText}`}>
+                      {c.courseInterest || "Generale"}
+                    </span>
                   </div>
-                  <Badge variant="outline">{c.courseInterest || "Generale"}</Badge>
+                  <p className="text-sm mt-3 border-t pt-3">{c.message}</p>
+                  <p className="text-[10px] text-muted-foreground mt-2">Ricevuto: {new Date(c.createdAt).toLocaleString("it-IT")}</p>
                 </div>
-                <p className="text-sm mt-3 border-t pt-3">{c.message}</p>
-                <p className="text-[10px] text-muted-foreground mt-2">Ricevuto: {new Date(c.createdAt).toLocaleString("it-IT")}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </CardContent>
