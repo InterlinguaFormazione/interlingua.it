@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { CourseReviewsInline } from "@/components/product-reviews";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -459,6 +460,7 @@ export default function SpeakersCornerPage() {
             </div>
           </div>
         </section>
+        <CourseReviewsInline productSlug="speakers-corner" />
       </main>
       <Footer />
     </div>
