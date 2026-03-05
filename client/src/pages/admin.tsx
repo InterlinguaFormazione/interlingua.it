@@ -1999,7 +1999,11 @@ interface DiscountVoucher {
   validFrom: string | null;
   validUntil: string | null;
   productSlugs: string | null;
+  productOptions: string | null;
   active: boolean | null;
+  firstTimeBuyerOnly: boolean | null;
+  autoApply: boolean | null;
+  requiresNewsletterSub: boolean | null;
   createdAt: string | null;
 }
 
@@ -2016,6 +2020,7 @@ function VouchersTab({ token }: { token: string }) {
     validFrom: "",
     validUntil: "",
     productSlugs: "",
+    productOptions: "" as string,
     firstTimeBuyerOnly: false,
     autoApply: false,
     requiresNewsletterSub: false,
@@ -2107,6 +2112,7 @@ function VouchersTab({ token }: { token: string }) {
       validFrom: "",
       validUntil: "",
       productSlugs: "",
+      productOptions: "",
       firstTimeBuyerOnly: false,
       autoApply: false,
       requiresNewsletterSub: false,
@@ -2127,6 +2133,7 @@ function VouchersTab({ token }: { token: string }) {
       validFrom: v.validFrom ? v.validFrom.slice(0, 16) : "",
       validUntil: v.validUntil ? v.validUntil.slice(0, 16) : "",
       productSlugs: v.productSlugs || "",
+      productOptions: v.productOptions || "",
       firstTimeBuyerOnly: v.firstTimeBuyerOnly || false,
       autoApply: v.autoApply || false,
       requiresNewsletterSub: v.requiresNewsletterSub || false,
@@ -2176,6 +2183,7 @@ function VouchersTab({ token }: { token: string }) {
       validFrom: formData.validFrom || null,
       validUntil: formData.validUntil || null,
       productSlugs: formData.productSlugs || null,
+      productOptions: formData.productOptions || null,
       firstTimeBuyerOnly: formData.firstTimeBuyerOnly,
       autoApply: formData.autoApply,
       requiresNewsletterSub: formData.requiresNewsletterSub,
@@ -2438,7 +2446,7 @@ function VouchersTab({ token }: { token: string }) {
                 <Label>Prodotti applicabili (vuoto = tutti i prodotti)</Label>
                 <Select value="__trigger__" onValueChange={(slug) => {
                   if (slug === "__clear__") {
-                    setFormData({ ...formData, productSlugs: "" });
+                    setFormData({ ...formData, productSlugs: "", productOptions: "" });
                     return;
                   }
                   const current = formData.productSlugs ? formData.productSlugs.split(",").map(s => s.trim()).filter(Boolean) : [];
@@ -2487,6 +2495,63 @@ function VouchersTab({ token }: { token: string }) {
                     ))}
                   </div>
                 )}
+                {(() => {
+                  const selectedSlugs = formData.productSlugs ? formData.productSlugs.split(",").map(s => s.trim()).filter(Boolean) : [];
+                  const selectedProducts = selectedSlugs.map(s => SHOP_PRODUCTS.find(p => p.slug === s)).filter(Boolean);
+                  const allOptions: Record<string, Set<string>> = {};
+                  const optionLabels: Record<string, string> = {};
+                  selectedProducts.forEach(p => {
+                    if (p && p.options) {
+                      p.options.forEach(opt => {
+                        if (!allOptions[opt.name]) {
+                          allOptions[opt.name] = new Set();
+                          optionLabels[opt.name] = opt.label;
+                        }
+                        opt.values.forEach(v => allOptions[opt.name].add(v));
+                      });
+                    }
+                  });
+                  const optionNames = Object.keys(allOptions);
+                  if (optionNames.length === 0) return null;
+                  let parsedOptions: Record<string, string> = {};
+                  try { parsedOptions = formData.productOptions ? JSON.parse(formData.productOptions) : {}; } catch {}
+                  return (
+                    <div className="mt-2 space-y-2">
+                      <Label className="text-xs text-muted-foreground">Filtro opzioni (vuoto = tutte)</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {optionNames.map(optName => {
+                          const values = Array.from(allOptions[optName]).sort();
+                          const currentVal = parsedOptions[optName] || "";
+                          return (
+                            <div key={optName}>
+                              <Label className="text-xs">{optionLabels[optName] || optName}</Label>
+                              <Select value={currentVal || "__all__"} onValueChange={(val) => {
+                                const updated = { ...parsedOptions };
+                                if (val === "__all__") {
+                                  delete updated[optName];
+                                } else {
+                                  updated[optName] = val;
+                                }
+                                const hasValues = Object.keys(updated).length > 0;
+                                setFormData({ ...formData, productOptions: hasValues ? JSON.stringify(updated) : "" });
+                              }}>
+                                <SelectTrigger className="h-8 text-xs" data-testid={`select-voucher-option-${optName}`}>
+                                  <SelectValue placeholder="Tutte" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="__all__">Tutte</SelectItem>
+                                  {values.map(v => (
+                                    <SelectItem key={v} value={v}>{v}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
               <Button
                 className="w-full mt-4"
@@ -2568,6 +2633,13 @@ function VouchersTab({ token }: { token: string }) {
                       {v.requiresNewsletterSub && (
                         <Badge variant="outline" className="ml-1 border-green-400 text-green-600">Newsletter</Badge>
                       )}
+                      {v.productOptions && (() => {
+                        try {
+                          const opts = JSON.parse(v.productOptions) as Record<string, string>;
+                          const labels = Object.entries(opts).map(([, val]) => val).join(", ");
+                          return <Badge variant="outline" className="ml-1 border-purple-400 text-purple-600 text-[10px]">{labels}</Badge>;
+                        } catch { return null; }
+                      })()}
                     </td>
                     <td className="py-3 px-2 text-right whitespace-nowrap">
                       <Button

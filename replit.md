@@ -103,7 +103,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `sc_payments` - PayPal payment records (subscriber ID, PayPal order ID, amount, currency, status, payer email)
 - `shop_customers` - Customer accounts created during shop checkout (email, hashed password, first_name, last_name, phone, codice_fiscale, indirizzo, cap, citta, provincia)
 - `shop_orders` - Online shop orders (product slug/name, amount, PayPal order ID, customer first/last name, email, phone, student first/last name + email for third-party purchases, billing info, status, discount_code, discount_amount, linked to customer account, invoiceNumber, invoiceDate, invoiceSent — Italian fiscal invoice fields)
-- `discount_vouchers` - Discount voucher codes for the shop (code, description, discount_type percentage/fixed, discount_value, min_order_amount, max_uses, used_count, valid_from, valid_until, product_slugs, first_time_buyer_only, auto_apply, requires_newsletter_sub, active)
+- `discount_vouchers` - Discount voucher codes for the shop (code, description, discount_type percentage/fixed/tiered, discount_value, min_order_amount, max_uses, used_count, valid_from, valid_until, product_slugs, product_options JSON for option filtering e.g. {"lingua":"Inglese"}, first_time_buyer_only, auto_apply, requires_newsletter_sub, active)
 - `course_materials` - Downloadable files per course product (slug, file name, URL, size, description)
 
 ## API Endpoints

@@ -132,11 +132,13 @@ export default function CartCheckout() {
     setVoucherLoading(true);
     try {
       const productSlugs = items.map(item => item.product.slug);
+      const cartSelectedOptions = items.map(item => item.selectedOptions || {});
       const res = await apiRequest("POST", "/api/shop/validate-voucher", {
         code: voucherCode.trim(),
         cartTotal: totalPrice.toFixed(2),
         productSlugs,
         customerEmail: customerEmail || undefined,
+        selectedOptions: cartSelectedOptions,
       });
       const data = await res.json();
       if (data.valid && voucherResult?.valid && voucherResult.discount) {

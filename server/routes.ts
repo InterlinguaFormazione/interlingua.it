@@ -1668,6 +1668,15 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
           const validTime = (!voucher.validFrom || now >= new Date(voucher.validFrom)) && (!voucher.validUntil || now <= new Date(voucher.validUntil));
           const validUses = voucher.maxUses === null || (voucher.usedCount || 0) < voucher.maxUses;
           const validProduct = !voucher.productSlugs || voucher.productSlugs.split(",").map((s: string) => s.trim()).includes(product.slug);
+          let validOptions = true;
+          if (voucher.productOptions) {
+            try {
+              const reqOpts = JSON.parse(voucher.productOptions) as Record<string, string>;
+              if (typeof reqOpts === "object" && reqOpts !== null) {
+                validOptions = Object.entries(reqOpts).every(([k, v]) => selectedOptions[k] === v);
+              } else { validOptions = false; }
+            } catch { validOptions = false; }
+          }
           const total = parseFloat(expectedPrice);
           const validMin = !voucher.minOrderAmount || total >= parseFloat(voucher.minOrderAmount);
           let validFirstTime = true;
@@ -1688,7 +1697,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
               if (!isSub) validNewsletter = false;
             }
           }
-          if (validTime && validUses && validProduct && validMin && validFirstTime && validNewsletter) {
+          if (validTime && validUses && validProduct && validOptions && validMin && validFirstTime && validNewsletter) {
             let discount = calculateVoucherDiscount(voucher.discountType, voucher.discountValue, total);
             discount = Math.min(discount, total);
             finalPrice = Math.max(0, total - discount).toFixed(2);
@@ -1885,6 +1894,15 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
           const cartSlugs = validatedItems.map(i => i.product.slug);
           const allowedSlugs = voucher.productSlugs ? voucher.productSlugs.split(",").map((s: string) => s.trim()) : [];
           const validProduct = !voucher.productSlugs || cartSlugs.every((s: string) => allowedSlugs.includes(s));
+          let validOptions = true;
+          if (voucher.productOptions) {
+            try {
+              const reqOpts = JSON.parse(voucher.productOptions) as Record<string, string>;
+              if (typeof reqOpts === "object" && reqOpts !== null) {
+                validOptions = validatedItems.every(item => Object.entries(reqOpts).every(([k, v]) => item.selectedOptions[k] === v));
+              } else { validOptions = false; }
+            } catch { validOptions = false; }
+          }
           const validMin = !voucher.minOrderAmount || expectedTotal >= parseFloat(voucher.minOrderAmount);
           let validFirstTime = true;
           if (voucher.firstTimeBuyerOnly) {
@@ -1904,7 +1922,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
               if (!isSub) validNewsletter = false;
             }
           }
-          if (validTime && validUses && validProduct && validMin && validFirstTime && validNewsletter) {
+          if (validTime && validUses && validProduct && validOptions && validMin && validFirstTime && validNewsletter) {
             let discount = calculateVoucherDiscount(voucher.discountType, voucher.discountValue, expectedTotal);
             discount = Math.min(discount, expectedTotal);
             finalTotal = Math.max(0, expectedTotal - discount);
@@ -2569,9 +2587,19 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
 
   app.post("/api/admin/vouchers", requireAuth, async (req, res) => {
     try {
-      const { code, description, discountType, discountValue, minOrderAmount, maxUses, validFrom, validUntil, productSlugs, firstTimeBuyerOnly, autoApply, requiresNewsletterSub, active } = req.body;
+      const { code, description, discountType, discountValue, minOrderAmount, maxUses, validFrom, validUntil, productSlugs, productOptions, firstTimeBuyerOnly, autoApply, requiresNewsletterSub, active } = req.body;
       if (!code || !discountType || !discountValue) {
         return res.status(400).json({ success: false, message: "Codice, tipo e valore sconto sono obbligatori." });
+      }
+      if (productOptions) {
+        try {
+          const parsed = JSON.parse(productOptions);
+          if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+            return res.status(400).json({ success: false, message: "Formato opzioni prodotto non valido." });
+          }
+        } catch {
+          return res.status(400).json({ success: false, message: "Formato opzioni prodotto non valido." });
+        }
       }
       if (!["percentage", "fixed", "tiered"].includes(discountType)) {
         return res.status(400).json({ success: false, message: "Tipo sconto non valido." });
@@ -2620,6 +2648,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         validFrom: validFrom ? new Date(validFrom) : null,
         validUntil: validUntil ? new Date(validUntil) : null,
         productSlugs: productSlugs || null,
+        productOptions: productOptions || null,
         firstTimeBuyerOnly: firstTimeBuyerOnly || false,
         autoApply: autoApply || false,
         requiresNewsletterSub: requiresNewsletterSub || false,
@@ -2634,7 +2663,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
 
   app.patch("/api/admin/vouchers/:id", requireAuth, async (req, res) => {
     try {
-      const { code, description, discountType, discountValue, minOrderAmount, maxUses, validFrom, validUntil, productSlugs, firstTimeBuyerOnly, autoApply, requiresNewsletterSub, active } = req.body;
+      const { code, description, discountType, discountValue, minOrderAmount, maxUses, validFrom, validUntil, productSlugs, productOptions, firstTimeBuyerOnly, autoApply, requiresNewsletterSub, active } = req.body;
       const updateData: any = {};
       if (code !== undefined) updateData.code = code.toUpperCase().trim();
       if (description !== undefined) updateData.description = description || null;
@@ -2645,6 +2674,19 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       if (validFrom !== undefined) updateData.validFrom = validFrom ? new Date(validFrom) : null;
       if (validUntil !== undefined) updateData.validUntil = validUntil ? new Date(validUntil) : null;
       if (productSlugs !== undefined) updateData.productSlugs = productSlugs || null;
+      if (productOptions !== undefined) {
+        if (productOptions) {
+          try {
+            const parsed = JSON.parse(productOptions);
+            if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+              return res.status(400).json({ success: false, message: "Formato opzioni prodotto non valido." });
+            }
+          } catch {
+            return res.status(400).json({ success: false, message: "Formato opzioni prodotto non valido." });
+          }
+        }
+        updateData.productOptions = productOptions || null;
+      }
       if (firstTimeBuyerOnly !== undefined) updateData.firstTimeBuyerOnly = firstTimeBuyerOnly;
       if (autoApply !== undefined) updateData.autoApply = autoApply;
       if (requiresNewsletterSub !== undefined) updateData.requiresNewsletterSub = requiresNewsletterSub;
@@ -2885,7 +2927,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
 
   app.post("/api/shop/validate-voucher", async (req, res) => {
     try {
-      const { code, cartTotal, productSlugs: reqProductSlugs, customerEmail: rawCustEmail } = req.body;
+      const { code, cartTotal, productSlugs: reqProductSlugs, customerEmail: rawCustEmail, selectedOptions: reqSelectedOptions } = req.body;
       const customerEmail = rawCustEmail ? rawCustEmail.toLowerCase().trim() : undefined;
       if (!code) {
         return res.status(400).json({ valid: false, message: "Inserisci un codice sconto." });
@@ -2928,6 +2970,25 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         const allAllowed = requestedSlugs.every((s: string) => allowedSlugs.includes(s));
         if (!allAllowed) {
           return res.json({ valid: false, message: "Questo codice sconto non è valido per i prodotti selezionati." });
+        }
+      }
+      if (voucher.productOptions) {
+        try {
+          const reqOpts = JSON.parse(voucher.productOptions) as Record<string, string>;
+          if (typeof reqOpts === "object" && reqOpts !== null && Object.keys(reqOpts).length > 0) {
+            if (!reqSelectedOptions) {
+              return res.json({ valid: false, message: "Questo codice sconto non è valido per le opzioni selezionate." });
+            }
+            const custOpts = typeof reqSelectedOptions === "string" ? JSON.parse(reqSelectedOptions) : reqSelectedOptions;
+            const optionsMatch = Array.isArray(custOpts)
+              ? custOpts.every((itemOpts: Record<string, string>) => Object.entries(reqOpts).every(([k, v]) => itemOpts[k] === v))
+              : Object.entries(reqOpts).every(([k, v]) => custOpts[k] === v);
+            if (!optionsMatch) {
+              return res.json({ valid: false, message: "Questo codice sconto non è valido per le opzioni selezionate." });
+            }
+          }
+        } catch {
+          return res.json({ valid: false, message: "Errore nella validazione delle opzioni del voucher." });
         }
       }
       const total = parseFloat(cartTotal || "0");
@@ -3113,9 +3174,18 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
           const validTime = (!voucher.validFrom || now >= new Date(voucher.validFrom)) && (!voucher.validUntil || now <= new Date(voucher.validUntil));
           const validUses = voucher.maxUses === null || (voucher.usedCount || 0) < voucher.maxUses;
           const validProduct = !voucher.productSlugs || voucher.productSlugs.split(",").map((s: string) => s.trim()).includes(product.slug);
+          let validOptions = true;
+          if (voucher.productOptions) {
+            try {
+              const reqOpts = JSON.parse(voucher.productOptions) as Record<string, string>;
+              if (typeof reqOpts === "object" && reqOpts !== null) {
+                validOptions = Object.entries(reqOpts).every(([k, v]) => selectedOptions[k] === v);
+              } else { validOptions = false; }
+            } catch { validOptions = false; }
+          }
           const total = parseFloat(expectedPrice);
           const validMin = !voucher.minOrderAmount || total >= parseFloat(voucher.minOrderAmount);
-          if (validTime && validUses && validProduct && validMin) {
+          if (validTime && validUses && validProduct && validOptions && validMin) {
             let discount = calculateVoucherDiscount(voucher.discountType, voucher.discountValue, total);
             discount = Math.min(discount, total);
             finalPrice = Math.max(0, total - discount).toFixed(2);
@@ -3335,8 +3405,17 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
           const cartSlugs = validatedItems.map(i => i.product.slug);
           const allowedSlugs = voucher.productSlugs ? voucher.productSlugs.split(",").map((s: string) => s.trim()) : [];
           const validProduct = !voucher.productSlugs || cartSlugs.every((s: string) => allowedSlugs.includes(s));
+          let validOptions = true;
+          if (voucher.productOptions) {
+            try {
+              const reqOpts = JSON.parse(voucher.productOptions) as Record<string, string>;
+              if (typeof reqOpts === "object" && reqOpts !== null) {
+                validOptions = validatedItems.every(item => Object.entries(reqOpts).every(([k, v]) => item.selectedOptions[k] === v));
+              } else { validOptions = false; }
+            } catch { validOptions = false; }
+          }
           const validMin = !voucher.minOrderAmount || expectedTotal >= parseFloat(voucher.minOrderAmount);
-          if (validTime && validUses && validProduct && validMin) {
+          if (validTime && validUses && validProduct && validOptions && validMin) {
             let discount = calculateVoucherDiscount(voucher.discountType, voucher.discountValue, expectedTotal);
             discount = Math.min(discount, expectedTotal);
             finalTotal = Math.max(0, expectedTotal - discount);

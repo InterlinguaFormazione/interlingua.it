@@ -145,6 +145,7 @@ export default function ShopCheckout() {
         cartTotal: effectivePrice,
         productSlugs: product ? [product.slug] : [],
         customerEmail: customerEmail || undefined,
+        selectedOptions,
       });
       const data = await res.json();
       if (data.valid && voucherResult?.valid && voucherResult.discount) {
