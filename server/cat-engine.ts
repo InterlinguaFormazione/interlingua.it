@@ -130,27 +130,99 @@ export function calculateFinalLevel(
   return NUMERIC_LEVEL[Math.round(avg)] ?? "A0";
 }
 
-export function getWritingPrompt(level: string): string {
-  const prompts: Record<string, string> = {
+const writingPrompts: Record<string, Record<string, string>> = {
+  english: {
     A0: "Write 3-4 simple sentences about yourself: your name, where you live, and one thing you like.",
     A1: "Write a short message to a friend inviting them to a party at your house this Saturday. Include the time and your address.",
     A2: "Write an email to a hotel to book a room for two nights next month. Ask about the price and breakfast.",
     B1: "Write a letter to a friend describing a recent holiday you took. Include where you went, what you did, and whether you enjoyed it.",
     B2: "Write an essay discussing the advantages and disadvantages of social media for young people today.",
     C1: "Write a well-structured opinion essay on whether governments should invest more in renewable energy. Support your argument with examples.",
-  };
-  return prompts[level] || prompts.B1;
-}
+  },
+  german: {
+    A0: "Schreiben Sie 3-4 einfache Sätze über sich selbst: Ihren Namen, wo Sie wohnen und eine Sache, die Sie mögen.",
+    A1: "Schreiben Sie eine kurze Nachricht an einen Freund und laden Sie ihn zu einer Party bei Ihnen am Samstag ein. Nennen Sie die Uhrzeit und Ihre Adresse.",
+    A2: "Schreiben Sie eine E-Mail an ein Hotel, um ein Zimmer für zwei Nächte nächsten Monat zu buchen. Fragen Sie nach dem Preis und dem Frühstück.",
+    B1: "Schreiben Sie einen Brief an einen Freund, in dem Sie einen kürzlichen Urlaub beschreiben. Erzählen Sie, wohin Sie gefahren sind, was Sie gemacht haben und ob es Ihnen gefallen hat.",
+    B2: "Schreiben Sie einen Aufsatz über die Vor- und Nachteile von sozialen Medien für junge Menschen heute.",
+    C1: "Schreiben Sie einen gut strukturierten Meinungsaufsatz darüber, ob Regierungen mehr in erneuerbare Energien investieren sollten. Unterstützen Sie Ihre Argumentation mit Beispielen.",
+  },
+  italian: {
+    A0: "Scrivi 3-4 frasi semplici su di te: il tuo nome, dove vivi e una cosa che ti piace.",
+    A1: "Scrivi un breve messaggio a un amico per invitarlo a una festa a casa tua sabato prossimo. Includi l'orario e il tuo indirizzo.",
+    A2: "Scrivi un'e-mail a un hotel per prenotare una camera per due notti il mese prossimo. Chiedi informazioni sul prezzo e sulla colazione.",
+    B1: "Scrivi una lettera a un amico descrivendo una vacanza recente. Racconta dove sei andato/a, cosa hai fatto e se ti è piaciuto.",
+    B2: "Scrivi un tema sui vantaggi e gli svantaggi dei social media per i giovani di oggi.",
+    C1: "Scrivi un saggio d'opinione ben strutturato sul tema se i governi dovrebbero investire di più nelle energie rinnovabili. Supporta la tua argomentazione con esempi.",
+  },
+  french: {
+    A0: "Écrivez 3-4 phrases simples sur vous-même : votre nom, où vous habitez et une chose que vous aimez.",
+    A1: "Écrivez un court message à un ami pour l'inviter à une fête chez vous samedi prochain. Indiquez l'heure et votre adresse.",
+    A2: "Écrivez un e-mail à un hôtel pour réserver une chambre pour deux nuits le mois prochain. Demandez le prix et le petit-déjeuner.",
+    B1: "Écrivez une lettre à un ami décrivant des vacances récentes. Racontez où vous êtes allé(e), ce que vous avez fait et si vous avez aimé.",
+    B2: "Écrivez un essai sur les avantages et les inconvénients des réseaux sociaux pour les jeunes d'aujourd'hui.",
+    C1: "Écrivez un essai d'opinion bien structuré sur la question de savoir si les gouvernements devraient investir davantage dans les énergies renouvelables. Appuyez votre argumentation avec des exemples.",
+  },
+  spanish: {
+    A0: "Escribe 3-4 oraciones simples sobre ti mismo/a: tu nombre, dónde vives y una cosa que te gusta.",
+    A1: "Escribe un mensaje corto a un amigo invitándolo a una fiesta en tu casa el próximo sábado. Incluye la hora y tu dirección.",
+    A2: "Escribe un correo electrónico a un hotel para reservar una habitación por dos noches el próximo mes. Pregunta por el precio y el desayuno.",
+    B1: "Escribe una carta a un amigo describiendo unas vacaciones recientes. Cuenta adónde fuiste, qué hiciste y si te gustó.",
+    B2: "Escribe un ensayo sobre las ventajas y desventajas de las redes sociales para los jóvenes de hoy.",
+    C1: "Escribe un ensayo de opinión bien estructurado sobre si los gobiernos deberían invertir más en energías renovables. Apoya tu argumentación con ejemplos.",
+  },
+};
 
-export function getSpeakingPrompt(level: string): string {
-  const prompts: Record<string, string> = {
+const speakingPrompts: Record<string, Record<string, string>> = {
+  english: {
     A0: "Tell me your name and where you are from. Use very simple words.",
     A1: "Describe your daily routine. What do you do in the morning, afternoon, and evening?",
     A2: "Talk about your favourite hobby or free-time activity. Why do you enjoy it?",
     B1: "Describe an interesting trip or experience you had recently and explain why it was memorable.",
     B2: "Discuss the advantages and disadvantages of living in a big city compared to a small town.",
     C1: "Analyse how technology has changed the way people communicate and discuss whether these changes are mostly positive or negative.",
-  };
+  },
+  german: {
+    A0: "Sagen Sie mir Ihren Namen und woher Sie kommen. Verwenden Sie ganz einfache Wörter.",
+    A1: "Beschreiben Sie Ihren Tagesablauf. Was machen Sie morgens, nachmittags und abends?",
+    A2: "Erzählen Sie von Ihrem Lieblingshobby oder Ihrer Freizeitbeschäftigung. Warum gefällt es Ihnen?",
+    B1: "Beschreiben Sie eine interessante Reise oder Erfahrung, die Sie kürzlich gemacht haben, und erklären Sie, warum sie unvergesslich war.",
+    B2: "Diskutieren Sie die Vor- und Nachteile des Lebens in einer Großstadt im Vergleich zu einer Kleinstadt.",
+    C1: "Analysieren Sie, wie die Technologie die Art und Weise verändert hat, wie Menschen kommunizieren, und erörtern Sie, ob diese Veränderungen überwiegend positiv oder negativ sind.",
+  },
+  italian: {
+    A0: "Dimmi il tuo nome e da dove vieni. Usa parole molto semplici.",
+    A1: "Descrivi la tua routine quotidiana. Cosa fai la mattina, il pomeriggio e la sera?",
+    A2: "Parla del tuo hobby preferito o di un'attività del tempo libero. Perché ti piace?",
+    B1: "Descrivi un viaggio o un'esperienza interessante che hai fatto di recente e spiega perché è stata memorabile.",
+    B2: "Discuti i vantaggi e gli svantaggi di vivere in una grande città rispetto a una piccola città.",
+    C1: "Analizza come la tecnologia ha cambiato il modo in cui le persone comunicano e discuti se questi cambiamenti sono prevalentemente positivi o negativi.",
+  },
+  french: {
+    A0: "Dites-moi votre nom et d'où vous venez. Utilisez des mots très simples.",
+    A1: "Décrivez votre routine quotidienne. Que faites-vous le matin, l'après-midi et le soir ?",
+    A2: "Parlez de votre passe-temps préféré ou d'une activité de loisir. Pourquoi l'aimez-vous ?",
+    B1: "Décrivez un voyage ou une expérience intéressante que vous avez vécue récemment et expliquez pourquoi elle était mémorable.",
+    B2: "Discutez des avantages et des inconvénients de vivre dans une grande ville par rapport à une petite ville.",
+    C1: "Analysez comment la technologie a changé la façon dont les gens communiquent et discutez si ces changements sont plutôt positifs ou négatifs.",
+  },
+  spanish: {
+    A0: "Dime tu nombre y de dónde eres. Usa palabras muy sencillas.",
+    A1: "Describe tu rutina diaria. ¿Qué haces por la mañana, por la tarde y por la noche?",
+    A2: "Habla de tu pasatiempo favorito o actividad de tiempo libre. ¿Por qué te gusta?",
+    B1: "Describe un viaje o una experiencia interesante que hayas tenido recientemente y explica por qué fue memorable.",
+    B2: "Discute las ventajas y desventajas de vivir en una ciudad grande en comparación con un pueblo pequeño.",
+    C1: "Analiza cómo la tecnología ha cambiado la forma en que las personas se comunican y discute si estos cambios son mayormente positivos o negativos.",
+  },
+};
+
+export function getWritingPrompt(level: string, language: string = "english"): string {
+  const prompts = writingPrompts[language] || writingPrompts.english;
+  return prompts[level] || prompts.B1;
+}
+
+export function getSpeakingPrompt(level: string, language: string = "english"): string {
+  const prompts = speakingPrompts[language] || speakingPrompts.english;
   return prompts[level] || prompts.B1;
 }
 

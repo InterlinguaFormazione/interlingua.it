@@ -3479,7 +3479,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
 
       if (a0HardFail) {
         const mcLevel = "A0";
-        const writingPrompt = getWritingPrompt(mcLevel);
+        const writingPrompt = getWritingPrompt(mcLevel, session.language);
         return res.json({
           success: true,
           isCorrect,
@@ -3494,7 +3494,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       }
 
       if (nextSectionIndex > SECTION_SKILLS.length) {
-        const writingPrompt = getWritingPrompt(adaptedLevel);
+        const writingPrompt = getWritingPrompt(adaptedLevel, session.language);
         return res.json({
           success: true,
           isCorrect,
@@ -3528,7 +3528,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         await storage.updateBeTestSession(sessionId, { currentSectionIndex: nextSectionIndex });
 
         if (nextSectionIndex > SECTION_SKILLS.length) {
-          const writingPrompt = getWritingPrompt(adaptedLevel);
+          const writingPrompt = getWritingPrompt(adaptedLevel, session.language);
           return res.json({
             success: true,
             isCorrect,
@@ -3597,19 +3597,20 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       }
 
       const responseText = writtenResponse || "";
+      const lang = session.language || "english";
       const aiResult = responseText.trim().length < 5
         ? { level: "A0", grammar: 0, vocabulary: 0, coherence: 0, taskCompletion: 0, feedback: "No writing response provided or response too short to evaluate." }
         : await scoreWriting(
-            prompt || getWritingPrompt(session.currentLevel),
+            prompt || getWritingPrompt(session.currentLevel, lang),
             responseText,
             session.currentLevel,
-            language
+            lang
           );
 
       await storage.createBeWritingSpeaking({
         sessionId,
         taskType: "writing",
-        prompt: prompt || getWritingPrompt(session.currentLevel),
+        prompt: prompt || getWritingPrompt(session.currentLevel, session.language || "english"),
         response: responseText,
         aiScore: aiResult.level,
         aiGrammarScore: aiResult.grammar,
@@ -3637,7 +3638,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         currentSectionIndex: 7,
       });
 
-      const speakingPrompt = getSpeakingPrompt(session.currentLevel);
+      const speakingPrompt = getSpeakingPrompt(session.currentLevel, session.language || "english");
 
       res.json({
         success: true,
@@ -3676,9 +3677,10 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         return res.status(400).json({ success: false, message: "Speaking already submitted" });
       }
 
+      const lang = session.language || "english";
       let transcript = "";
       try {
-        transcript = await transcribeAudio(req.file.buffer, req.file.originalname || "audio.webm");
+        transcript = await transcribeAudio(req.file.buffer, req.file.originalname || "audio.webm", lang);
       } catch (transcribeErr) {
         console.error("Whisper transcription failed:", transcribeErr);
       }
@@ -3686,15 +3688,16 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       const aiResult = !transcript || transcript.trim().length < 3
         ? { level: "A0", grammar: 0, vocabulary: 0, coherence: 0, taskCompletion: 0, feedback: "Audio could not be transcribed or was too short to evaluate." }
         : await scoreSpeaking(
-            prompt || getSpeakingPrompt(session.currentLevel),
+            prompt || getSpeakingPrompt(session.currentLevel, lang),
             transcript,
-            session.currentLevel
+            session.currentLevel,
+            lang
           );
 
       await storage.createBeWritingSpeaking({
         sessionId,
         taskType: "speaking",
-        prompt: prompt || getSpeakingPrompt(session.currentLevel),
+        prompt: prompt || getSpeakingPrompt(session.currentLevel, lang),
         response: transcript,
         aiScore: aiResult.level,
         aiGrammarScore: aiResult.grammar,

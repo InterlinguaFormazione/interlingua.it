@@ -71,8 +71,8 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `routes.ts` - API endpoints with bot protection (honeypot, timestamp check, rate limiting)
 - `storage.ts` - PostgreSQL database storage (Drizzle ORM)
 - `ai-chat.ts` - AI chat endpoint (OpenAI GPT-4o-mini with full site context)
-- `english-test.ts` - AI scoring for English test (GPT-4o writing/speaking scoring, Whisper transcription)
-- `cat-engine.ts` - CAT/IRT engine (2PL model, EAP Bayesian theta update, Fisher Information SE update, theta ×100). Min 5, max 25 questions/section. SE threshold 40 for early stop. Level stability rule: last 3 consecutive answers must be at the same CEFR level before SE-based early stop is allowed. Detailed [CAT] logging on each answer.
+- `english-test.ts` - AI scoring for all language tests (GPT-4o writing/speaking scoring, Whisper transcription). Supports language parameter for English, German, Italian, French, Spanish — Whisper uses correct ISO 639-1 code per language, scoring prompts reference the target language.
+- `cat-engine.ts` - CAT/IRT engine (2PL model, EAP Bayesian theta update, Fisher Information SE update, theta ×100). Min 5, max 25 questions/section. SE threshold 40 for early stop. Level stability rule: last 3 consecutive answers must be at the same CEFR level before SE-based early stop is allowed. Detailed [CAT] logging on each answer. Writing/speaking prompts are language-aware — each language has its own A0-C1 prompts written in the target language.
 - `english-test-questions.ts` - Question bank for General English test (450 questions, 5 skills x 6 levels x 15 per cell, difficulty spread ±40 within each level). Listening questions auto-assign audioUrl paths to MP3 files in `client/public/audio/listening/`
 - `italian-test-questions.ts` - Question bank for Italian test (~75 questions in Italian, 5 skills, listening has audio playback)
 - `german-test-questions.ts` - Question bank for German test (~90 questions in German, 5 skills, listening has audio playback)

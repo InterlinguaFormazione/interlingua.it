@@ -6,7 +6,15 @@ function getOpenAI() {
   return _openai;
 }
 
-export async function transcribeAudio(audioBuffer: Buffer, mimeType: string = "audio/webm"): Promise<string> {
+const WHISPER_LANG_CODES: Record<string, string> = {
+  english: "en",
+  german: "de",
+  italian: "it",
+  french: "fr",
+  spanish: "es",
+};
+
+export async function transcribeAudio(audioBuffer: Buffer, mimeType: string = "audio/webm", language: string = "english"): Promise<string> {
   const openai = getOpenAI();
 
   const ext = mimeType.includes("wav") ? "wav" : mimeType.includes("mp4") ? "mp4" : "webm";
@@ -15,7 +23,7 @@ export async function transcribeAudio(audioBuffer: Buffer, mimeType: string = "a
   const transcription = await openai.audio.transcriptions.create({
     model: "whisper-1",
     file,
-    language: "en",
+    language: WHISPER_LANG_CODES[language] || "en",
   });
 
   return transcription.text;
@@ -96,14 +104,24 @@ Respond ONLY with valid JSON:
   };
 }
 
-export async function scoreSpeaking(prompt: string, transcript: string, currentLevel: string): Promise<EnglishTestScore> {
+export async function scoreSpeaking(prompt: string, transcript: string, currentLevel: string, language: string = "english"): Promise<EnglishTestScore> {
   const openai = getOpenAI();
 
-  const systemPrompt = `You are an expert English language examiner. Evaluate a candidate's spoken response (transcribed) for a General English placement test.
+  const languageNames: Record<string, string> = {
+    english: "English",
+    italian: "Italian",
+    german: "German",
+    french: "French",
+    spanish: "Spanish",
+  };
+  const langName = languageNames[language] || "English";
+
+  const systemPrompt = `You are an expert ${langName} language examiner. Evaluate a candidate's spoken response (transcribed) for a General ${langName} placement test.
+The candidate's response MUST be evaluated as ${langName} speech. If the response is not in ${langName}, score it very low.
 The candidate's estimated CEFR level is ${currentLevel}.
 
 Score these four dimensions from 0-100:
-- grammar: Grammar accuracy — correctness and complexity in spoken English
+- grammar: Grammar accuracy — correctness and complexity in spoken ${langName}
 - vocabulary: Vocabulary range — variety, appropriateness, fluency of expression
 - coherence: Coherence — logical flow, clarity of ideas, appropriate register
 - taskCompletion: Task completion — addressing the prompt fully, relevant content
