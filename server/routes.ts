@@ -1514,6 +1514,33 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       });
 
       try {
+        await storage.createShopOrder({
+          productSlug: "speakers-corner",
+          productName: "Speaker's Corner (Abbonamento Annuale)",
+          amount: verification.amount || "200.00",
+          currency: verification.currency || "EUR",
+          paypalOrderId,
+          status: "completed",
+          customerFirstName: nome,
+          customerLastName: cognome,
+          customerEmail: email,
+          customerPhone: null,
+          billingCodiceFiscale: codiceFiscale || null,
+          billingIndirizzo: indirizzo || null,
+          billingCap: cap || null,
+          billingCitta: citta || null,
+          billingProvincia: provincia || null,
+          billingPaese: paese || null,
+          billingPartitaIva: partitaIva || null,
+          billingCodiceSdi: codiceSdi || null,
+          billingPec: pec || null,
+          notes: `Tipo fatturazione: ${tipoFatturazione || "non specificato"}${ragioneSociale ? ` — Ragione sociale: ${ragioneSociale}` : ""}`,
+        });
+      } catch (orderErr) {
+        console.error("Failed to create shop order for SC purchase:", orderErr);
+      }
+
+      try {
         await sendSubscriptionConfirmation({
           nome,
           cognome,
