@@ -1513,8 +1513,28 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         billingPec: pec || null,
       });
 
+      let customerId: string | undefined;
+      try {
+        const existingCustomer = await storage.getShopCustomerByEmail(email);
+        if (existingCustomer) {
+          customerId = existingCustomer.id;
+        } else {
+          const newCustomer = await storage.createShopCustomer({
+            email,
+            password: hashedPassword,
+            firstName: nome,
+            lastName: cognome,
+            phone: null,
+          });
+          customerId = newCustomer.id;
+        }
+      } catch (custErr) {
+        console.error("Failed to create shop customer for SC purchase:", custErr);
+      }
+
       try {
         await storage.createShopOrder({
+          customerId: customerId || null,
           productSlug: "speakers-corner",
           productName: "Speaker's Corner (Abbonamento Annuale)",
           amount: verification.amount || "200.00",
