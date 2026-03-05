@@ -154,6 +154,7 @@ export interface IStorage {
   updateBeTestSession(id: number, data: Partial<BeTestSession>): Promise<BeTestSession | undefined>;
   getBeTestSessions(): Promise<BeTestSession[]>;
   getBeTestSessionsByType(testType: string): Promise<BeTestSession[]>;
+  deleteBeTestSession(id: number): Promise<void>;
 
   createBeQuestion(question: InsertBeQuestion): Promise<BeQuestion>;
   getBeQuestions(): Promise<BeQuestion[]>;
@@ -593,6 +594,13 @@ export class DatabaseStorage implements IStorage {
 
   async getBeTestSessionsByType(testType: string): Promise<BeTestSession[]> {
     return db.select().from(beTestSessions).where(eq(beTestSessions.testType, testType)).orderBy(desc(beTestSessions.startedAt));
+  }
+
+  async deleteBeTestSession(id: number): Promise<void> {
+    await db.delete(beResponses).where(eq(beResponses.sessionId, id));
+    await db.delete(beWritingSpeaking).where(eq(beWritingSpeaking.sessionId, id));
+    await db.delete(beSectionResults).where(eq(beSectionResults.sessionId, id));
+    await db.delete(beTestSessions).where(eq(beTestSessions.id, id));
   }
 
   async createBeQuestion(question: InsertBeQuestion): Promise<BeQuestion> {

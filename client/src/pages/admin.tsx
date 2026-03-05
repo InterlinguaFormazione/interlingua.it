@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
@@ -1026,9 +1026,11 @@ function MiniFlag({ lang }: { lang: string }) {
 
 function EnglishAdaptiveTab({ token }: { token: string }) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<BeSession | null>(null);
   const [filterCompany, setFilterCompany] = useState("");
   const [filterLevel, setFilterLevel] = useState("");
   const [filterLanguage, setFilterLanguage] = useState("");
+  const { toast } = useToast();
 
   const { data: sessions = [], isLoading } = useQuery<BeSession[]>({
     queryKey: ["/api/admin/all-test-results"],
@@ -1251,6 +1253,9 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
                     <Button variant="ghost" size="sm" onClick={() => setSelectedId(s.id)} data-testid={`button-view-${s.id}`}>
                       <Eye className="w-4 h-4" />
                     </Button>
+                    <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive" onClick={() => setDeleteTarget(s)} data-testid={`button-delete-${s.id}`}>
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -1258,6 +1263,50 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
           </table>
         </div>
       )}
+
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Conferma eliminazione</DialogTitle>
+            <DialogDescription>
+              Stai per eliminare il risultato del test di{" "}
+              <strong>{deleteTarget?.firstName} {deleteTarget?.lastName}</strong>
+              {deleteTarget?.language ? <> (<span className="inline-flex items-center gap-1"><MiniFlag lang={deleteTarget.language} />{LANGUAGE_LABELS[deleteTarget.language] || deleteTarget.language}</span>)</> : ""}
+              {deleteTarget?.finalLevel ? <>, livello <strong>{deleteTarget.finalLevel}</strong></> : ""}
+              {deleteTarget?.completedAt ? <>, del {new Date(deleteTarget.completedAt).toLocaleDateString("it-IT")}</> : ""}.
+              <br /><br />
+              Questa azione è irreversibile. Vuoi procedere?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <DialogClose asChild>
+              <Button variant="outline" data-testid="button-cancel-delete">Annulla</Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              data-testid="button-confirm-delete"
+              onClick={async () => {
+                if (!deleteTarget) return;
+                try {
+                  const res = await fetch(`/api/admin/all-test-results/${deleteTarget.id}`, {
+                    method: "DELETE",
+                    headers: { Authorization: `Bearer ${token}` },
+                  });
+                  if (!res.ok) throw new Error("Errore durante l'eliminazione");
+                  queryClient.invalidateQueries({ queryKey: ["/api/admin/all-test-results"] });
+                  toast({ title: "Eliminato", description: `Test di ${deleteTarget.firstName} ${deleteTarget.lastName} eliminato.` });
+                  setDeleteTarget(null);
+                  if (selectedId === deleteTarget.id) setSelectedId(null);
+                } catch (e: any) {
+                  toast({ title: "Errore", description: e.message, variant: "destructive" });
+                }
+              }}
+            >
+              Elimina
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

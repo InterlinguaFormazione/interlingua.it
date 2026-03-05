@@ -4123,6 +4123,18 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
     }
   });
 
+  app.delete("/api/admin/all-test-results/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const session = await storage.getBeTestSession(id);
+      if (!session) return res.status(404).json({ success: false, message: "Session not found" });
+      await storage.deleteBeTestSession(id);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+
   app.get("/api/admin/all-test-results/:id", requireAdmin, async (req, res) => {
     try {
       const id = parseInt(req.params.id);
