@@ -2582,6 +2582,7 @@ function VouchersTab({ token }: { token: string }) {
                   <th className="text-left py-3 px-2 font-medium">Descrizione</th>
                   <th className="text-center py-3 px-2 font-medium">Tipo</th>
                   <th className="text-center py-3 px-2 font-medium">Valore</th>
+                  <th className="text-left py-3 px-2 font-medium">Prodotti</th>
                   <th className="text-center py-3 px-2 font-medium">Utilizzi</th>
                   <th className="text-center py-3 px-2 font-medium">Scadenza</th>
                   <th className="text-center py-3 px-2 font-medium">Stato</th>
@@ -2608,6 +2609,28 @@ function VouchersTab({ token }: { token: string }) {
                         } catch { return v.discountValue; }
                       })() : v.discountType === "percentage" ? `${v.discountValue}%` : `€${parseFloat(v.discountValue).toFixed(2)}`}
                     </td>
+                    <td className="py-3 px-2 text-xs max-w-[200px]">
+                      {v.productSlugs ? (
+                        <div className="space-y-0.5">
+                          {v.productSlugs.split(",").map(s => s.trim()).filter(Boolean).map(slug => (
+                            <div key={slug} className="truncate">{SHOP_PRODUCTS.find(p => p.slug === slug)?.name || slug}</div>
+                          ))}
+                          {v.productOptions && (() => {
+                            try {
+                              const opts = JSON.parse(v.productOptions) as Record<string, string>;
+                              const parts = Object.entries(opts).map(([k, val]) => {
+                                const product = v.productSlugs!.split(",").map(s => s.trim()).map(s => SHOP_PRODUCTS.find(p => p.slug === s)).find(Boolean);
+                                const optLabel = product?.options?.find(o => o.name === k)?.label || k;
+                                return `${optLabel}: ${val}`;
+                              });
+                              return parts.length > 0 ? <div className="text-[10px] text-purple-600 mt-0.5">{parts.join(", ")}</div> : null;
+                            } catch { return null; }
+                          })()}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground italic">Tutti</span>
+                      )}
+                    </td>
                     <td className="py-3 px-2 text-center">
                       {v.usedCount}{v.maxUses !== null ? `/${v.maxUses}` : ""}
                     </td>
@@ -2633,13 +2656,6 @@ function VouchersTab({ token }: { token: string }) {
                       {v.requiresNewsletterSub && (
                         <Badge variant="outline" className="ml-1 border-green-400 text-green-600">Newsletter</Badge>
                       )}
-                      {v.productOptions && (() => {
-                        try {
-                          const opts = JSON.parse(v.productOptions) as Record<string, string>;
-                          const labels = Object.entries(opts).map(([, val]) => val).join(", ");
-                          return <Badge variant="outline" className="ml-1 border-purple-400 text-purple-600 text-[10px]">{labels}</Badge>;
-                        } catch { return null; }
-                      })()}
                     </td>
                     <td className="py-3 px-2 text-right whitespace-nowrap">
                       <Button
