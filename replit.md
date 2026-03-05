@@ -35,7 +35,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/bando-detail.tsx` - Individual bando/funded course detail page
 - `src/pages/speakers-corner.tsx` - Speaker's Corner landing page with login
 - `src/pages/speakers-corner-dashboard.tsx` - Subscriber dashboard for booking sessions
-- `src/pages/admin.tsx` - General admin panel (contacts, newsletter, blog, shop orders, materials, English adaptive test results, discount vouchers, product reviews moderation, user management)
+- `src/pages/admin.tsx` - General admin panel (contacts, newsletter, blog, shop orders, materials, English adaptive test results, discount vouchers, product reviews moderation, conventions management, user management)
 - `src/pages/shop-product.tsx` - Product detail page with full description, features, reviews section (rating summary, distribution chart, review cards), review submission form, and purchase sidebar
 - `src/pages/speakers-corner-admin.tsx` - Admin panel for managing subscribers, sessions, email settings
 - `src/pages/blog.tsx` - Blog listing page
@@ -48,6 +48,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/german-test.tsx` - German Adaptive Test at `/german-test` — same structure, German UI labels, 18 listening audio files.
 - `src/pages/french-test.tsx` - French Adaptive Test at `/french-test` — same structure, French UI labels, 15 listening audio files.
 - `src/pages/spanish-test.tsx` - Spanish Adaptive Test at `/spanish-test` — same structure, Spanish UI labels, 15 listening audio files.
+- `src/pages/convenzioni.tsx` - Public conventions page at `/convenzioni` — 3-step flow: employee enters company code, sees discount details, registers with name/email/phone/role, receives discount code. Honeypot + timestamp spam protection.
 - `src/pages/cookie-policy.tsx` - GDPR cookie policy
 - `src/pages/privacy-policy.tsx` - GDPR privacy policy
 - `src/pages/termini-e-condizioni.tsx` - Terms and conditions for e-commerce (Italian law, course cancellation policies, refunds, IP, ODR)

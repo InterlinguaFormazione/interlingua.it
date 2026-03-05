@@ -54,6 +54,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
+  Handshake,
 } from "lucide-react";
 
 interface DashboardStats {
@@ -2747,6 +2748,409 @@ function ReviewsTab({ token }: { token: string }) {
   );
 }
 
+interface ConventionRow {
+  id: string;
+  companyName: string;
+  companyCode: string;
+  discountCode: string;
+  discountDescription: string | null;
+  contactPerson: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  maxRegistrations: number | null;
+  active: boolean;
+  createdAt: string;
+  registrationCount: number;
+}
+
+interface ConventionReg {
+  id: string;
+  conventionId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string | null;
+  companyRole: string | null;
+  verified: boolean;
+  discountCodeSent: boolean;
+  createdAt: string;
+}
+
+function ConventionsTab({ token }: { token: string }) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingConvention, setEditingConvention] = useState<ConventionRow | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    companyName: "",
+    companyCode: "",
+    discountCode: "",
+    discountDescription: "",
+    contactPerson: "",
+    contactEmail: "",
+    contactPhone: "",
+    maxRegistrations: "",
+    active: true,
+  });
+  const { toast } = useToast();
+
+  const { data: conventionsList = [], isLoading } = useQuery<ConventionRow[]>({
+    queryKey: ["/api/admin/conventions"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/conventions", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to fetch conventions");
+      return res.json();
+    },
+  });
+
+  const { data: registrations = [] } = useQuery<ConventionReg[]>({
+    queryKey: ["/api/admin/conventions", expandedId, "registrations"],
+    queryFn: async () => {
+      if (!expandedId) return [];
+      const res = await fetch(`/api/admin/conventions/${expandedId}/registrations`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to fetch registrations");
+      return res.json();
+    },
+    enabled: !!expandedId,
+  });
+
+  const saveMutation = useMutation({
+    mutationFn: async (data: Record<string, unknown>) => {
+      const method = editingConvention ? "PATCH" : "POST";
+      const url = editingConvention
+        ? `/api/admin/conventions/${editingConvention.id}`
+        : "/api/admin/conventions";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Errore durante il salvataggio");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/conventions"] });
+      closeDialog();
+      toast({ title: "Successo", description: editingConvention ? "Convenzione aggiornata" : "Convenzione creata" });
+    },
+    onError: (error: any) => {
+      toast({ title: "Errore", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/admin/conventions/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Errore durante l'eliminazione");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/conventions"] });
+      toast({ title: "Successo", description: "Convenzione eliminata" });
+    },
+  });
+
+  const toggleMutation = useMutation({
+    mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
+      const res = await fetch(`/api/admin/conventions/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ active }),
+      });
+      if (!res.ok) throw new Error("Errore");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/conventions"] });
+    },
+  });
+
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    setEditingConvention(null);
+    setFormData({
+      companyName: "",
+      companyCode: "",
+      discountCode: "",
+      discountDescription: "",
+      contactPerson: "",
+      contactEmail: "",
+      contactPhone: "",
+      maxRegistrations: "",
+      active: true,
+    });
+  };
+
+  const openEdit = (c: ConventionRow) => {
+    setEditingConvention(c);
+    setFormData({
+      companyName: c.companyName,
+      companyCode: c.companyCode,
+      discountCode: c.discountCode,
+      discountDescription: c.discountDescription || "",
+      contactPerson: c.contactPerson || "",
+      contactEmail: c.contactEmail || "",
+      contactPhone: c.contactPhone || "",
+      maxRegistrations: c.maxRegistrations ? String(c.maxRegistrations) : "",
+      active: c.active,
+    });
+    setIsDialogOpen(true);
+  };
+
+  const handleSave = () => {
+    if (!formData.companyName || !formData.companyCode || !formData.discountCode) {
+      toast({ title: "Errore", description: "Nome azienda, codice aziendale e codice sconto sono obbligatori.", variant: "destructive" });
+      return;
+    }
+    saveMutation.mutate(formData);
+  };
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle className="flex items-center gap-2">
+            <Handshake className="w-5 h-5" />
+            Gestione Convenzioni
+          </CardTitle>
+          <CardDescription>Gestisci le convenzioni aziendali e le registrazioni dei dipendenti</CardDescription>
+        </div>
+        <Dialog open={isDialogOpen} onOpenChange={(open) => { if (!open) closeDialog(); else setIsDialogOpen(true); }}>
+          <DialogTrigger asChild>
+            <Button data-testid="button-add-convention" onClick={() => setIsDialogOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" /> Nuova Convenzione
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{editingConvention ? "Modifica Convenzione" : "Nuova Convenzione"}</DialogTitle>
+              <DialogDescription>
+                {editingConvention ? "Modifica i dettagli della convenzione" : "Crea una nuova convenzione aziendale"}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Nome Azienda *</Label>
+                <Input
+                  data-testid="input-convention-company-name"
+                  value={formData.companyName}
+                  onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
+                  placeholder="Es. Acme S.r.l."
+                />
+              </div>
+              <div>
+                <Label>Codice Aziendale *</Label>
+                <Input
+                  data-testid="input-convention-company-code"
+                  value={formData.companyCode}
+                  onChange={(e) => setFormData({ ...formData, companyCode: e.target.value.toUpperCase() })}
+                  placeholder="Es. ACME2025 (codice che i dipendenti useranno)"
+                />
+              </div>
+              <div>
+                <Label>Codice Sconto *</Label>
+                <Input
+                  data-testid="input-convention-discount-code"
+                  value={formData.discountCode}
+                  onChange={(e) => setFormData({ ...formData, discountCode: e.target.value })}
+                  placeholder="Codice sconto che riceveranno i dipendenti"
+                />
+              </div>
+              <div>
+                <Label>Descrizione Sconto</Label>
+                <Input
+                  data-testid="input-convention-discount-description"
+                  value={formData.discountDescription}
+                  onChange={(e) => setFormData({ ...formData, discountDescription: e.target.value })}
+                  placeholder="Es. 15% di sconto su tutti i corsi"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Referente</Label>
+                  <Input
+                    data-testid="input-convention-contact-person"
+                    value={formData.contactPerson}
+                    onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
+                    placeholder="Nome referente"
+                  />
+                </div>
+                <div>
+                  <Label>Email Referente</Label>
+                  <Input
+                    data-testid="input-convention-contact-email"
+                    value={formData.contactEmail}
+                    onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
+                    placeholder="email@azienda.it"
+                    type="email"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Telefono Referente</Label>
+                  <Input
+                    data-testid="input-convention-contact-phone"
+                    value={formData.contactPhone}
+                    onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
+                    placeholder="+39 ..."
+                  />
+                </div>
+                <div>
+                  <Label>Max Registrazioni</Label>
+                  <Input
+                    data-testid="input-convention-max-registrations"
+                    value={formData.maxRegistrations}
+                    onChange={(e) => setFormData({ ...formData, maxRegistrations: e.target.value })}
+                    placeholder="Illimitato se vuoto"
+                    type="number"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  data-testid="switch-convention-active"
+                  checked={formData.active}
+                  onCheckedChange={(val) => setFormData({ ...formData, active: val })}
+                />
+                <Label>Attiva</Label>
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">Annulla</Button>
+              </DialogClose>
+              <Button data-testid="button-save-convention" onClick={handleSave} disabled={saveMutation.isPending}>
+                {saveMutation.isPending ? "Salvataggio..." : editingConvention ? "Aggiorna" : "Crea"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <div className="text-center py-8 text-muted-foreground">Caricamento...</div>
+        ) : conventionsList.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">Nessuna convenzione creata</div>
+        ) : (
+          <div className="space-y-3">
+            {conventionsList.map((conv) => (
+              <div key={conv.id} className="border rounded-lg">
+                <div className="p-4 flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold" data-testid={`text-convention-name-${conv.id}`}>{conv.companyName}</span>
+                      <Badge variant={conv.active ? "default" : "secondary"} data-testid={`badge-convention-status-${conv.id}`}>
+                        {conv.active ? "Attiva" : "Inattiva"}
+                      </Badge>
+                    </div>
+                    <div className="text-sm text-muted-foreground flex flex-wrap gap-x-4 gap-y-1">
+                      <span>Codice: <strong>{conv.companyCode}</strong></span>
+                      <span>Sconto: <strong>{conv.discountCode}</strong></span>
+                      <span>Registrazioni: <strong>{conv.registrationCount}{conv.maxRegistrations ? ` / ${conv.maxRegistrations}` : ""}</strong></span>
+                      {conv.discountDescription && <span>{conv.discountDescription}</span>}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      data-testid={`button-expand-convention-${conv.id}`}
+                      onClick={() => setExpandedId(expandedId === conv.id ? null : conv.id)}
+                      title="Vedi registrazioni"
+                    >
+                      {expandedId === conv.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      data-testid={`button-toggle-convention-${conv.id}`}
+                      onClick={() => toggleMutation.mutate({ id: conv.id, active: !conv.active })}
+                      title={conv.active ? "Disattiva" : "Attiva"}
+                    >
+                      {conv.active ? <ToggleRight className="w-4 h-4 text-green-600" /> : <ToggleLeft className="w-4 h-4" />}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      data-testid={`button-edit-convention-${conv.id}`}
+                      onClick={() => openEdit(conv)}
+                      title="Modifica"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      data-testid={`button-delete-convention-${conv.id}`}
+                      onClick={() => {
+                        if (confirm("Eliminare questa convenzione e tutte le registrazioni associate?")) {
+                          deleteMutation.mutate(conv.id);
+                        }
+                      }}
+                      title="Elimina"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </Button>
+                  </div>
+                </div>
+                {expandedId === conv.id && (
+                  <div className="border-t px-4 py-3 bg-muted/30">
+                    <div className="text-sm font-medium mb-2">Registrazioni ({registrations.length})</div>
+                    {registrations.length === 0 ? (
+                      <div className="text-sm text-muted-foreground">Nessuna registrazione</div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b text-left">
+                              <th className="pb-2 pr-4">Nome</th>
+                              <th className="pb-2 pr-4">Email</th>
+                              <th className="pb-2 pr-4">Telefono</th>
+                              <th className="pb-2 pr-4">Ruolo</th>
+                              <th className="pb-2">Data</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {registrations.map((reg) => (
+                              <tr key={reg.id} className="border-b last:border-0" data-testid={`row-registration-${reg.id}`}>
+                                <td className="py-2 pr-4">{reg.firstName} {reg.lastName}</td>
+                                <td className="py-2 pr-4">{reg.email}</td>
+                                <td className="py-2 pr-4">{reg.phone || "-"}</td>
+                                <td className="py-2 pr-4">{reg.companyRole || "-"}</td>
+                                <td className="py-2">{new Date(reg.createdAt).toLocaleDateString("it-IT")}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                    {conv.contactPerson && (
+                      <div className="mt-3 pt-3 border-t text-sm text-muted-foreground">
+                        <span className="font-medium">Referente:</span> {conv.contactPerson}
+                        {conv.contactEmail && <span> — {conv.contactEmail}</span>}
+                        {conv.contactPhone && <span> — {conv.contactPhone}</span>}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 const adminTabs = [
   { value: "contacts", label: "Contatti", icon: MessageSquare },
   { value: "newsletter", label: "Newsletter", icon: Mail },
@@ -2757,6 +3161,7 @@ const adminTabs = [
   { value: "english-test", label: "Test Lingue", icon: GraduationCap },
   { value: "vouchers", label: "Voucher", icon: Tag },
   { value: "reviews", label: "Recensioni", icon: Star },
+  { value: "conventions", label: "Convenzioni", icon: Handshake },
   { value: "users", label: "Utenti", icon: Users, adminOnly: true },
 ] as const;
 
@@ -2993,6 +3398,9 @@ export default function AdminPage() {
           </TabsContent>
           <TabsContent value="reviews">
             <ReviewsTab token={token} />
+          </TabsContent>
+          <TabsContent value="conventions">
+            <ConventionsTab token={token} />
           </TabsContent>
           {user?.role === "admin" && (
             <TabsContent value="users">

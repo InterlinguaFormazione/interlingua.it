@@ -539,3 +539,44 @@ export interface Feature {
   description: string;
   icon: string;
 }
+
+export const conventions = pgTable("conventions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  companyName: text("company_name").notNull(),
+  companyCode: text("company_code").notNull().unique(),
+  discountCode: text("discount_code").notNull(),
+  discountDescription: text("discount_description"),
+  contactPerson: text("contact_person"),
+  contactEmail: text("contact_email"),
+  contactPhone: text("contact_phone"),
+  maxRegistrations: integer("max_registrations"),
+  active: boolean("active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertConventionSchema = createInsertSchema(conventions).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertConvention = z.infer<typeof insertConventionSchema>;
+export type Convention = typeof conventions.$inferSelect;
+
+export const conventionRegistrations = pgTable("convention_registrations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  conventionId: varchar("convention_id").notNull(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone"),
+  companyRole: text("company_role"),
+  verified: boolean("verified").default(false),
+  discountCodeSent: boolean("discount_code_sent").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertConventionRegistrationSchema = createInsertSchema(conventionRegistrations).omit({
+  id: true,
+  createdAt: true,
+});
+export type InsertConventionRegistration = z.infer<typeof insertConventionRegistrationSchema>;
+export type ConventionRegistration = typeof conventionRegistrations.$inferSelect;

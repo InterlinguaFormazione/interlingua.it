@@ -42,6 +42,7 @@ import TerminiECondizioniPage from "@/pages/termini-e-condizioni";
 import CodiceEticoPage from "@/pages/codice-etico";
 import ShopProductPage from "@/pages/shop-product";
 import CartCheckoutPage from "@/pages/shop-cart-checkout";
+import ConvenzioniPage from "@/pages/convenzioni";
 import NotFound from "@/pages/not-found";
 import { CartProvider } from "@/lib/cart-context";
 import { CartDrawer } from "@/components/cart-drawer";
@@ -90,6 +91,7 @@ function Router() {
       <Route path="/privacy-policy" component={PrivacyPolicyPage} />
       <Route path="/termini-e-condizioni" component={TerminiECondizioniPage} />
       <Route path="/codice-etico" component={CodiceEticoPage} />
+      <Route path="/convenzioni" component={ConvenzioniPage} />
       <Route component={NotFound} />
     </Switch>
   );

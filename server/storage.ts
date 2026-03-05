@@ -42,6 +42,10 @@ import {
   type InsertProductReview,
   type BlogComment,
   type InsertBlogComment,
+  type Convention,
+  type InsertConvention,
+  type ConventionRegistration,
+  type InsertConventionRegistration,
   users,
   contactSubmissions,
   newsletterSubscriptions,
@@ -64,6 +68,8 @@ import {
   discountVouchers,
   productReviews,
   blogComments,
+  conventions,
+  conventionRegistrations,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
@@ -195,6 +201,18 @@ export interface IStorage {
   getBlogCommentsBySlug(blogSlug: string): Promise<BlogComment[]>;
   getAllBlogComments(): Promise<BlogComment[]>;
   deleteBlogComment(id: string): Promise<void>;
+
+  createConvention(convention: InsertConvention): Promise<Convention>;
+  getConventions(): Promise<Convention[]>;
+  getConventionById(id: string): Promise<Convention | undefined>;
+  getConventionByCode(code: string): Promise<Convention | undefined>;
+  updateConvention(id: string, data: Partial<InsertConvention>): Promise<Convention | undefined>;
+  deleteConvention(id: string): Promise<void>;
+  createConventionRegistration(registration: InsertConventionRegistration): Promise<ConventionRegistration>;
+  getConventionRegistrations(): Promise<ConventionRegistration[]>;
+  getRegistrationsByConvention(conventionId: string): Promise<ConventionRegistration[]>;
+  getRegistrationByEmail(conventionId: string, email: string): Promise<ConventionRegistration | undefined>;
+  getRegistrationCountByConvention(conventionId: string): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -762,6 +780,62 @@ export class DatabaseStorage implements IStorage {
 
   async deleteBlogComment(id: string): Promise<void> {
     await db.delete(blogComments).where(eq(blogComments.id, id));
+  }
+
+  async createConvention(convention: InsertConvention): Promise<Convention> {
+    const [result] = await db.insert(conventions).values(convention).returning();
+    return result;
+  }
+
+  async getConventions(): Promise<Convention[]> {
+    return db.select().from(conventions).orderBy(desc(conventions.createdAt));
+  }
+
+  async getConventionById(id: string): Promise<Convention | undefined> {
+    const [result] = await db.select().from(conventions).where(eq(conventions.id, id));
+    return result;
+  }
+
+  async getConventionByCode(code: string): Promise<Convention | undefined> {
+    const [result] = await db.select().from(conventions).where(eq(conventions.companyCode, code.toUpperCase().trim()));
+    return result;
+  }
+
+  async updateConvention(id: string, data: Partial<InsertConvention>): Promise<Convention | undefined> {
+    const [result] = await db.update(conventions).set(data).where(eq(conventions.id, id)).returning();
+    return result;
+  }
+
+  async deleteConvention(id: string): Promise<void> {
+    await db.delete(conventionRegistrations).where(eq(conventionRegistrations.conventionId, id));
+    await db.delete(conventions).where(eq(conventions.id, id));
+  }
+
+  async createConventionRegistration(registration: InsertConventionRegistration): Promise<ConventionRegistration> {
+    const [result] = await db.insert(conventionRegistrations).values(registration).returning();
+    return result;
+  }
+
+  async getConventionRegistrations(): Promise<ConventionRegistration[]> {
+    return db.select().from(conventionRegistrations).orderBy(desc(conventionRegistrations.createdAt));
+  }
+
+  async getRegistrationsByConvention(conventionId: string): Promise<ConventionRegistration[]> {
+    return db.select().from(conventionRegistrations)
+      .where(eq(conventionRegistrations.conventionId, conventionId))
+      .orderBy(desc(conventionRegistrations.createdAt));
+  }
+
+  async getRegistrationByEmail(conventionId: string, email: string): Promise<ConventionRegistration | undefined> {
+    const [result] = await db.select().from(conventionRegistrations)
+      .where(and(eq(conventionRegistrations.conventionId, conventionId), eq(conventionRegistrations.email, email.toLowerCase().trim())));
+    return result;
+  }
+
+  async getRegistrationCountByConvention(conventionId: string): Promise<number> {
+    const result = await db.select({ count: sql<number>`count(*)` }).from(conventionRegistrations)
+      .where(eq(conventionRegistrations.conventionId, conventionId));
+    return Number(result[0]?.count || 0);
   }
 }
 

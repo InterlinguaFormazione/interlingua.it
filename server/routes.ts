@@ -2576,6 +2576,174 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
     }
   });
 
+  app.get("/api/admin/conventions", requireAuth, async (_req, res) => {
+    try {
+      const allConventions = await storage.getConventions();
+      const withCounts = await Promise.all(allConventions.map(async (c) => {
+        const count = await storage.getRegistrationCountByConvention(c.id);
+        return { ...c, registrationCount: count };
+      }));
+      res.json(withCounts);
+    } catch (error) {
+      console.error("Error fetching conventions:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/admin/conventions", requireAuth, async (req, res) => {
+    try {
+      const { companyName, companyCode, discountCode, discountDescription, contactPerson, contactEmail, contactPhone, maxRegistrations, active } = req.body;
+      if (!companyName || !companyCode || !discountCode) {
+        return res.status(400).json({ success: false, message: "Nome azienda, codice aziendale e codice sconto sono obbligatori." });
+      }
+      const existing = await storage.getConventionByCode(companyCode.toUpperCase().trim());
+      if (existing) {
+        return res.status(400).json({ success: false, message: "Una convenzione con questo codice esiste già." });
+      }
+      const convention = await storage.createConvention({
+        companyName,
+        companyCode: companyCode.toUpperCase().trim(),
+        discountCode,
+        discountDescription: discountDescription || null,
+        contactPerson: contactPerson || null,
+        contactEmail: contactEmail || null,
+        contactPhone: contactPhone || null,
+        maxRegistrations: maxRegistrations ? parseInt(maxRegistrations) : null,
+        active: active !== false,
+      });
+      res.json({ success: true, convention });
+    } catch (error) {
+      console.error("Error creating convention:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.patch("/api/admin/conventions/:id", requireAuth, async (req, res) => {
+    try {
+      const updateData: any = {};
+      const { companyName, companyCode, discountCode, discountDescription, contactPerson, contactEmail, contactPhone, maxRegistrations, active } = req.body;
+      if (companyName !== undefined) updateData.companyName = companyName;
+      if (companyCode !== undefined) updateData.companyCode = companyCode.toUpperCase().trim();
+      if (discountCode !== undefined) updateData.discountCode = discountCode;
+      if (discountDescription !== undefined) updateData.discountDescription = discountDescription || null;
+      if (contactPerson !== undefined) updateData.contactPerson = contactPerson || null;
+      if (contactEmail !== undefined) updateData.contactEmail = contactEmail || null;
+      if (contactPhone !== undefined) updateData.contactPhone = contactPhone || null;
+      if (maxRegistrations !== undefined) updateData.maxRegistrations = maxRegistrations ? parseInt(maxRegistrations) : null;
+      if (active !== undefined) updateData.active = active;
+      const updated = await storage.updateConvention(req.params.id, updateData);
+      if (!updated) return res.status(404).json({ success: false, message: "Convenzione non trovata." });
+      res.json({ success: true, convention: updated });
+    } catch (error) {
+      console.error("Error updating convention:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.delete("/api/admin/conventions/:id", requireAuth, async (req, res) => {
+    try {
+      await storage.deleteConvention(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting convention:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.get("/api/admin/conventions/:id/registrations", requireAuth, async (req, res) => {
+    try {
+      const regs = await storage.getRegistrationsByConvention(req.params.id);
+      res.json(regs);
+    } catch (error) {
+      console.error("Error fetching convention registrations:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.get("/api/conventions/lookup", async (req, res) => {
+    try {
+      const code = (req.query.code as string || "").toUpperCase().trim();
+      if (!code) return res.json({ found: false });
+      const convention = await storage.getConventionByCode(code);
+      if (!convention || !convention.active) {
+        return res.json({ found: false, message: "Codice convenzione non trovato o non più attivo." });
+      }
+      const count = await storage.getRegistrationCountByConvention(convention.id);
+      if (convention.maxRegistrations && count >= convention.maxRegistrations) {
+        return res.json({ found: false, message: "Le registrazioni per questa convenzione hanno raggiunto il limite massimo." });
+      }
+      res.json({
+        found: true,
+        conventionId: convention.id,
+        companyName: convention.companyName,
+        discountDescription: convention.discountDescription,
+      });
+    } catch (error) {
+      console.error("Error looking up convention:", error);
+      res.status(500).json({ found: false, message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/conventions/register", async (req, res) => {
+    try {
+      const { companyCode, firstName, lastName, email, phone, companyRole, _hp, _ts } = req.body;
+      if (_hp) return res.status(400).json({ success: false, message: "Richiesta non valida." });
+      if (_ts && Date.now() - parseInt(_ts) < 2000) return res.status(400).json({ success: false, message: "Riprova tra qualche secondo." });
+      if (!companyCode || !firstName || !lastName || !email) {
+        return res.status(400).json({ success: false, message: "Nome, cognome, email e codice aziendale sono obbligatori." });
+      }
+      const convention = await storage.getConventionByCode(companyCode.toUpperCase().trim());
+      if (!convention || !convention.active) {
+        return res.status(400).json({ success: false, message: "Convenzione non trovata o non attiva." });
+      }
+      const count = await storage.getRegistrationCountByConvention(convention.id);
+      if (convention.maxRegistrations && count >= convention.maxRegistrations) {
+        return res.status(400).json({ success: false, message: "Le registrazioni per questa convenzione hanno raggiunto il limite massimo." });
+      }
+      const existing = await storage.getRegistrationByEmail(convention.id, email);
+      if (existing) {
+        return res.json({
+          success: true,
+          alreadyRegistered: true,
+          discountCode: convention.discountCode,
+          companyName: convention.companyName,
+          message: "Risulti già registrato/a per questa convenzione. Ecco il tuo codice sconto.",
+        });
+      }
+      await storage.createConventionRegistration({
+        conventionId: convention.id,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.toLowerCase().trim(),
+        phone: phone || null,
+        companyRole: companyRole || null,
+        verified: false,
+        discountCodeSent: true,
+      });
+      try {
+        await forwardToCRM({
+          nome: firstName.trim(),
+          cognome: lastName.trim(),
+          email: email.toLowerCase().trim(),
+          telefono: phone || "",
+          interesse: `Convenzione: ${convention.companyName}`,
+          messaggio: `Registrazione convenzione ${convention.companyName} (${convention.companyCode}). Ruolo: ${companyRole || "N/A"}`,
+          sorgente: "convenzione",
+        });
+      } catch {}
+      res.json({
+        success: true,
+        alreadyRegistered: false,
+        discountCode: convention.discountCode,
+        companyName: convention.companyName,
+        message: "Registrazione completata! Ecco il tuo codice sconto riservato.",
+      });
+    } catch (error) {
+      console.error("Error registering for convention:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
   app.post("/api/shop/validate-voucher", async (req, res) => {
     try {
       const { code, cartTotal, productSlugs: reqProductSlugs, customerEmail: rawCustEmail } = req.body;
