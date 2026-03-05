@@ -44,7 +44,6 @@ export default function ConvenzioniPage() {
   const [phone, setPhone] = useState("");
   const [companyRole, setCompanyRole] = useState("");
 
-  const [honeypot, setHoneypot] = useState("");
   const [formLoadedAt] = useState(() => Date.now());
 
   const handleLookup = async () => {
@@ -92,7 +91,8 @@ export default function ConvenzioniPage() {
     if (e) e.preventDefault();
     console.log("[convenzioni] handleRegister called");
 
-    if (honeypot) { console.log("[convenzioni] blocked by honeypot"); return; }
+    const hpField = document.getElementById("conv_hp_field") as HTMLInputElement | null;
+    if (hpField && hpField.value) { console.log("[convenzioni] blocked by honeypot"); return; }
 
     const elapsed = Date.now() - formLoadedAt;
     console.log("[convenzioni] elapsed:", elapsed);
@@ -120,7 +120,7 @@ export default function ConvenzioniPage() {
         email: email.trim(),
         phone: phone.trim() || undefined,
         companyRole: companyRole.trim() || undefined,
-        _hp: honeypot,
+        _hp: hpField?.value || "",
         _ts: String(formLoadedAt),
       };
       const res = await apiRequest("POST", "/api/conventions/register", payload);
@@ -257,11 +257,11 @@ export default function ConvenzioniPage() {
                   <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true">
                     <input
                       type="text"
-                      name="website"
+                      id="conv_hp_field"
+                      name="conv_hp_field"
                       tabIndex={-1}
-                      autoComplete="off"
-                      value={honeypot}
-                      onChange={(e) => setHoneypot(e.target.value)}
+                      autoComplete="new-password"
+                      defaultValue=""
                     />
                   </div>
 
