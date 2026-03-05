@@ -87,9 +87,7 @@ export default function ConvenzioniPage() {
     }
   };
 
-  const handleRegister = async (e?: React.FormEvent | React.MouseEvent) => {
-    if (e) e.preventDefault();
-
+  const handleRegister = async () => {
     const hpField = document.getElementById("conv_hp_field") as HTMLInputElement | null;
     if (hpField && hpField.value) return;
 
@@ -248,23 +246,11 @@ export default function ConvenzioniPage() {
 
                 <h3 className="font-semibold mb-4">Compila i tuoi dati per ricevere il codice sconto</h3>
 
-                <form onSubmit={(e) => { e.preventDefault(); handleRegister(e); }} className="space-y-4" style={{ position: "relative" }}>
-                  <div style={{ overflow: "hidden", height: 0, width: 0, margin: 0, padding: 0 }} aria-hidden="true">
-                    <input
-                      type="text"
-                      id="conv_hp_field"
-                      name="conv_hp_field"
-                      tabIndex={-1}
-                      autoComplete="new-password"
-                      defaultValue=""
-                    />
-                  </div>
-
+                <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="firstName">Nome *</Label>
+                      <Label>Nome *</Label>
                       <Input
-                        id="firstName"
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         className="mt-1.5"
@@ -272,9 +258,8 @@ export default function ConvenzioniPage() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="lastName">Cognome *</Label>
+                      <Label>Cognome *</Label>
                       <Input
-                        id="lastName"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         className="mt-1.5"
@@ -284,9 +269,8 @@ export default function ConvenzioniPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="email">Email *</Label>
+                    <Label>Email *</Label>
                     <Input
-                      id="email"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -296,9 +280,8 @@ export default function ConvenzioniPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="phone">Telefono</Label>
+                    <Label>Telefono</Label>
                     <Input
-                      id="phone"
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
@@ -308,9 +291,8 @@ export default function ConvenzioniPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="companyRole">Ruolo in Azienda</Label>
+                    <Label>Ruolo in Azienda</Label>
                     <Input
-                      id="companyRole"
                       value={companyRole}
                       onChange={(e) => setCompanyRole(e.target.value)}
                       placeholder="es. Responsabile Marketing"
@@ -321,7 +303,6 @@ export default function ConvenzioniPage() {
 
                   <div className="flex gap-3 pt-2">
                     <Button
-                      type="button"
                       variant="outline"
                       onClick={() => setStep(1)}
                       data-testid="button-back-step1"
@@ -330,17 +311,16 @@ export default function ConvenzioniPage() {
                       Indietro
                     </Button>
                     <Button
-                      type="button"
                       disabled={submitLoading}
                       className="flex-1"
                       data-testid="button-register"
-                      onClick={handleRegister}
+                      onClick={() => handleRegister()}
                     >
                       {submitLoading ? "Registrazione in corso..." : "Registrati e Ottieni Sconto"}
                       {!submitLoading && <ArrowRight className="w-4 h-4 ml-2" />}
                     </Button>
                   </div>
-                </form>
+                </div>
               </Card>
             </motion.div>
           )}
