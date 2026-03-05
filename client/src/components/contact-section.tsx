@@ -208,7 +208,7 @@ export function ContactSection() {
                   ) : (
                     <Form {...form}>
                       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true" tabIndex={-1}>
+                        <div style={{ overflow: "hidden", height: 0, width: 0, margin: 0, padding: 0 }} aria-hidden="true">
                           <input
                             type="text"
                             id="ct_hp_field"

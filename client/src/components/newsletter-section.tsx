@@ -178,7 +178,7 @@ export function NewsletterSection() {
                   onSubmit={form.handleSubmit(onSubmit)}
                   className="flex flex-col gap-3 max-w-lg mx-auto"
                 >
-                  <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true" tabIndex={-1}>
+                  <div style={{ overflow: "hidden", height: 0, width: 0, margin: 0, padding: 0 }} aria-hidden="true">
                     <input
                       type="text"
                       id="nl_hp_field"

@@ -248,8 +248,8 @@ export default function ConvenzioniPage() {
 
                 <h3 className="font-semibold mb-4">Compila i tuoi dati per ricevere il codice sconto</h3>
 
-                <form onSubmit={(e) => { e.preventDefault(); handleRegister(e); }} className="space-y-4">
-                  <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true">
+                <form onSubmit={(e) => { e.preventDefault(); handleRegister(e); }} className="space-y-4" style={{ position: "relative" }}>
+                  <div style={{ overflow: "hidden", height: 0, width: 0, margin: 0, padding: 0 }} aria-hidden="true">
                     <input
                       type="text"
                       id="conv_hp_field"
