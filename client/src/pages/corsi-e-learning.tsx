@@ -54,11 +54,11 @@ import {
 import { Link } from "wouter";
 import { PROVINCES } from "@shared/provinces";
 import { COUNTRIES } from "@shared/countries";
-import corsoOnlineImage from "@assets/corso-lingua-online_1772143586662.jpg";
+import corsoOnlineImage from "@assets/course-digitale.png";
 import categoryOnline from "@/assets/images/category-online.jpg";
 import courseIndividual from "@/assets/images/course-individual.jpg";
-import lingueStraniereImage from "@assets/lingue-straniere_1772143318023.webp";
-import managementImage from "@assets/management-leadership_1772143822898.webp";
+import lingueStraniereImage from "@assets/course-lingue-straniere.png";
+import managementImage from "@assets/course-management.png";
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
