@@ -27,50 +27,6 @@ export interface ShopProduct {
 
 export const SHOP_PRODUCTS: ShopProduct[] = [
   {
-    slug: "corsi-gruppo",
-    name: "Corsi di Gruppo in Presenza",
-    category: "Formazione in Presenza",
-    description: "Corsi collettivi di lingua in piccoli gruppi (5-8 partecipanti) nelle sedi di Vicenza e Thiene, con docenti madrelingua qualificati.",
-    price: "340.00",
-    priceLabel: "da",
-    duration: "6-12 settimane",
-    features: [
-      "Gruppi ridotti 5-8 persone",
-      "Docenti madrelingua qualificati",
-      "Certificato di partecipazione",
-      "Metodo Interlingua",
-    ],
-    pageLink: "/formazione-in-presenza",
-    pageAnchor: "corsi-gruppo",
-    options: [
-      {
-        name: "lingua",
-        label: "Lingua",
-        values: ["Inglese", "Francese", "Tedesco", "Spagnolo", "Russo", "Italiano"],
-      },
-      {
-        name: "livello",
-        label: "Livello",
-        values: ["A1 - Principiante", "A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
-      },
-      {
-        name: "moduli",
-        label: "Moduli",
-        values: ["1 modulo (6 settimane)", "2 moduli (12 settimane)"],
-      },
-      {
-        name: "sede",
-        label: "Sede",
-        values: ["Vicenza", "Thiene (VI)"],
-      },
-    ],
-    variations: [
-      { options: { moduli: "1 modulo (6 settimane)" }, price: "340.00" },
-      { options: { moduli: "2 moduli (12 settimane)" }, price: "630.00" },
-    ],
-    priceRange: { min: "340.00", max: "630.00" },
-  },
-  {
     slug: "individuali-presenza",
     name: "Corsi Individuali o Semi-Individuali in Presenza",
     category: "Formazione in Presenza",
