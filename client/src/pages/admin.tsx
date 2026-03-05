@@ -1467,25 +1467,25 @@ function CourseMaterialsTab({ token }: { token: string }) {
   );
 }
 
-function getContactColor(interest: string | null): { border: string; badgeBg: string; badgeText: string } {
+function getContactColor(interest: string | null): { border: string; badgeBg: string; badgeText: string; flagLang: string | null } {
   const s = (interest || "").toLowerCase();
   if (s.includes("inglese") || s.includes("english") || s.includes("full immersion"))
-    return { border: "border-l-blue-500", badgeBg: "bg-blue-50 dark:bg-blue-950/40", badgeText: "text-blue-700 dark:text-blue-300" };
+    return { border: "border-l-blue-500", badgeBg: "bg-blue-50 dark:bg-blue-950/40", badgeText: "text-blue-700 dark:text-blue-300", flagLang: "english" };
   if (s.includes("tedesco") || s.includes("german"))
-    return { border: "border-l-amber-500", badgeBg: "bg-amber-50 dark:bg-amber-950/40", badgeText: "text-amber-700 dark:text-amber-300" };
+    return { border: "border-l-amber-500", badgeBg: "bg-amber-50 dark:bg-amber-950/40", badgeText: "text-amber-700 dark:text-amber-300", flagLang: "german" };
   if (s.includes("francese") || s.includes("french"))
-    return { border: "border-l-indigo-500", badgeBg: "bg-indigo-50 dark:bg-indigo-950/40", badgeText: "text-indigo-700 dark:text-indigo-300" };
+    return { border: "border-l-indigo-500", badgeBg: "bg-indigo-50 dark:bg-indigo-950/40", badgeText: "text-indigo-700 dark:text-indigo-300", flagLang: "french" };
   if (s.includes("spagnolo") || s.includes("spanish"))
-    return { border: "border-l-orange-500", badgeBg: "bg-orange-50 dark:bg-orange-950/40", badgeText: "text-orange-700 dark:text-orange-300" };
+    return { border: "border-l-orange-500", badgeBg: "bg-orange-50 dark:bg-orange-950/40", badgeText: "text-orange-700 dark:text-orange-300", flagLang: "spanish" };
   if (s.includes("italiano") || s.includes("italian") || s.includes("stranieri"))
-    return { border: "border-l-green-500", badgeBg: "bg-green-50 dark:bg-green-950/40", badgeText: "text-green-700 dark:text-green-300" };
+    return { border: "border-l-green-500", badgeBg: "bg-green-50 dark:bg-green-950/40", badgeText: "text-green-700 dark:text-green-300", flagLang: "italian" };
   if (s.includes("coaching"))
-    return { border: "border-l-violet-500", badgeBg: "bg-violet-50 dark:bg-violet-950/40", badgeText: "text-violet-700 dark:text-violet-300" };
+    return { border: "border-l-violet-500", badgeBg: "bg-violet-50 dark:bg-violet-950/40", badgeText: "text-violet-700 dark:text-violet-300", flagLang: null };
   if (s.includes("aziendal") || s.includes("corporate") || s.includes("multilingua"))
-    return { border: "border-l-rose-500", badgeBg: "bg-rose-50 dark:bg-rose-950/40", badgeText: "text-rose-700 dark:text-rose-300" };
+    return { border: "border-l-rose-500", badgeBg: "bg-rose-50 dark:bg-rose-950/40", badgeText: "text-rose-700 dark:text-rose-300", flagLang: null };
   if (s.includes("e-learning") || s.includes("online"))
-    return { border: "border-l-teal-500", badgeBg: "bg-teal-50 dark:bg-teal-950/40", badgeText: "text-teal-700 dark:text-teal-300" };
-  return { border: "border-l-gray-400", badgeBg: "bg-gray-50 dark:bg-gray-800/40", badgeText: "text-gray-700 dark:text-gray-300" };
+    return { border: "border-l-teal-500", badgeBg: "bg-teal-50 dark:bg-teal-950/40", badgeText: "text-teal-700 dark:text-teal-300", flagLang: null };
+  return { border: "border-l-gray-400", badgeBg: "bg-gray-50 dark:bg-gray-800/40", badgeText: "text-gray-700 dark:text-gray-300", flagLang: null };
 }
 
 function ContactsTab({ token }: { token: string }) {
@@ -1523,7 +1523,8 @@ function ContactsTab({ token }: { token: string }) {
                       <h3 className="font-bold">{c.name}</h3>
                       <p className="text-sm text-muted-foreground">{c.email} | {c.phone || "No phone"}</p>
                     </div>
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${colors.badgeBg} ${colors.badgeText}`}>
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${colors.badgeBg} ${colors.badgeText}`}>
+                      {colors.flagLang && <MiniFlag lang={colors.flagLang} />}
                       {c.courseInterest || "Generale"}
                     </span>
                   </div>
