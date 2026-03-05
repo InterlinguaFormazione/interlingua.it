@@ -1006,6 +1006,24 @@ const LANGUAGE_LABELS: Record<string, string> = {
   spanish: "Spagnolo",
 };
 
+function MiniFlag({ lang }: { lang: string }) {
+  const cls = "w-5 h-3.5 rounded-sm inline-block shrink-0";
+  switch (lang) {
+    case "english":
+      return <svg viewBox="0 0 60 40" className={cls}><rect width="60" height="40" fill="#012169"/><path d="M0,0 L60,40 M60,0 L0,40" stroke="#fff" strokeWidth="6.5"/><path d="M0,0 L60,40 M60,0 L0,40" stroke="#C8102E" strokeWidth="4"/><path d="M30,0 V40 M0,20 H60" stroke="#fff" strokeWidth="10"/><path d="M30,0 V40 M0,20 H60" stroke="#C8102E" strokeWidth="6"/></svg>;
+    case "italian":
+      return <svg viewBox="0 0 60 40" className={cls}><rect width="20" height="40" fill="#009246"/><rect x="20" width="20" height="40" fill="#fff"/><rect x="40" width="20" height="40" fill="#CE2B37"/></svg>;
+    case "german":
+      return <svg viewBox="0 0 60 40" className={cls}><rect width="60" height="13.33" fill="#000"/><rect y="13.33" width="60" height="13.33" fill="#DD0000"/><rect y="26.67" width="60" height="13.33" fill="#FFCC00"/></svg>;
+    case "french":
+      return <svg viewBox="0 0 60 40" className={cls}><rect width="20" height="40" fill="#002395"/><rect x="20" width="20" height="40" fill="#fff"/><rect x="40" width="20" height="40" fill="#ED2939"/></svg>;
+    case "spanish":
+      return <svg viewBox="0 0 60 40" className={cls}><rect width="60" height="10" fill="#AA151B"/><rect y="10" width="60" height="20" fill="#F1BF00"/><rect y="30" width="60" height="10" fill="#AA151B"/></svg>;
+    default:
+      return null;
+  }
+}
+
 function EnglishAdaptiveTab({ token }: { token: string }) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [filterCompany, setFilterCompany] = useState("");
@@ -1061,7 +1079,7 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
         <Card>
           <CardHeader>
             <CardTitle>{detail.session.firstName} {detail.session.lastName}</CardTitle>
-            <CardDescription>{detail.session.email}{detail.session.company ? ` - ${detail.session.company}` : ""} — Test {LANGUAGE_LABELS[detail.session.language] || detail.session.language}</CardDescription>
+            <CardDescription>{detail.session.email}{detail.session.company ? ` - ${detail.session.company}` : ""} — <span className="inline-flex items-center gap-1"><MiniFlag lang={detail.session.language} /> Test {LANGUAGE_LABELS[detail.session.language] || detail.session.language}</span></CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-3 gap-4 text-center">
@@ -1221,7 +1239,7 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
                     <div className="font-medium">{s.firstName} {s.lastName}</div>
                     <div className="text-xs text-muted-foreground">{s.email}</div>
                   </td>
-                  <td className="px-2 text-sm">{LANGUAGE_LABELS[s.language] || s.language}</td>
+                  <td className="px-2 text-sm"><span className="flex items-center gap-1.5"><MiniFlag lang={s.language} />{LANGUAGE_LABELS[s.language] || s.language}</span></td>
                   <td className="px-2">{s.company}</td>
                   <td className="text-center px-2">{levelBadge(s.finalLevel)}</td>
                   <td className="text-center px-2">{s.correctAnswers}/{s.totalQuestions}</td>
