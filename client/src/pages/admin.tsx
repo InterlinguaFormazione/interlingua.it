@@ -2013,6 +2013,10 @@ function VouchersTab({ token }: { token: string }) {
     requiresNewsletterSub: false,
     active: true,
   });
+  const [tiers, setTiers] = useState<Array<{ min: number; discount: number; type: "percentage" | "fixed" }>>([
+    { min: 200, discount: 10, type: "percentage" },
+    { min: 500, discount: 20, type: "percentage" },
+  ]);
   const { toast } = useToast();
 
   const { data: vouchers = [], isLoading } = useQuery<DiscountVoucher[]>({
@@ -2100,6 +2104,7 @@ function VouchersTab({ token }: { token: string }) {
       requiresNewsletterSub: false,
       active: true,
     });
+    setTiers([{ min: 200, discount: 10, type: "percentage" }, { min: 500, discount: 20, type: "percentage" }]);
   };
 
   const handleEdit = (v: DiscountVoucher) => {
@@ -2108,7 +2113,7 @@ function VouchersTab({ token }: { token: string }) {
       code: v.code,
       description: v.description || "",
       discountType: v.discountType,
-      discountValue: v.discountValue,
+      discountValue: v.discountType === "tiered" ? "" : v.discountValue,
       minOrderAmount: v.minOrderAmount || "",
       maxUses: v.maxUses !== null ? String(v.maxUses) : "",
       validFrom: v.validFrom ? v.validFrom.slice(0, 16) : "",
@@ -2119,19 +2124,45 @@ function VouchersTab({ token }: { token: string }) {
       requiresNewsletterSub: v.requiresNewsletterSub || false,
       active: v.active !== false,
     });
+    if (v.discountType === "tiered") {
+      try {
+        setTiers(JSON.parse(v.discountValue));
+      } catch {
+        setTiers([{ min: 200, discount: 10, type: "percentage" }, { min: 500, discount: 20, type: "percentage" }]);
+      }
+    } else {
+      setTiers([{ min: 200, discount: 10, type: "percentage" }, { min: 500, discount: 20, type: "percentage" }]);
+    }
     setIsDialogOpen(true);
   };
 
   const handleSubmit = () => {
-    if (!formData.code || !formData.discountValue) {
+    const isTiered = formData.discountType === "tiered";
+    if (!formData.code || (!isTiered && !formData.discountValue)) {
       toast({ title: "Errore", description: "Codice e valore sconto sono obbligatori", variant: "destructive" });
       return;
+    }
+    if (isTiered && tiers.length === 0) {
+      toast({ title: "Errore", description: "Aggiungi almeno una fascia di sconto", variant: "destructive" });
+      return;
+    }
+    if (isTiered) {
+      for (const t of tiers) {
+        if (t.min <= 0 || t.discount <= 0) {
+          toast({ title: "Errore", description: "Tutti i valori delle fasce devono essere positivi", variant: "destructive" });
+          return;
+        }
+        if (t.type === "percentage" && t.discount > 100) {
+          toast({ title: "Errore", description: "La percentuale non può superare il 100%", variant: "destructive" });
+          return;
+        }
+      }
     }
     const payload: Record<string, unknown> = {
       code: formData.code.toUpperCase().trim(),
       description: formData.description || null,
       discountType: formData.discountType,
-      discountValue: formData.discountValue,
+      discountValue: isTiered ? JSON.stringify(tiers.sort((a, b) => a.min - b.min)) : formData.discountValue,
       minOrderAmount: formData.minOrderAmount || null,
       maxUses: formData.maxUses ? parseInt(formData.maxUses, 10) : null,
       validFrom: formData.validFrom || null,
@@ -2212,10 +2243,91 @@ function VouchersTab({ token }: { token: string }) {
                     <SelectContent>
                       <SelectItem value="percentage">Percentuale (%)</SelectItem>
                       <SelectItem value="fixed">Fisso (&euro;)</SelectItem>
+                      <SelectItem value="tiered">Per Fasce di Spesa</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
+              {formData.discountType === "tiered" ? (
+                <div className="space-y-3">
+                  <Label>Fasce di Sconto</Label>
+                  <p className="text-xs text-muted-foreground">Definisci le soglie di spesa e lo sconto corrispondente. Viene applicata la fascia più alta raggiunta.</p>
+                  <div className="space-y-2">
+                    {tiers.map((tier, idx) => (
+                      <div key={idx} className="flex items-center gap-2 p-2 border rounded-lg bg-muted/30" data-testid={`tier-row-${idx}`}>
+                        <div className="flex items-center gap-1 flex-1">
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">Spesa min €</span>
+                          <Input
+                            type="number"
+                            value={tier.min}
+                            onChange={e => {
+                              const updated = [...tiers];
+                              updated[idx] = { ...updated[idx], min: parseFloat(e.target.value) || 0 };
+                              setTiers(updated);
+                            }}
+                            className="w-20 h-8 text-sm"
+                            data-testid={`input-tier-min-${idx}`}
+                          />
+                        </div>
+                        <div className="flex items-center gap-1 flex-1">
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">Sconto</span>
+                          <Input
+                            type="number"
+                            value={tier.discount}
+                            onChange={e => {
+                              const updated = [...tiers];
+                              updated[idx] = { ...updated[idx], discount: parseFloat(e.target.value) || 0 };
+                              setTiers(updated);
+                            }}
+                            className="w-20 h-8 text-sm"
+                            data-testid={`input-tier-discount-${idx}`}
+                          />
+                        </div>
+                        <Select value={tier.type} onValueChange={(val: "percentage" | "fixed") => {
+                          const updated = [...tiers];
+                          updated[idx] = { ...updated[idx], type: val };
+                          setTiers(updated);
+                        }}>
+                          <SelectTrigger className="w-20 h-8 text-xs" data-testid={`select-tier-type-${idx}`}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="percentage">%</SelectItem>
+                            <SelectItem value="fixed">€</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                          onClick={() => setTiers(tiers.filter((_, i) => i !== idx))}
+                          data-testid={`button-remove-tier-${idx}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setTiers([...tiers, { min: 0, discount: 5, type: "percentage" }])}
+                    data-testid="button-add-tier"
+                  >
+                    <Plus className="w-3.5 h-3.5 mr-1" /> Aggiungi Fascia
+                  </Button>
+                  {tiers.length > 0 && (
+                    <div className="text-xs text-muted-foreground bg-muted/50 rounded p-2 space-y-1">
+                      <p className="font-medium">Anteprima:</p>
+                      {[...tiers].sort((a, b) => a.min - b.min).map((t, i) => (
+                        <p key={i}>
+                          Spesa ≥ €{t.min.toFixed(0)} → sconto {t.type === "percentage" ? `${t.discount}%` : `€${t.discount.toFixed(2)}`}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Valore Sconto</Label>
@@ -2236,6 +2348,7 @@ function VouchersTab({ token }: { token: string }) {
                   />
                 </div>
               </div>
+              )}
               <div className="space-y-2">
                 <Label>Descrizione (nota interna)</Label>
                 <Input
@@ -2409,11 +2522,18 @@ function VouchersTab({ token }: { token: string }) {
                     <td className="py-3 px-2 text-muted-foreground text-xs max-w-[150px] truncate">{v.description || "-"}</td>
                     <td className="py-3 px-2 text-center">
                       <Badge variant="outline" className="text-xs">
-                        {v.discountType === "percentage" ? "%" : "EUR"}
+                        {v.discountType === "percentage" ? "%" : v.discountType === "tiered" ? "Fasce" : "EUR"}
                       </Badge>
                     </td>
-                    <td className="py-3 px-2 text-center font-medium">
-                      {v.discountType === "percentage" ? `${v.discountValue}%` : `${parseFloat(v.discountValue).toFixed(2)}`}
+                    <td className="py-3 px-2 text-center font-medium text-xs">
+                      {v.discountType === "tiered" ? (() => {
+                        try {
+                          const t = JSON.parse(v.discountValue) as Array<{min: number; discount: number; type: string}>;
+                          return t.sort((a, b) => a.min - b.min).map((tier, i) => (
+                            <div key={i}>€{tier.min}+ → {tier.type === "percentage" ? `${tier.discount}%` : `€${tier.discount}`}</div>
+                          ));
+                        } catch { return v.discountValue; }
+                      })() : v.discountType === "percentage" ? `${v.discountValue}%` : `€${parseFloat(v.discountValue).toFixed(2)}`}
                     </td>
                     <td className="py-3 px-2 text-center">
                       {v.usedCount}{v.maxUses !== null ? `/${v.maxUses}` : ""}

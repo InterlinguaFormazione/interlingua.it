@@ -38,6 +38,53 @@ import {
   getWritingPrompt, getSpeakingPrompt, SECTION_SKILLS,
   shouldEndSection, MAX_QUESTIONS_PER_SECTION,  isLevelStable
 } from "./cat-engine";
+
+interface TieredTier {
+  min: number;
+  discount: number;
+  type: "percentage" | "fixed";
+}
+
+function calculateVoucherDiscount(discountType: string, discountValue: string, total: number): number {
+  if (discountType === "percentage") {
+    const pct = parseFloat(discountValue);
+    if (isNaN(pct) || pct <= 0) return 0;
+    return total * (Math.min(pct, 100) / 100);
+  } else if (discountType === "tiered") {
+    try {
+      const tiers: TieredTier[] = JSON.parse(discountValue);
+      if (!Array.isArray(tiers) || tiers.length === 0) return 0;
+      const valid = tiers.filter(t => typeof t.min === "number" && typeof t.discount === "number" && !isNaN(t.min) && !isNaN(t.discount) && t.min > 0 && t.discount > 0);
+      const sorted = [...valid].sort((a, b) => b.min - a.min);
+      for (const tier of sorted) {
+        if (total >= tier.min) {
+          if (tier.type === "percentage") {
+            return total * (Math.min(tier.discount, 100) / 100);
+          } else {
+            return tier.discount;
+          }
+        }
+      }
+      return 0;
+    } catch {
+      return 0;
+    }
+  } else {
+    const val = parseFloat(discountValue);
+    if (isNaN(val) || val <= 0) return 0;
+    return val;
+  }
+}
+
+function formatVoucherMessage(discountType: string, discountValue: string, discountAmount: number): string {
+  if (discountType === "percentage") {
+    return `Sconto del ${discountValue}% applicato!`;
+  } else if (discountType === "tiered") {
+    return `Sconto di €${discountAmount.toFixed(2)} applicato in base alla spesa!`;
+  } else {
+    return `Sconto di €${parseFloat(discountValue).toFixed(2)} applicato!`;
+  }
+}
 import { sendEnglishTestResultEmail, sendEnglishTestConfirmationEmail } from "./email";
 import multer from "multer";
 import cron from "node-cron";
@@ -1642,12 +1689,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
             }
           }
           if (validTime && validUses && validProduct && validMin && validFirstTime && validNewsletter) {
-            let discount = 0;
-            if (voucher.discountType === "percentage") {
-              discount = total * (parseFloat(voucher.discountValue) / 100);
-            } else {
-              discount = parseFloat(voucher.discountValue);
-            }
+            let discount = calculateVoucherDiscount(voucher.discountType, voucher.discountValue, total);
             discount = Math.min(discount, total);
             finalPrice = Math.max(0, total - discount).toFixed(2);
             appliedDiscountCode = voucher.code;
@@ -1831,12 +1873,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
             }
           }
           if (validTime && validUses && validProduct && validMin && validFirstTime && validNewsletter) {
-            let discount = 0;
-            if (voucher.discountType === "percentage") {
-              discount = expectedTotal * (parseFloat(voucher.discountValue) / 100);
-            } else {
-              discount = parseFloat(voucher.discountValue);
-            }
+            let discount = calculateVoucherDiscount(voucher.discountType, voucher.discountValue, expectedTotal);
             discount = Math.min(discount, expectedTotal);
             finalTotal = Math.max(0, expectedTotal - discount);
             appliedDiscountCode = voucher.code;
@@ -2442,15 +2479,37 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       if (!code || !discountType || !discountValue) {
         return res.status(400).json({ success: false, message: "Codice, tipo e valore sconto sono obbligatori." });
       }
-      if (!["percentage", "fixed"].includes(discountType)) {
+      if (!["percentage", "fixed", "tiered"].includes(discountType)) {
         return res.status(400).json({ success: false, message: "Tipo sconto non valido." });
       }
-      const numValue = parseFloat(discountValue);
-      if (isNaN(numValue) || numValue <= 0) {
-        return res.status(400).json({ success: false, message: "Il valore dello sconto deve essere un numero positivo." });
-      }
-      if (discountType === "percentage" && numValue > 100) {
-        return res.status(400).json({ success: false, message: "La percentuale di sconto non può superare il 100%." });
+      if (discountType === "tiered") {
+        try {
+          const tiers = JSON.parse(discountValue);
+          if (!Array.isArray(tiers) || tiers.length === 0) {
+            return res.status(400).json({ success: false, message: "Le fasce di sconto devono contenere almeno una fascia." });
+          }
+          for (const tier of tiers) {
+            if (typeof tier.min !== "number" || typeof tier.discount !== "number" || !["percentage", "fixed"].includes(tier.type)) {
+              return res.status(400).json({ success: false, message: "Ogni fascia deve avere min, discount e type validi." });
+            }
+            if (isNaN(tier.min) || isNaN(tier.discount) || tier.min <= 0 || tier.discount <= 0) {
+              return res.status(400).json({ success: false, message: "I valori min e sconto devono essere numeri positivi." });
+            }
+            if (tier.type === "percentage" && tier.discount > 100) {
+              return res.status(400).json({ success: false, message: "La percentuale di sconto non può superare il 100%." });
+            }
+          }
+        } catch {
+          return res.status(400).json({ success: false, message: "Formato fasce di sconto non valido." });
+        }
+      } else {
+        const numValue = parseFloat(discountValue);
+        if (isNaN(numValue) || numValue <= 0) {
+          return res.status(400).json({ success: false, message: "Il valore dello sconto deve essere un numero positivo." });
+        }
+        if (discountType === "percentage" && numValue > 100) {
+          return res.status(400).json({ success: false, message: "La percentuale di sconto non può superare il 100%." });
+        }
       }
       const existing = await storage.getDiscountVoucherByCode(code.toUpperCase());
       if (existing) {
@@ -2568,12 +2627,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       if (voucher.minOrderAmount && total < parseFloat(voucher.minOrderAmount)) {
         return res.json({ valid: false, message: `Ordine minimo di €${parseFloat(voucher.minOrderAmount).toFixed(2)} richiesto per questo codice.` });
       }
-      let discount = 0;
-      if (voucher.discountType === "percentage") {
-        discount = total * (parseFloat(voucher.discountValue) / 100);
-      } else {
-        discount = parseFloat(voucher.discountValue);
-      }
+      let discount = calculateVoucherDiscount(voucher.discountType, voucher.discountValue, total);
       discount = Math.min(discount, total);
       const discountedTotal = Math.max(0, total - discount).toFixed(2);
       res.json({
@@ -2582,9 +2636,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         discountedTotal,
         discountType: voucher.discountType,
         discountValue: voucher.discountValue,
-        message: voucher.discountType === "percentage"
-          ? `Sconto del ${voucher.discountValue}% applicato!`
-          : `Sconto di €${parseFloat(voucher.discountValue).toFixed(2)} applicato!`,
+        message: formatVoucherMessage(voucher.discountType, voucher.discountValue, discount),
       });
     } catch (error) {
       console.error("Error validating voucher:", error);
@@ -2757,12 +2809,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
           const total = parseFloat(expectedPrice);
           const validMin = !voucher.minOrderAmount || total >= parseFloat(voucher.minOrderAmount);
           if (validTime && validUses && validProduct && validMin) {
-            let discount = 0;
-            if (voucher.discountType === "percentage") {
-              discount = total * (parseFloat(voucher.discountValue) / 100);
-            } else {
-              discount = parseFloat(voucher.discountValue);
-            }
+            let discount = calculateVoucherDiscount(voucher.discountType, voucher.discountValue, total);
             discount = Math.min(discount, total);
             finalPrice = Math.max(0, total - discount).toFixed(2);
             appliedDiscountCode = voucher.code;
@@ -2983,12 +3030,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
           const validProduct = !voucher.productSlugs || cartSlugs.every((s: string) => allowedSlugs.includes(s));
           const validMin = !voucher.minOrderAmount || expectedTotal >= parseFloat(voucher.minOrderAmount);
           if (validTime && validUses && validProduct && validMin) {
-            let discount = 0;
-            if (voucher.discountType === "percentage") {
-              discount = expectedTotal * (parseFloat(voucher.discountValue) / 100);
-            } else {
-              discount = parseFloat(voucher.discountValue);
-            }
+            let discount = calculateVoucherDiscount(voucher.discountType, voucher.discountValue, expectedTotal);
             discount = Math.min(discount, expectedTotal);
             finalTotal = Math.max(0, expectedTotal - discount);
             appliedDiscountCode = voucher.code;
@@ -3179,12 +3221,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         }
         const total = parseFloat(cartTotal || "0");
         if (voucher.minOrderAmount && total < parseFloat(voucher.minOrderAmount)) continue;
-        let discount = 0;
-        if (voucher.discountType === "percentage") {
-          discount = total * (parseFloat(voucher.discountValue) / 100);
-        } else {
-          discount = parseFloat(voucher.discountValue);
-        }
+        let discount = calculateVoucherDiscount(voucher.discountType, voucher.discountValue, total);
         discount = Math.min(discount, total);
         const discountedTotal = Math.max(0, total - discount).toFixed(2);
         return res.json({
@@ -3194,9 +3231,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
           discountedTotal,
           discountType: voucher.discountType,
           discountValue: voucher.discountValue,
-          message: voucher.discountType === "percentage"
-            ? `Sconto di benvenuto del ${voucher.discountValue}% applicato!`
-            : `Sconto di benvenuto di €${parseFloat(voucher.discountValue).toFixed(2)} applicato!`,
+          message: formatVoucherMessage(voucher.discountType, voucher.discountValue, discount),
         });
       }
       res.json({ found: false });
