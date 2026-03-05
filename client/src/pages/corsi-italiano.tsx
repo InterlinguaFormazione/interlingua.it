@@ -154,6 +154,7 @@ const content = {
           "Tassa di iscrizione: 50,00 euro",
         ],
         popular: true,
+        reviewSlug: "italiano-intensivo-15",
       },
       {
         title: "Intensivo Collettivo 20",
@@ -170,6 +171,7 @@ const content = {
           "Tassa di iscrizione: 50,00 euro",
         ],
         popular: false,
+        reviewSlug: "italiano-intensivo-20",
       },
       {
         title: "Individuale in Presenza",
@@ -186,6 +188,7 @@ const content = {
           "Certificato finale",
         ],
         popular: false,
+        reviewSlug: "italiano-individuale-presenza",
       },
       {
         title: "Individuale Online",
@@ -202,6 +205,7 @@ const content = {
           "Certificato finale",
         ],
         popular: false,
+        reviewSlug: "italiano-individuale-online",
       },
     ],
     enrollmentNote: "Tassa di iscrizione: 50,00 euro (una tantum)",
@@ -302,6 +306,7 @@ const content = {
           "Enrolment fee: 50.00 euro",
         ],
         popular: true,
+        reviewSlug: "italiano-intensivo-15",
       },
       {
         title: "Intensive Collective 20",
@@ -318,6 +323,7 @@ const content = {
           "Enrolment fee: 50.00 euro",
         ],
         popular: false,
+        reviewSlug: "italiano-intensivo-20",
       },
       {
         title: "Individual In-Person",
@@ -334,6 +340,7 @@ const content = {
           "Final certificate",
         ],
         popular: false,
+        reviewSlug: "italiano-individuale-presenza",
       },
       {
         title: "Individual Online",
@@ -350,6 +357,7 @@ const content = {
           "Final certificate",
         ],
         popular: false,
+        reviewSlug: "italiano-individuale-online",
       },
     ],
     enrollmentNote: "Enrolment fee: 50.00 euro (one-time)",
@@ -786,6 +794,11 @@ export default function CorsiItalianoPage() {
                         {t.heroCtaSecondary}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
+                      {course.reviewSlug && (
+                        <div className="mt-4">
+                          <CourseReviewsInline productSlug={course.reviewSlug} />
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </AnimatedSection>
@@ -990,8 +1003,6 @@ export default function CorsiItalianoPage() {
             </AnimatedSection>
           </div>
         </section>
-        <CourseReviewsInline productSlug="italiano-intensivo-15" />
-        <CourseReviewsInline productSlug="italiano-intensivo-20" />
       </main>
       <Footer />
     </div>
