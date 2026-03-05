@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
-import { CourseReviewsInline } from "@/components/product-reviews";
+import { ProductReviewsSection } from "@/components/product-reviews";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -903,7 +903,7 @@ export default function FullImmersionPage() {
             </AnimatedSection>
           </div>
         </section>
-        <CourseReviewsInline productSlug="full-immersion" />
+        <ProductReviewsSection productSlugs={["full-immersion"]} />
       </main>
       <Footer />
     </div>
