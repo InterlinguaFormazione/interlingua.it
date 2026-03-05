@@ -57,10 +57,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import languageCoachingImage from "@assets/course-language-coaching.png";
-import courseIndividual from "@/assets/images/course-individual.jpg";
-import courseConversation from "@/assets/images/course-conversation.jpg";
-import categorySoftSkills from "@/assets/images/category-soft-skills.jpg";
-import categoryOnline from "@/assets/images/category-online.jpg";
+import courseIndividual from "@assets/coaching-individuale-sede.png";
+import courseConversation from "@assets/coaching-fluency.png";
+import categorySoftSkills from "@assets/coaching-blended.png";
+import categoryOnline from "@assets/coaching-online.png";
 
 function usePrefersReducedMotion() {
   const [prefersReduced, setPrefersReduced] = useState(false);
