@@ -36,6 +36,8 @@ export function NewsletterSection() {
   const form = useForm<NewsletterFormData>({
     resolver: zodResolver(newsletterFormSchema),
     defaultValues: {
+      firstName: "",
+      lastName: "",
       email: "",
     },
   });
@@ -174,7 +176,7 @@ export function NewsletterSection() {
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
-                  className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto"
+                  className="flex flex-col gap-3 max-w-lg mx-auto"
                 >
                   <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true" tabIndex={-1}>
                     <label htmlFor="company_name">Company</label>
@@ -187,6 +189,45 @@ export function NewsletterSection() {
                       autoComplete="off"
                     />
                   </div>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <FormField
+                      control={form.control}
+                      name="firstName"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="Nome"
+                              className="h-14 text-base rounded-xl bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:bg-white/20 backdrop-blur-sm shadow-lg shadow-black/10"
+                              data-testid="input-newsletter-firstname"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-white/80" />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="lastName"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <Input
+                              type="text"
+                              placeholder="Cognome"
+                              className="h-14 text-base rounded-xl bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:bg-white/20 backdrop-blur-sm shadow-lg shadow-black/10"
+                              data-testid="input-newsletter-lastname"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-white/80" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3">
                   <FormField
                     control={form.control}
                     name="email"
@@ -222,6 +263,7 @@ export function NewsletterSection() {
                       </>
                     )}
                   </Button>
+                  </div>
                 </form>
               </Form>
 

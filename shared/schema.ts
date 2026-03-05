@@ -42,6 +42,8 @@ export type ContactSubmission = typeof contactSubmissions.$inferSelect;
 
 export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  firstName: text("first_name").notNull().default(""),
+  lastName: text("last_name").notNull().default(""),
   email: text("email").notNull().unique(),
   subscribed: boolean("subscribed").default(true),
   createdAt: timestamp("created_at").defaultNow(),

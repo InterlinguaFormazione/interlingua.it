@@ -1531,7 +1531,8 @@ function NewsletterTab({ token }: { token: string }) {
   });
 
   const filtered = subs.filter((s) => {
-    if (searchEmail && !s.email.toLowerCase().includes(searchEmail.toLowerCase())) return false;
+    const searchLower = searchEmail.toLowerCase();
+    if (searchEmail && !s.email.toLowerCase().includes(searchLower) && !(s.firstName || "").toLowerCase().includes(searchLower) && !(s.lastName || "").toLowerCase().includes(searchLower)) return false;
     if (filterStatus === "active" && !s.subscribed) return false;
     if (filterStatus === "unsubscribed" && s.subscribed) return false;
     return true;
@@ -1551,7 +1552,7 @@ function NewsletterTab({ token }: { token: string }) {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Cerca per email..."
+              placeholder="Cerca per nome o email..."
               value={searchEmail}
               onChange={(e) => setSearchEmail(e.target.value)}
               className="pl-9"
@@ -1581,6 +1582,7 @@ function NewsletterTab({ token }: { token: string }) {
             <table className="w-full">
               <thead>
                 <tr className="border-b">
+                  <th className="text-left py-3 px-2 font-medium">Nome</th>
                   <th className="text-left py-3 px-2 font-medium">Email</th>
                   <th className="text-center py-3 px-2 font-medium">Stato</th>
                   <th className="text-right py-3 px-2 font-medium">Data Iscrizione</th>
@@ -1590,6 +1592,7 @@ function NewsletterTab({ token }: { token: string }) {
               <tbody>
                 {filtered.map((s) => (
                   <tr key={s.id} className="border-b last:border-0" data-testid={`newsletter-row-${s.id}`}>
+                    <td className="py-3 px-2 font-medium">{s.firstName || ""} {s.lastName || ""}</td>
                     <td className="py-3 px-2">{s.email}</td>
                     <td className="py-3 px-2 text-center">
                       <Badge variant={s.subscribed ? "default" : "secondary"}>
