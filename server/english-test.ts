@@ -51,7 +51,8 @@ export async function scoreWriting(prompt: string, response: string, currentLeve
   const langName = languageNames[language] || "English";
 
   const systemPrompt = `You are an expert ${langName} language examiner. Evaluate a candidate's written response for a General ${langName} placement test.
-The candidate's response MUST be evaluated as ${langName} writing. If the response is not in ${langName}, score it very low.
+The candidate's response MUST be evaluated as ${langName} writing. If the response is entirely in a different language, score it very low.
+However, ignore occasional filler words or short expressions from the candidate's native language (e.g. "dunque", "ma", "allora", "bueno", "also", "perro", "alors"). These subconscious slips are normal for language learners and should NOT count against the candidate.
 The candidate's estimated CEFR level is ${currentLevel}.
 
 Score these four dimensions from 0-100:
@@ -117,7 +118,8 @@ export async function scoreSpeaking(prompt: string, transcript: string, currentL
   const langName = languageNames[language] || "English";
 
   const systemPrompt = `You are an expert ${langName} language examiner. Evaluate a candidate's spoken response (transcribed) for a General ${langName} placement test.
-The candidate's response MUST be evaluated as ${langName} speech. If the response is not in ${langName}, score it very low.
+The candidate's response MUST be evaluated as ${langName} speech. If the response is entirely in a different language, score it very low.
+However, ignore occasional filler words or short expressions from the candidate's native language (e.g. "dunque", "ma", "allora", "bueno", "also", "perro", "alors", "ehm", "cioè"). These subconscious slips are very common in spoken language tests and should NOT count against the candidate. Focus on the substantive ${langName} content only.
 The candidate's estimated CEFR level is ${currentLevel}.
 
 Score these four dimensions from 0-100:
