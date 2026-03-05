@@ -2112,6 +2112,31 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
     }
   });
 
+  app.get("/api/shop/my-conventions", async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.replace("Bearer ", "");
+      if (!token) return res.status(401).json({ success: false, message: "Non autorizzato." });
+      const session = shopCustomerSessions.get(token);
+      if (!session || Date.now() - session.createdAt > SHOP_SESSION_DURATION) {
+        if (session) shopCustomerSessions.delete(token);
+        return res.status(401).json({ success: false, message: "Sessione scaduta." });
+      }
+      const customer = await storage.getShopCustomerById(session.customerId);
+      if (!customer) return res.status(401).json({ success: false, message: "Cliente non trovato." });
+      const convRegistrations = await storage.getRegistrationsByCustomerEmail(customer.email);
+      const result = convRegistrations.map(({ registration, convention }) => ({
+        companyName: convention.companyName,
+        registeredAt: registration.createdAt,
+        discounts: convention.discounts || [],
+      }));
+      res.json(result);
+    } catch (error) {
+      console.error("Shop my-conventions error:", error);
+      res.status(500).json({ success: false, message: "Errore del server." });
+    }
+  });
+
   app.get("/api/shop/my-orders", async (req, res) => {
     try {
       const authHeader = req.headers.authorization;
@@ -2753,11 +2778,14 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
 
   app.post("/api/conventions/register", async (req, res) => {
     try {
-      const { companyCode, firstName, lastName, email, phone, companyRole, _hp, _ts } = req.body;
+      const { companyCode, firstName, lastName, email, password, phone, companyRole, _hp, _ts } = req.body;
       if (_hp) return res.status(400).json({ success: false, message: "Richiesta non valida." });
       if (_ts && Date.now() - parseInt(_ts) < 2000) return res.status(400).json({ success: false, message: "Riprova tra qualche secondo." });
       if (!companyCode || !firstName || !lastName || !email) {
         return res.status(400).json({ success: false, message: "Nome, cognome, email e codice aziendale sono obbligatori." });
+      }
+      if (!password || password.length < 6) {
+        return res.status(400).json({ success: false, message: "La password deve essere di almeno 6 caratteri." });
       }
       const convention = await storage.getConventionByCode(companyCode.toUpperCase().trim());
       if (!convention || !convention.active) {
@@ -2767,29 +2795,49 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       if (convention.maxRegistrations && count >= convention.maxRegistrations) {
         return res.status(400).json({ success: false, message: "Le registrazioni per questa convenzione hanno raggiunto il limite massimo." });
       }
-      const existing = await storage.getRegistrationByEmail(convention.id, email);
+      const normalizedEmail = email.toLowerCase().trim();
+
+      const existingCustomer = await storage.getShopCustomerByEmail(normalizedEmail);
+      let accountCreated = false;
+      if (!existingCustomer) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await storage.createShopCustomer({
+          email: normalizedEmail,
+          password: hashedPassword,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          phone: phone || null,
+        });
+        accountCreated = true;
+      }
+
+      const existing = await storage.getRegistrationByEmail(convention.id, normalizedEmail);
       if (existing) {
         return res.json({
           success: true,
           alreadyRegistered: true,
+          accountCreated,
           companyName: convention.companyName,
-          message: "Risulti già registrato/a per questa convenzione. Gli sconti verranno applicati automaticamente al checkout.",
+          message: accountCreated
+            ? "Risulti già registrato/a per questa convenzione. Il tuo account è stato creato."
+            : "Risulti già registrato/a per questa convenzione. Gli sconti verranno applicati automaticamente al checkout.",
         });
       }
       await storage.createConventionRegistration({
         conventionId: convention.id,
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        email: email.toLowerCase().trim(),
+        email: normalizedEmail,
         phone: phone || null,
         companyRole: companyRole || null,
         verified: false,
       });
+
       try {
         await forwardToCRM({
           nome: firstName.trim(),
           cognome: lastName.trim(),
-          email: email.toLowerCase().trim(),
+          email: normalizedEmail,
           telefono: phone || "",
           interesse: `Convenzione: ${convention.companyName}`,
           messaggio: `Registrazione convenzione ${convention.companyName} (${convention.companyCode}). Ruolo: ${companyRole || "N/A"}`,
@@ -2799,8 +2847,11 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       res.json({
         success: true,
         alreadyRegistered: false,
+        accountCreated,
         companyName: convention.companyName,
-        message: "Registrazione completata! Gli sconti verranno applicati automaticamente quando inserirai questa email al checkout.",
+        message: accountCreated
+          ? "Registrazione completata! Il tuo account è stato creato."
+          : "Registrazione completata! Gli sconti verranno applicati automaticamente al checkout.",
       });
     } catch (error) {
       console.error("Error registering for convention:", error);

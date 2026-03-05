@@ -212,6 +212,7 @@ export interface IStorage {
   getConventionRegistrations(): Promise<ConventionRegistration[]>;
   getRegistrationsByConvention(conventionId: string): Promise<ConventionRegistration[]>;
   getRegistrationByEmail(conventionId: string, email: string): Promise<ConventionRegistration | undefined>;
+  getRegistrationsByCustomerEmail(email: string): Promise<Array<{ registration: ConventionRegistration; convention: Convention }>>;
   getRegistrationCountByConvention(conventionId: string): Promise<number>;
 }
 
@@ -830,6 +831,16 @@ export class DatabaseStorage implements IStorage {
     const [result] = await db.select().from(conventionRegistrations)
       .where(and(eq(conventionRegistrations.conventionId, conventionId), eq(conventionRegistrations.email, email.toLowerCase().trim())));
     return result;
+  }
+
+  async getRegistrationsByCustomerEmail(email: string): Promise<Array<{ registration: ConventionRegistration; convention: Convention }>> {
+    const results = await db.select({
+      registration: conventionRegistrations,
+      convention: conventions,
+    }).from(conventionRegistrations)
+      .innerJoin(conventions, eq(conventionRegistrations.conventionId, conventions.id))
+      .where(and(eq(conventionRegistrations.email, email.toLowerCase().trim()), eq(conventions.active, true)));
+    return results;
   }
 
   async getRegistrationCountByConvention(conventionId: string): Promise<number> {

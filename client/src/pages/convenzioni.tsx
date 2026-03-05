@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Handshake, Search, CheckCircle, Gift, ArrowRight, ArrowLeft, Building2 } from "lucide-react";
+import { Handshake, Search, CheckCircle, Gift, ArrowRight, ArrowLeft, Building2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,8 @@ interface ConventionInfo {
 interface RegistrationResult {
   companyName: string;
   discounts: ConventionDiscount[];
+  accountCreated: boolean;
+  alreadyRegistered: boolean;
 }
 
 const fadeInUp = {
@@ -50,6 +52,10 @@ export default function ConvenzioniPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [companyRole, setCompanyRole] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [formLoadedAt] = useState(() => Date.now());
 
@@ -109,6 +115,16 @@ export default function ConvenzioniPage() {
       return;
     }
 
+    if (!password || password.length < 6) {
+      toast({ title: "La password deve essere di almeno 6 caratteri", variant: "destructive" });
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast({ title: "Le password non corrispondono", variant: "destructive" });
+      return;
+    }
+
     if (!convention) return;
 
     setSubmitLoading(true);
@@ -118,6 +134,7 @@ export default function ConvenzioniPage() {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim(),
+        password: password,
         phone: phone.trim() || undefined,
         companyRole: companyRole.trim() || undefined,
         _hp: hpField?.value || "",
@@ -132,6 +149,8 @@ export default function ConvenzioniPage() {
       setResult({
         companyName: data.companyName || convention.companyName,
         discounts: convention.discounts || [],
+        accountCreated: !!data.accountCreated,
+        alreadyRegistered: !!data.alreadyRegistered,
       });
       if (data.alreadyRegistered) {
         toast({ title: "Già registrato/a", description: data.message });
@@ -301,6 +320,56 @@ export default function ConvenzioniPage() {
                     />
                   </div>
 
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Password *</Label>
+                      <div className="relative mt-1.5">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Minimo 6 caratteri"
+                          data-testid="input-password"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3"
+                          onClick={() => setShowPassword(!showPassword)}
+                          data-testid="button-toggle-password"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                    <div>
+                      <Label>Conferma Password *</Label>
+                      <div className="relative mt-1.5">
+                        <Input
+                          type={showConfirmPassword ? "text" : "password"}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="Ripeti la password"
+                          data-testid="input-confirm-password"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          data-testid="button-toggle-confirm-password"
+                        >
+                          {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground -mt-2">
+                    Verrà creato un account per accedere all'Area Clienti dove potrai vedere ordini e sconti.
+                  </p>
+
                   <div>
                     <Label>Telefono</Label>
                     <Input
@@ -387,11 +456,29 @@ export default function ConvenzioniPage() {
                 <div className="bg-muted/30 rounded-md p-4 text-left space-y-2 mb-6">
                   <h3 className="font-semibold text-sm">Come funziona:</h3>
                   <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-1">
-                    <li>Visita il nostro <a href="/shop" className="text-primary hover:underline">Shop Corsi</a></li>
+                    <li>Visita il nostro <a href="/shop" className="text-primary underline">Shop Corsi</a></li>
                     <li>Scegli il corso che ti interessa</li>
                     <li>Al checkout, inserisci la stessa email usata per la registrazione</li>
                     <li>Lo sconto verrà applicato automaticamente ai prodotti convenzionati</li>
                   </ol>
+                </div>
+
+                <div className="bg-primary/5 rounded-md p-4 text-left mb-6">
+                  {result.accountCreated ? (
+                    <>
+                      <p className="text-sm font-medium mb-1">Il tuo account è stato creato</p>
+                      <p className="text-sm text-muted-foreground">
+                        Puoi accedere all'<a href="/shop/dashboard" className="text-primary underline" data-testid="link-area-clienti">Area Clienti</a> con la email e la password scelte per visualizzare i tuoi sconti, ordini e materiali.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm font-medium mb-1">Hai già un account</p>
+                      <p className="text-sm text-muted-foreground">
+                        Accedi all'<a href="/shop/dashboard" className="text-primary underline" data-testid="link-area-clienti">Area Clienti</a> con le tue credenziali per visualizzare i tuoi sconti, ordini e materiali.
+                      </p>
+                    </>
+                  )}
                 </div>
 
                 <p className="text-xs text-muted-foreground" data-testid="text-email-notice">

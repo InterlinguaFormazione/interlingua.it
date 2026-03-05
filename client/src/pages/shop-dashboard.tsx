@@ -35,7 +35,10 @@ import {
   Mail,
   Eye,
   EyeOff,
+  Handshake,
+  Tag,
 } from "lucide-react";
+import { SHOP_PRODUCTS, getProductBySlug } from "@shared/products";
 
 interface CustomerInfo {
   id: string;
@@ -58,6 +61,18 @@ interface Order {
   status: string;
   createdAt: string | null;
   invoiceNumber?: string | null;
+}
+
+interface ConventionBenefit {
+  companyName: string;
+  registeredAt: string;
+  discounts: Array<{
+    productSlug: string;
+    productOptions?: Record<string, string>;
+    discountType: "percentage" | "fixed";
+    discountValue: number;
+    description?: string;
+  }>;
 }
 
 interface Material {
@@ -275,6 +290,18 @@ export default function ShopDashboard() {
     enabled: !!token && !!customer,
   });
 
+  const { data: conventionBenefits = [] } = useQuery<ConventionBenefit[]>({
+    queryKey: ["/api/shop/my-conventions"],
+    queryFn: async () => {
+      const res = await fetch("/api/shop/my-conventions", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    enabled: !!token && !!customer,
+  });
+
   const uniqueCourses = orders.reduce<Order[]>((acc, order) => {
     if (order.status === "completed" && !acc.find((o) => o.productSlug === order.productSlug)) {
       acc.push(order);
@@ -421,6 +448,58 @@ export default function ShopDashboard() {
                 )}
               </CardContent>
             </Card>
+
+            {conventionBenefits.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Handshake className="w-5 h-5 text-primary" />
+                    Le Tue Convenzioni
+                  </CardTitle>
+                  <CardDescription>Sconti riservati grazie alla tua azienda</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {conventionBenefits.map((conv, idx) => (
+                      <div key={idx} className="border rounded-lg p-4" data-testid={`card-convention-benefit-${idx}`}>
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="font-semibold" data-testid={`text-convention-company-${idx}`}>{conv.companyName}</span>
+                          <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                            Attiva
+                          </Badge>
+                        </div>
+                        {conv.discounts.length > 0 && (
+                          <div className="space-y-2">
+                            {conv.discounts.map((d, i) => {
+                              const product = getProductBySlug(d.productSlug);
+                              const optionEntries = d.productOptions ? Object.entries(d.productOptions).filter(([, v]) => v) : [];
+                              return (
+                                <div key={i} className="flex items-center justify-between text-sm bg-muted/50 rounded-lg px-3 py-2" data-testid={`text-convention-discount-${idx}-${i}`}>
+                                  <div className="min-w-0">
+                                    <div className="font-medium">{product?.name || d.productSlug}</div>
+                                    {optionEntries.length > 0 && (
+                                      <div className="text-xs text-muted-foreground mt-0.5">
+                                        {optionEntries.map(([k, v]) => `${k}: ${v}`).join(" · ")}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <Badge variant="outline" className="shrink-0 font-semibold tabular-nums ml-2">
+                                    {d.discountType === "percentage" ? `-${d.discountValue}%` : `-€${d.discountValue.toFixed(2)}`}
+                                  </Badge>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                        <p className="text-xs text-muted-foreground mt-3">
+                          Gli sconti vengono applicati automaticamente al checkout quando usi la stessa email del tuo account.
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             <Card>
               <CardHeader>
