@@ -51,7 +51,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "livello",
         label: "Livello",
-        values: ["Base", "Intermedio", "Avanzato"],
+        values: ["A1 - Principiante", "A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
       },
       {
         name: "moduli",
@@ -95,7 +95,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "livello",
         label: "Livello",
-        values: ["Base", "Intermedio", "Avanzato"],
+        values: ["A1 - Principiante", "A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
       },
       {
         name: "ore",
@@ -136,7 +136,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "livello",
         label: "Livello",
-        values: ["Base", "Intermedio", "Avanzato"],
+        values: ["A1 - Principiante", "A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
       },
     ],
   },
@@ -165,7 +165,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "livello",
         label: "Livello",
-        values: ["Base", "Intermedio", "Avanzato"],
+        values: ["A1 - Principiante", "A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
       },
     ],
   },
@@ -231,7 +231,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "livello",
         label: "Livello",
-        values: ["Intermedio", "Avanzato"],
+        values: ["B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
       },
     ],
     variations: [
@@ -308,7 +308,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "livello",
         label: "Livello",
-        values: ["A1 (principiante)", "A2 (elementare)", "B1 (intermedio)", "B2 (post-intermedio)", "C1 (avanzato)"],
+        values: ["A1 - Principiante", "A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
       },
       {
         name: "durata",
@@ -357,7 +357,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "livello",
         label: "Livello",
-        values: ["A1 (principiante)", "A2 (elementare)", "B1 (intermedio)", "B2 (post-intermedio)", "C1 (avanzato)"],
+        values: ["A1 - Principiante", "A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
       },
       {
         name: "durata",
@@ -397,7 +397,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "livello",
         label: "Livello",
-        values: ["A1 (principiante)", "A2 (elementare)", "B1 (intermedio)", "B2 (post-intermedio)", "C1 (avanzato)"],
+        values: ["A1 - Principiante", "A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
       },
       {
         name: "tipo",
@@ -446,7 +446,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "livello",
         label: "Livello",
-        values: ["A2 (elementare)", "B1 (intermedio)", "B2 (post-intermedio)", "C1 (avanzato)", "C2 (bilinguismo)"],
+        values: ["A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato", "C2 - Bilinguismo"],
       },
       {
         name: "corso",
@@ -512,7 +512,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "livello",
         label: "Livello",
-        values: ["A1 (principiante)", "A2 (elementare)", "B1 (intermedio)", "B2 (post-intermedio)", "C1 (avanzato)"],
+        values: ["A1 - Principiante", "A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
       },
     ],
   },
