@@ -56,6 +56,11 @@ import {
   ChevronRight,
   Search,
   Handshake,
+  Building,
+  Phone,
+  Hash,
+  Percent,
+  UserCheck,
 } from "lucide-react";
 
 interface DashboardStats {
@@ -3244,129 +3249,190 @@ function ConventionsTab({ token }: { token: string }) {
         ) : conventionsList.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">Nessuna convenzione creata</div>
         ) : (
-          <div className="space-y-3">
-            {conventionsList.map((conv) => (
-              <div key={conv.id} className="border rounded-lg">
-                <div className="p-4 flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold" data-testid={`text-convention-name-${conv.id}`}>{conv.companyName}</span>
-                      <Badge variant={conv.active ? "default" : "secondary"} data-testid={`badge-convention-status-${conv.id}`}>
-                        {conv.active ? "Attiva" : "Inattiva"}
-                      </Badge>
-                    </div>
-                    <div className="text-sm text-muted-foreground flex flex-wrap gap-x-4 gap-y-1">
-                      <span>Codice: <strong>{conv.companyCode}</strong></span>
-                      <span>Sconti: <strong>{(conv.discounts || []).length} prodotti</strong></span>
-                      <span>Registrazioni: <strong>{conv.registrationCount}{conv.maxRegistrations ? ` / ${conv.maxRegistrations}` : ""}</strong></span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      data-testid={`button-expand-convention-${conv.id}`}
-                      onClick={() => setExpandedId(expandedId === conv.id ? null : conv.id)}
-                      title="Vedi registrazioni"
-                    >
-                      {expandedId === conv.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      data-testid={`button-toggle-convention-${conv.id}`}
-                      onClick={() => toggleMutation.mutate({ id: conv.id, active: !conv.active })}
-                      title={conv.active ? "Disattiva" : "Attiva"}
-                    >
-                      {conv.active ? <ToggleRight className="w-4 h-4 text-green-600" /> : <ToggleLeft className="w-4 h-4" />}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      data-testid={`button-edit-convention-${conv.id}`}
-                      onClick={() => openEdit(conv)}
-                      title="Modifica"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      data-testid={`button-delete-convention-${conv.id}`}
-                      onClick={() => {
-                        if (confirm("Eliminare questa convenzione e tutte le registrazioni associate?")) {
-                          deleteMutation.mutate(conv.id);
-                        }
-                      }}
-                      title="Elimina"
-                    >
-                      <Trash2 className="w-4 h-4 text-red-500" />
-                    </Button>
-                  </div>
-                </div>
-                {expandedId === conv.id && (
-                  <div className="border-t px-4 py-3 bg-muted/30">
-                    {conv.discounts && (conv.discounts as Array<{ productSlug: string; productOptions?: Record<string, string>; discountType: "percentage" | "fixed"; discountValue: number; description?: string }>).length > 0 && (
-                      <div className="mb-4">
-                        <div className="text-sm font-medium mb-2">Sconti configurati</div>
-                        <div className="space-y-1">
-                          {(conv.discounts as Array<{ productSlug: string; productOptions?: Record<string, string>; discountType: "percentage" | "fixed"; discountValue: number; description?: string }>).map((d, i) => {
-                            const product = SHOP_PRODUCTS.find(p => p.slug === d.productSlug);
-                            const optionsLabel = d.productOptions && Object.keys(d.productOptions).length > 0
-                              ? ` (${Object.values(d.productOptions).join(", ")})`
-                              : "";
-                            return (
-                              <div key={i} className="flex items-center justify-between text-sm bg-background rounded px-3 py-1.5 border" data-testid={`text-conv-discount-${conv.id}-${i}`}>
-                                <span>{product?.name || d.productSlug}{optionsLabel}</span>
-                                <Badge variant="secondary">
-                                  {d.discountType === "percentage" ? `-${d.discountValue}%` : `-€${d.discountValue.toFixed(2)}`}
-                                </Badge>
-                              </div>
-                            );
-                          })}
+          <div className="space-y-4">
+            {conventionsList.map((conv) => {
+              const discountsList = (conv.discounts || []) as Array<{ productSlug: string; productOptions?: Record<string, string>; discountType: "percentage" | "fixed"; discountValue: number; description?: string }>;
+              const isExpanded = expandedId === conv.id;
+              return (
+                <div key={conv.id} className={`border rounded-xl overflow-hidden ${isExpanded ? "shadow-md" : ""} ${!conv.active ? "opacity-70" : ""}`}>
+                  <div
+                    className={`px-5 py-4 cursor-pointer ${isExpanded ? "bg-muted/40" : ""}`}
+                    onClick={() => setExpandedId(isExpanded ? null : conv.id)}
+                    data-testid={`button-expand-convention-${conv.id}`}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className="flex items-center gap-2">
+                            <Building className="w-4 h-4 text-muted-foreground shrink-0" />
+                            <h3 className="font-semibold text-base truncate" data-testid={`text-convention-name-${conv.id}`}>{conv.companyName}</h3>
+                          </div>
+                          <Badge
+                            variant={conv.active ? "default" : "secondary"}
+                            className={`shrink-0 ${conv.active ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" : ""}`}
+                            data-testid={`badge-convention-status-${conv.id}`}
+                          >
+                            {conv.active ? "Attiva" : "Inattiva"}
+                          </Badge>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1.5">
+                            <Hash className="w-3.5 h-3.5" />
+                            <span className="font-mono font-medium text-foreground">{conv.companyCode}</span>
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <Tag className="w-3.5 h-3.5" />
+                            {discountsList.length} {discountsList.length === 1 ? "sconto" : "sconti"}
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <Users className="w-3.5 h-3.5" />
+                            {conv.registrationCount}{conv.maxRegistrations ? ` / ${conv.maxRegistrations}` : ""} registrazioni
+                          </span>
+                          {conv.contactPerson && (
+                            <span className="flex items-center gap-1.5">
+                              <UserCheck className="w-3.5 h-3.5" />
+                              {conv.contactPerson}
+                            </span>
+                          )}
                         </div>
                       </div>
-                    )}
-                    <div className="text-sm font-medium mb-2">Registrazioni ({registrations.length})</div>
-                    {registrations.length === 0 ? (
-                      <div className="text-sm text-muted-foreground">Nessuna registrazione</div>
-                    ) : (
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b text-left">
-                              <th className="pb-2 pr-4">Nome</th>
-                              <th className="pb-2 pr-4">Email</th>
-                              <th className="pb-2 pr-4">Telefono</th>
-                              <th className="pb-2 pr-4">Ruolo</th>
-                              <th className="pb-2">Data</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {registrations.map((reg) => (
-                              <tr key={reg.id} className="border-b last:border-0" data-testid={`row-registration-${reg.id}`}>
-                                <td className="py-2 pr-4">{reg.firstName} {reg.lastName}</td>
-                                <td className="py-2 pr-4">{reg.email}</td>
-                                <td className="py-2 pr-4">{reg.phone || "-"}</td>
-                                <td className="py-2 pr-4">{reg.companyRole || "-"}</td>
-                                <td className="py-2">{new Date(reg.createdAt).toLocaleDateString("it-IT")}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          data-testid={`button-toggle-convention-${conv.id}`}
+                          onClick={(e) => { e.stopPropagation(); toggleMutation.mutate({ id: conv.id, active: !conv.active }); }}
+                          title={conv.active ? "Disattiva" : "Attiva"}
+                        >
+                          {conv.active ? <ToggleRight className="w-4 h-4 text-green-600" /> : <ToggleLeft className="w-4 h-4" />}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          data-testid={`button-edit-convention-${conv.id}`}
+                          onClick={(e) => { e.stopPropagation(); openEdit(conv); }}
+                          title="Modifica"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          data-testid={`button-delete-convention-${conv.id}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm("Eliminare questa convenzione e tutte le registrazioni associate?")) {
+                              deleteMutation.mutate(conv.id);
+                            }
+                          }}
+                          title="Elimina"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </Button>
+                        {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground ml-1" /> : <ChevronDown className="w-4 h-4 text-muted-foreground ml-1" />}
                       </div>
-                    )}
-                    {conv.contactPerson && (
-                      <div className="mt-3 pt-3 border-t text-sm text-muted-foreground">
-                        <span className="font-medium">Referente:</span> {conv.contactPerson}
-                        {conv.contactEmail && <span> — {conv.contactEmail}</span>}
-                        {conv.contactPhone && <span> — {conv.contactPhone}</span>}
-                      </div>
-                    )}
+                    </div>
                   </div>
-                )}
-              </div>
-            ))}
+
+                  {isExpanded && (
+                    <div className="border-t">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-0">
+                        <div className="p-5 md:border-r">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Percent className="w-4 h-4 text-primary" />
+                            <h4 className="font-semibold text-sm">Sconti Configurati</h4>
+                          </div>
+                          {discountsList.length === 0 ? (
+                            <div className="text-sm text-muted-foreground italic">Nessuno sconto configurato</div>
+                          ) : (
+                            <div className="space-y-2">
+                              {discountsList.map((d, i) => {
+                                const product = SHOP_PRODUCTS.find(p => p.slug === d.productSlug);
+                                const optionEntries = d.productOptions ? Object.entries(d.productOptions).filter(([, v]) => v) : [];
+                                return (
+                                  <div key={i} className="flex items-center justify-between gap-2 text-sm bg-muted/50 rounded-lg px-3 py-2" data-testid={`text-conv-discount-${conv.id}-${i}`}>
+                                    <div className="min-w-0">
+                                      <div className="font-medium truncate">{product?.name || d.productSlug}</div>
+                                      {optionEntries.length > 0 && (
+                                        <div className="text-xs text-muted-foreground mt-0.5">
+                                          {optionEntries.map(([k, v]) => `${k}: ${v}`).join(" · ")}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <Badge variant="outline" className="shrink-0 font-semibold tabular-nums">
+                                      {d.discountType === "percentage" ? `-${d.discountValue}%` : `-€${d.discountValue.toFixed(2)}`}
+                                    </Badge>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+
+                          {(conv.contactPerson || conv.contactEmail || conv.contactPhone) && (
+                            <div className="mt-4 pt-4 border-t">
+                              <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                                <UserCheck className="w-4 h-4 text-primary" />
+                                Referente
+                              </h4>
+                              <div className="space-y-1 text-sm text-muted-foreground">
+                                {conv.contactPerson && <div>{conv.contactPerson}</div>}
+                                {conv.contactEmail && (
+                                  <div className="flex items-center gap-1.5">
+                                    <Mail className="w-3 h-3" />
+                                    {conv.contactEmail}
+                                  </div>
+                                )}
+                                {conv.contactPhone && (
+                                  <div className="flex items-center gap-1.5">
+                                    <Phone className="w-3 h-3" />
+                                    {conv.contactPhone}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="p-5 border-t md:border-t-0">
+                          <div className="flex items-center gap-2 mb-3">
+                            <Users className="w-4 h-4 text-primary" />
+                            <h4 className="font-semibold text-sm">Registrazioni ({registrations.length})</h4>
+                          </div>
+                          {registrations.length === 0 ? (
+                            <div className="text-sm text-muted-foreground italic">Nessuna registrazione</div>
+                          ) : (
+                            <div className="overflow-x-auto rounded-lg border">
+                              <table className="w-full text-sm">
+                                <thead>
+                                  <tr className="bg-muted/50 text-left">
+                                    <th className="px-3 py-2 font-medium">Nome</th>
+                                    <th className="px-3 py-2 font-medium">Email</th>
+                                    <th className="px-3 py-2 font-medium hidden sm:table-cell">Telefono</th>
+                                    <th className="px-3 py-2 font-medium hidden md:table-cell">Ruolo</th>
+                                    <th className="px-3 py-2 font-medium">Data</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {registrations.map((reg) => (
+                                    <tr key={reg.id} className="border-t" data-testid={`row-registration-${reg.id}`}>
+                                      <td className="px-3 py-2 whitespace-nowrap">{reg.firstName} {reg.lastName}</td>
+                                      <td className="px-3 py-2">{reg.email}</td>
+                                      <td className="px-3 py-2 hidden sm:table-cell">{reg.phone || "—"}</td>
+                                      <td className="px-3 py-2 hidden md:table-cell">{reg.companyRole || "—"}</td>
+                                      <td className="px-3 py-2 whitespace-nowrap tabular-nums">{new Date(reg.createdAt).toLocaleDateString("it-IT")}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </CardContent>
