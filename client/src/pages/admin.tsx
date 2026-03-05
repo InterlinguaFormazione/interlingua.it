@@ -53,6 +53,7 @@ import {
   StickyNote,
   ChevronLeft,
   ChevronRight,
+  Search,
 } from "lucide-react";
 
 interface DashboardStats {
@@ -1513,6 +1514,9 @@ function ContactsTab({ token }: { token: string }) {
 }
 
 function NewsletterTab({ token }: { token: string }) {
+  const [searchEmail, setSearchEmail] = useState("");
+  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "unsubscribed">("all");
+
   const { data: subs = [], isLoading } = useQuery<any[]>({
     queryKey: ["/api/admin/newsletter"],
     queryFn: async () => {
@@ -1525,30 +1529,71 @@ function NewsletterTab({ token }: { token: string }) {
     },
   });
 
+  const filtered = subs.filter((s) => {
+    if (searchEmail && !s.email.toLowerCase().includes(searchEmail.toLowerCase())) return false;
+    if (filterStatus === "active" && !s.subscribed) return false;
+    if (filterStatus === "unsubscribed" && s.subscribed) return false;
+    return true;
+  });
+
+  const activeCount = subs.filter((s) => s.subscribed).length;
+  const unsubCount = subs.filter((s) => !s.subscribed).length;
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Iscritti Newsletter</CardTitle>
-        <CardDescription>Utenti che desiderano ricevere aggiornamenti</CardDescription>
+        <CardDescription>Utenti che desiderano ricevere aggiornamenti — {activeCount} attivi, {unsubCount} disiscritti</CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Cerca per email..."
+              value={searchEmail}
+              onChange={(e) => setSearchEmail(e.target.value)}
+              className="pl-9"
+              data-testid="input-newsletter-search"
+            />
+          </div>
+          <Select value={filterStatus} onValueChange={(v: "all" | "active" | "unsubscribed") => setFilterStatus(v)}>
+            <SelectTrigger className="w-full sm:w-[200px]" data-testid="select-newsletter-status">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tutti ({subs.length})</SelectItem>
+              <SelectItem value="active">Attivi ({activeCount})</SelectItem>
+              <SelectItem value="unsubscribed">Disiscritti ({unsubCount})</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         {isLoading ? (
           <div className="text-center py-8">Caricamento...</div>
-        ) : subs.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">Nessun iscritto</div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            {subs.length === 0 ? "Nessun iscritto" : "Nessun risultato per i filtri selezionati"}
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b">
                   <th className="text-left py-3 px-2 font-medium">Email</th>
+                  <th className="text-center py-3 px-2 font-medium">Stato</th>
                   <th className="text-right py-3 px-2 font-medium">Data Iscrizione</th>
                 </tr>
               </thead>
               <tbody>
-                {subs.map((s) => (
+                {filtered.map((s) => (
                   <tr key={s.id} className="border-b last:border-0" data-testid={`newsletter-row-${s.id}`}>
                     <td className="py-3 px-2">{s.email}</td>
+                    <td className="py-3 px-2 text-center">
+                      <Badge variant={s.subscribed ? "default" : "secondary"}>
+                        {s.subscribed ? "Attivo" : "Disiscritto"}
+                      </Badge>
+                    </td>
                     <td className="py-3 px-2 text-right text-muted-foreground text-xs">
                       {new Date(s.createdAt).toLocaleDateString("it-IT")}
                     </td>
@@ -1556,6 +1601,9 @@ function NewsletterTab({ token }: { token: string }) {
                 ))}
               </tbody>
             </table>
+            <div className="text-xs text-muted-foreground mt-3 text-right">
+              {filtered.length} di {subs.length} iscritti
+            </div>
           </div>
         )}
       </CardContent>
