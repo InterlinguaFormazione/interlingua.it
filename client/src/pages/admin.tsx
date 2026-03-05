@@ -3306,6 +3306,27 @@ function ConventionsTab({ token }: { token: string }) {
                 </div>
                 {expandedId === conv.id && (
                   <div className="border-t px-4 py-3 bg-muted/30">
+                    {conv.discounts && (conv.discounts as Array<{ productSlug: string; productOptions?: Record<string, string>; discountType: "percentage" | "fixed"; discountValue: number; description?: string }>).length > 0 && (
+                      <div className="mb-4">
+                        <div className="text-sm font-medium mb-2">Sconti configurati</div>
+                        <div className="space-y-1">
+                          {(conv.discounts as Array<{ productSlug: string; productOptions?: Record<string, string>; discountType: "percentage" | "fixed"; discountValue: number; description?: string }>).map((d, i) => {
+                            const product = SHOP_PRODUCTS.find(p => p.slug === d.productSlug);
+                            const optionsLabel = d.productOptions && Object.keys(d.productOptions).length > 0
+                              ? ` (${Object.values(d.productOptions).join(", ")})`
+                              : "";
+                            return (
+                              <div key={i} className="flex items-center justify-between text-sm bg-background rounded px-3 py-1.5 border" data-testid={`text-conv-discount-${conv.id}-${i}`}>
+                                <span>{product?.name || d.productSlug}{optionsLabel}</span>
+                                <Badge variant="secondary">
+                                  {d.discountType === "percentage" ? `-${d.discountValue}%` : `-€${d.discountValue.toFixed(2)}`}
+                                </Badge>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                     <div className="text-sm font-medium mb-2">Registrazioni ({registrations.length})</div>
                     {registrations.length === 0 ? (
                       <div className="text-sm text-muted-foreground">Nessuna registrazione</div>
