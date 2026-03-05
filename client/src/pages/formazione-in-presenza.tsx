@@ -56,7 +56,7 @@ import { COUNTRIES } from "@shared/countries";
 import lingueStraniereImage from "@assets/course-lingue-straniere.png";
 import languageCoachingImage from "@assets/course-language-coaching.png";
 import managementImage from "@assets/course-management.png";
-import categoryPresence from "@/assets/images/category-presence.jpg";
+import categoryPresence from "@assets/course-formazione-presenza-hero.png";
 import courseIndividual from "@/assets/images/course-individual.jpg";
 import courseExcel from "@/assets/images/course-excel.jpg";
 import courseAi from "@/assets/images/course-ai.jpg";
