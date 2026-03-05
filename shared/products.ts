@@ -604,6 +604,42 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     pageLink: "/corsi-italiano",
     pageAnchor: "italian-courses",
   },
+  {
+    slug: "italiano-individuale",
+    name: "Italiano Individuale One-to-One",
+    category: "Corsi di Italiano per Stranieri",
+    description: "Lezioni individuali di italiano con docente qualificato. Percorso personalizzato su misura per le tue esigenze, ritmo e obiettivi.",
+    price: "300.00",
+    priceLabel: "da",
+    duration: "Pacchetti da 6 a 24 ore",
+    features: [
+      "Lezioni 1-to-1 personalizzate",
+      "Docente qualificato dedicato",
+      "Orari flessibili",
+      "Certificato finale",
+    ],
+    pageLink: "/corsi-italiano",
+    pageAnchor: "italian-courses",
+    options: [
+      {
+        name: "livello",
+        label: "Livello",
+        values: ["A1 - Principiante", "A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
+      },
+      {
+        name: "ore",
+        label: "Pacchetto ore",
+        values: ["6 ore", "12 ore", "18 ore", "24 ore"],
+      },
+    ],
+    variations: [
+      { options: { ore: "6 ore" }, price: "300.00" },
+      { options: { ore: "12 ore" }, price: "575.00" },
+      { options: { ore: "18 ore" }, price: "830.00" },
+      { options: { ore: "24 ore" }, price: "1060.00" },
+    ],
+    priceRange: { min: "300.00", max: "1060.00" },
+  },
 ];
 
 export function getProductBySlug(slug: string): ShopProduct | undefined {
