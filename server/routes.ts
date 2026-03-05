@@ -3253,6 +3253,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         questionsAtCurrentLevel: 0,
         consecutiveIncorrectA1: 0,
         testType,
+        language,
       });
 
       try {
