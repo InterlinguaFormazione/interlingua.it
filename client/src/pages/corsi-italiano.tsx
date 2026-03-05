@@ -169,6 +169,36 @@ const content = {
         ],
         popular: false,
       },
+      {
+        title: "Individuale in Presenza",
+        subtitle: "Lezioni one-to-one in sede",
+        schedule: "Orari flessibili",
+        price: "300",
+        period: " (6 ore)",
+        features: [
+          "Lezioni 1-to-1 personalizzate",
+          "Docente qualificato dedicato",
+          "In sede a Vicenza",
+          "Pacchetti: 6h €300 · 12h €575 · 18h €830 · 24h €1.060",
+          "Certificato finale",
+        ],
+        popular: false,
+      },
+      {
+        title: "Individuale Online",
+        subtitle: "Lezioni one-to-one via Zoom",
+        schedule: "Orari flessibili",
+        price: "300",
+        period: " (6 ore)",
+        features: [
+          "Lezioni 1-to-1 via Zoom",
+          "Docente qualificato dedicato",
+          "Studia da qualsiasi parte del mondo",
+          "Pacchetti: 6h €300 · 12h €575 · 18h €830 · 24h €1.060",
+          "Certificato finale",
+        ],
+        popular: false,
+      },
     ],
     enrollmentNote: "Tassa di iscrizione: 50,00 euro (una tantum)",
     accommodationTitle: "Hai Bisogno di Alloggio?",
@@ -207,7 +237,8 @@ const content = {
     courseOptions: [
       { value: "collettivo-15", label: "Intensivo Collettivo 15 (€275/sett.)" },
       { value: "collettivo-20", label: "Intensivo Collettivo 20 (€360/sett.)" },
-      { value: "individuale", label: "Lezioni Individuali" },
+      { value: "individuale-presenza", label: "Individuale in Presenza (da €300)" },
+      { value: "individuale-online", label: "Individuale Online (da €300)" },
       { value: "altro", label: "Altro / Non sono sicuro" },
     ],
     accommodationOptions: [
@@ -282,6 +313,36 @@ const content = {
         ],
         popular: false,
       },
+      {
+        title: "Individual In-Person",
+        subtitle: "One-to-one lessons on site",
+        schedule: "Flexible schedule",
+        price: "300",
+        period: " (6 hours)",
+        features: [
+          "Personalised 1-to-1 lessons",
+          "Dedicated qualified teacher",
+          "On site in Vicenza",
+          "Packages: 6h €300 · 12h €575 · 18h €830 · 24h €1,060",
+          "Final certificate",
+        ],
+        popular: false,
+      },
+      {
+        title: "Individual Online",
+        subtitle: "One-to-one lessons via Zoom",
+        schedule: "Flexible schedule",
+        price: "300",
+        period: " (6 hours)",
+        features: [
+          "1-to-1 lessons via Zoom",
+          "Dedicated qualified teacher",
+          "Study from anywhere in the world",
+          "Packages: 6h €300 · 12h €575 · 18h €830 · 24h €1,060",
+          "Final certificate",
+        ],
+        popular: false,
+      },
     ],
     enrollmentNote: "Enrolment fee: 50.00 euro (one-time)",
     accommodationTitle: "Need Accommodation?",
@@ -320,7 +381,8 @@ const content = {
     courseOptions: [
       { value: "collettivo-15", label: "Intensive Collective 15 (€275/wk)" },
       { value: "collettivo-20", label: "Intensive Collective 20 (€360/wk)" },
-      { value: "individuale", label: "Individual Lessons" },
+      { value: "individuale-presenza", label: "Individual In-Person (from €300)" },
+      { value: "individuale-online", label: "Individual Online (from €300)" },
       { value: "altro", label: "Other / I'm not sure" },
     ],
     accommodationOptions: [
@@ -678,7 +740,7 @@ export default function CorsiItalianoPage() {
               <h2 className="text-3xl md:text-4xl font-bold" data-testid="text-courses-title">{t.coursesTitle}</h2>
             </AnimatedSection>
 
-            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
               {t.courses.map((course, i) => (
                 <AnimatedSection key={i} delay={i * 0.15}>
                   <Card className={`h-full relative overflow-hidden ${course.popular ? "border-green-500 shadow-lg shadow-green-500/10" : ""}`}>
