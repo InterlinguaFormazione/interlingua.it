@@ -518,7 +518,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
   },
   {
     slug: "coaching-in-sede",
-    name: "Coaching Individuale in Sede",
+    name: "Language Coaching Individuale in Sede",
     category: "Language Coaching",
     description: "Percorso di coaching linguistico individuale nella sede di Vicenza o Thiene. Approccio personalizzato e risultati concreti.",
     price: "390.00",
@@ -542,7 +542,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
   },
   {
     slug: "coaching-blended",
-    name: "Coaching Blended (Presenza + Online)",
+    name: "Language Coaching Blended (Presenza + Online)",
     category: "Language Coaching",
     description: "Il meglio dei due mondi: sessioni in sede con coach + piattaforma e-learning 24/7 con AI e riconoscimento vocale.",
     price: "840.00",
@@ -566,7 +566,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
   },
   {
     slug: "coaching-online",
-    name: "Coaching Individuale Online",
+    name: "Language Coaching Individuale Online",
     category: "Language Coaching",
     description: "Coaching linguistico individuale interamente online. 12 sessioni con coach madrelingua dedicato via Zoom.",
     price: "300.00",
@@ -590,7 +590,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
   },
   {
     slug: "fluency-coaching",
-    name: "Fluency Coaching Intensivo",
+    name: "Fluency Language Coaching Intensivo",
     category: "Language Coaching",
     description: "5 sessioni intensive focalizzate sulla scioltezza orale. Per chi sa la grammatica ma le parole non escono.",
     price: "125.00",

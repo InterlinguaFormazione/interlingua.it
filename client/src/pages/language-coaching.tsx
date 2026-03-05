@@ -166,7 +166,7 @@ const packages = [
   {
     id: "coaching-presenza",
     reviewSlug: "coaching-in-sede",
-    title: "Coaching Individuale in Sede",
+    title: "Language Coaching Individuale in Sede",
     subtitle: "Il percorso più profondo e trasformativo",
     description: "Sessioni one-to-one nella nostra sede, dove ogni dettaglio è pensato per facilitare il tuo apprendimento. Il contatto diretto con il coach crea una connessione unica che accelera i risultati in modi che potresti non aver immaginato possibili.",
     fullDescription: [
@@ -195,7 +195,7 @@ const packages = [
   {
     id: "coaching-blended",
     reviewSlug: "coaching-blended",
-    title: "Coaching Blended: Presenza + Online",
+    title: "Language Coaching Blended: Presenza + Online",
     subtitle: "Il meglio dei due mondi, quando ne hai bisogno",
     description: "Un percorso che combina la profondità delle sessioni in sede con la continuità della piattaforma digitale. Tra una sessione e l'altra, la lingua continua a crescere dentro di te grazie a strumenti progettati per mantenere vivo ogni progresso.",
     fullDescription: [
@@ -224,7 +224,7 @@ const packages = [
   {
     id: "coaching-online",
     reviewSlug: "coaching-online",
-    title: "Coaching Individuale Online",
+    title: "Language Coaching Individuale Online",
     subtitle: "La stessa profondità, ovunque tu sia",
     description: "Per chi sa che la distanza non è un ostacolo quando la connessione è autentica. Le sessioni via Zoom mantengono tutta l'intensità e la personalizzazione del coaching in presenza, con la flessibilità di poter lavorare da qualsiasi luogo.",
     fullDescription: [
@@ -253,7 +253,7 @@ const packages = [
   {
     id: "coaching-fluency",
     reviewSlug: "fluency-coaching",
-    title: "Fluency Coaching Intensivo",
+    title: "Fluency Language Coaching Intensivo",
     subtitle: "Per chi vuole sbloccarsi, una volta per tutte",
     description: "Cinque sessioni intensive focalizzate sulla scioltezza orale. Se sai la grammatica ma le parole non escono, se capisci tutto ma fatichi a rispondere, questo è il percorso che ti porta dall'altra parte. Quello che manca non è la conoscenza: è la fiducia. E la fiducia si costruisce.",
     fullDescription: [
@@ -940,7 +940,7 @@ export default function LanguageCoachingPage() {
               <div className="text-center mb-14">
                 <Badge variant="secondary" className="mb-4">
                   <GraduationCap className="w-3 h-3 mr-1" />
-                  I Percorsi di Coaching
+                  I Percorsi di Language Coaching
                 </Badge>
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-5">
                   Scegli il percorso che{" "}
