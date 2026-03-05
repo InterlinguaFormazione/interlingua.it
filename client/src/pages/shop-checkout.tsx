@@ -43,6 +43,8 @@ import {
   ChevronDown,
   ChevronUp,
   Ticket,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 declare global {
@@ -68,6 +70,8 @@ export default function ShopCheckout() {
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerPassword, setCustomerPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [buyingForOther, setBuyingForOther] = useState(false);
   const [studentFirstName, setStudentFirstName] = useState("");
   const [studentLastName, setStudentLastName] = useState("");
@@ -1091,15 +1095,20 @@ export default function ShopCheckout() {
                         <p className="text-xs text-muted-foreground mb-2">
                           Inserisci una password per accedere alla tua area clienti dopo l'acquisto, dove troverai i materiali del corso.
                         </p>
-                        <Input
-                          id="customerPassword"
-                          type="password"
-                          value={customerPassword}
-                          onChange={(e) => setCustomerPassword(e.target.value)}
-                          placeholder="Minimo 8 caratteri"
-                          className="mt-1"
-                          data-testid="input-customer-password"
-                        />
+                        <div className="relative mt-1">
+                          <Input
+                            id="customerPassword"
+                            type={showPassword ? "text" : "password"}
+                            value={customerPassword}
+                            onChange={(e) => setCustomerPassword(e.target.value)}
+                            placeholder="Minimo 8 caratteri"
+                            className="pr-10"
+                            data-testid="input-customer-password"
+                          />
+                          <button type="button" tabIndex={-1} onClick={() => setShowPassword(!showPassword)} className="absolute right-0 top-0 h-full px-3 text-muted-foreground" data-testid="button-toggle-password">
+                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
                         {customerPassword && (
                           <>
                             <div className="mt-2 space-y-1">
@@ -1121,15 +1130,20 @@ export default function ShopCheckout() {
                             </div>
                             <div className="mt-2">
                               <Label htmlFor="confirmPassword">Conferma password</Label>
-                              <Input
-                                id="confirmPassword"
-                                type="password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                placeholder="Ripeti la password"
-                                className="mt-1"
-                                data-testid="input-confirm-password"
-                              />
+                              <div className="relative mt-1">
+                                <Input
+                                  id="confirmPassword"
+                                  type={showConfirmPassword ? "text" : "password"}
+                                  value={confirmPassword}
+                                  onChange={(e) => setConfirmPassword(e.target.value)}
+                                  placeholder="Ripeti la password"
+                                  className="pr-10"
+                                  data-testid="input-confirm-password"
+                                />
+                                <button type="button" tabIndex={-1} onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-0 top-0 h-full px-3 text-muted-foreground" data-testid="button-toggle-confirm-password">
+                                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                </button>
+                              </div>
                               {confirmPassword && customerPassword !== confirmPassword && (
                                 <p className="text-xs text-destructive mt-1">Le password non coincidono</p>
                               )}

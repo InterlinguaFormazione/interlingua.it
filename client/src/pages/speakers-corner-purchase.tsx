@@ -34,6 +34,8 @@ import {
   User,
   Briefcase,
   Building2,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 declare global {
@@ -55,6 +57,8 @@ export default function SpeakersCornerPurchase() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [tipoFatturazione, setTipoFatturazione] = useState<"privato" | "professionista" | "azienda">("privato");
   const [codiceFiscale, setCodiceFiscale] = useState("");
   const [indirizzo, setIndirizzo] = useState("");
@@ -469,27 +473,64 @@ export default function SpeakersCornerPurchase() {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="purchase-password">Password</Label>
-                          <Input
-                            id="purchase-password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Min. 8 caratteri, maiuscola, numero, speciale"
-                            required
-                            data-testid="input-purchase-password"
-                          />
+                          <div className="relative">
+                            <Input
+                              id="purchase-password"
+                              type={showPassword ? "text" : "password"}
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              placeholder="Min. 8 caratteri, maiuscola, numero, speciale"
+                              required
+                              className="pr-10"
+                              data-testid="input-purchase-password"
+                            />
+                            <button type="button" tabIndex={-1} onClick={() => setShowPassword(!showPassword)} className="absolute right-0 top-0 h-full px-3 text-muted-foreground" data-testid="button-toggle-password">
+                              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
+                          {password && (
+                            <div className="space-y-1">
+                              <p className={`text-xs ${password.length >= 8 ? "text-green-600" : "text-muted-foreground"}`}>
+                                {password.length >= 8 ? "✓" : "○"} Almeno 8 caratteri
+                              </p>
+                              <p className={`text-xs ${/[A-Z]/.test(password) ? "text-green-600" : "text-muted-foreground"}`}>
+                                {/[A-Z]/.test(password) ? "✓" : "○"} Una lettera maiuscola
+                              </p>
+                              <p className={`text-xs ${/[a-z]/.test(password) ? "text-green-600" : "text-muted-foreground"}`}>
+                                {/[a-z]/.test(password) ? "✓" : "○"} Una lettera minuscola
+                              </p>
+                              <p className={`text-xs ${/[0-9]/.test(password) ? "text-green-600" : "text-muted-foreground"}`}>
+                                {/[0-9]/.test(password) ? "✓" : "○"} Un numero
+                              </p>
+                              <p className={`text-xs ${/[^A-Za-z0-9]/.test(password) ? "text-green-600" : "text-muted-foreground"}`}>
+                                {/[^A-Za-z0-9]/.test(password) ? "✓" : "○"} Un carattere speciale (!@#$...)
+                              </p>
+                            </div>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="purchase-confirm-password">Conferma Password</Label>
-                          <Input
-                            id="purchase-confirm-password"
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="Ripeti la password"
-                            required
-                            data-testid="input-purchase-confirm-password"
-                          />
+                          <div className="relative">
+                            <Input
+                              id="purchase-confirm-password"
+                              type={showConfirmPassword ? "text" : "password"}
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              placeholder="Ripeti la password"
+                              required
+                              className="pr-10"
+                              data-testid="input-purchase-confirm-password"
+                            />
+                            <button type="button" tabIndex={-1} onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-0 top-0 h-full px-3 text-muted-foreground" data-testid="button-toggle-confirm-password">
+                              {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                          </div>
+                          {confirmPassword && password !== confirmPassword && (
+                            <p className="text-xs text-destructive">Le password non coincidono</p>
+                          )}
+                          {confirmPassword && password === confirmPassword && (
+                            <p className="text-xs text-green-600">✓ Le password coincidono</p>
+                          )}
                         </div>
                         <Button type="submit" className="w-full" size="lg" data-testid="button-continue-billing">
                           Continua

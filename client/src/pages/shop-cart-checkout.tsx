@@ -46,6 +46,8 @@ import {
   ChevronDown,
   ChevronUp,
   Ticket,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 declare global {
@@ -70,6 +72,8 @@ export default function CartCheckout() {
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerPassword, setCustomerPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [notes, setNotes] = useState("");
 
   const [tipoFatturazione, setTipoFatturazione] = useState<"privato" | "professionista" | "azienda">("privato");
@@ -904,7 +908,12 @@ export default function CartCheckout() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="password">Password (per Area Clienti)</Label>
-                        <Input id="password" type="password" value={customerPassword} onChange={(e) => setCustomerPassword(e.target.value)} placeholder="Minimo 8 caratteri" data-testid="input-password" />
+                        <div className="relative">
+                          <Input id="password" type={showPassword ? "text" : "password"} value={customerPassword} onChange={(e) => setCustomerPassword(e.target.value)} placeholder="Minimo 8 caratteri" className="pr-10" data-testid="input-password" />
+                          <button type="button" tabIndex={-1} onClick={() => setShowPassword(!showPassword)} className="absolute right-0 top-0 h-full px-3 text-muted-foreground" data-testid="button-toggle-password">
+                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
                         <p className="text-xs text-muted-foreground">Crea una password per accedere ai tuoi acquisti</p>
                         {customerPassword && (
                           <>
@@ -927,15 +936,20 @@ export default function CartCheckout() {
                             </div>
                             <div className="mt-2">
                               <Label htmlFor="confirmPassword">Conferma password</Label>
-                              <Input
-                                id="confirmPassword"
-                                type="password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                placeholder="Ripeti la password"
-                                className="mt-1"
-                                data-testid="input-confirm-password"
-                              />
+                              <div className="relative mt-1">
+                                <Input
+                                  id="confirmPassword"
+                                  type={showConfirmPassword ? "text" : "password"}
+                                  value={confirmPassword}
+                                  onChange={(e) => setConfirmPassword(e.target.value)}
+                                  placeholder="Ripeti la password"
+                                  className="pr-10"
+                                  data-testid="input-confirm-password"
+                                />
+                                <button type="button" tabIndex={-1} onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-0 top-0 h-full px-3 text-muted-foreground" data-testid="button-toggle-confirm-password">
+                                  {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                </button>
+                              </div>
                               {confirmPassword && customerPassword !== confirmPassword && (
                                 <p className="text-xs text-destructive mt-1">Le password non coincidono</p>
                               )}
