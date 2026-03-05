@@ -242,48 +242,6 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     priceRange: { min: "450.00", max: "1620.00" },
   },
   {
-    slug: "experiential-workshop",
-    name: "Experiential Workshop",
-    category: "Formazione in Presenza",
-    description: "Workshop esperienziale di lingua inglese. Settimana intera o weekend intensivo con optional di consolidamento.",
-    price: "550.00",
-    priceLabel: "da",
-    duration: "Weekend o settimana",
-    features: [
-      "Apprendimento esperienziale",
-      "Formato weekend o settimana",
-      "Optional e-learning o conversazione",
-      "Certificato finale",
-    ],
-    pageLink: "/formazione-in-presenza",
-    pageAnchor: "courses-section",
-    options: [
-      {
-        name: "durata",
-        label: "Durata",
-        values: ["Weekend (venerdi pom. + sabato)", "Settimana (dal lunedi al venerdi)"],
-      },
-      {
-        name: "optional",
-        label: "Optional",
-        values: [
-          "Nessun Optional",
-          "Foundation & Consolidation: 3 mesi di e-learning",
-          "Foundation & Consolidation: 6 mesi di conversazione",
-        ],
-      },
-    ],
-    variations: [
-      { options: { durata: "Weekend (venerdi pom. + sabato)", optional: "Nessun Optional" }, price: "550.00" },
-      { options: { durata: "Weekend (venerdi pom. + sabato)", optional: "Foundation & Consolidation: 3 mesi di e-learning" }, price: "600.00" },
-      { options: { durata: "Weekend (venerdi pom. + sabato)", optional: "Foundation & Consolidation: 6 mesi di conversazione" }, price: "600.00" },
-      { options: { durata: "Settimana (dal lunedi al venerdi)", optional: "Nessun Optional" }, price: "1100.00" },
-      { options: { durata: "Settimana (dal lunedi al venerdi)", optional: "Foundation & Consolidation: 3 mesi di e-learning" }, price: "1150.00" },
-      { options: { durata: "Settimana (dal lunedi al venerdi)", optional: "Foundation & Consolidation: 6 mesi di conversazione" }, price: "1150.00" },
-    ],
-    priceRange: { min: "550.00", max: "1150.00" },
-  },
-  {
     slug: "camclass-selflearning",
     name: "Corso di Lingue Online - Self-Learning e Tutor",
     category: "Corsi E-Learning",
