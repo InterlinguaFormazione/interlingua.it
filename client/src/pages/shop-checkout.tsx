@@ -407,9 +407,15 @@ export default function ShopCheckout() {
       toast({ title: "Email non valida", description: "Inserisci un indirizzo email valido.", variant: "destructive" });
       return;
     }
-    if (customerPassword && customerPassword.length < 6) {
-      toast({ title: "Password troppo corta", description: "La password deve avere almeno 6 caratteri.", variant: "destructive" });
-      return;
+    if (customerPassword) {
+      const hasUppercase = /[A-Z]/.test(customerPassword);
+      const hasLowercase = /[a-z]/.test(customerPassword);
+      const hasNumber = /[0-9]/.test(customerPassword);
+      const hasSpecial = /[^A-Za-z0-9]/.test(customerPassword);
+      if (customerPassword.length < 8 || !hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {
+        toast({ title: "Password troppo debole", description: "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale.", variant: "destructive" });
+        return;
+      }
     }
     if (customerPassword && customerPassword !== confirmPassword) {
       toast({ title: "Le password non coincidono", description: "La password e la conferma devono essere uguali.", variant: "destructive" });
@@ -1090,26 +1096,48 @@ export default function ShopCheckout() {
                           type="password"
                           value={customerPassword}
                           onChange={(e) => setCustomerPassword(e.target.value)}
-                          placeholder="Minimo 6 caratteri"
+                          placeholder="Minimo 8 caratteri"
                           className="mt-1"
                           data-testid="input-customer-password"
                         />
                         {customerPassword && (
-                          <div className="mt-2">
-                            <Label htmlFor="confirmPassword">Conferma password</Label>
-                            <Input
-                              id="confirmPassword"
-                              type="password"
-                              value={confirmPassword}
-                              onChange={(e) => setConfirmPassword(e.target.value)}
-                              placeholder="Ripeti la password"
-                              className="mt-1"
-                              data-testid="input-confirm-password"
-                            />
-                            {confirmPassword && customerPassword !== confirmPassword && (
-                              <p className="text-xs text-destructive mt-1">Le password non coincidono</p>
-                            )}
-                          </div>
+                          <>
+                            <div className="mt-2 space-y-1">
+                              <p className={`text-xs ${customerPassword.length >= 8 ? "text-green-600" : "text-muted-foreground"}`}>
+                                {customerPassword.length >= 8 ? "✓" : "○"} Almeno 8 caratteri
+                              </p>
+                              <p className={`text-xs ${/[A-Z]/.test(customerPassword) ? "text-green-600" : "text-muted-foreground"}`}>
+                                {/[A-Z]/.test(customerPassword) ? "✓" : "○"} Una lettera maiuscola
+                              </p>
+                              <p className={`text-xs ${/[a-z]/.test(customerPassword) ? "text-green-600" : "text-muted-foreground"}`}>
+                                {/[a-z]/.test(customerPassword) ? "✓" : "○"} Una lettera minuscola
+                              </p>
+                              <p className={`text-xs ${/[0-9]/.test(customerPassword) ? "text-green-600" : "text-muted-foreground"}`}>
+                                {/[0-9]/.test(customerPassword) ? "✓" : "○"} Un numero
+                              </p>
+                              <p className={`text-xs ${/[^A-Za-z0-9]/.test(customerPassword) ? "text-green-600" : "text-muted-foreground"}`}>
+                                {/[^A-Za-z0-9]/.test(customerPassword) ? "✓" : "○"} Un carattere speciale (!@#$...)
+                              </p>
+                            </div>
+                            <div className="mt-2">
+                              <Label htmlFor="confirmPassword">Conferma password</Label>
+                              <Input
+                                id="confirmPassword"
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                placeholder="Ripeti la password"
+                                className="mt-1"
+                                data-testid="input-confirm-password"
+                              />
+                              {confirmPassword && customerPassword !== confirmPassword && (
+                                <p className="text-xs text-destructive mt-1">Le password non coincidono</p>
+                              )}
+                              {confirmPassword && customerPassword === confirmPassword && (
+                                <p className="text-xs text-green-600 mt-1">✓ Le password coincidono</p>
+                              )}
+                            </div>
+                          </>
                         )}
                       </div>
                       <div>
