@@ -957,6 +957,8 @@ interface BeSession {
   status: string | null;
   startedAt: string | null;
   completedAt: string | null;
+  language: string;
+  testType: string | null;
 }
 
 interface BeSessionDetail {
@@ -996,15 +998,24 @@ interface BeSessionDetail {
   }>;
 }
 
+const LANGUAGE_LABELS: Record<string, string> = {
+  english: "Inglese",
+  italian: "Italiano",
+  german: "Tedesco",
+  french: "Francese",
+  spanish: "Spagnolo",
+};
+
 function EnglishAdaptiveTab({ token }: { token: string }) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [filterCompany, setFilterCompany] = useState("");
   const [filterLevel, setFilterLevel] = useState("");
+  const [filterLanguage, setFilterLanguage] = useState("");
 
   const { data: sessions = [], isLoading } = useQuery<BeSession[]>({
-    queryKey: ["/api/admin/english-test-results"],
+    queryKey: ["/api/admin/all-test-results"],
     queryFn: async () => {
-      const res = await fetch("/api/admin/english-test-results", {
+      const res = await fetch("/api/admin/all-test-results", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch test results");
@@ -1014,9 +1025,9 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
   });
 
   const { data: detail } = useQuery<BeSessionDetail>({
-    queryKey: ["/api/admin/english-test-results", selectedId],
+    queryKey: ["/api/admin/all-test-results", selectedId],
     queryFn: async () => {
-      const res = await fetch(`/api/admin/english-test-results/${selectedId}`, {
+      const res = await fetch(`/api/admin/all-test-results/${selectedId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.json();
@@ -1025,8 +1036,9 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
   });
 
   const filtered = sessions.filter(s => {
-    if (filterCompany && !s.company.toLowerCase().includes(filterCompany.toLowerCase())) return false;
+    if (filterCompany && !s.company?.toLowerCase().includes(filterCompany.toLowerCase())) return false;
     if (filterLevel && filterLevel !== "all" && s.finalLevel !== filterLevel) return false;
+    if (filterLanguage && filterLanguage !== "all" && s.language !== filterLanguage) return false;
     return true;
   });
 
@@ -1049,7 +1061,7 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
         <Card>
           <CardHeader>
             <CardTitle>{detail.session.firstName} {detail.session.lastName}</CardTitle>
-            <CardDescription>{detail.session.email}{detail.session.company ? ` - ${detail.session.company}` : ""}</CardDescription>
+            <CardDescription>{detail.session.email}{detail.session.company ? ` - ${detail.session.company}` : ""} — Test {LANGUAGE_LABELS[detail.session.language] || detail.session.language}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-3 gap-4 text-center">
@@ -1141,7 +1153,7 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
         <Input
           placeholder="Filtra per azienda..."
           value={filterCompany}
@@ -1149,6 +1161,19 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
           className="max-w-xs"
           data-testid="input-filter-company"
         />
+        <Select value={filterLanguage} onValueChange={setFilterLanguage}>
+          <SelectTrigger className="w-[160px]" data-testid="select-filter-language">
+            <SelectValue placeholder="Tutte le lingue" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tutte le lingue</SelectItem>
+            <SelectItem value="english">Inglese</SelectItem>
+            <SelectItem value="italian">Italiano</SelectItem>
+            <SelectItem value="german">Tedesco</SelectItem>
+            <SelectItem value="french">Francese</SelectItem>
+            <SelectItem value="spanish">Spagnolo</SelectItem>
+          </SelectContent>
+        </Select>
         <Select value={filterLevel} onValueChange={setFilterLevel}>
           <SelectTrigger className="w-[140px]" data-testid="select-filter-level">
             <SelectValue placeholder="Tutti i livelli" />
@@ -1178,6 +1203,7 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
             <thead>
               <tr className="border-b">
                 <th className="text-left py-3 px-2">Candidato</th>
+                <th className="text-left px-2">Lingua</th>
                 <th className="text-left px-2">Azienda</th>
                 <th className="text-center px-2">Livello</th>
                 <th className="text-center px-2">MC</th>
@@ -1195,6 +1221,7 @@ function EnglishAdaptiveTab({ token }: { token: string }) {
                     <div className="font-medium">{s.firstName} {s.lastName}</div>
                     <div className="text-xs text-muted-foreground">{s.email}</div>
                   </td>
+                  <td className="px-2 text-sm">{LANGUAGE_LABELS[s.language] || s.language}</td>
                   <td className="px-2">{s.company}</td>
                   <td className="text-center px-2">{levelBadge(s.finalLevel)}</td>
                   <td className="text-center px-2">{s.correctAnswers}/{s.totalQuestions}</td>
@@ -2437,7 +2464,7 @@ const adminTabs = [
   { value: "blog-comments", label: "Commenti Blog", icon: MessagesSquare },
   { value: "shop-orders", label: "Ordini Shop", icon: ShoppingBag },
   { value: "materials", label: "Materiali", icon: FileText },
-  { value: "english-test", label: "Test Inglese", icon: GraduationCap },
+  { value: "english-test", label: "Test Lingue", icon: GraduationCap },
   { value: "vouchers", label: "Voucher", icon: Tag },
   { value: "reviews", label: "Recensioni", icon: Star },
   { value: "users", label: "Utenti", icon: Users, adminOnly: true },
@@ -2663,8 +2690,8 @@ export default function AdminPage() {
           <TabsContent value="english-test">
             <Card>
               <CardHeader>
-                <CardTitle>Risultati Test Inglese</CardTitle>
-                <CardDescription>Test adattivi completati</CardDescription>
+                <CardTitle>Risultati Test Lingue</CardTitle>
+                <CardDescription>Test adattivi completati — tutte le lingue</CardDescription>
               </CardHeader>
               <CardContent>
                 <EnglishAdaptiveTab token={token} />

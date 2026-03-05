@@ -4113,6 +4113,50 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
   registerAdminTestResultRoutes("/api/admin/french-test-results", "french");
   registerAdminTestResultRoutes("/api/admin/spanish-test-results", "spanish");
 
+  app.get("/api/admin/all-test-results", requireAdmin, async (_req, res) => {
+    try {
+      const sessions = await storage.getBeTestSessions();
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching all test results:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  });
+
+  app.get("/api/admin/all-test-results/:id", requireAdmin, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const session = await storage.getBeTestSession(id);
+      if (!session) return res.status(404).json({ success: false, message: "Session not found" });
+
+      const responses = await storage.getBeResponsesBySession(id);
+      const sectionResults = await storage.getBeSectionResultsBySession(id);
+      const writingSpeaking = await storage.getBeWritingSpeakingBySession(id);
+
+      const allQuestions = await storage.getBeQuestions();
+      const enrichedResponses = responses.map(r => {
+        const q = allQuestions.find(qq => qq.id === r.questionId);
+        return {
+          ...r,
+          question: q?.question,
+          correctAnswer: q?.correctAnswer,
+          skillType: q?.skillType,
+          level: q?.level,
+        };
+      });
+
+      res.json({
+        session,
+        responses: enrichedResponses,
+        sectionResults,
+        writingSpeaking,
+      });
+    } catch (error) {
+      console.error("Error fetching test result detail:", error);
+      res.status(500).json({ success: false, message: "Server error" });
+    }
+  });
+
   return httpServer;
 }
 
