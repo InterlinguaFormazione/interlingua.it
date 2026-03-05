@@ -302,6 +302,7 @@ export const discountVouchers = pgTable("discount_vouchers", {
   validFrom: timestamp("valid_from"),
   validUntil: timestamp("valid_until"),
   productSlugs: text("product_slugs"),
+  productOptions: text("product_options"),
   firstTimeBuyerOnly: boolean("first_time_buyer_only").default(false),
   autoApply: boolean("auto_apply").default(false),
   requiresNewsletterSub: boolean("requires_newsletter_sub").default(false),
