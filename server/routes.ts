@@ -3200,6 +3200,8 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         return res.json({ found: false });
       }
       const now = new Date();
+      const total = parseFloat(cartTotal || "0");
+      let bestMatch: { code: string; discount: number; discountType: string; discountValue: string } | null = null;
       for (const voucher of autoVouchers) {
         const validTime = (!voucher.validFrom || now >= new Date(voucher.validFrom)) && (!voucher.validUntil || now <= new Date(voucher.validUntil));
         if (!validTime) continue;
@@ -3219,19 +3221,23 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
           const allAllowed = requestedSlugs.every((s: string) => allowedSlugs.includes(s));
           if (!allAllowed) continue;
         }
-        const total = parseFloat(cartTotal || "0");
         if (voucher.minOrderAmount && total < parseFloat(voucher.minOrderAmount)) continue;
         let discount = calculateVoucherDiscount(voucher.discountType, voucher.discountValue, total);
         discount = Math.min(discount, total);
-        const discountedTotal = Math.max(0, total - discount).toFixed(2);
+        if (discount > 0 && (!bestMatch || discount > bestMatch.discount)) {
+          bestMatch = { code: voucher.code, discount, discountType: voucher.discountType, discountValue: voucher.discountValue };
+        }
+      }
+      if (bestMatch) {
+        const discountedTotal = Math.max(0, total - bestMatch.discount).toFixed(2);
         return res.json({
           found: true,
-          code: voucher.code,
-          discount: discount.toFixed(2),
+          code: bestMatch.code,
+          discount: bestMatch.discount.toFixed(2),
           discountedTotal,
-          discountType: voucher.discountType,
-          discountValue: voucher.discountValue,
-          message: formatVoucherMessage(voucher.discountType, voucher.discountValue, discount),
+          discountType: bestMatch.discountType,
+          discountValue: bestMatch.discountValue,
+          message: formatVoucherMessage(bestMatch.discountType, bestMatch.discountValue, bestMatch.discount),
         });
       }
       res.json({ found: false });

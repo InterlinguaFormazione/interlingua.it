@@ -137,9 +137,23 @@ export default function ShopCheckout() {
         customerEmail: customerEmail || undefined,
       });
       const data = await res.json();
-      setVoucherResult(data);
-      if (data.valid) {
-        setAppliedVoucherCode(voucherCode.trim().toUpperCase());
+      if (data.valid && voucherResult?.valid && voucherResult.discount) {
+        const currentDiscount = parseFloat(voucherResult.discount);
+        const newDiscount = parseFloat(data.discount || "0");
+        if (newDiscount > currentDiscount) {
+          setVoucherResult(data);
+          setAppliedVoucherCode(voucherCode.trim().toUpperCase());
+        } else {
+          setVoucherResult({
+            ...voucherResult,
+            message: `Lo sconto attuale (-€${currentDiscount.toFixed(2)}) è migliore. Manteniamo quello applicato.`,
+          });
+        }
+      } else {
+        setVoucherResult(data);
+        if (data.valid) {
+          setAppliedVoucherCode(voucherCode.trim().toUpperCase());
+        }
       }
     } catch {
       setVoucherResult({ valid: false, message: "Errore di connessione. Riprova." });
@@ -250,7 +264,6 @@ export default function ShopCheckout() {
   };
 
   const checkAutoApplyVoucher = async (email: string) => {
-    if (appliedVoucherCode) return;
     try {
       const res = await apiRequest("POST", "/api/shop/auto-apply-voucher", {
         email,
@@ -259,17 +272,21 @@ export default function ShopCheckout() {
       });
       const data = await res.json();
       if (data.found) {
-        setVoucherCode(data.code);
-        setAppliedVoucherCode(data.code);
-        setVoucherResult({
-          valid: true,
-          discount: data.discount,
-          discountedTotal: data.discountedTotal,
-          discountType: data.discountType,
-          discountValue: data.discountValue,
-          message: data.message,
-        });
-        setVoucherOpen(true);
+        const autoDiscount = parseFloat(data.discount || "0");
+        const currentDiscount = voucherResult?.valid ? parseFloat(voucherResult.discount || "0") : 0;
+        if (autoDiscount > currentDiscount) {
+          setVoucherCode(data.code);
+          setAppliedVoucherCode(data.code);
+          setVoucherResult({
+            valid: true,
+            discount: data.discount,
+            discountedTotal: data.discountedTotal,
+            discountType: data.discountType,
+            discountValue: data.discountValue,
+            message: data.message,
+          });
+          setVoucherOpen(true);
+        }
       }
     } catch {}
   };
