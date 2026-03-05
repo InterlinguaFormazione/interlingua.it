@@ -90,21 +90,26 @@ export default function ConvenzioniPage() {
 
   const handleRegister = async (e?: React.FormEvent | React.MouseEvent) => {
     if (e) e.preventDefault();
+    console.log("[convenzioni] handleRegister called");
 
-    if (honeypot) return;
+    if (honeypot) { console.log("[convenzioni] blocked by honeypot"); return; }
 
     const elapsed = Date.now() - formLoadedAt;
+    console.log("[convenzioni] elapsed:", elapsed);
     if (elapsed < 3000) {
+      console.log("[convenzioni] blocked by timing check");
       toast({ title: "Attendi qualche secondo prima di inviare", variant: "destructive" });
       return;
     }
 
+    console.log("[convenzioni] fields:", { firstName, lastName, email });
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
+      console.log("[convenzioni] blocked by empty fields");
       toast({ title: "Compila i campi obbligatori", variant: "destructive" });
       return;
     }
 
-    if (!convention) return;
+    if (!convention) { console.log("[convenzioni] blocked: no convention"); return; }
 
     setSubmitLoading(true);
     try {
