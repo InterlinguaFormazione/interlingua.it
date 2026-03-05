@@ -142,6 +142,7 @@ const content = {
       {
         title: "Intensivo Collettivo 15",
         subtitle: "15 lezioni a settimana",
+        description: "Corso intensivo di italiano in piccoli gruppi (5-6 persone). Tre lezioni al giorno con approccio comunicativo e attività culturali per un'immersione completa nella lingua e nella cultura italiana.",
         schedule: "3 lezioni al giorno",
         price: "275",
         period: "/settimana",
@@ -157,6 +158,7 @@ const content = {
       {
         title: "Intensivo Collettivo 20",
         subtitle: "20 lezioni a settimana",
+        description: "Il nostro corso più completo: quattro lezioni al giorno in piccoli gruppi per massima immersione linguistica. Ideale per chi vuole raggiungere risultati rapidi in tempi brevi.",
         schedule: "4 lezioni al giorno",
         price: "360",
         period: "/settimana",
@@ -172,6 +174,7 @@ const content = {
       {
         title: "Individuale in Presenza",
         subtitle: "Lezioni one-to-one in sede",
+        description: "Lezioni individuali di italiano in sede a Vicenza con docente qualificato. Percorso completamente personalizzato su misura per le tue esigenze, il tuo ritmo e i tuoi obiettivi.",
         schedule: "Orari flessibili",
         price: "300",
         period: " (6 ore)",
@@ -187,6 +190,7 @@ const content = {
       {
         title: "Individuale Online",
         subtitle: "Lezioni one-to-one via Zoom",
+        description: "Lezioni individuali di italiano online via Zoom con docente qualificato. Studia da qualsiasi parte del mondo con la stessa qualità didattica dei nostri corsi in sede.",
         schedule: "Orari flessibili",
         price: "300",
         period: " (6 ore)",
@@ -286,6 +290,7 @@ const content = {
       {
         title: "Intensive Collective 15",
         subtitle: "15 lessons per week",
+        description: "Intensive Italian course in small groups (5-6 students). Three lessons per day with a communicative approach and cultural activities for a complete immersion in the Italian language and culture.",
         schedule: "3 lessons per day",
         price: "275",
         period: "/week",
@@ -301,6 +306,7 @@ const content = {
       {
         title: "Intensive Collective 20",
         subtitle: "20 lessons per week",
+        description: "Our most comprehensive course: four lessons per day in small groups for maximum linguistic immersion. Ideal for those who want to achieve rapid results in a short time.",
         schedule: "4 lessons per day",
         price: "360",
         period: "/week",
@@ -316,6 +322,7 @@ const content = {
       {
         title: "Individual In-Person",
         subtitle: "One-to-one lessons on site",
+        description: "Individual Italian lessons on site in Vicenza with a qualified teacher. A fully personalised programme tailored to your needs, pace and goals.",
         schedule: "Flexible schedule",
         price: "300",
         period: " (6 hours)",
@@ -331,6 +338,7 @@ const content = {
       {
         title: "Individual Online",
         subtitle: "One-to-one lessons via Zoom",
+        description: "Individual Italian lessons online via Zoom with a qualified teacher. Study from anywhere in the world with the same teaching quality as our on-site courses.",
         schedule: "Flexible schedule",
         price: "300",
         period: " (6 hours)",
@@ -755,7 +763,8 @@ export default function CorsiItalianoPage() {
                     <CardContent className="p-6">
                       <div className="mb-4">
                         <h3 className="text-xl font-bold mb-1" data-testid={`text-course-title-${i}`}>{course.title}</h3>
-                        <p className="text-sm text-muted-foreground">{course.subtitle}</p>
+                        <p className="text-sm text-muted-foreground mb-2">{course.subtitle}</p>
+                        <p className="text-sm text-muted-foreground" data-testid={`text-course-desc-${i}`}>{course.description}</p>
                       </div>
                       <div className="flex items-baseline gap-1 mb-6">
                         <span className="text-4xl font-bold text-green-700 dark:text-green-400">&euro;{course.price}</span>
