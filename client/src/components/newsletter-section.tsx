@@ -28,7 +28,6 @@ export function NewsletterSection() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [gdprAccepted, setGdprAccepted] = useState(false);
   const [gdprError, setGdprError] = useState(false);
-  const [honeypot, setHoneypot] = useState("");
   const formLoadTime = useRef(Date.now());
   const { toast } = useToast();
   const prefersReducedMotion = useReducedMotion();
@@ -44,9 +43,10 @@ export function NewsletterSection() {
 
   const mutation = useMutation({
     mutationFn: async (data: NewsletterFormData) => {
+      const hpField = document.getElementById("nl_hp_field") as HTMLInputElement | null;
       const response = await apiRequest("POST", "/api/newsletter", {
         ...data,
-        _hp: honeypot,
+        _hp: hpField?.value || "",
         _ts: formLoadTime.current,
       });
       return response.json();
@@ -179,14 +179,13 @@ export function NewsletterSection() {
                   className="flex flex-col gap-3 max-w-lg mx-auto"
                 >
                   <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true" tabIndex={-1}>
-                    <label htmlFor="company_name">Company</label>
                     <input
                       type="text"
-                      id="company_name"
-                      name="company_name"
-                      value={honeypot}
-                      onChange={(e) => setHoneypot(e.target.value)}
-                      autoComplete="off"
+                      id="nl_hp_field"
+                      name="nl_hp_field"
+                      tabIndex={-1}
+                      autoComplete="new-password"
+                      defaultValue=""
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row gap-3">

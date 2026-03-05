@@ -49,7 +49,6 @@ export function ContactSection() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [gdprAccepted, setGdprAccepted] = useState(false);
   const [gdprError, setGdprError] = useState(false);
-  const [honeypot, setHoneypot] = useState("");
   const formLoadTime = useRef(Date.now());
   const { toast } = useToast();
   const prefersReducedMotion = useReducedMotion();
@@ -67,9 +66,10 @@ export function ContactSection() {
 
   const mutation = useMutation({
     mutationFn: async (data: ContactFormData) => {
+      const hpField = document.getElementById("ct_hp_field") as HTMLInputElement | null;
       const response = await apiRequest("POST", "/api/contact", {
         ...data,
-        _hp: honeypot,
+        _hp: hpField?.value || "",
         _ts: formLoadTime.current,
       });
       return response.json();
@@ -209,14 +209,13 @@ export function ContactSection() {
                     <Form {...form}>
                       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true" tabIndex={-1}>
-                          <label htmlFor="website_url">Website</label>
                           <input
                             type="text"
-                            id="website_url"
-                            name="website_url"
-                            value={honeypot}
-                            onChange={(e) => setHoneypot(e.target.value)}
-                            autoComplete="off"
+                            id="ct_hp_field"
+                            name="ct_hp_field"
+                            tabIndex={-1}
+                            autoComplete="new-password"
+                            defaultValue=""
                           />
                         </div>
                         <div className="grid sm:grid-cols-2 gap-6">
