@@ -42,6 +42,7 @@ import {
   ToggleRight,
   Wand2,
   Star,
+  Check,
   CheckCircle,
   XCircle,
   LayoutDashboard,
@@ -2782,6 +2783,126 @@ interface ConventionReg {
   createdAt: string;
 }
 
+function ConventionDiscountRow({ idx, discount, onUpdate, onRemove }: {
+  idx: number;
+  discount: ConventionDiscount;
+  onUpdate: (index: number, updates: Partial<ConventionDiscount>) => void;
+  onRemove: (index: number) => void;
+}) {
+  const [productOpen, setProductOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const selectedProduct = SHOP_PRODUCTS.find(p => p.slug === discount.productSlug);
+  const filteredProducts = SHOP_PRODUCTS.filter(p =>
+    p && p.title && p.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="border rounded-md p-3 space-y-2 bg-muted/20">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 relative">
+          <Label className="text-xs">Prodotto</Label>
+          <div
+            data-testid={`select-discount-product-${idx}`}
+            className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm cursor-pointer hover:bg-accent/50"
+            onClick={() => setProductOpen(!productOpen)}
+          >
+            <span className={selectedProduct ? "" : "text-muted-foreground"}>
+              {selectedProduct ? selectedProduct.title : "Seleziona prodotto..."}
+            </span>
+            <ChevronDown className={`h-4 w-4 opacity-50 transition-transform ${productOpen ? "rotate-180" : ""}`} />
+          </div>
+          {productOpen && (
+            <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-lg">
+              <div className="p-2 border-b">
+                <Input
+                  placeholder="Cerca prodotto..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="h-8 text-sm"
+                  autoFocus
+                  data-testid={`input-search-product-${idx}`}
+                />
+              </div>
+              <div className="max-h-48 overflow-y-auto p-1">
+                {filteredProducts.length === 0 ? (
+                  <div className="text-sm text-muted-foreground py-2 px-3">Nessun prodotto trovato</div>
+                ) : (
+                  filteredProducts.map((p) => (
+                    <div
+                      key={p.slug}
+                      className={`flex items-center gap-2 rounded-sm px-3 py-1.5 text-sm cursor-pointer hover:bg-accent ${discount.productSlug === p.slug ? "bg-accent font-medium" : ""}`}
+                      data-testid={`option-product-${p.slug}-${idx}`}
+                      onClick={() => {
+                        onUpdate(idx, { productSlug: p.slug });
+                        setProductOpen(false);
+                        setSearchTerm("");
+                      }}
+                    >
+                      {discount.productSlug === p.slug && <Check className="w-3 h-3" />}
+                      {p.title}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+        <Button type="button" variant="ghost" size="icon" className="mt-5 shrink-0" onClick={() => onRemove(idx)} data-testid={`button-remove-discount-${idx}`}>
+          <Trash2 className="w-4 h-4 text-red-500" />
+        </Button>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <Label className="text-xs">Tipo Sconto</Label>
+          <div className="flex gap-1">
+            <Button
+              type="button"
+              variant={discount.discountType === "percentage" ? "default" : "outline"}
+              size="sm"
+              className="flex-1 h-9 text-xs"
+              data-testid={`button-discount-type-percentage-${idx}`}
+              onClick={() => onUpdate(idx, { discountType: "percentage" })}
+            >
+              Percentuale (%)
+            </Button>
+            <Button
+              type="button"
+              variant={discount.discountType === "fixed" ? "default" : "outline"}
+              size="sm"
+              className="flex-1 h-9 text-xs"
+              data-testid={`button-discount-type-fixed-${idx}`}
+              onClick={() => onUpdate(idx, { discountType: "fixed" })}
+            >
+              Fisso (€)
+            </Button>
+          </div>
+        </div>
+        <div>
+          <Label className="text-xs">Valore</Label>
+          <Input
+            data-testid={`input-discount-value-${idx}`}
+            type="number"
+            min="0"
+            step={discount.discountType === "percentage" ? "1" : "0.01"}
+            value={discount.discountValue}
+            onChange={(e) => onUpdate(idx, { discountValue: parseFloat(e.target.value) || 0 })}
+            placeholder={discount.discountType === "percentage" ? "Es. 15" : "Es. 50.00"}
+          />
+        </div>
+      </div>
+      <div>
+        <Label className="text-xs">Descrizione (opzionale)</Label>
+        <Input
+          data-testid={`input-discount-description-${idx}`}
+          value={discount.description || ""}
+          onChange={(e) => onUpdate(idx, { description: e.target.value })}
+          placeholder="Es. Sconto riservato dipendenti"
+        />
+      </div>
+    </div>
+  );
+}
+
 function ConventionsTab({ token }: { token: string }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingConvention, setEditingConvention] = useState<ConventionRow | null>(null);
@@ -2992,67 +3113,13 @@ function ConventionsTab({ token }: { token: string }) {
                   <div className="text-sm text-muted-foreground py-2">Nessuno sconto configurato. Aggiungi sconti per prodotto specifico.</div>
                 )}
                 {formData.discounts.map((discount, idx) => (
-                  <div key={idx} className="border rounded-md p-3 space-y-2 bg-muted/20">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1">
-                        <Label className="text-xs">Prodotto</Label>
-                        <Select
-                          value={discount.productSlug || undefined}
-                          onValueChange={(val) => updateDiscount(idx, { productSlug: val })}
-                        >
-                          <SelectTrigger data-testid={`select-discount-product-${idx}`}>
-                            <SelectValue placeholder="Seleziona prodotto..." />
-                          </SelectTrigger>
-                          <SelectContent className="max-h-60">
-                            {SHOP_PRODUCTS.map((p) => (
-                              <SelectItem key={p.slug} value={p.slug}>{p.title}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <Button type="button" variant="ghost" size="icon" className="mt-5 shrink-0" onClick={() => removeDiscount(idx)} data-testid={`button-remove-discount-${idx}`}>
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </Button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <Label className="text-xs">Tipo Sconto</Label>
-                        <Select
-                          value={discount.discountType}
-                          onValueChange={(val) => updateDiscount(idx, { discountType: val as "percentage" | "fixed" })}
-                        >
-                          <SelectTrigger data-testid={`select-discount-type-${idx}`}>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="percentage">Percentuale (%)</SelectItem>
-                            <SelectItem value="fixed">Fisso (€)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label className="text-xs">Valore</Label>
-                        <Input
-                          data-testid={`input-discount-value-${idx}`}
-                          type="number"
-                          min="0"
-                          step={discount.discountType === "percentage" ? "1" : "0.01"}
-                          value={discount.discountValue}
-                          onChange={(e) => updateDiscount(idx, { discountValue: parseFloat(e.target.value) || 0 })}
-                          placeholder={discount.discountType === "percentage" ? "Es. 15" : "Es. 50.00"}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Label className="text-xs">Descrizione (opzionale)</Label>
-                      <Input
-                        data-testid={`input-discount-description-${idx}`}
-                        value={discount.description || ""}
-                        onChange={(e) => updateDiscount(idx, { description: e.target.value })}
-                        placeholder="Es. Sconto riservato dipendenti"
-                      />
-                    </div>
-                  </div>
+                  <ConventionDiscountRow
+                    key={idx}
+                    idx={idx}
+                    discount={discount}
+                    onUpdate={updateDiscount}
+                    onRemove={removeDiscount}
+                  />
                 ))}
               </div>
               <div className="grid grid-cols-2 gap-4">
