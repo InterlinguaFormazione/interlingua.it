@@ -92,6 +92,7 @@ export default function ShopDashboard() {
   const [customer, setCustomer] = useState<CustomerInfo | null>(null);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
   const [profileFirstName, setProfileFirstName] = useState("");
@@ -341,14 +342,25 @@ export default function ShopDashboard() {
                   </div>
                   <div>
                     <Label htmlFor="login-password">Password</Label>
-                    <Input
-                      id="login-password"
-                      type="password"
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      className="mt-1"
-                      data-testid="input-login-password"
-                    />
+                    <div className="relative mt-1">
+                      <Input
+                        id="login-password"
+                        type={showLoginPassword ? "text" : "password"}
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
+                        data-testid="input-login-password"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3"
+                        onClick={() => setShowLoginPassword(!showLoginPassword)}
+                        data-testid="button-toggle-login-password"
+                      >
+                        {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </Button>
+                    </div>
                   </div>
                   <Button type="submit" className="w-full" disabled={loginLoading} data-testid="button-login">
                     {loginLoading ? (
