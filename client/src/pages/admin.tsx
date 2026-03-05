@@ -2996,17 +2996,19 @@ function ConventionsTab({ token }: { token: string }) {
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
                         <Label className="text-xs">Prodotto</Label>
-                        <select
-                          data-testid={`select-discount-product-${idx}`}
-                          className="w-full border rounded-md px-3 py-2 text-sm bg-background"
-                          value={discount.productSlug}
-                          onChange={(e) => updateDiscount(idx, { productSlug: e.target.value })}
+                        <Select
+                          value={discount.productSlug || undefined}
+                          onValueChange={(val) => updateDiscount(idx, { productSlug: val })}
                         >
-                          <option value="">Seleziona prodotto...</option>
-                          {SHOP_PRODUCTS.map((p) => (
-                            <option key={p.slug} value={p.slug}>{p.title}</option>
-                          ))}
-                        </select>
+                          <SelectTrigger data-testid={`select-discount-product-${idx}`}>
+                            <SelectValue placeholder="Seleziona prodotto..." />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-60">
+                            {SHOP_PRODUCTS.map((p) => (
+                              <SelectItem key={p.slug} value={p.slug}>{p.title}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <Button type="button" variant="ghost" size="icon" className="mt-5 shrink-0" onClick={() => removeDiscount(idx)} data-testid={`button-remove-discount-${idx}`}>
                         <Trash2 className="w-4 h-4 text-red-500" />
@@ -3015,15 +3017,18 @@ function ConventionsTab({ token }: { token: string }) {
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <Label className="text-xs">Tipo Sconto</Label>
-                        <select
-                          data-testid={`select-discount-type-${idx}`}
-                          className="w-full border rounded-md px-3 py-2 text-sm bg-background"
+                        <Select
                           value={discount.discountType}
-                          onChange={(e) => updateDiscount(idx, { discountType: e.target.value as "percentage" | "fixed" })}
+                          onValueChange={(val) => updateDiscount(idx, { discountType: val as "percentage" | "fixed" })}
                         >
-                          <option value="percentage">Percentuale (%)</option>
-                          <option value="fixed">Fisso (€)</option>
-                        </select>
+                          <SelectTrigger data-testid={`select-discount-type-${idx}`}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="percentage">Percentuale (%)</SelectItem>
+                            <SelectItem value="fixed">Fisso (€)</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div>
                         <Label className="text-xs">Valore</Label>
