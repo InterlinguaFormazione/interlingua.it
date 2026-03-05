@@ -48,7 +48,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/german-test.tsx` - German Adaptive Test at `/german-test` — same structure, German UI labels, 18 listening audio files.
 - `src/pages/french-test.tsx` - French Adaptive Test at `/french-test` — same structure, French UI labels, 15 listening audio files.
 - `src/pages/spanish-test.tsx` - Spanish Adaptive Test at `/spanish-test` — same structure, Spanish UI labels, 15 listening audio files.
-- `src/pages/convenzioni.tsx` - Public conventions page at `/convenzioni` — 3-step flow: employee enters company code, sees discount details, registers with name/email/phone/role, receives discount code. Honeypot + timestamp spam protection.
+- `src/pages/convenzioni.tsx` - Public conventions page at `/convenzioni` — 3-step flow: employee enters company code, sees per-product discount table, registers with name/email/phone/role, discounts auto-apply at checkout by email. Honeypot + timestamp spam protection.
 - `src/pages/cookie-policy.tsx` - GDPR cookie policy
 - `src/pages/privacy-policy.tsx` - GDPR privacy policy
 - `src/pages/termini-e-condizioni.tsx` - Terms and conditions for e-commerce (Italian law, course cancellation policies, refunds, IP, ODR)

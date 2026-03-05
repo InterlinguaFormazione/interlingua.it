@@ -2748,12 +2748,19 @@ function ReviewsTab({ token }: { token: string }) {
   );
 }
 
+interface ConventionDiscount {
+  productSlug: string;
+  productOptions?: Record<string, string>;
+  discountType: "percentage" | "fixed";
+  discountValue: number;
+  description?: string;
+}
+
 interface ConventionRow {
   id: string;
   companyName: string;
   companyCode: string;
-  discountCode: string;
-  discountDescription: string | null;
+  discounts: ConventionDiscount[];
   contactPerson: string | null;
   contactEmail: string | null;
   contactPhone: string | null;
@@ -2772,7 +2779,6 @@ interface ConventionReg {
   phone: string | null;
   companyRole: string | null;
   verified: boolean;
-  discountCodeSent: boolean;
   createdAt: string;
 }
 
@@ -2783,8 +2789,7 @@ function ConventionsTab({ token }: { token: string }) {
   const [formData, setFormData] = useState({
     companyName: "",
     companyCode: "",
-    discountCode: "",
-    discountDescription: "",
+    discounts: [] as ConventionDiscount[],
     contactPerson: "",
     contactEmail: "",
     contactPhone: "",
@@ -2879,8 +2884,7 @@ function ConventionsTab({ token }: { token: string }) {
     setFormData({
       companyName: "",
       companyCode: "",
-      discountCode: "",
-      discountDescription: "",
+      discounts: [],
       contactPerson: "",
       contactEmail: "",
       contactPhone: "",
@@ -2894,8 +2898,7 @@ function ConventionsTab({ token }: { token: string }) {
     setFormData({
       companyName: c.companyName,
       companyCode: c.companyCode,
-      discountCode: c.discountCode,
-      discountDescription: c.discountDescription || "",
+      discounts: c.discounts || [],
       contactPerson: c.contactPerson || "",
       contactEmail: c.contactEmail || "",
       contactPhone: c.contactPhone || "",
@@ -2905,10 +2908,33 @@ function ConventionsTab({ token }: { token: string }) {
     setIsDialogOpen(true);
   };
 
+  const addDiscount = () => {
+    setFormData({
+      ...formData,
+      discounts: [...formData.discounts, { productSlug: "", discountType: "percentage" as const, discountValue: 10 }],
+    });
+  };
+
+  const updateDiscount = (index: number, updates: Partial<ConventionDiscount>) => {
+    const newDiscounts = [...formData.discounts];
+    newDiscounts[index] = { ...newDiscounts[index], ...updates };
+    setFormData({ ...formData, discounts: newDiscounts });
+  };
+
+  const removeDiscount = (index: number) => {
+    setFormData({ ...formData, discounts: formData.discounts.filter((_, i) => i !== index) });
+  };
+
   const handleSave = () => {
-    if (!formData.companyName || !formData.companyCode || !formData.discountCode) {
-      toast({ title: "Errore", description: "Nome azienda, codice aziendale e codice sconto sono obbligatori.", variant: "destructive" });
+    if (!formData.companyName || !formData.companyCode) {
+      toast({ title: "Errore", description: "Nome azienda e codice aziendale sono obbligatori.", variant: "destructive" });
       return;
+    }
+    for (const d of formData.discounts) {
+      if (!d.productSlug || d.discountValue <= 0) {
+        toast({ title: "Errore", description: "Ogni sconto deve avere un prodotto selezionato e un valore positivo.", variant: "destructive" });
+        return;
+      }
     }
     saveMutation.mutate(formData);
   };
@@ -2955,23 +2981,74 @@ function ConventionsTab({ token }: { token: string }) {
                   placeholder="Es. ACME2025 (codice che i dipendenti useranno)"
                 />
               </div>
-              <div>
-                <Label>Codice Sconto *</Label>
-                <Input
-                  data-testid="input-convention-discount-code"
-                  value={formData.discountCode}
-                  onChange={(e) => setFormData({ ...formData, discountCode: e.target.value })}
-                  placeholder="Codice sconto che riceveranno i dipendenti"
-                />
-              </div>
-              <div>
-                <Label>Descrizione Sconto</Label>
-                <Input
-                  data-testid="input-convention-discount-description"
-                  value={formData.discountDescription}
-                  onChange={(e) => setFormData({ ...formData, discountDescription: e.target.value })}
-                  placeholder="Es. 15% di sconto su tutti i corsi"
-                />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-medium">Sconti per Prodotto</Label>
+                  <Button type="button" variant="outline" size="sm" data-testid="button-add-discount" onClick={addDiscount}>
+                    <Plus className="w-3 h-3 mr-1" /> Aggiungi Sconto
+                  </Button>
+                </div>
+                {formData.discounts.length === 0 && (
+                  <div className="text-sm text-muted-foreground py-2">Nessuno sconto configurato. Aggiungi sconti per prodotto specifico.</div>
+                )}
+                {formData.discounts.map((discount, idx) => (
+                  <div key={idx} className="border rounded-md p-3 space-y-2 bg-muted/20">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <Label className="text-xs">Prodotto</Label>
+                        <select
+                          data-testid={`select-discount-product-${idx}`}
+                          className="w-full border rounded-md px-3 py-2 text-sm bg-background"
+                          value={discount.productSlug}
+                          onChange={(e) => updateDiscount(idx, { productSlug: e.target.value })}
+                        >
+                          <option value="">Seleziona prodotto...</option>
+                          {SHOP_PRODUCTS.map((p) => (
+                            <option key={p.slug} value={p.slug}>{p.title}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <Button type="button" variant="ghost" size="icon" className="mt-5 shrink-0" onClick={() => removeDiscount(idx)} data-testid={`button-remove-discount-${idx}`}>
+                        <Trash2 className="w-4 h-4 text-red-500" />
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Label className="text-xs">Tipo Sconto</Label>
+                        <select
+                          data-testid={`select-discount-type-${idx}`}
+                          className="w-full border rounded-md px-3 py-2 text-sm bg-background"
+                          value={discount.discountType}
+                          onChange={(e) => updateDiscount(idx, { discountType: e.target.value as "percentage" | "fixed" })}
+                        >
+                          <option value="percentage">Percentuale (%)</option>
+                          <option value="fixed">Fisso (€)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <Label className="text-xs">Valore</Label>
+                        <Input
+                          data-testid={`input-discount-value-${idx}`}
+                          type="number"
+                          min="0"
+                          step={discount.discountType === "percentage" ? "1" : "0.01"}
+                          value={discount.discountValue}
+                          onChange={(e) => updateDiscount(idx, { discountValue: parseFloat(e.target.value) || 0 })}
+                          placeholder={discount.discountType === "percentage" ? "Es. 15" : "Es. 50.00"}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Descrizione (opzionale)</Label>
+                      <Input
+                        data-testid={`input-discount-description-${idx}`}
+                        value={discount.description || ""}
+                        onChange={(e) => updateDiscount(idx, { description: e.target.value })}
+                        placeholder="Es. Sconto riservato dipendenti"
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -3054,9 +3131,8 @@ function ConventionsTab({ token }: { token: string }) {
                     </div>
                     <div className="text-sm text-muted-foreground flex flex-wrap gap-x-4 gap-y-1">
                       <span>Codice: <strong>{conv.companyCode}</strong></span>
-                      <span>Sconto: <strong>{conv.discountCode}</strong></span>
+                      <span>Sconti: <strong>{(conv.discounts || []).length} prodotti</strong></span>
                       <span>Registrazioni: <strong>{conv.registrationCount}{conv.maxRegistrations ? ` / ${conv.maxRegistrations}` : ""}</strong></span>
-                      {conv.discountDescription && <span>{conv.discountDescription}</span>}
                     </div>
                   </div>
                   <div className="flex items-center gap-1">

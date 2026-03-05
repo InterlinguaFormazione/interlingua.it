@@ -41,6 +41,7 @@ import {
   Plus,
   Minus,
   Tag,
+  Handshake,
   X,
   ChevronDown,
   ChevronUp,
@@ -114,10 +115,17 @@ export default function CartCheckout() {
     message?: string;
   } | null>(null);
   const [appliedVoucherCode, setAppliedVoucherCode] = useState("");
+  const [conventionDiscount, setConventionDiscount] = useState<{
+    companyName: string;
+    totalDiscountAmount: number;
+    itemDiscounts: Array<{ productSlug: string; discountAmount: number; discountType: "percentage" | "fixed"; discountValue: number }>;
+  } | null>(null);
 
   const displayTotal = voucherResult?.valid && voucherResult.discountedTotal
     ? parseFloat(voucherResult.discountedTotal)
-    : totalPrice;
+    : conventionDiscount
+      ? Math.max(0, totalPrice - conventionDiscount.totalDiscountAmount)
+      : totalPrice;
 
   const handleApplyVoucher = async () => {
     if (!voucherCode.trim()) return;
@@ -206,6 +214,10 @@ export default function CartCheckout() {
     billingPec: isItaly ? pec : "",
     notes,
     ...(appliedVoucherCode ? { discountCode: appliedVoucherCode } : {}),
+    ...(!appliedVoucherCode && conventionDiscount ? {
+      conventionCompanyName: conventionDiscount.companyName,
+      conventionDiscountAmount: conventionDiscount.totalDiscountAmount.toFixed(2),
+    } : {}),
     ...extraFields,
   });
 
@@ -250,6 +262,40 @@ export default function CartCheckout() {
     } finally {
       setCcProcessing(false);
     }
+  };
+
+  const checkConventionDiscount = async (email: string) => {
+    try {
+      const res = await apiRequest("POST", "/api/conventions/check-email", { email });
+      const data = await res.json();
+      if (data.found && data.discounts) {
+        const discountsList = data.discounts as Array<{ productSlug: string; discountType: "percentage" | "fixed"; discountValue: number }>;
+        const itemDiscounts: Array<{ productSlug: string; discountAmount: number; discountType: "percentage" | "fixed"; discountValue: number }> = [];
+        let totalDisc = 0;
+        for (const item of items) {
+          const matching = discountsList.find((d) => d.productSlug === item.product.slug);
+          if (matching) {
+            const itemPrice = parseFloat(item.effectivePrice) * item.quantity;
+            let amt = 0;
+            if (matching.discountType === "percentage") {
+              amt = itemPrice * matching.discountValue / 100;
+            } else {
+              amt = Math.min(matching.discountValue * item.quantity, itemPrice);
+            }
+            amt = Math.round(amt * 100) / 100;
+            totalDisc += amt;
+            itemDiscounts.push({ productSlug: item.product.slug, discountAmount: amt, discountType: matching.discountType, discountValue: matching.discountValue });
+          }
+        }
+        if (totalDisc > 0) {
+          setConventionDiscount({
+            companyName: data.companyName,
+            totalDiscountAmount: totalDisc,
+            itemDiscounts,
+          });
+        }
+      }
+    } catch {}
   };
 
   const checkAutoApplyVoucher = async (email: string) => {
@@ -341,6 +387,7 @@ export default function CartCheckout() {
       toast({ title: "Le password non coincidono", description: "La password e la conferma devono essere uguali.", variant: "destructive" });
       return;
     }
+    checkConventionDiscount(customerEmail);
     checkAutoApplyVoucher(customerEmail);
     setStep("billing");
   };
@@ -510,6 +557,10 @@ export default function CartCheckout() {
                   billingPec: isItaly ? pec : "",
                   notes,
                   ...(appliedVoucherCode ? { discountCode: appliedVoucherCode } : {}),
+                  ...(!appliedVoucherCode && conventionDiscount ? {
+                    conventionCompanyName: conventionDiscount.companyName,
+                    conventionDiscountAmount: conventionDiscount.totalDiscountAmount.toFixed(2),
+                  } : {}),
                 });
               } else {
                 setProcessing(false);
@@ -1091,6 +1142,15 @@ export default function CartCheckout() {
                             Sconto ({appliedVoucherCode})
                           </span>
                           <span>-&euro;{parseFloat(voucherResult.discount).toFixed(2)}</span>
+                        </div>
+                      )}
+                      {!voucherResult?.valid && conventionDiscount && (
+                        <div className="flex items-center justify-between text-sm text-green-600 dark:text-green-400" data-testid="text-convention-discount-line">
+                          <span className="flex items-center gap-1">
+                            <Handshake className="w-3 h-3" />
+                            Convenzione {conventionDiscount.companyName}
+                          </span>
+                          <span>-&euro;{conventionDiscount.totalDiscountAmount.toFixed(2)}</span>
                         </div>
                       )}
                     </div>

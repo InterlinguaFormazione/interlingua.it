@@ -10,17 +10,24 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { SHOP_PRODUCTS, getProductBySlug } from "@shared/products";
+
+interface ConventionDiscount {
+  productSlug: string;
+  discountType: "percentage" | "fixed";
+  discountValue: number;
+  description?: string;
+}
 
 interface ConventionInfo {
   id: string;
   companyName: string;
-  discountDescription: string | null;
+  discounts: ConventionDiscount[];
 }
 
 interface RegistrationResult {
-  discountCode: string;
   companyName: string;
-  discountDescription: string | null;
+  discounts: ConventionDiscount[];
 }
 
 const fadeInUp = {
@@ -73,7 +80,7 @@ export default function ConvenzioniPage() {
       setConvention({
         id: data.conventionId,
         companyName: data.companyName,
-        discountDescription: data.discountDescription,
+        discounts: data.discounts || [],
       });
       setStep(2);
     } catch (err: any) {
@@ -123,9 +130,8 @@ export default function ConvenzioniPage() {
         return;
       }
       setResult({
-        discountCode: data.discountCode,
         companyName: data.companyName || convention.companyName,
-        discountDescription: convention.discountDescription,
+        discounts: convention.discounts || [],
       });
       if (data.alreadyRegistered) {
         toast({ title: "Già registrato/a", description: data.message });
@@ -237,14 +243,25 @@ export default function ConvenzioniPage() {
                   <p className="font-semibold text-lg" data-testid="text-company-name">
                     {convention.companyName}
                   </p>
-                  {convention.discountDescription && (
-                    <p className="text-muted-foreground text-sm mt-1" data-testid="text-discount-description">
-                      {convention.discountDescription}
-                    </p>
+                  {convention.discounts.length > 0 && (
+                    <div className="mt-3 space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Sconti riservati:</p>
+                      {convention.discounts.map((d, i) => {
+                        const product = getProductBySlug(d.productSlug);
+                        return (
+                          <div key={i} className="flex items-center justify-between text-sm" data-testid={`text-discount-preview-${i}`}>
+                            <span>{product?.title || d.productSlug}</span>
+                            <Badge variant="secondary">
+                              {d.discountType === "percentage" ? `-${d.discountValue}%` : `-€${d.discountValue.toFixed(2)}`}
+                            </Badge>
+                          </div>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
 
-                <h3 className="font-semibold mb-4">Compila i tuoi dati per ricevere il codice sconto</h3>
+                <h3 className="font-semibold mb-4">Registrati per attivare gli sconti al checkout</h3>
 
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -335,36 +352,40 @@ export default function ConvenzioniPage() {
                   Registrazione completata!
                 </h2>
                 <p className="text-muted-foreground mb-6" data-testid="text-step3-subtitle">
-                  Ecco il tuo codice sconto riservato ai dipendenti di {result.companyName}
+                  I tuoi sconti riservati come dipendente di {result.companyName} sono ora attivi
                 </p>
 
-                <div className="bg-muted/50 rounded-md p-6 mb-6">
-                  <p className="text-sm text-muted-foreground mb-2">Il tuo codice sconto</p>
-                  <p
-                    className="text-3xl font-mono font-bold tracking-widest text-primary"
-                    data-testid="text-discount-code"
-                  >
-                    {result.discountCode}
-                  </p>
-                  {result.discountDescription && (
-                    <p className="text-sm text-muted-foreground mt-3" data-testid="text-discount-info">
-                      {result.discountDescription}
-                    </p>
-                  )}
-                </div>
+                {result.discounts.length > 0 && (
+                  <div className="bg-muted/50 rounded-md p-6 mb-6 text-left">
+                    <p className="text-sm font-medium mb-3">I tuoi sconti:</p>
+                    <div className="space-y-2">
+                      {result.discounts.map((d, i) => {
+                        const product = getProductBySlug(d.productSlug);
+                        return (
+                          <div key={i} className="flex items-center justify-between text-sm border-b pb-2 last:border-0 last:pb-0" data-testid={`text-result-discount-${i}`}>
+                            <span>{product?.title || d.productSlug}</span>
+                            <Badge variant="secondary" className="font-semibold">
+                              {d.discountType === "percentage" ? `-${d.discountValue}%` : `-€${d.discountValue.toFixed(2)}`}
+                            </Badge>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 <div className="bg-muted/30 rounded-md p-4 text-left space-y-2 mb-6">
-                  <h3 className="font-semibold text-sm">Come utilizzare il codice:</h3>
+                  <h3 className="font-semibold text-sm">Come funziona:</h3>
                   <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-1">
                     <li>Visita il nostro <a href="/shop" className="text-primary hover:underline">Shop Corsi</a></li>
                     <li>Scegli il corso che ti interessa</li>
-                    <li>Inserisci il codice sconto durante il checkout</li>
-                    <li>Lo sconto verrà applicato automaticamente</li>
+                    <li>Al checkout, inserisci la stessa email usata per la registrazione</li>
+                    <li>Lo sconto verrà applicato automaticamente ai prodotti convenzionati</li>
                   </ol>
                 </div>
 
                 <p className="text-xs text-muted-foreground" data-testid="text-email-notice">
-                  Il codice sconto è stato inviato anche al tuo indirizzo email.
+                  Ricorda: usa la stessa email ({email}) al checkout per ricevere gli sconti automaticamente.
                 </p>
               </Card>
             </motion.div>

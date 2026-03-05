@@ -1698,6 +1698,32 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         }
       }
 
+      if (!appliedDiscountCode && parsed.data.customerEmail) {
+        const allConventions = await storage.getConventions();
+        for (const conv of allConventions) {
+          if (!conv.active) continue;
+          const reg = await storage.getRegistrationByEmail(conv.id, parsed.data.customerEmail.toLowerCase().trim());
+          if (reg && conv.discounts) {
+            const discountsArr = conv.discounts as Array<{ productSlug: string; discountType: "percentage" | "fixed"; discountValue: number }>;
+            const match = discountsArr.find(d => d.productSlug === product.slug);
+            if (match) {
+              const price = parseFloat(expectedPrice);
+              let discount = 0;
+              if (match.discountType === "percentage") {
+                discount = price * match.discountValue / 100;
+              } else {
+                discount = Math.min(match.discountValue, price);
+              }
+              discount = Math.round(discount * 100) / 100;
+              finalPrice = Math.max(0, price - discount).toFixed(2);
+              appliedDiscountCode = `CONV:${conv.companyName}`;
+              appliedDiscountAmount = discount.toFixed(2);
+            }
+            break;
+          }
+        }
+      }
+
       const verification = await verifyPaypalOrder(parsed.data.paypalOrderId, finalPrice);
       if (!verification.verified) {
         console.error("PayPal order verification failed for shop:", verification);
@@ -1878,6 +1904,37 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
             finalTotal = Math.max(0, expectedTotal - discount);
             appliedDiscountCode = voucher.code;
             appliedDiscountAmount = discount.toFixed(2);
+          }
+        }
+      }
+
+      if (!appliedDiscountCode && customerEmail) {
+        const allConventions = await storage.getConventions();
+        for (const conv of allConventions) {
+          if (!conv.active) continue;
+          const reg = await storage.getRegistrationByEmail(conv.id, customerEmail.toLowerCase().trim());
+          if (reg && conv.discounts) {
+            const discountsArr = conv.discounts as Array<{ productSlug: string; discountType: "percentage" | "fixed"; discountValue: number }>;
+            let totalConvDiscount = 0;
+            for (const item of validatedItems) {
+              const match = discountsArr.find(d => d.productSlug === item.product.slug);
+              if (match) {
+                const itemTotal = parseFloat(item.unitPrice) * item.quantity;
+                let disc = 0;
+                if (match.discountType === "percentage") {
+                  disc = itemTotal * match.discountValue / 100;
+                } else {
+                  disc = Math.min(match.discountValue * item.quantity, itemTotal);
+                }
+                totalConvDiscount += Math.round(disc * 100) / 100;
+              }
+            }
+            if (totalConvDiscount > 0) {
+              finalTotal = Math.max(0, expectedTotal - totalConvDiscount);
+              appliedDiscountCode = `CONV:${conv.companyName}`;
+              appliedDiscountAmount = totalConvDiscount.toFixed(2);
+            }
+            break;
           }
         }
       }
@@ -2592,9 +2649,9 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
 
   app.post("/api/admin/conventions", requireAuth, async (req, res) => {
     try {
-      const { companyName, companyCode, discountCode, discountDescription, contactPerson, contactEmail, contactPhone, maxRegistrations, active } = req.body;
-      if (!companyName || !companyCode || !discountCode) {
-        return res.status(400).json({ success: false, message: "Nome azienda, codice aziendale e codice sconto sono obbligatori." });
+      const { companyName, companyCode, discounts, contactPerson, contactEmail, contactPhone, maxRegistrations, active } = req.body;
+      if (!companyName || !companyCode) {
+        return res.status(400).json({ success: false, message: "Nome azienda e codice aziendale sono obbligatori." });
       }
       const existing = await storage.getConventionByCode(companyCode.toUpperCase().trim());
       if (existing) {
@@ -2603,8 +2660,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       const convention = await storage.createConvention({
         companyName,
         companyCode: companyCode.toUpperCase().trim(),
-        discountCode,
-        discountDescription: discountDescription || null,
+        discounts: discounts || [],
         contactPerson: contactPerson || null,
         contactEmail: contactEmail || null,
         contactPhone: contactPhone || null,
@@ -2621,11 +2677,10 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
   app.patch("/api/admin/conventions/:id", requireAuth, async (req, res) => {
     try {
       const updateData: any = {};
-      const { companyName, companyCode, discountCode, discountDescription, contactPerson, contactEmail, contactPhone, maxRegistrations, active } = req.body;
+      const { companyName, companyCode, discounts, contactPerson, contactEmail, contactPhone, maxRegistrations, active } = req.body;
       if (companyName !== undefined) updateData.companyName = companyName;
       if (companyCode !== undefined) updateData.companyCode = companyCode.toUpperCase().trim();
-      if (discountCode !== undefined) updateData.discountCode = discountCode;
-      if (discountDescription !== undefined) updateData.discountDescription = discountDescription || null;
+      if (discounts !== undefined) updateData.discounts = discounts;
       if (contactPerson !== undefined) updateData.contactPerson = contactPerson || null;
       if (contactEmail !== undefined) updateData.contactEmail = contactEmail || null;
       if (contactPhone !== undefined) updateData.contactPhone = contactPhone || null;
@@ -2676,7 +2731,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         found: true,
         conventionId: convention.id,
         companyName: convention.companyName,
-        discountDescription: convention.discountDescription,
+        discounts: convention.discounts || [],
       });
     } catch (error) {
       console.error("Error looking up convention:", error);
@@ -2705,9 +2760,8 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         return res.json({
           success: true,
           alreadyRegistered: true,
-          discountCode: convention.discountCode,
           companyName: convention.companyName,
-          message: "Risulti già registrato/a per questa convenzione. Ecco il tuo codice sconto.",
+          message: "Risulti già registrato/a per questa convenzione. Gli sconti verranno applicati automaticamente al checkout.",
         });
       }
       await storage.createConventionRegistration({
@@ -2718,7 +2772,6 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         phone: phone || null,
         companyRole: companyRole || null,
         verified: false,
-        discountCodeSent: true,
       });
       try {
         await forwardToCRM({
@@ -2734,13 +2787,36 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       res.json({
         success: true,
         alreadyRegistered: false,
-        discountCode: convention.discountCode,
         companyName: convention.companyName,
-        message: "Registrazione completata! Ecco il tuo codice sconto riservato.",
+        message: "Registrazione completata! Gli sconti verranno applicati automaticamente quando inserirai questa email al checkout.",
       });
     } catch (error) {
       console.error("Error registering for convention:", error);
       res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/conventions/check-email", async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) return res.json({ found: false });
+      const normalizedEmail = email.toLowerCase().trim();
+      const allConventions = await storage.getConventions();
+      for (const conv of allConventions) {
+        if (!conv.active) continue;
+        const reg = await storage.getRegistrationByEmail(conv.id, normalizedEmail);
+        if (reg) {
+          return res.json({
+            found: true,
+            companyName: conv.companyName,
+            discounts: conv.discounts || [],
+          });
+        }
+      }
+      return res.json({ found: false });
+    } catch (error) {
+      console.error("Error checking convention email:", error);
+      res.json({ found: false });
     }
   });
 

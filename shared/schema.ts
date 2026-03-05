@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, date, integer, unique, serial } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, date, integer, unique, serial, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -544,8 +544,7 @@ export const conventions = pgTable("conventions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   companyName: text("company_name").notNull(),
   companyCode: text("company_code").notNull().unique(),
-  discountCode: text("discount_code").notNull(),
-  discountDescription: text("discount_description"),
+  discounts: jsonb("discounts").default([]),
   contactPerson: text("contact_person"),
   contactEmail: text("contact_email"),
   contactPhone: text("contact_phone"),
@@ -570,7 +569,6 @@ export const conventionRegistrations = pgTable("convention_registrations", {
   phone: text("phone"),
   companyRole: text("company_role"),
   verified: boolean("verified").default(false),
-  discountCodeSent: boolean("discount_code_sent").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
