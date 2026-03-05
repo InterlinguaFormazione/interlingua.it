@@ -15,6 +15,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { SHOP_PRODUCTS } from "@shared/products";
+import { SpeakersCornerTabContent } from "@/pages/speakers-corner-admin";
 import {
   Shield,
   Mail,
@@ -3564,6 +3565,7 @@ const adminTabs = [
   { value: "vouchers", label: "Voucher", icon: Tag },
   { value: "reviews", label: "Recensioni", icon: Star },
   { value: "conventions", label: "Convenzioni", icon: Handshake },
+  { value: "speakers-corner", label: "Speaker's Corner", icon: Mic },
   { value: "users", label: "Utenti", icon: Users, adminOnly: true },
 ] as const;
 
@@ -3803,6 +3805,19 @@ export default function AdminPage() {
           </TabsContent>
           <TabsContent value="conventions">
             <ConventionsTab token={token} />
+          </TabsContent>
+          <TabsContent value="speakers-corner">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Mic className="w-5 h-5" /> Speaker's Corner
+                </CardTitle>
+                <CardDescription>Gestione iscritti, sessioni e notifiche email</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SpeakersCornerTabContent />
+              </CardContent>
+            </Card>
           </TabsContent>
           {user?.role === "admin" && (
             <TabsContent value="users">

@@ -79,7 +79,7 @@ interface AdminPayment {
   createdAt: string;
 }
 
-export default function SpeakersCornerAdmin() {
+export function SpeakersCornerTabContent() {
   const { toast } = useToast();
   const [newSubscriber, setNewSubscriber] = useState({
     nome: "",
@@ -258,21 +258,8 @@ export default function SpeakersCornerAdmin() {
   const activeSubscribers = subscribers.filter(s => s.active);
 
   return (
-    <div className="min-h-screen">
-      <Navigation />
-      <main className="pt-28 pb-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3 mb-8">
-            <Settings className="w-8 h-8 text-primary" />
-            <div>
-              <h1 className="text-3xl font-bold text-foreground" data-testid="text-admin-title">
-                Admin — Speaker's Corner
-              </h1>
-              <p className="text-muted-foreground">Gestione iscritti, sessioni e notifiche email</p>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-4 mb-8">
+    <div className="space-y-6">
+          <div className="grid md:grid-cols-4 gap-4">
             <Card data-testid="card-stat-subscribers">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
@@ -1086,6 +1073,26 @@ export default function SpeakersCornerAdmin() {
               </Card>
             </TabsContent>
           </Tabs>
+    </div>
+  );
+}
+
+export default function SpeakersCornerAdmin() {
+  return (
+    <div className="min-h-screen">
+      <Navigation />
+      <main className="pt-28 pb-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3 mb-8">
+            <Settings className="w-8 h-8 text-primary" />
+            <div>
+              <h1 className="text-3xl font-bold text-foreground" data-testid="text-admin-title">
+                Admin — Speaker's Corner
+              </h1>
+              <p className="text-muted-foreground">Gestione iscritti, sessioni e notifiche email</p>
+            </div>
+          </div>
+          <SpeakersCornerTabContent />
         </div>
       </main>
       <Footer />
