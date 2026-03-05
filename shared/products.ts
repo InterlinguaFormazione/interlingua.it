@@ -615,7 +615,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     features: [
       "Lezioni 1-to-1 personalizzate",
       "Docente qualificato dedicato",
-      "In sede a Vicenza",
+      "In sede a Vicenza o Thiene",
       "Certificato finale",
     ],
     pageLink: "/corsi-italiano",
@@ -630,6 +630,11 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
         name: "ore",
         label: "Pacchetto ore",
         values: ["6 ore", "12 ore", "18 ore", "24 ore"],
+      },
+      {
+        name: "sede",
+        label: "Sede",
+        values: ["Vicenza", "Thiene (VI)"],
       },
     ],
     variations: [
