@@ -108,16 +108,17 @@ export default function ConvenzioniPage() {
 
     setSubmitLoading(true);
     try {
-      const res = await apiRequest("POST", "/api/conventions/register", {
+      const payload = {
         companyCode: companyCode.trim(),
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim(),
-        phone: phone.trim(),
-        companyRole: companyRole.trim(),
+        phone: phone.trim() || undefined,
+        companyRole: companyRole.trim() || undefined,
         _hp: honeypot,
         _ts: String(formLoadedAt),
-      });
+      };
+      const res = await apiRequest("POST", "/api/conventions/register", payload);
       const data = await res.json();
       if (!data.success) {
         toast({ title: "Errore", description: data.message || "Registrazione non riuscita.", variant: "destructive" });
@@ -248,7 +249,7 @@ export default function ConvenzioniPage() {
                 <h3 className="font-semibold mb-4">Compila i tuoi dati per ricevere il codice sconto</h3>
 
                 <form onSubmit={handleRegister} className="space-y-4">
-                  <div className="absolute opacity-0 pointer-events-none" aria-hidden="true">
+                  <div style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }} aria-hidden="true">
                     <input
                       type="text"
                       name="website"
