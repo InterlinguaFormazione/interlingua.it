@@ -873,7 +873,7 @@ export default function SpeakersCornerPurchase() {
                           Acquisto completato!
                         </h2>
                         <p className="text-muted-foreground">
-                          Benvenuto/a, {name}! Il tuo abbonamento annuale è ora attivo.
+                          Benvenuto/a, {nome}! Il tuo abbonamento annuale è ora attivo.
                         </p>
                         <p className="text-muted-foreground mt-2">
                           Verrai reindirizzato/a alla tua dashboard tra pochi secondi...

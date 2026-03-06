@@ -3,6 +3,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { CourseReviewsInline } from "@/components/product-reviews";
 import { useSEO } from "@/hooks/use-seo";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -57,7 +58,35 @@ import { COUNTRIES } from "@shared/countries";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { CourseFAQ } from "@/components/course-faq";
 import languageCoachingImage from "@assets/course-language-coaching.png";
+
+const languageCoachingFAQs = [
+  {
+    question: "Qual è la differenza tra coaching linguistico e un corso di lingua tradizionale?",
+    answer: "Un corso tradizionale ti dà informazioni e segue un programma prestabilito. Il coaching linguistico costruisce ogni sessione interamente intorno a te: i tuoi obiettivi, i tuoi blocchi, il tuo modo unico di apprendere. Il coach non insegna regole, ma ti guida verso una padronanza della lingua che va oltre la grammatica, lavorando su schemi, potenzialità nascoste e abitudini linguistiche.",
+  },
+  {
+    question: "Quanto costa il language coaching e quali pacchetti sono disponibili?",
+    answer: "Offriamo diverse formule: Language Coaching in Sede (da 390 euro), Coaching Blended con piattaforma e-learning (840 euro per 12 settimane), Coaching Online individuale (300 euro per 12 sessioni) e Fluency Coaching intensivo (125 euro per 5 sessioni). Ogni pacchetto può essere personalizzato in base alle tue esigenze specifiche.",
+  },
+  {
+    question: "Quanto tempo serve per vedere risultati concreti?",
+    answer: "I risultati del coaching sono generalmente 3 volte più rapidi rispetto ai corsi tradizionali. Molti clienti notano miglioramenti significativi già dopo le prime 3-4 sessioni, soprattutto nella fluency e nella sicurezza comunicativa. Il percorso completo produce trasformazioni profonde e durature.",
+  },
+  {
+    question: "In quali lingue è disponibile il coaching?",
+    answer: "Il coaching linguistico è disponibile per 7 lingue: inglese, francese, tedesco, spagnolo, russo, portoghese e italiano per stranieri. Ogni coach è specializzato nella propria lingua e formato nelle metodologie di coaching linguistico.",
+  },
+  {
+    question: "Posso fare coaching online o devo venire in sede?",
+    answer: "Offriamo entrambe le opzioni. Il coaching online si svolge su Zoom con la stessa intensità e personalizzazione del coaching in presenza. Puoi anche scegliere il formato blended che combina sessioni in sede con la piattaforma e-learning 24/7.",
+  },
+  {
+    question: "Il coaching è adatto anche a chi ha già un buon livello?",
+    answer: "Assolutamente sì. Il coaching è particolarmente efficace per chi ha già una base solida ma si sente bloccato, fatica a esprimersi con naturalezza, o vuole raggiungere un livello di padronanza professionale. Il Fluency Coaching è pensato specificamente per questo (livello minimo B1).",
+  },
+];
 import courseIndividual from "@assets/coaching-individuale-sede.png";
 import courseConversation from "@assets/coaching-fluency.png";
 import categorySoftSkills from "@assets/coaching-blended.png";
@@ -708,6 +737,7 @@ export default function LanguageCoachingPage() {
 
   return (
     <div className="min-h-screen relative">
+      <Breadcrumb items={[{ label: "Language Coaching", href: "/language-coaching" }]} schemaOnly />
       <Navigation />
       <main>
         <section ref={heroRef} className="relative pt-32 pb-28 overflow-hidden min-h-[90vh] flex items-center">
@@ -1009,6 +1039,13 @@ export default function LanguageCoachingPage() {
             </AnimatedSection>
           </div>
         </section>
+
+        <CourseFAQ
+          pageUrl="/language-coaching"
+          faqs={languageCoachingFAQs}
+          title="Domande Frequenti"
+          subtitle="Trova le risposte alle domande più comuni sul Language Coaching."
+        />
       </main>
       <Footer />
     </div>

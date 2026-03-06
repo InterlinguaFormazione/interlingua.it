@@ -3,6 +3,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { CourseReviewsInline } from "@/components/product-reviews";
 import { useSEO } from "@/hooks/use-seo";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -55,6 +56,42 @@ import { Link } from "wouter";
 import { PROVINCES } from "@shared/provinces";
 import { COUNTRIES } from "@shared/countries";
 import { FormazionePresenzaSchema } from "@/components/seo-schemas";
+import { CourseFAQ } from "@/components/course-faq";
+
+const formazionePresenzaFAQs = [
+  {
+    question: "Quanti studenti ci sono in ogni classe?",
+    answer: "I nostri corsi di gruppo hanno classi ridotte, generalmente tra 5 e 8 partecipanti, per garantire la massima attenzione individuale e ampie opportunità di pratica per ogni studente.",
+  },
+  {
+    question: "Quali sono gli orari dei corsi?",
+    answer: "I corsi di gruppo serali si tengono generalmente una volta a settimana, in fascia serale. I corsi individuali e semi-individuali hanno orari completamente flessibili, concordati direttamente con il docente.",
+  },
+  {
+    question: "Per quali livelli sono disponibili i corsi?",
+    answer: "Offriamo corsi per tutti i livelli del Quadro Comune Europeo (QCER), dal principiante assoluto (A1) all'avanzato (C1). Prima dell'inizio del corso, effettuiamo un test di livello gratuito per inserire ogni studente nella classe più adatta.",
+  },
+  {
+    question: "Quali materiali didattici sono inclusi?",
+    answer: "Il materiale didattico è incluso nel prezzo del corso. Per i corsi di lingua, include anche l'accesso alla piattaforma e-learning attiva 24/7 con esercizi interattivi e riconoscimento vocale.",
+  },
+  {
+    question: "Qual è la politica di cancellazione?",
+    answer: "Puoi cancellare la tua iscrizione gratuitamente fino a 7 giorni prima dell'inizio del corso. Dopo tale termine, è possibile trasferire l'iscrizione a un'altra sessione o a un'altra persona. Contattaci per maggiori dettagli.",
+  },
+  {
+    question: "Rilasciate un certificato a fine corso?",
+    answer: "Sì, al termine di ogni corso rilasciamo un certificato di competenza con il livello raggiunto secondo il QCER. Il certificato attesta le competenze acquisite durante il percorso formativo.",
+  },
+  {
+    question: "Posso pagare con la Carta Cultura Giovani?",
+    answer: "Sì, siamo un ente accreditato e accettiamo la Carta Cultura Giovani per i corsi di lingua. Contattaci per verificare l'idoneità del corso che ti interessa.",
+  },
+  {
+    question: "Dove si svolgono i corsi?",
+    answer: "I corsi si svolgono nelle nostre sedi di Vicenza (Viale Mazzini, 27) e Thiene. Per i corsi individuali, è possibile anche organizzare le lezioni presso la sede dell'azienda o a domicilio.",
+  },
+];
 import lingueStraniereImage from "@assets/course-lingue-straniere.png";
 import languageCoachingImage from "@assets/course-language-coaching.png";
 import managementImage from "@assets/course-management.png";
@@ -801,6 +838,7 @@ export default function FormazioneInPresenzaPage() {
   return (
     <div className="min-h-screen relative">
       <FormazionePresenzaSchema />
+      <Breadcrumb items={[{ label: "Formazione in Presenza", href: "/formazione-in-presenza" }]} schemaOnly />
       <Navigation />
       <main>
         <section ref={heroRef} className="relative pt-32 pb-28 overflow-hidden min-h-[85vh] flex items-center">
@@ -1151,6 +1189,13 @@ export default function FormazioneInPresenzaPage() {
             </AnimatedSection>
           </div>
         </section>
+
+        <CourseFAQ
+          pageUrl="/formazione-in-presenza"
+          faqs={formazionePresenzaFAQs}
+          title="Domande Frequenti"
+          subtitle="Trova le risposte alle domande più comuni sui nostri corsi in presenza a Vicenza e Thiene."
+        />
       </main>
       <Footer />
     </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -312,6 +313,7 @@ export default function ShopProductPage() {
         slug={product.slug}
         category={product.category}
       />
+      <Breadcrumb items={[{ label: "Shop", href: "/shop" }, { label: product.name }]} schemaOnly />
       <Navigation />
 
       <section className={`relative pt-28 pb-16 overflow-hidden`}>

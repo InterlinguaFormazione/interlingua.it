@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useParams } from "wouter";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { 
   ArrowLeft, 
   Globe,
@@ -455,6 +456,7 @@ export default function CourseDetailPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Breadcrumb items={[{ label: course.title }]} schemaOnly />
       <header className="sticky top-0 z-[999] bg-background/80 backdrop-blur-md border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <Link href="/">

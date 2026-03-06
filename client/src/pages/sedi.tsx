@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { useSEO } from "@/hooks/use-seo";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -125,6 +126,7 @@ export default function SediPage() {
 
   return (
     <div className="min-h-screen relative">
+      <Breadcrumb items={[{ label: "Le Nostre Sedi", href: "/sedi" }]} schemaOnly />
       <Navigation />
       <main>
         <section ref={heroRef} className="relative min-h-[80vh] flex items-center overflow-hidden">

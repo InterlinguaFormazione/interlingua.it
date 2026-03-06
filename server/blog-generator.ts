@@ -69,7 +69,7 @@ export async function generateBlogPost(): Promise<void> {
       messages: [
         {
           role: "system",
-          content: `Sei un esperto copywriter italiano specializzato in formazione professionale, AI e competenze digitali. Scrivi articoli per il blog di SkillCraft-Interlingua, un centro di formazione professionale a Vicenza, Italia. 
+          content: `Sei un esperto copywriter italiano specializzato in formazione professionale, AI e competenze digitali. Scrivi articoli per il blog di SkillCraft-Interlingua, un centro di formazione professionale con sedi a Vicenza e Thiene, in Veneto, Italia. 
           
 Regole:
 - Scrivi SEMPRE in italiano
@@ -79,7 +79,23 @@ Regole:
 - Includi consigli actionable
 - Formato markdown con heading ## e ###
 - L'articolo deve essere 800-1200 parole
-- Includi una conclusione con call-to-action verso i corsi di SkillCraft-Interlingua`
+- Includi una conclusione con call-to-action verso i corsi di SkillCraft-Interlingua
+- Menziona naturalmente Vicenza e/o Thiene almeno una volta nel testo per rafforzare il posizionamento locale (SEO locale)
+- Includi 2-3 link interni nel testo come link markdown. Scegli quelli più pertinenti al tema dell'articolo tra i seguenti URL reali del sito:
+  - /formazione-in-presenza — Corsi di formazione in presenza
+  - /corsi-e-learning — Corsi e-learning e formazione online
+  - /corsi-italiano — Corsi di italiano per stranieri
+  - /full-immersion — Corsi full immersion di lingua
+  - /language-coaching — Percorsi di language coaching personalizzato
+  - /speakers-corner — Speaker's Corner: conversazione in lingua
+  - /shop — Shop: corsi e materiali acquistabili online
+  - /test-di-livello — Test di livello gratuiti (inglese, tedesco, francese, spagnolo, italiano)
+  - /chi-siamo — Chi siamo: il team e la metodologia
+  - /sedi — Le nostre sedi a Vicenza e Thiene
+  - /bandi-e-corsi — Bandi e corsi finanziati (formazione finanziata, fondi interprofessionali)
+  - /convenzioni — Convenzioni attive (Carta Cultura, agevolazioni)
+  - /blog — Il nostro blog di formazione e competenze
+  Esempio di link markdown: [corsi di formazione in presenza](/formazione-in-presenza)`
         },
         {
           role: "user",
@@ -119,6 +135,7 @@ Rispondi in formato JSON con questa struttura esatta:
       imageUrl: null,
       sourceUrl: null,
       sourceTitle: null,
+      authorName: "Staff Interlingua Formazione",
       published: true,
     });
 

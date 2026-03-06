@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useSEO } from "@/hooks/use-seo";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { Handshake, Search, CheckCircle, Gift, ArrowRight, ArrowLeft, Building2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -15,6 +16,7 @@ import { SHOP_PRODUCTS, getProductBySlug } from "@shared/products";
 
 interface ConventionDiscount {
   productSlug: string;
+  productOptions?: Record<string, string>;
   discountType: "percentage" | "fixed";
   discountValue: number;
   description?: string;
@@ -175,6 +177,7 @@ export default function ConvenzioniPage() {
 
   return (
     <div className="min-h-screen">
+      <Breadcrumb items={[{ label: "Convenzioni", href: "/convenzioni" }]} schemaOnly />
       <Navigation />
       <main className="pt-32 pb-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-2xl">

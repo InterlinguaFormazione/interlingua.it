@@ -67,6 +67,9 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
   - `theme-provider.tsx` - Dark/light mode support
   - `theme-toggle.tsx` - Theme switcher button
   - `seo-schemas.tsx` - Per-page JSON-LD structured data components (Course, LanguageSchool, BlogPosting, Product, LearningResource, AboutPage schemas)
+  - `breadcrumb.tsx` - Reusable breadcrumb component with BreadcrumbList JSON-LD schema injection. Supports `schemaOnly` mode (SEO schema without visible UI). Applied to all 21 pages.
+  - `course-faq.tsx` - Page-specific FAQ sections for course pages with FAQPage JSON-LD schema
+  - `faq-section.tsx` - General FAQ section rendered on home page
 - `src/hooks/use-seo.ts` - Reusable SEO hook that dynamically sets page title, meta description, canonical URL, and Open Graph tags per page
 
 ### Backend (`server/`)

@@ -6,6 +6,7 @@ import { TestimonialsSection } from "@/components/testimonials-section";
 import { AboutSection } from "@/components/about-section";
 import { ContactSection } from "@/components/contact-section";
 import { NewsletterSection } from "@/components/newsletter-section";
+import { FAQSection } from "@/components/faq-section";
 import { Footer } from "@/components/footer";
 import { useSEO } from "@/hooks/use-seo";
 
@@ -24,6 +25,7 @@ export default function Home() {
         <FeaturesSection />
         <TestimonialsSection />
         <AboutSection />
+        <FAQSection />
         <ContactSection />
         <NewsletterSection />
       </main>

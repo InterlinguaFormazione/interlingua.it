@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useSEO } from "@/hooks/use-seo";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -403,6 +404,7 @@ export default function GermanTestPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50/50 to-violet-50 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950 relative overflow-hidden notranslate" translate="no">
+      <Breadcrumb items={[{ label: "Test di Livello", href: "/test-di-livello" }, { label: "Test di Tedesco" }]} schemaOnly />
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-blue-200/30 dark:bg-blue-800/10 rounded-full blur-3xl" />
         <div className="absolute top-1/3 -left-32 w-80 h-80 bg-indigo-200/25 dark:bg-indigo-800/10 rounded-full blur-3xl" />

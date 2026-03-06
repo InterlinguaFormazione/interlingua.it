@@ -4,6 +4,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { CourseReviewsInline } from "@/components/product-reviews";
 import { useSEO } from "@/hooks/use-seo";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -52,6 +53,42 @@ import {
 } from "lucide-react";
 import { COUNTRIES } from "@shared/countries";
 import { CorsiItalianoSchema } from "@/components/seo-schemas";
+import { CourseFAQ } from "@/components/course-faq";
+
+const corsiItalianoFAQs = [
+  {
+    question: "Offrite supporto per il visto studentesco?",
+    answer: "Possiamo fornire la documentazione necessaria per la richiesta del visto studentesco, inclusa la lettera di iscrizione al corso. Contattaci prima della partenza e ti guideremo nel processo. Ti consigliamo di verificare i requisiti specifici presso l'ambasciata o il consolato italiano nel tuo paese.",
+  },
+  {
+    question: "Potete aiutarmi a trovare un alloggio a Vicenza?",
+    answer: "Sì, possiamo aiutarti a trovare il posto perfetto dove soggiornare durante il tuo corso. Dai B&B alle camere in affitto, Vicenza offre molte opzioni a misura di studente. Contattaci e ti forniremo una lista di alloggi convenzionati a tariffe agevolate.",
+  },
+  {
+    question: "Per quali livelli sono disponibili i corsi?",
+    answer: "Offriamo corsi per tutti i livelli, dal principiante assoluto (A1) all'avanzato (C1). All'arrivo, viene effettuato un test di livello per inserirti nella classe più adatta. I corsi individuali sono disponibili per qualsiasi livello e possono essere completamente personalizzati.",
+  },
+  {
+    question: "Rilasciate un certificato di competenza?",
+    answer: "Sì, al termine del corso rilasciamo un certificato di competenza con il livello raggiunto secondo il QCER (Quadro Comune Europeo di Riferimento). Il certificato attesta le competenze linguistiche acquisite durante il percorso.",
+  },
+  {
+    question: "Quando iniziano i corsi collettivi?",
+    answer: "I corsi intensivi collettivi (15 e 20 lezioni a settimana) iniziano ogni lunedì dell'anno. Non c'è un periodo fisso di iscrizione: puoi iniziare quando preferisci e per la durata che desideri, da una settimana in su.",
+  },
+  {
+    question: "Quanto sono grandi le classi?",
+    answer: "Le nostre classi sono molto piccole: in media 5-6 studenti per gruppo. Questo garantisce la massima attenzione individuale, più personalizzazione e un ambiente dove ogni studente ha ampio spazio per praticare.",
+  },
+  {
+    question: "Posso seguire il corso online?",
+    answer: "Sì, offriamo corsi individuali online via Zoom con la stessa qualità didattica dei corsi in sede. Puoi studiare italiano da qualsiasi parte del mondo, con orari flessibili e un docente qualificato dedicato.",
+  },
+  {
+    question: "C'è una tassa di iscrizione?",
+    answer: "Sì, la tassa di iscrizione è di 50 euro (una tantum) e copre il test di livello iniziale, il materiale didattico e le attività culturali organizzate dalla scuola.",
+  },
+];
 import courseItalianImage from "@assets/course-italiano-per-stranieri.png";
 import aboutVicenzaImage from "@assets/vicenza_1772179633305.jpg";
 
@@ -547,6 +584,7 @@ export default function CorsiItalianoPage() {
   return (
     <div className="min-h-screen relative">
       <CorsiItalianoSchema />
+      <Breadcrumb items={[{ label: "Corsi di Italiano", href: "/corsi-italiano" }]} schemaOnly />
       <Navigation />
       <main>
         <div className="fixed top-32 right-4 z-40">
@@ -1015,6 +1053,13 @@ export default function CorsiItalianoPage() {
             </AnimatedSection>
           </div>
         </section>
+
+        <CourseFAQ
+          pageUrl="/corsi-italiano"
+          faqs={corsiItalianoFAQs}
+          title="Domande Frequenti"
+          subtitle="Trova le risposte alle domande più comuni sui nostri corsi di italiano per stranieri."
+        />
       </main>
       <Footer />
     </div>

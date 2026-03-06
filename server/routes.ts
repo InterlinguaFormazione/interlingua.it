@@ -2485,7 +2485,6 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         const customer = await storage.getShopCustomerById(session.customerId);
         if (!customer) return res.status(404).json({ success: false, message: "Cliente non trovato." });
 
-        const bcrypt = await import("bcrypt");
         const valid = await bcrypt.compare(currentPassword, customer.password);
         if (!valid) {
           return res.status(400).json({ success: false, message: "La password attuale non è corretta." });
@@ -3009,13 +3008,11 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
 
       try {
         await forwardToCRM({
-          nome: firstName.trim(),
-          cognome: lastName.trim(),
+          name: `${firstName.trim()} ${lastName.trim()}`,
           email: normalizedEmail,
-          telefono: phone || "",
-          interesse: `Convenzione: ${convention.companyName}`,
-          messaggio: `Registrazione convenzione ${convention.companyName} (${convention.companyCode}). Ruolo: ${companyRole || "N/A"}`,
-          sorgente: "convenzione",
+          phone: phone || null,
+          courseInterest: `Convenzione: ${convention.companyName}`,
+          message: `Registrazione convenzione ${convention.companyName} (${convention.companyCode}). Ruolo: ${companyRole || "N/A"}`,
         });
       } catch {}
       res.json({
@@ -3416,7 +3413,6 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         studentFirstName: stuFirst || null,
         studentLastName: stuLast || null,
         studentEmail: stuEmail || null,
-        codiceFiscale: codiceFiscale || null,
         billingCodiceFiscale: billingCodiceFiscale || codiceFiscale || null,
         billingIndirizzo: billingIndirizzo || null,
         billingCap: billingCap || null,
@@ -3645,7 +3641,6 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         studentFirstName: null,
         studentLastName: null,
         studentEmail: null,
-        codiceFiscale: codiceFiscale || null,
         billingCodiceFiscale: billingCodiceFiscale || codiceFiscale || null,
         billingIndirizzo: billingIndirizzo || null,
         billingCap: billingCap || null,
@@ -3855,7 +3850,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       const allQuestions = await storage.getBeQuestionsByLanguage(language);
       let firstQuestion = null;
       let startSectionIndex = 1;
-      let startSkill = SECTION_SKILLS[0];
+      let startSkill: typeof SECTION_SKILLS[number] = SECTION_SKILLS[0];
 
       for (let si = 0; si < SECTION_SKILLS.length; si++) {
         const skill = SECTION_SKILLS[si];
@@ -4414,7 +4409,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         await sendEnglishTestResultEmail({
           candidateName: `${session.firstName} ${session.lastName}`,
           candidateEmail: session.email,
-          company: session.company,
+          company: session.company || "",
           phone: session.phone,
           finalLevel,
           overallScore: finalLevel,
@@ -4562,7 +4557,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         await sendEnglishTestResultEmail({
           candidateName: `${session.firstName} ${session.lastName}`,
           candidateEmail: session.email,
-          company: session.company,
+          company: session.company || "",
           phone: session.phone,
           finalLevel,
           overallScore: finalLevel,

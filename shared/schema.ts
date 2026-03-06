@@ -89,6 +89,7 @@ export const blogPosts = pgTable("blog_posts", {
   imageUrl: text("image_url"),
   sourceUrl: text("source_url"),
   sourceTitle: text("source_title"),
+  authorName: text("author_name").default("Staff Interlingua Formazione"),
   published: boolean("published").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });

@@ -3,6 +3,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ProductReviewsSection } from "@/components/product-reviews";
 import { useSEO } from "@/hooks/use-seo";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -29,7 +30,35 @@ import {
   Volume2,
   Zap,
 } from "lucide-react";
+import { CourseFAQ } from "@/components/course-faq";
 const speakersCornerImage = "/images/speakers-corner.png";
+
+const speakersCornerFAQs = [
+  {
+    question: "Come funziona Speaker's Corner?",
+    answer: "Speaker's Corner è un appuntamento settimanale di conversazione in inglese. Ogni venerdì alle 18:30 un moderatore qualificato guida un'ora di conversazione su un tema diverso, in un ambiente informale e stimolante. Ogni martedì ricevi un'email con il tema della sessione e il link per prenotarti.",
+  },
+  {
+    question: "Chi può partecipare?",
+    answer: "Speaker's Corner è aperto a tutti gli abbonati attivi. Non è richiesto un livello minimo specifico, ma è consigliato avere almeno un livello intermedio (B1) per poter partecipare attivamente alla conversazione. L'ambiente è accogliente e il moderatore aiuta tutti a partecipare.",
+  },
+  {
+    question: "Quando si tengono le sessioni?",
+    answer: "Le sessioni si svolgono ogni venerdì dalle 18:30 alle 19:30. Ogni martedì precedente ricevi un'email con il tema della settimana e il link per prenotare il tuo posto.",
+  },
+  {
+    question: "Quanto costa l'abbonamento?",
+    answer: "L'abbonamento annuale costa 200 euro e ti dà accesso a tutte le sessioni settimanali per un anno intero. Puoi acquistare l'abbonamento direttamente online dal nostro sito.",
+  },
+  {
+    question: "Devo prenotare ogni settimana?",
+    answer: "Sì, per garantire gruppi ridotti e la migliore esperienza possibile, ti chiediamo di prenotare il tuo posto ogni settimana tramite la tua area riservata. La prenotazione è semplice e si fa con un click.",
+  },
+  {
+    question: "Quali argomenti vengono trattati?",
+    answer: "Ogni settimana un argomento diverso: attualità, cultura, viaggi, tecnologia, cinema, sport e molto altro. Il moderatore prepara materiali e spunti per rendere la conversazione stimolante e coinvolgente per tutti i partecipanti.",
+  },
+];
 
 export default function SpeakersCornerPage() {
   useSEO({
@@ -139,6 +168,7 @@ export default function SpeakersCornerPage() {
 
   return (
     <div className="min-h-screen">
+      <Breadcrumb items={[{ label: "Speaker's Corner", href: "/speakers-corner" }]} schemaOnly />
       <Navigation />
       <main>
         <section className="relative pt-36 pb-24 overflow-hidden">
@@ -466,6 +496,12 @@ export default function SpeakersCornerPage() {
             </div>
           </div>
         </section>
+        <CourseFAQ
+          pageUrl="/speakers-corner"
+          faqs={speakersCornerFAQs}
+          title="Domande Frequenti"
+          subtitle="Trova le risposte alle domande più comuni sullo Speaker's Corner."
+        />
         <ProductReviewsSection productSlugs={["speakers-corner"]} />
       </main>
       <Footer />

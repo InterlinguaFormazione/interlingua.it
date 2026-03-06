@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useSEO } from "@/hooks/use-seo";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { ArrowLeft, Calendar, Tag, ChevronRight, BookOpen, Newspaper, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -232,6 +233,7 @@ export default function BlogPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Breadcrumb items={[{ label: "Blog", href: "/blog" }]} schemaOnly />
       <Navigation />
 
       <section className="relative pt-32 pb-16 overflow-hidden">

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { useSEO } from "@/hooks/use-seo";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { 
   ArrowLeft, 
   Award, 
@@ -140,6 +141,7 @@ export default function ChiSiamoPage() {
   return (
     <div className="min-h-screen bg-background">
       <ChiSiamoSchema />
+      <Breadcrumb items={[{ label: "Chi Siamo", href: "/chi-siamo" }]} schemaOnly />
       <Navigation />
       
       <section className="relative pt-28 md:pt-32 overflow-hidden">

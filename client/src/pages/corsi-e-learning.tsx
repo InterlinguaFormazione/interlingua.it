@@ -3,6 +3,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { CourseReviewsInline } from "@/components/product-reviews";
 import { useSEO } from "@/hooks/use-seo";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,6 +57,42 @@ import { Link } from "wouter";
 import { PROVINCES } from "@shared/provinces";
 import { COUNTRIES } from "@shared/countries";
 import { CorsiELearningSchema } from "@/components/seo-schemas";
+import { CourseFAQ } from "@/components/course-faq";
+
+const corsiELearningFAQs = [
+  {
+    question: "Quale piattaforma e-learning utilizzate?",
+    answer: "Utilizziamo una piattaforma digitale all'avanguardia basata su Intelligenza Artificiale, con riconoscimento vocale avanzato, lezioni interattive, test e certificazione finale CEFR. La piattaforma è accessibile 24/7 da qualsiasi dispositivo.",
+  },
+  {
+    question: "Quali requisiti tecnici servono?",
+    answer: "Basta un computer, tablet o smartphone con connessione internet stabile. Per le lezioni live su Zoom è consigliato un PC o tablet con webcam e microfono. Non è necessario installare software aggiuntivo oltre a Zoom.",
+  },
+  {
+    question: "Posso studiare quando voglio?",
+    answer: "Sì, la piattaforma e-learning è accessibile 24 ore su 24, 7 giorni su 7. Per i corsi con lezioni live, gli incontri con il tutor sono programmati in orari concordati, ma tutto il resto dello studio è completamente flessibile.",
+  },
+  {
+    question: "Ho accesso a un tutor?",
+    answer: "Nei corsi blended e nei corsi individuali online hai un tutor qualificato dedicato con cui fare lezioni live su Zoom. Anche nei corsi self-learning, un tutor monitora i tuoi progressi e ti fornisce supporto via piattaforma.",
+  },
+  {
+    question: "Per quanto tempo ho accesso alla piattaforma?",
+    answer: "L'accesso alla piattaforma dura per tutta la durata del corso acquistato. I corsi mensili si rinnovano mensilmente, mentre i pacchetti di lezioni individuali hanno accesso per la durata del percorso concordato.",
+  },
+  {
+    question: "Rilasciate un certificato?",
+    answer: "Sì, al completamento del corso rilasciamo un certificato con il livello raggiunto secondo il QCER (Quadro Comune Europeo di Riferimento). La certificazione è inclusa nel prezzo del corso.",
+  },
+  {
+    question: "Posso pagare con la Carta Cultura Giovani?",
+    answer: "Sì, accettiamo la Carta Cultura Giovani e 18app per la maggior parte dei nostri corsi online. Contattaci per verificare l'idoneità del corso che ti interessa.",
+  },
+  {
+    question: "Posso cambiare lingua o corso dopo l'iscrizione?",
+    answer: "Sì, è possibile modificare la lingua o il tipo di corso entro i primi 7 giorni dall'iscrizione. Contattaci e troveremo insieme la soluzione migliore per le tue esigenze.",
+  },
+];
 import corsoOnlineImage from "@assets/course-digitale.png";
 import categoryOnline from "@/assets/images/category-online.jpg";
 import courseIndividual from "@/assets/images/course-individual.jpg";
@@ -755,6 +792,7 @@ export default function CorsiELearningPage() {
   return (
     <div className="min-h-screen relative">
       <CorsiELearningSchema />
+      <Breadcrumb items={[{ label: "Corsi E-Learning", href: "/corsi-e-learning" }]} schemaOnly />
       <Navigation />
       <main>
         <section ref={heroRef} className="relative pt-32 pb-28 overflow-hidden min-h-[85vh] flex items-center">
@@ -1047,6 +1085,13 @@ export default function CorsiELearningPage() {
             </AnimatedSection>
           </div>
         </section>
+
+        <CourseFAQ
+          pageUrl="/corsi-e-learning"
+          faqs={corsiELearningFAQs}
+          title="Domande Frequenti"
+          subtitle="Trova le risposte alle domande più comuni sui nostri corsi online e sulla piattaforma e-learning."
+        />
       </main>
       <Footer />
     </div>

@@ -1,6 +1,7 @@
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { useSEO } from "@/hooks/use-seo";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
@@ -129,6 +130,7 @@ export default function LanguageTestsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50/50 to-violet-50 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950">
       <LanguageTestsPageSchema />
+      <Breadcrumb items={[{ label: "Test di Livello", href: "/test-di-livello" }]} schemaOnly />
       <Navigation />
 
       <main className="container mx-auto px-4 pt-28 pb-20">

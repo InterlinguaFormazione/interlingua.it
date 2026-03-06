@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { useSEO } from "@/hooks/use-seo";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { ArrowLeft, ArrowRight, ExternalLink, CheckCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,12 +25,11 @@ export default function BandiECorsiPage() {
   const activeBandi = bandiCards.filter(b => b.status === "active");
   const expiredBandi = bandiCards.filter(b => b.status === "expired");
 
-  const sections = [
-    ...new Set(activeBandi.map(b => b.section))
-  ];
+  const sections = Array.from(new Set(activeBandi.map(b => b.section)));
 
   return (
     <div className="min-h-screen bg-background">
+      <Breadcrumb items={[{ label: "Bandi e Corsi Finanziati", href: "/bandi-e-corsi-finanziati" }]} schemaOnly />
       <Navigation />
 
       <section className="relative pt-28 md:pt-32 overflow-hidden">

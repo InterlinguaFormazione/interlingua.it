@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { ArrowLeft, Calendar, MessageCircle, Send, Loader2, User, Reply } from "lucide-react";
+import { ArrowLeft, Calendar, MessageCircle, Send, Loader2, User, Reply, PenLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import DOMPurify from "dompurify";
@@ -252,6 +253,7 @@ export default function BlogPostPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Breadcrumb items={[{ label: "Blog", href: "/blog" }, { label: post.title }]} schemaOnly />
       <Navigation />
       <main className="pt-32 pb-16">
         <article className="container mx-auto px-4 max-w-3xl">
@@ -269,6 +271,7 @@ export default function BlogPostPage() {
               slug={post.slug}
               category={post.category}
               createdAt={new Date(post.createdAt!).toISOString()}
+              authorName={post.authorName || undefined}
             />
             <div className="flex flex-wrap items-center gap-3 mb-4">
               <Badge className={`bg-gradient-to-r ${categoryColors[post.category] || "from-gray-500 to-gray-600"} text-white border-0`}>
@@ -278,6 +281,12 @@ export default function BlogPostPage() {
                 <Calendar className="w-4 h-4" />
                 {new Date(post.createdAt!).toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" })}
               </span>
+              {post.authorName && (
+                <span className="text-sm text-muted-foreground flex items-center gap-1" data-testid="text-blog-author">
+                  <PenLine className="w-4 h-4" />
+                  {post.authorName}
+                </span>
+              )}
             </div>
 
             <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight" data-testid="text-blog-post-title">
@@ -295,6 +304,23 @@ export default function BlogPostPage() {
               dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }} 
               data-testid="blog-post-content"
             />
+
+            {post.authorName && (
+              <div className="mt-10 pt-8 border-t" data-testid="author-card">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center flex-shrink-0">
+                    <PenLine className="w-5 h-5 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Scritto da</p>
+                    <p className="font-semibold text-foreground" data-testid="text-author-card-name">{post.authorName}</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Il team di SkillCraft-Interlingua condivide approfondimenti su formazione professionale, competenze digitali e lingue straniere da oltre 30 anni.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <BlogCommentSection slug={post.slug} />
 

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { HelpCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +39,30 @@ const faqs = [
 ];
 
 export function FAQSection() {
+  useEffect(() => {
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqs.map(faq => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: faq.answer,
+        },
+      })),
+    };
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify(schema);
+    script.id = "faq-schema";
+    document.head.appendChild(script);
+    return () => {
+      const el = document.getElementById("faq-schema");
+      if (el) el.remove();
+    };
+  }, []);
+
   return (
     <section id="faq" className="py-24">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">

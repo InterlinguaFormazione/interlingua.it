@@ -311,12 +311,14 @@ export function BlogPostSchema({
   slug,
   category,
   createdAt,
+  authorName,
 }: {
   title: string;
   excerpt: string;
   slug: string;
   category: string;
   createdAt: string;
+  authorName?: string;
 }) {
   useJsonLd({
     "@type": "BlogPosting",
@@ -325,8 +327,8 @@ export function BlogPostSchema({
     url: `https://skillcraft-interlingua.it/blog/${slug}`,
     datePublished: createdAt,
     author: {
-      "@type": "Organization",
-      name: "SkillCraft-Interlingua",
+      "@type": "Person",
+      name: authorName || "Staff Interlingua Formazione",
     },
     publisher: {
       "@type": "Organization",

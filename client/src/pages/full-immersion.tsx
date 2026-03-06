@@ -3,6 +3,7 @@ import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { ProductReviewsSection } from "@/components/product-reviews";
 import { useSEO } from "@/hooks/use-seo";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +41,42 @@ import {
 import { Link } from "wouter";
 import fullImmersionImage from "@assets/course-full-immersion.png";
 import { FullImmersionSchema } from "@/components/seo-schemas";
+import { CourseFAQ } from "@/components/course-faq";
+
+const fullImmersionFAQs = [
+  {
+    question: "Quanto dura il Full Immersion Workshop?",
+    answer: "Il FIW dura 5 giorni intensivi, dal lunedì al venerdì, con almeno 30 ore frontali (dalle 9:00 alle 16:30, estendibili fino alle 18:00 con attività esperienziali). L'Experiential Weekend dura 2 giorni (sabato e domenica).",
+  },
+  {
+    question: "Quanto è intensivo il programma?",
+    answer: "Il programma prevede almeno 30 ore frontali in 5 giorni, con 4 moduli che si alternano durante la giornata: Language Studies, Small Talk & Ear Training, Specialist & Executive Language, e Specialist & Executive Mindset. L'immersione è totale: si comunica, si pensa e si vive in inglese per tutta la settimana.",
+  },
+  {
+    question: "Cosa è incluso nel prezzo?",
+    answer: "Il prezzo include 5 giorni di formazione intensiva con un team di coach qualificati, materiale didattico personalizzato, certificato di competenza con il livello raggiunto, 3 mesi di accesso alla piattaforma e-learning 24/7 e sessioni di conversazione nello Speaker's Corner. Non sono inclusi vitto e alloggio, ma abbiamo convenzioni con B&B e hotel a Vicenza.",
+  },
+  {
+    question: "Quali risultati posso aspettarmi?",
+    answer: "I partecipanti guadagnano in media un livello QCER completo in una sola settimana. Il 98% dei partecipanti rifarebbe l'esperienza. I progressi più evidenti si notano nella fluency, nella sicurezza comunicativa e nella capacità di sostenere conversazioni complesse.",
+  },
+  {
+    question: "Qual è il livello minimo richiesto?",
+    answer: "Il FIW è disponibile per livelli da A2 a C1. Un test di livello viene effettuato prima dell'inizio per garantire gruppi omogenei e un programma calibrato sulle reali competenze dei partecipanti.",
+  },
+  {
+    question: "Dove si svolge e serve prenotare un alloggio?",
+    answer: "Il workshop si svolge nella nostra sede di Vicenza. Per chi arriva da fuori città, abbiamo convenzioni con B&B e hotel a tariffe agevolate. Il nostro staff può aiutarti nella ricerca dell'alloggio più adatto.",
+  },
+  {
+    question: "Posso partecipare da solo o serve un gruppo?",
+    answer: "Puoi iscriverti singolarmente al FIW Collettivo (5-8 partecipanti) e verrai inserito in un gruppo. In alternativa, puoi scegliere il formato Semi-Individuale (2-4 partecipanti) o Individuale (1 partecipante) per un'esperienza completamente personalizzata.",
+  },
+  {
+    question: "In che periodo dell'anno si tengono i workshop?",
+    answer: "I workshop vengono programmati durante tutto l'anno. Contattaci per conoscere le prossime date disponibili o per organizzare un workshop su misura per te o la tua azienda.",
+  },
+];
 
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -199,6 +236,7 @@ export default function FullImmersionPage() {
   return (
     <div className="min-h-screen relative">
       <FullImmersionSchema />
+      <Breadcrumb items={[{ label: "Full Immersion", href: "/full-immersion" }]} schemaOnly />
       <Navigation />
       <main>
         <section ref={heroRef} className="relative pt-32 pb-28 overflow-hidden min-h-[90vh] flex items-center">
@@ -316,7 +354,7 @@ export default function FullImmersionPage() {
                     src={fullImmersionImage}
                     alt="Full Immersion Workshop di lingua inglese"
                     className="relative rounded-[2rem] w-full max-w-lg mx-auto shadow-2xl shadow-black/30 border-2 border-white/15"
-                    loading="lazy"
+                    loading="eager"
                     decoding="async"
                     data-testid="img-fi-hero"
                   />
@@ -911,6 +949,12 @@ export default function FullImmersionPage() {
             </AnimatedSection>
           </div>
         </section>
+        <CourseFAQ
+          pageUrl="/full-immersion"
+          faqs={fullImmersionFAQs}
+          title="Domande Frequenti"
+          subtitle="Trova le risposte alle domande più comuni sul Full Immersion Workshop."
+        />
         <ProductReviewsSection productSlugs={["full-immersion"]} />
       </main>
       <Footer />

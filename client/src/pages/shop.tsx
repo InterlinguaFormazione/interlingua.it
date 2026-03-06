@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
 import { useSEO } from "@/hooks/use-seo";
+import { Breadcrumb } from "@/components/breadcrumb";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -235,6 +236,7 @@ export default function ShopPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <Breadcrumb items={[{ label: "Shop", href: "/shop" }]} schemaOnly />
       <Navigation />
 
       <section className="relative pt-28 pb-20 overflow-hidden">
