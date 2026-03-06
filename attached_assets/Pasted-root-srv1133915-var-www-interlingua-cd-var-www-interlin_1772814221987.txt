@@ -1,0 +1,103 @@
+root@srv1133915:/var/www/interlingua# cd /var/www/interlingua
+git remote -v
+origin  https://github.com/InterlinguaFormazione/interlingua.it.git (fetch)
+origin  https://github.com/InterlinguaFormazione/interlingua.it.git (push)
+root@srv1133915:/var/www/interlingua# cd /var/www/interlingua
+git pull
+npm install
+npm run build
+psql "postgresql://interlingua_user:Sk7llCraft_DB_2025_Pro@localhost:5432/interlingua" -f /var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql
+pm2 restart interlingua
+Already up to date.
+
+up to date, audited 661 packages in 1s
+
+79 packages are looking for funding
+  run `npm fund` for details
+
+7 vulnerabilities (3 low, 2 moderate, 2 high)
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+
+> rest-express@1.0.0 build
+> tsx script/build.ts
+
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'esbuild' imported from /var/www/interlingua/script/build.ts
+    at packageResolve (node:internal/modules/esm/resolve:873:9)
+    at moduleResolve (node:internal/modules/esm/resolve:946:18)
+    at defaultResolve (node:internal/modules/esm/resolve:1188:11)
+    at nextResolve (node:internal/modules/esm/hooks:864:28)
+    at resolveBase (file:///usr/lib/node_modules/tsx/dist/esm/index.mjs?1772814125981:2:3744)
+    at resolveDirectory (file:///usr/lib/node_modules/tsx/dist/esm/index.mjs?1772814125981:2:4243)
+    at resolveTsPaths (file:///usr/lib/node_modules/tsx/dist/esm/index.mjs?1772814125981:2:4984)
+    at async resolve (file:///usr/lib/node_modules/tsx/dist/esm/index.mjs?1772814125981:2:5355)
+    at async nextResolve (node:internal/modules/esm/hooks:864:22)
+    at async Hooks.resolve (node:internal/modules/esm/hooks:306:24) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v20.20.0
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:18: ERROR:  relation "be_questions" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:33: ERROR:  relation "be_responses" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:48: ERROR:  relation "be_section_results" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:85: ERROR:  relation "be_test_sessions" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:101: ERROR:  relation "be_writing_speaking" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:112: ERROR:  relation "blog_comments" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:128: ERROR:  relation "blog_posts" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:138: ERROR:  relation "contact_submissions" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:150: ERROR:  relation "convention_registrations" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:164: ERROR:  relation "conventions" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:177: ERROR:  relation "cookie_consents" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:188: ERROR:  relation "course_materials" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:210: ERROR:  relation "discount_vouchers" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:233: ERROR:  relation "english_test_results" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:243: ERROR:  relation "newsletter_subscriptions" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:256: ERROR:  relation "product_reviews" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:264: ERROR:  relation "sc_bookings" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:271: ERROR:  relation "sc_email_settings" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:292: ERROR:  relation "sc_payments" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:302: ERROR:  relation "sc_sessions" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:326: ERROR:  relation "sc_subscribers" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:342: ERROR:  relation "shop_customers" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:377: ERROR:  relation "shop_orders" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:389: ERROR:  relation "users" already exists
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:400: NOTICE:  relation "page_views" already exists, skipping
+CREATE TABLE
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:408: NOTICE:  relation "excluded_ips" already exists, skipping
+CREATE TABLE
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:412: NOTICE:  column "city" of relation "page_views" already exists, skipping
+ALTER TABLE
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:413: NOTICE:  column "region" of relation "page_views" already exists, skipping
+ALTER TABLE
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:414: NOTICE:  column "country" of relation "page_views" already exists, skipping
+ALTER TABLE
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:417: NOTICE:  column "device_type" of relation "page_views" already exists, skipping
+ALTER TABLE
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:418: NOTICE:  column "browser" of relation "page_views" already exists, skipping
+ALTER TABLE
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:419: NOTICE:  column "os" of relation "page_views" already exists, skipping
+ALTER TABLE
+psql:/var/www/interlingua/migrations/0000_bouncy_obadiah_stane.sql:431: NOTICE:  relation "cart_events" already exists, skipping
+CREATE TABLE
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [interlingua](ids: [ 54 ])
+[PM2] [interlingua](54) ✓
+┌────┬───────────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name                      │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼───────────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 18 │ english-test              │ default     │ 1.0.0   │ fork    │ 1319710  │ 2D     │ 20   │ online    │ 0%       │ 117.2mb  │ root     │ disabled │
+│ 49 │ english-workout           │ default     │ N/A     │ fork    │ 1321248  │ 2D     │ 8    │ online    │ 0%       │ 62.0mb   │ root     │ disabled │
+│ 54 │ interlingua               │ default     │ 1.0.0   │ fork    │ 1374873  │ 0s     │ 18   │ online    │ 0%       │ 20.1mb   │ root     │ disabled │
+│ 50 │ quality-skillcraft        │ default     │ 1.0.0   │ fork    │ 1367002  │ 6h     │ 5    │ online    │ 0%       │ 134.7mb  │ root     │ disabled │
+│ 51 │ skillcraft                │ default     │ 1.0.0   │ fork    │ 1367932  │ 5h     │ 1    │ online    │ 0%       │ 211.9mb  │ root     │ disabled │
+│ 42 │ skillcraft-crm            │ default     │ 1.0.0   │ fork    │ 1113371  │ 14D    │ 3    │ online    │ 0%       │ 97.4mb   │ root     │ disabled │
+│ 43 │ skillcraft-interlingua    │ default     │ 1.0.0   │ fork    │ 1369493  │ 4h     │ 37   │ online    │ 0%       │ 94.5mb   │ root     │ disabled │
+└────┴───────────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+root@srv1133915:/var/www/interlingua#
