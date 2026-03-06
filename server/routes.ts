@@ -819,7 +819,7 @@ ${allPages.map(p => `  <url>
   });
 
   let satisfactionCache: { data: any; timestamp: number } | null = null;
-  const SATISFACTION_CACHE_DURATION = 6 * 60 * 60 * 1000;
+  const SATISFACTION_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000;
 
   async function curateCommentsWithAI(comments: any[]): Promise<number[]> {
     try {
