@@ -588,6 +588,9 @@ export const pageViews = pgTable("page_views", {
   userAgent: text("user_agent"),
   referrer: text("referrer"),
   sessionId: text("session_id"),
+  city: text("city"),
+  region: text("region"),
+  country: text("country"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

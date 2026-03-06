@@ -28,6 +28,7 @@ import {
   Trash2,
   ShoppingBag,
   AlertTriangle,
+  MapPin,
 } from "lucide-react";
 
 interface AnalyticsData {
@@ -87,6 +88,8 @@ interface AnalyticsData {
     topPages: Array<{ path: string; count: number }>;
     viewsByDay: Array<{ day: string; count: number }>;
     topReferrers: Array<{ source: string; count: number }>;
+    topLocations: Array<{ city: string; region: string; country: string; count: number }>;
+    topCountries: Array<{ country: string; count: number }>;
   };
   cartStats: {
     totalAddToCarts: number;
@@ -96,6 +99,21 @@ interface AnalyticsData {
     abandonmentRate: number;
     topCartProducts: Array<{ slug: string; name: string; count: number }>;
   };
+}
+
+const COUNTRY_NAMES: Record<string, string> = {
+  IT: "Italia", DE: "Germania", FR: "Francia", ES: "Spagna", GB: "Regno Unito", US: "Stati Uniti",
+  AT: "Austria", CH: "Svizzera", NL: "Paesi Bassi", BE: "Belgio", PT: "Portogallo", PL: "Polonia",
+  RO: "Romania", HR: "Croazia", SI: "Slovenia", CZ: "Rep. Ceca", SK: "Slovacchia", HU: "Ungheria",
+  GR: "Grecia", SE: "Svezia", DK: "Danimarca", FI: "Finlandia", NO: "Norvegia", IE: "Irlanda",
+  BG: "Bulgaria", LT: "Lituania", LV: "Lettonia", EE: "Estonia", LU: "Lussemburgo", MT: "Malta",
+  CY: "Cipro", BR: "Brasile", CN: "Cina", JP: "Giappone", RU: "Russia", IN: "India",
+  CA: "Canada", AU: "Australia", AR: "Argentina", MX: "Messico", TR: "Turchia", UA: "Ucraina",
+  AL: "Albania", RS: "Serbia", BA: "Bosnia ed Erzegovina", ME: "Montenegro", MK: "Macedonia del Nord",
+  XK: "Kosovo", MD: "Moldavia", BY: "Bielorussia", KR: "Corea del Sud",
+};
+function countryName(code: string): string {
+  return COUNTRY_NAMES[code] || code;
 }
 
 function FunnelBar({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
@@ -663,6 +681,62 @@ export function AnalyticsTabContent({ token }: { token: string }) {
           </CardContent>
         </Card>
 
+        <Card data-testid="card-top-countries">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Globe className="w-5 h-5 text-purple-600" />
+              Paesi
+            </CardTitle>
+            <CardDescription>Visite per paese</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {data.pageViewStats.topCountries.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nessun dato disponibile ancora</p>
+            ) : (
+              <div className="space-y-2 max-h-80 overflow-y-auto">
+                {data.pageViewStats.topCountries.map((c, i) => (
+                  <div key={i} className="flex items-center justify-between gap-2 py-1.5 border-b last:border-0" data-testid={`row-country-${i}`}>
+                    <span className="text-sm">{countryName(c.country)}</span>
+                    <Badge variant="secondary" className="shrink-0">{c.count}</Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card data-testid="card-top-locations">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-red-600" />
+            Località Visitatori
+          </CardTitle>
+          <CardDescription>Città e province — ultimi 30 giorni</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {data.pageViewStats.topLocations.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Nessun dato di geolocalizzazione ancora. Le nuove visite inizieranno a mostrare la località.</p>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+              {data.pageViewStats.topLocations.map((loc, i) => (
+                <div key={i} className="flex items-center justify-between gap-2 p-2 rounded-lg bg-muted/50" data-testid={`row-location-${i}`}>
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium truncate">{loc.city}</div>
+                      <div className="text-xs text-muted-foreground truncate">{[loc.region, countryName(loc.country)].filter(Boolean).join(", ")}</div>
+                    </div>
+                  </div>
+                  <Badge variant="secondary" className="shrink-0">{loc.count}</Badge>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="grid lg:grid-cols-3 gap-6">
         <Card data-testid="card-top-pages" className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

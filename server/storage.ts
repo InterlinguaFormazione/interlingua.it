@@ -228,7 +228,7 @@ export interface IStorage {
 
   createPageView(view: InsertPageView): Promise<PageView>;
   getPageViews(since?: Date): Promise<PageView[]>;
-  getPageViewStats(since?: Date, excludedIpList?: string[]): Promise<{ totalViews: number; uniqueVisitors: number; topPages: Array<{ path: string; count: number }>; viewsByDay: Array<{ day: string; count: number }>; topReferrers: Array<{ source: string; count: number }> }>;
+  getPageViewStats(since?: Date, excludedIpList?: string[]): Promise<{ totalViews: number; uniqueVisitors: number; topPages: Array<{ path: string; count: number }>; viewsByDay: Array<{ day: string; count: number }>; topReferrers: Array<{ source: string; count: number }>; topLocations: Array<{ city: string; region: string; country: string; count: number }>; topCountries: Array<{ country: string; count: number }> }>;
 
   getExcludedIps(): Promise<ExcludedIp[]>;
   addExcludedIp(data: InsertExcludedIp): Promise<ExcludedIp>;
@@ -893,7 +893,7 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(pageViews).orderBy(desc(pageViews.createdAt));
   }
 
-  async getPageViewStats(since?: Date, excludedIpList?: string[]): Promise<{ totalViews: number; uniqueVisitors: number; topPages: Array<{ path: string; count: number }>; viewsByDay: Array<{ day: string; count: number }>; topReferrers: Array<{ source: string; count: number }> }> {
+  async getPageViewStats(since?: Date, excludedIpList?: string[]): Promise<{ totalViews: number; uniqueVisitors: number; topPages: Array<{ path: string; count: number }>; viewsByDay: Array<{ day: string; count: number }>; topReferrers: Array<{ source: string; count: number }>; topLocations: Array<{ city: string; region: string; country: string; count: number }>; topCountries: Array<{ country: string; count: number }> }> {
     let allViews = await this.getPageViews(since);
     if (excludedIpList && excludedIpList.length > 0) {
       allViews = allViews.filter(v => !excludedIpList.includes(v.ipAddress || ""));
@@ -902,6 +902,8 @@ export class DatabaseStorage implements IStorage {
     const pageCounts: Record<string, number> = {};
     const dayCounts: Record<string, number> = {};
     const referrerCounts: Record<string, number> = {};
+    const locationCounts: Record<string, { city: string; region: string; country: string; count: number }> = {};
+    const countryCounts: Record<string, number> = {};
     allViews.forEach(v => {
       pageCounts[v.path] = (pageCounts[v.path] || 0) + 1;
       const day = v.createdAt ? new Date(v.createdAt).toISOString().slice(0, 10) : "unknown";
@@ -918,6 +920,16 @@ export class DatabaseStorage implements IStorage {
             referrerCounts[v.referrer] = (referrerCounts[v.referrer] || 0) + 1;
           }
         }
+      }
+      if (v.city || v.country) {
+        const locKey = `${v.city || ""}|${v.region || ""}|${v.country || ""}`;
+        if (!locationCounts[locKey]) {
+          locationCounts[locKey] = { city: v.city || "Sconosciuta", region: v.region || "", country: v.country || "??", count: 0 };
+        }
+        locationCounts[locKey].count++;
+      }
+      if (v.country) {
+        countryCounts[v.country] = (countryCounts[v.country] || 0) + 1;
       }
     });
     const directCount = allViews.filter(v => !v.referrer).length;
@@ -936,7 +948,14 @@ export class DatabaseStorage implements IStorage {
       .map(([source, count]) => ({ source, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 15);
-    return { totalViews: allViews.length, uniqueVisitors: uniqueIps.size, topPages, viewsByDay, topReferrers };
+    const topLocations = Object.values(locationCounts)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 20);
+    const topCountries = Object.entries(countryCounts)
+      .map(([country, count]) => ({ country, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 20);
+    return { totalViews: allViews.length, uniqueVisitors: uniqueIps.size, topPages, viewsByDay, topReferrers, topLocations, topCountries };
   }
 
   async getExcludedIps(): Promise<ExcludedIp[]> {

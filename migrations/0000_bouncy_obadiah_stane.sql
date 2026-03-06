@@ -408,6 +408,11 @@ CREATE TABLE IF NOT EXISTS "excluded_ips" (
 );
 
 -- Cart events for abandonment tracking
+-- Geolocation columns for page_views
+ALTER TABLE "page_views" ADD COLUMN IF NOT EXISTS "city" text;
+ALTER TABLE "page_views" ADD COLUMN IF NOT EXISTS "region" text;
+ALTER TABLE "page_views" ADD COLUMN IF NOT EXISTS "country" text;
+
 CREATE TABLE IF NOT EXISTS "cart_events" (
   "id" serial PRIMARY KEY NOT NULL,
   "session_id" text NOT NULL,

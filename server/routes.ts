@@ -12,6 +12,7 @@ import { chatWithAI } from "./ai-chat";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalOrder } from "./paypal";
 import { checkVoucher, confirmVoucher, isCartaCulturaAvailable, ALLOWED_AMBITO, ALLOWED_BENE } from "./carta-cultura";
 import { SHOP_PRODUCTS, getProductBySlug, getEffectivePrice } from "@shared/products";
+import geoip from "geoip-lite";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import { validateCodiceFiscale } from "@shared/cf-validator";
@@ -678,12 +679,26 @@ ${allPages.map(p => `  <url>
       if (!pagePath || typeof pagePath !== "string") {
         return res.status(400).json({ success: false });
       }
+      let city: string | null = null;
+      let region: string | null = null;
+      let country: string | null = null;
+      try {
+        const geo = geoip.lookup(ip);
+        if (geo) {
+          city = geo.city || null;
+          region = geo.region || null;
+          country = geo.country || null;
+        }
+      } catch {}
       await storage.createPageView({
         path: pagePath,
         ipAddress: ip,
         userAgent: (req.headers["user-agent"] || "").substring(0, 500),
         referrer: (req.headers["referer"] || "").substring(0, 500),
         sessionId: req.body.sessionId || null,
+        city,
+        region,
+        country,
       });
       res.json({ success: true });
     } catch (error) {
