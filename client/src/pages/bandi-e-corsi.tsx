@@ -132,7 +132,7 @@ export default function BandiECorsiPage() {
             <div className="flex items-center gap-3 mb-2">
               <Clock className="w-6 h-6 text-muted-foreground" />
               <h2 className="text-3xl md:text-4xl font-bold" data-testid="heading-bandi-scaduti">
-                Bandi Scaduti
+                Bandi Chiusi
               </h2>
             </div>
             <p className="text-muted-foreground">

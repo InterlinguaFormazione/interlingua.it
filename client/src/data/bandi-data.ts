@@ -142,7 +142,7 @@ export const bandiCards: BandoCard[] = [
     image: "/images/bandi/dgr-231.gif",
     link: "/bandi/4400-0003-231-2024",
     status: "expired",
-    section: "BANDI SCADUTI",
+    section: "BANDI CHIUSI",
   },
   {
     id: "fondimpresa-ca",
@@ -190,7 +190,7 @@ export const bandiCards: BandoCard[] = [
     image: "/images/bandi/fondirigenti.jpg",
     link: "/bandi/fondirigenti",
     status: "expired",
-    section: "BANDI SCADUTI",
+    section: "BANDI CHIUSI",
   },
   {
     id: "fse-turismo",
@@ -200,7 +200,7 @@ export const bandiCards: BandoCard[] = [
     image: "/images/bandi/fse-turismo.gif",
     link: "/bandi/fse-turismo",
     status: "expired",
-    section: "BANDI SCADUTI",
+    section: "BANDI CHIUSI",
   },
   {
     id: "fse-cultura",
@@ -210,7 +210,7 @@ export const bandiCards: BandoCard[] = [
     image: "/images/bandi/fse-cultura.gif",
     link: "/bandi/fse-cultura",
     status: "expired",
-    section: "BANDI SCADUTI",
+    section: "BANDI CHIUSI",
   },
   {
     id: "dgr-1010",
@@ -220,7 +220,7 @@ export const bandiCards: BandoCard[] = [
     image: "/images/bandi/dgr-1010.gif",
     link: "/bandi/dgr-1010",
     status: "expired",
-    section: "BANDI SCADUTI",
+    section: "BANDI CHIUSI",
   },
   {
     id: "pa-without-borders",
@@ -230,7 +230,7 @@ export const bandiCards: BandoCard[] = [
     image: "/images/bandi/agire-pa.gif",
     link: "/bandi/pa-without-borders",
     status: "expired",
-    section: "BANDI SCADUTI",
+    section: "BANDI CHIUSI",
   },
   {
     id: "dgr-1311",
@@ -240,7 +240,7 @@ export const bandiCards: BandoCard[] = [
     image: "/images/bandi/dgr-1311.gif",
     link: "/bandi/dgr-1311",
     status: "expired",
-    section: "BANDI SCADUTI",
+    section: "BANDI CHIUSI",
   },
 ];
 
