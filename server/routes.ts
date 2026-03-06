@@ -12,7 +12,6 @@ import { chatWithAI } from "./ai-chat";
 import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalOrder } from "./paypal";
 import { checkVoucher, confirmVoucher, isCartaCulturaAvailable, ALLOWED_AMBITO, ALLOWED_BENE } from "./carta-cultura";
 import { SHOP_PRODUCTS, getProductBySlug, getEffectivePrice } from "@shared/products";
-import geoip from "geoip-lite";
 import { UAParser } from "ua-parser-js";
 import { readFileSync } from "fs";
 import { resolve } from "path";
@@ -673,6 +672,32 @@ ${allPages.map(p => `  <url>
     }
   });
 
+  const geoCache = new Map<string, { city: string | null; region: string | null; country: string | null; ts: number }>();
+  const GEO_CACHE_TTL = 24 * 60 * 60 * 1000;
+  async function lookupGeo(ip: string): Promise<{ city: string | null; region: string | null; country: string | null }> {
+    const cached = geoCache.get(ip);
+    if (cached && Date.now() - cached.ts < GEO_CACHE_TTL) {
+      return { city: cached.city, region: cached.region, country: cached.country };
+    }
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 3000);
+      const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,city,regionName,countryCode`, { signal: controller.signal });
+      clearTimeout(timeout);
+      const data = await res.json() as any;
+      if (data.status === "success") {
+        const result = { city: data.city || null, region: data.regionName || null, country: data.countryCode || null };
+        geoCache.set(ip, { ...result, ts: Date.now() });
+        if (geoCache.size > 5000) {
+          const oldest = [...geoCache.entries()].sort((a, b) => a[1].ts - b[1].ts).slice(0, 1000);
+          oldest.forEach(([k]) => geoCache.delete(k));
+        }
+        return result;
+      }
+    } catch {}
+    return { city: null, region: null, country: null };
+  }
+
   app.post("/api/track-pageview", async (req, res) => {
     try {
       const ip = getClientIp(req);
@@ -680,17 +705,6 @@ ${allPages.map(p => `  <url>
       if (!pagePath || typeof pagePath !== "string") {
         return res.status(400).json({ success: false });
       }
-      let city: string | null = null;
-      let region: string | null = null;
-      let country: string | null = null;
-      try {
-        const geo = geoip.lookup(ip);
-        if (geo) {
-          city = geo.city || null;
-          region = geo.region || null;
-          country = geo.country || null;
-        }
-      } catch {}
 
       let deviceType: string | null = null;
       let browser: string | null = null;
@@ -706,15 +720,17 @@ ${allPages.map(p => `  <url>
         os = osInfo.name || null;
       } catch {}
 
+      const geo = await lookupGeo(ip);
+
       await storage.createPageView({
         path: pagePath,
         ipAddress: ip,
         userAgent: (req.headers["user-agent"] || "").substring(0, 500),
         referrer: (req.headers["referer"] || "").substring(0, 500),
         sessionId: req.body.sessionId || null,
-        city,
-        region,
-        country,
+        city: geo.city,
+        region: geo.region,
+        country: geo.country,
         deviceType,
         browser,
         os,
