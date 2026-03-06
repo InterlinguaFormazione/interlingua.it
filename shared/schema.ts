@@ -605,3 +605,19 @@ export const excludedIps = pgTable("excluded_ips", {
 export const insertExcludedIpSchema = createInsertSchema(excludedIps).omit({ id: true, createdAt: true });
 export type InsertExcludedIp = z.infer<typeof insertExcludedIpSchema>;
 export type ExcludedIp = typeof excludedIps.$inferSelect;
+
+export const cartEvents = pgTable("cart_events", {
+  id: serial("id").primaryKey(),
+  sessionId: text("session_id").notNull(),
+  eventType: text("event_type").notNull(),
+  productSlug: text("product_slug"),
+  productName: text("product_name"),
+  cartValue: text("cart_value"),
+  itemCount: integer("item_count"),
+  ipAddress: text("ip_address"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertCartEventSchema = createInsertSchema(cartEvents).omit({ id: true, createdAt: true });
+export type InsertCartEvent = z.infer<typeof insertCartEventSchema>;
+export type CartEvent = typeof cartEvents.$inferSelect;

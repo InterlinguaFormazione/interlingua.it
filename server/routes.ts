@@ -483,7 +483,40 @@ ${allPages.map(p => `  <url>
 
       const excludedIpAddresses = excludedIpsList.map((ip: any) => ip.ipAddress);
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-      const pageViewStats = await storage.getPageViewStats(thirtyDaysAgo, excludedIpAddresses);
+      const [pageViewStats, cartEventsRaw] = await Promise.all([
+        storage.getPageViewStats(thirtyDaysAgo, excludedIpAddresses),
+        storage.getCartEvents(thirtyDaysAgo),
+      ]);
+
+      const filteredCartEvents = excludedIpAddresses.length > 0
+        ? cartEventsRaw.filter((e: any) => !excludedIpAddresses.includes(e.ipAddress || ""))
+        : cartEventsRaw;
+      const addToCartSessions = new Set(filteredCartEvents.filter((e: any) => e.eventType === "add_to_cart").map((e: any) => e.sessionId));
+      const checkoutStartedSessions = new Set(filteredCartEvents.filter((e: any) => e.eventType === "checkout_started").map((e: any) => e.sessionId));
+      const checkoutCompletedSessions = new Set(filteredCartEvents.filter((e: any) => e.eventType === "checkout_completed").map((e: any) => e.sessionId));
+      const abandonedSessions = [...addToCartSessions].filter(s => !checkoutCompletedSessions.has(s));
+      const abandonmentRate = addToCartSessions.size > 0
+        ? Math.round((abandonedSessions.length / addToCartSessions.size) * 100)
+        : 0;
+
+      const mostAddedProducts: Record<string, { name: string; count: number }> = {};
+      filteredCartEvents.filter((e: any) => e.eventType === "add_to_cart" && e.productSlug).forEach((e: any) => {
+        if (!mostAddedProducts[e.productSlug]) mostAddedProducts[e.productSlug] = { name: e.productName || e.productSlug, count: 0 };
+        mostAddedProducts[e.productSlug].count++;
+      });
+      const topCartProducts = Object.entries(mostAddedProducts)
+        .map(([slug, d]) => ({ slug, name: d.name, count: d.count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
+
+      const cartStats = {
+        totalAddToCarts: addToCartSessions.size,
+        checkoutsStarted: checkoutStartedSessions.size,
+        checkoutsCompleted: checkoutCompletedSessions.size,
+        abandoned: abandonedSessions.length,
+        abandonmentRate,
+        topCartProducts,
+      };
 
       const completedOrders = allOrders.filter((o: any) => o.status === "completed");
       const totalRevenue = completedOrders.reduce((sum: number, o: any) => sum + parseFloat(o.amount || "0"), 0);
@@ -630,6 +663,7 @@ ${allPages.map(p => `  <url>
           totalRegistrations: allConvRegistrations.length,
         },
         pageViewStats,
+        cartStats,
       });
     } catch (error) {
       console.error("Error fetching analytics:", error);
@@ -684,6 +718,42 @@ ${allPages.map(p => `  <url>
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  const cartEventRateLimit = new Map<string, number[]>();
+  const CART_EVENT_TYPES = ["add_to_cart", "checkout_started", "checkout_completed"];
+  app.post("/api/track-cart-event", async (req, res) => {
+    try {
+      const ip = getClientIp(req);
+      const now = Date.now();
+      const ipHits = cartEventRateLimit.get(ip) || [];
+      const recentHits = ipHits.filter(t => now - t < 60000);
+      if (recentHits.length >= 30) return res.status(429).json({ success: false });
+      recentHits.push(now);
+      cartEventRateLimit.set(ip, recentHits);
+
+      const { sessionId, eventType, productSlug, productName, cartValue, itemCount } = req.body;
+      if (!sessionId || typeof sessionId !== "string" || sessionId.length > 100) return res.status(400).json({ success: false });
+      if (!CART_EVENT_TYPES.includes(eventType)) return res.status(400).json({ success: false });
+
+      const safeSlug = typeof productSlug === "string" ? productSlug.slice(0, 200) : null;
+      const safeName = typeof productName === "string" ? productName.slice(0, 200) : null;
+      const safeValue = typeof cartValue === "string" && /^\d+(\.\d{1,2})?$/.test(cartValue) ? cartValue : null;
+      const safeCount = typeof itemCount === "number" && itemCount >= 1 && itemCount <= 1000 ? itemCount : null;
+
+      await storage.createCartEvent({
+        sessionId: sessionId.slice(0, 100),
+        eventType,
+        productSlug: safeSlug,
+        productName: safeName,
+        cartValue: safeValue,
+        itemCount: safeCount,
+        ipAddress: ip,
+      });
+      res.json({ success: true });
+    } catch (error) {
+      res.json({ success: false });
     }
   });
 

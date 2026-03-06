@@ -50,6 +50,8 @@ import {
   type InsertPageView,
   type ExcludedIp,
   type InsertExcludedIp,
+  type CartEvent,
+  type InsertCartEvent,
   users,
   contactSubmissions,
   newsletterSubscriptions,
@@ -76,6 +78,7 @@ import {
   conventionRegistrations,
   pageViews,
   excludedIps,
+  cartEvents,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
@@ -230,6 +233,9 @@ export interface IStorage {
   getExcludedIps(): Promise<ExcludedIp[]>;
   addExcludedIp(data: InsertExcludedIp): Promise<ExcludedIp>;
   removeExcludedIp(id: number): Promise<boolean>;
+
+  createCartEvent(event: InsertCartEvent): Promise<CartEvent>;
+  getCartEvents(since?: Date): Promise<CartEvent[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -945,6 +951,18 @@ export class DatabaseStorage implements IStorage {
   async removeExcludedIp(id: number): Promise<boolean> {
     const result = await db.delete(excludedIps).where(eq(excludedIps.id, id)).returning();
     return result.length > 0;
+  }
+
+  async createCartEvent(event: InsertCartEvent): Promise<CartEvent> {
+    const [result] = await db.insert(cartEvents).values(event).returning();
+    return result;
+  }
+
+  async getCartEvents(since?: Date): Promise<CartEvent[]> {
+    if (since) {
+      return db.select().from(cartEvents).where(gte(cartEvents.createdAt, since)).orderBy(desc(cartEvents.createdAt));
+    }
+    return db.select().from(cartEvents).orderBy(desc(cartEvents.createdAt));
   }
 }
 

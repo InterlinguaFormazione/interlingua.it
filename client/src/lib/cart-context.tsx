@@ -19,6 +19,7 @@ interface CartContextType {
   totalPrice: number;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
+  trackCartEvent: (eventType: string, productSlug?: string, productName?: string, cartValue?: string, itemCount?: number) => void;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -60,6 +61,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("shop_cart", JSON.stringify(serializeCart(items)));
   }, [items]);
 
+  const getCartSessionId = useCallback(() => {
+    let sid = sessionStorage.getItem("cart_sid");
+    if (!sid) {
+      sid = `cart-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      sessionStorage.setItem("cart_sid", sid);
+    }
+    return sid;
+  }, []);
+
+  const trackCartEvent = useCallback((eventType: string, productSlug?: string, productName?: string, cartValue?: string, itemCount?: number) => {
+    fetch("/api/track-cart-event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId: getCartSessionId(), eventType, productSlug, productName, cartValue, itemCount }),
+    }).catch(() => {});
+  }, [getCartSessionId]);
+
   const addItem = useCallback((product: ShopProduct, selectedOptions: Record<string, string> = {}) => {
     const normalizedOptions = Object.keys(selectedOptions).sort().reduce((acc, key) => {
       acc[key] = selectedOptions[key];
@@ -86,7 +104,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }];
     });
     setIsOpen(true);
-  }, []);
+    trackCartEvent("add_to_cart", product.slug, product.name);
+  }, [trackCartEvent]);
 
   const removeItem = useCallback((index: number) => {
     setItems(prev => prev.filter((_, i) => i !== index));
@@ -109,7 +128,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const totalPrice = items.reduce((sum, item) => sum + parseFloat(item.effectivePrice) * item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice, isOpen, setIsOpen }}>
+    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice, isOpen, setIsOpen, trackCartEvent }}>
       {children}
     </CartContext.Provider>
   );

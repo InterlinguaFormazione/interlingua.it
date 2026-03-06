@@ -62,7 +62,7 @@ declare global {
 }
 
 export default function CartCheckout() {
-  const { items, removeItem, updateQuantity, totalPrice, totalItems, clearCart } = useCart();
+  const { items, removeItem, updateQuantity, totalPrice, totalItems, clearCart, trackCartEvent } = useCart();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -234,6 +234,7 @@ export default function CartCheckout() {
       const data = await res.json();
       if (data.success) {
         if (data.customerToken) localStorage.setItem("shop_customer_token", data.customerToken);
+        trackCartEvent("checkout_completed", undefined, undefined, totalPrice.toFixed(2), totalItems);
         clearCart();
         setStep("success");
         toast({ title: "Acquisto completato!", description: "Il pagamento con Carta della Cultura è stato elaborato con successo." });
@@ -257,6 +258,7 @@ export default function CartCheckout() {
       const data = await res.json();
       if (data.success) {
         if (data.customerToken) localStorage.setItem("shop_customer_token", data.customerToken);
+        trackCartEvent("checkout_completed", undefined, undefined, totalPrice.toFixed(2), totalItems);
         clearCart();
         setStep("success");
         toast({ title: "Acquisto completato!", description: "Il pagamento combinato è stato elaborato con successo." });
@@ -349,6 +351,7 @@ export default function CartCheckout() {
         if (data.customerToken) {
           localStorage.setItem("shop_customer_token", data.customerToken);
         }
+        trackCartEvent("checkout_completed", undefined, undefined, totalPrice.toFixed(2), totalItems);
         clearCart();
         setStep("success");
         toast({
@@ -869,7 +872,7 @@ export default function CartCheckout() {
                           Continua lo shopping
                         </Button>
                       </Link>
-                      <Button onClick={() => setStep("details")} data-testid="button-proceed-details">
+                      <Button onClick={() => { trackCartEvent("checkout_started", undefined, undefined, totalPrice.toFixed(2), totalItems); setStep("details"); }} data-testid="button-proceed-details">
                         Continua
                         <ArrowRight className="w-4 h-4 ml-2" />
                       </Button>

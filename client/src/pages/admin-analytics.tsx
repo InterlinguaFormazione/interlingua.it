@@ -26,6 +26,8 @@ import {
   Shield,
   Plus,
   Trash2,
+  ShoppingBag,
+  AlertTriangle,
 } from "lucide-react";
 
 interface AnalyticsData {
@@ -86,6 +88,32 @@ interface AnalyticsData {
     viewsByDay: Array<{ day: string; count: number }>;
     topReferrers: Array<{ source: string; count: number }>;
   };
+  cartStats: {
+    totalAddToCarts: number;
+    checkoutsStarted: number;
+    checkoutsCompleted: number;
+    abandoned: number;
+    abandonmentRate: number;
+    topCartProducts: Array<{ slug: string; name: string; count: number }>;
+  };
+}
+
+function FunnelBar({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
+  const pct = max > 0 ? Math.min(100, Math.round((value / max) * 100)) : 0;
+  const colorMap: Record<string, string> = {
+    blue: "bg-blue-500",
+    yellow: "bg-yellow-500",
+    green: "bg-green-500",
+  };
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-sm w-24 text-right text-muted-foreground">{label}</span>
+      <div className="flex-1 bg-muted rounded-full h-6 overflow-hidden">
+        <div className={`h-full rounded-full transition-all ${colorMap[color] || "bg-primary"}`} style={{ width: `${pct}%` }} />
+      </div>
+      <span className="text-sm font-medium w-16">{value} ({pct}%)</span>
+    </div>
+  );
 }
 
 function StatCard({ title, value, subtitle, icon: Icon, color = "blue" }: {
@@ -659,6 +687,76 @@ export function AnalyticsTabContent({ token }: { token: string }) {
           </CardContent>
         </Card>
       </div>
+
+      <Card data-testid="card-cart-abandonment">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ShoppingBag className="w-5 h-5" />
+            Abbandono Carrello
+          </CardTitle>
+          <CardDescription>Ultimi 30 giorni — sessioni che hanno aggiunto prodotti al carrello</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+            <div className="text-center p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600" data-testid="text-add-to-carts">{data.cartStats.totalAddToCarts}</div>
+              <div className="text-xs text-muted-foreground">Aggiunte al carrello</div>
+            </div>
+            <div className="text-center p-3 bg-yellow-50 dark:bg-yellow-950 rounded-lg">
+              <div className="text-2xl font-bold text-yellow-600" data-testid="text-checkouts-started">{data.cartStats.checkoutsStarted}</div>
+              <div className="text-xs text-muted-foreground">Checkout iniziati</div>
+            </div>
+            <div className="text-center p-3 bg-green-50 dark:bg-green-950 rounded-lg">
+              <div className="text-2xl font-bold text-green-600" data-testid="text-checkouts-completed">{data.cartStats.checkoutsCompleted}</div>
+              <div className="text-xs text-muted-foreground">Completati</div>
+            </div>
+            <div className="text-center p-3 bg-red-50 dark:bg-red-950 rounded-lg">
+              <div className="text-2xl font-bold text-red-600" data-testid="text-abandoned">{data.cartStats.abandoned}</div>
+              <div className="text-xs text-muted-foreground">Abbandonati</div>
+            </div>
+            <div className="text-center p-3 bg-orange-50 dark:bg-orange-950 rounded-lg">
+              <div className="text-2xl font-bold text-orange-600" data-testid="text-abandonment-rate">
+                {data.cartStats.abandonmentRate}%
+              </div>
+              <div className="text-xs text-muted-foreground">Tasso abbandono</div>
+            </div>
+          </div>
+
+          {data.cartStats.totalAddToCarts === 0 ? (
+            <div className="text-center py-6 text-muted-foreground">
+              <AlertTriangle className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <p>Nessun dato ancora. Il tracciamento inizierà con le prossime visite allo shop.</p>
+            </div>
+          ) : (
+            <>
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Funnel di conversione</span>
+                </div>
+                <div className="space-y-2">
+                  <FunnelBar label="Carrello" value={data.cartStats.totalAddToCarts} max={data.cartStats.totalAddToCarts} color="blue" />
+                  <FunnelBar label="Checkout" value={data.cartStats.checkoutsStarted} max={data.cartStats.totalAddToCarts} color="yellow" />
+                  <FunnelBar label="Completato" value={data.cartStats.checkoutsCompleted} max={data.cartStats.totalAddToCarts} color="green" />
+                </div>
+              </div>
+
+              {data.cartStats.topCartProducts.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Prodotti più aggiunti al carrello</h4>
+                  <div className="space-y-1">
+                    {data.cartStats.topCartProducts.map((p, i) => (
+                      <div key={i} className="flex items-center justify-between gap-2 py-1">
+                        <span className="text-sm truncate flex-1">{p.name}</span>
+                        <Badge variant="secondary" className="shrink-0">{p.count}</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
 
       <ExcludedIpsSection token={token} />
     </div>

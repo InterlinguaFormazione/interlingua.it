@@ -37,7 +37,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - `src/pages/speakers-corner.tsx` - Speaker's Corner landing page with login
 - `src/pages/speakers-corner-dashboard.tsx` - Subscriber dashboard for booking sessions
 - `src/pages/admin.tsx` - General admin panel (analytics/statistics dashboard, contacts, newsletter, blog, shop orders, materials, English adaptive test results, discount vouchers, product reviews moderation, conventions management, user management)
-- `src/pages/admin-analytics.tsx` - Analytics tab: revenue charts, order stats, page view tracking, SC metrics, test stats, engagement, voucher usage, conventions, IP exclusion management
+- `src/pages/admin-analytics.tsx` - Analytics tab: revenue charts, order stats, page view tracking, cart abandonment funnel, SC metrics, test stats, engagement, voucher usage, conventions, IP exclusion management
 - `src/pages/shop-product.tsx` - Product detail page with full description, features, reviews section (rating summary, distribution chart, review cards), review submission form, and purchase sidebar
 - `src/pages/speakers-corner-admin.tsx` - Admin panel for managing subscribers, sessions, email settings
 - `src/pages/blog.tsx` - Blog listing page
