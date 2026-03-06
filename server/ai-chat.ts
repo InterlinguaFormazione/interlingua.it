@@ -1,9 +1,35 @@
 import OpenAI from "openai";
+import { storage } from "./storage";
 
 let _openai: OpenAI | null = null;
 function getOpenAI() {
   if (!_openai) _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   return _openai;
+}
+
+let blogContextCache: { text: string; updatedAt: number } | null = null;
+const BLOG_CACHE_TTL = 10 * 60 * 1000;
+
+async function getBlogContext(): Promise<string> {
+  if (blogContextCache && Date.now() - blogContextCache.updatedAt < BLOG_CACHE_TTL) {
+    return blogContextCache.text;
+  }
+  try {
+    const posts = await storage.getBlogPosts();
+    if (!posts.length) return "";
+    const lines = posts.slice(0, 20).map(p =>
+      `- "${p.title}" (/blog/${p.slug}) — ${p.category} — ${p.excerpt.slice(0, 120)}`
+    );
+    const text = `\n═══════════════════════════════════════════
+ARTICOLI DEL BLOG (aggiornamento automatico)
+═══════════════════════════════════════════
+${lines.join("\n")}
+Se l'utente chiede di un argomento trattato nel blog, menziona l'articolo e il link.`;
+    blogContextCache = { text, updatedAt: Date.now() };
+    return text;
+  } catch {
+    return "";
+  }
 }
 
 const SYSTEM_PROMPT = `Sei l'assistente virtuale di SkillCraft-Interlingua, un centro di formazione professionale a Vicenza e Thiene (Veneto, Italia). Rispondi in italiano in modo cortese, professionale e conciso. Usa un tono amichevole ma competente. Se l'utente scrive in un'altra lingua, rispondi nella stessa lingua.
@@ -444,10 +470,13 @@ export async function chatWithAI(messages: { role: "user" | "assistant"; content
     return "Mi dispiace, il servizio di assistenza AI non è al momento disponibile. Per qualsiasi domanda, contattaci a infocorsi@skillcraft.interlingua.it o chiama +39 0444 321601.";
   }
 
+  const blogContext = await getBlogContext();
+  const fullPrompt = SYSTEM_PROMPT + blogContext;
+
   const response = await getOpenAI().chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: fullPrompt },
       ...messages.map(m => ({ role: m.role as "user" | "assistant", content: m.content })),
     ],
     max_tokens: 500,
