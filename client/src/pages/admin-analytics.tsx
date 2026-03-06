@@ -84,6 +84,7 @@ interface AnalyticsData {
     uniqueVisitors: number;
     topPages: Array<{ path: string; count: number }>;
     viewsByDay: Array<{ day: string; count: number }>;
+    topReferrers: Array<{ source: string; count: number }>;
   };
 }
 
@@ -574,33 +575,67 @@ export function AnalyticsTabContent({ token }: { token: string }) {
         </Card>
       )}
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card data-testid="card-page-views">
+      <Card data-testid="card-page-views">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Eye className="w-5 h-5 text-blue-600" />
+            Visite al Sito
+          </CardTitle>
+          <CardDescription>
+            Ultimi 30 giorni — {data.pageViewStats.totalViews} visite, {data.pageViewStats.uniqueVisitors} visitatori unici
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {data.pageViewStats.viewsByDay.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Nessuna visita registrata ancora</p>
+          ) : (
+            <BarChartSimple
+              data={data.pageViewStats.viewsByDay.map(d => ({
+                label: d.day.slice(5),
+                value: d.count,
+              }))}
+              maxVal={Math.max(...data.pageViewStats.viewsByDay.map(d => d.count), 1)}
+            />
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="grid lg:grid-cols-3 gap-6">
+        <Card data-testid="card-top-referrers">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Eye className="w-5 h-5 text-blue-600" />
-              Visite al Sito
+              <TrendingUp className="w-5 h-5 text-green-600" />
+              Provenienza Visitatori
             </CardTitle>
-            <CardDescription>
-              Ultimi 30 giorni — {data.pageViewStats.totalViews} visite, {data.pageViewStats.uniqueVisitors} visitatori unici
-            </CardDescription>
+            <CardDescription>Da dove arrivano i visitatori</CardDescription>
           </CardHeader>
           <CardContent>
-            {data.pageViewStats.viewsByDay.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nessuna visita registrata ancora</p>
+            {data.pageViewStats.topReferrers.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nessun dato disponibile ancora</p>
             ) : (
-              <BarChartSimple
-                data={data.pageViewStats.viewsByDay.map(d => ({
-                  label: d.day.slice(5),
-                  value: d.count,
-                }))}
-                maxVal={Math.max(...data.pageViewStats.viewsByDay.map(d => d.count), 1)}
-              />
+              <div className="space-y-2 max-h-80 overflow-y-auto">
+                {data.pageViewStats.topReferrers.map((r, i) => {
+                  const isSearch = /google|bing|yahoo|duckduckgo|baidu|yandex/.test(r.source);
+                  const isSocial = /facebook|instagram|linkedin|twitter|tiktok|youtube|whatsapp|t\.co/.test(r.source);
+                  const isDirect = r.source === "Diretto / Bookmark";
+                  const tagColor = isSearch ? "bg-blue-100 text-blue-700" : isSocial ? "bg-pink-100 text-pink-700" : isDirect ? "bg-gray-100 text-gray-700" : "bg-green-100 text-green-700";
+                  const tagLabel = isSearch ? "Ricerca" : isSocial ? "Social" : isDirect ? "Diretto" : "Referral";
+                  return (
+                    <div key={i} className="flex items-center justify-between gap-2 py-1.5 border-b last:border-0" data-testid={`row-referrer-${i}`}>
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${tagColor} shrink-0`}>{tagLabel}</span>
+                        <span className="text-sm truncate">{r.source}</span>
+                      </div>
+                      <Badge variant="secondary" className="shrink-0">{r.count}</Badge>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </CardContent>
         </Card>
 
-        <Card data-testid="card-top-pages">
+        <Card data-testid="card-top-pages" className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="w-5 h-5 text-blue-600" />

@@ -225,7 +225,7 @@ export interface IStorage {
 
   createPageView(view: InsertPageView): Promise<PageView>;
   getPageViews(since?: Date): Promise<PageView[]>;
-  getPageViewStats(since?: Date, excludedIpList?: string[]): Promise<{ totalViews: number; uniqueVisitors: number; topPages: Array<{ path: string; count: number }>; viewsByDay: Array<{ day: string; count: number }> }>;
+  getPageViewStats(since?: Date, excludedIpList?: string[]): Promise<{ totalViews: number; uniqueVisitors: number; topPages: Array<{ path: string; count: number }>; viewsByDay: Array<{ day: string; count: number }>; topReferrers: Array<{ source: string; count: number }> }>;
 
   getExcludedIps(): Promise<ExcludedIp[]>;
   addExcludedIp(data: InsertExcludedIp): Promise<ExcludedIp>;
@@ -887,7 +887,7 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(pageViews).orderBy(desc(pageViews.createdAt));
   }
 
-  async getPageViewStats(since?: Date, excludedIpList?: string[]): Promise<{ totalViews: number; uniqueVisitors: number; topPages: Array<{ path: string; count: number }>; viewsByDay: Array<{ day: string; count: number }> }> {
+  async getPageViewStats(since?: Date, excludedIpList?: string[]): Promise<{ totalViews: number; uniqueVisitors: number; topPages: Array<{ path: string; count: number }>; viewsByDay: Array<{ day: string; count: number }>; topReferrers: Array<{ source: string; count: number }> }> {
     let allViews = await this.getPageViews(since);
     if (excludedIpList && excludedIpList.length > 0) {
       allViews = allViews.filter(v => !excludedIpList.includes(v.ipAddress || ""));
@@ -895,11 +895,29 @@ export class DatabaseStorage implements IStorage {
     const uniqueIps = new Set(allViews.map(v => v.ipAddress).filter(Boolean));
     const pageCounts: Record<string, number> = {};
     const dayCounts: Record<string, number> = {};
+    const referrerCounts: Record<string, number> = {};
     allViews.forEach(v => {
       pageCounts[v.path] = (pageCounts[v.path] || 0) + 1;
       const day = v.createdAt ? new Date(v.createdAt).toISOString().slice(0, 10) : "unknown";
       dayCounts[day] = (dayCounts[day] || 0) + 1;
+      if (v.referrer) {
+        try {
+          const url = new URL(v.referrer);
+          const host = url.hostname.replace(/^www\./, "");
+          if (!host.includes("interlingua.it") && !host.includes("localhost") && !host.includes("replit")) {
+            referrerCounts[host] = (referrerCounts[host] || 0) + 1;
+          }
+        } catch {
+          if (v.referrer.length > 3) {
+            referrerCounts[v.referrer] = (referrerCounts[v.referrer] || 0) + 1;
+          }
+        }
+      }
     });
+    const directCount = allViews.filter(v => !v.referrer).length;
+    if (directCount > 0) {
+      referrerCounts["Diretto / Bookmark"] = directCount;
+    }
     const topPages = Object.entries(pageCounts)
       .map(([path, count]) => ({ path, count }))
       .sort((a, b) => b.count - a.count)
@@ -908,7 +926,11 @@ export class DatabaseStorage implements IStorage {
       .map(([day, count]) => ({ day, count }))
       .sort((a, b) => a.day.localeCompare(b.day))
       .slice(-30);
-    return { totalViews: allViews.length, uniqueVisitors: uniqueIps.size, topPages, viewsByDay };
+    const topReferrers = Object.entries(referrerCounts)
+      .map(([source, count]) => ({ source, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 15);
+    return { totalViews: allViews.length, uniqueVisitors: uniqueIps.size, topPages, viewsByDay, topReferrers };
   }
 
   async getExcludedIps(): Promise<ExcludedIp[]> {
