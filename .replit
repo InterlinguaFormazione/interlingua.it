@@ -72,6 +72,7 @@ CARTA_CULTURA_PRIVATE_KEY = """
   K7XlHiHdPmvBFM8cEnGtFg==
   -----END PRIVATE KEY-----"""
 CRM_WEBHOOK_URL = "https://crm-privati.skillcraft.it/api/webhook/nuova-richiesta"
+QUALITY_API_URL = "https://quality-skillcraft.interlingua.it/api/public/satisfaction-comments"
 
 [agent]
 integrations = ["javascript_paypal:1.0.0"]
