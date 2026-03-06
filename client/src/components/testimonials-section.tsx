@@ -339,7 +339,7 @@ export function TestimonialsSection() {
                             <div>
                               <p className="font-semibold text-sm" data-testid={`text-sat-author-${item.id}`}>{item.author}</p>
                               <p className="text-xs text-muted-foreground">
-                                {courseName || "Questionario di Soddisfazione"}
+                                {[courseName, item.date ? new Date(item.date).toLocaleDateString("it-IT", { day: "numeric", month: "long", year: "numeric" }) : ""].filter(Boolean).join(" · ") || "Questionario di Soddisfazione"}
                               </p>
                             </div>
                           </div>
