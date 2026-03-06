@@ -117,8 +117,8 @@ function getInitials(name: string): string {
 }
 
 export function TestimonialsSection() {
-  const [startIndex, setStartIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState<"google" | "satisfaction">("google");
+  const [googleIndex, setGoogleIndex] = useState(0);
+  const [satIndex, setSatIndex] = useState(0);
 
   const { data: googleData, isLoading: googleLoading } = useQuery<ReviewsData>({
     queryKey: ["/api/reviews"],
@@ -136,33 +136,32 @@ export function TestimonialsSection() {
   const satisfactionComments = satData?.comments || [];
   const totalSatisfaction = satData?.total || 0;
 
-  const activeItems = activeTab === "google" ? googleReviews : satisfactionComments;
-
   useEffect(() => {
-    setStartIndex(0);
-  }, [activeTab]);
-
-  useEffect(() => {
-    if (activeItems.length <= 3) return;
-
+    if (googleReviews.length <= 3) return;
     const interval = setInterval(() => {
-      setStartIndex((prev) => (prev + 1) % activeItems.length);
+      setGoogleIndex((prev) => (prev + 1) % googleReviews.length);
     }, 5000);
-
     return () => clearInterval(interval);
-  }, [activeItems.length, activeTab]);
+  }, [googleReviews.length]);
 
-  const getVisibleItems = () => {
+  useEffect(() => {
+    if (satisfactionComments.length <= 3) return;
+    const interval = setInterval(() => {
+      setSatIndex((prev) => (prev + 1) % satisfactionComments.length);
+    }, 4200);
+    return () => clearInterval(interval);
+  }, [satisfactionComments.length]);
+
+  const getVisible = <T,>(items: T[], start: number, count = 3): T[] => {
     const visible = [];
-    for (let i = 0; i < Math.min(3, activeItems.length); i++) {
-      const index = (startIndex + i) % activeItems.length;
-      visible.push(activeItems[index]);
+    for (let i = 0; i < Math.min(count, items.length); i++) {
+      visible.push(items[(start + i) % items.length]);
     }
     return visible;
   };
 
-  const visibleItems = getVisibleItems();
-  const isLoading = activeTab === "google" ? googleLoading : satLoading;
+  const visibleGoogle = getVisible(googleReviews, googleIndex);
+  const visibleSat = getVisible(satisfactionComments, satIndex);
 
   return (
     <section id="testimonials" className="py-24 bg-muted/30 overflow-hidden">
@@ -172,7 +171,7 @@ export function TestimonialsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-10"
+          className="text-center mb-12"
         >
           <Badge variant="secondary" className="mb-4">
             Testimonianze
@@ -183,147 +182,164 @@ export function TestimonialsSection() {
               Studenti
             </span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Le storie di successo dei nostri studenti sono la nostra più grande soddisfazione.
           </p>
-
-          <div className="flex items-center justify-center gap-3 flex-wrap mb-2">
-            <button
-              onClick={() => setActiveTab("google")}
-              className={`inline-flex items-center gap-3 px-5 py-3 rounded-lg border transition-all ${
-                activeTab === "google"
-                  ? "bg-card ring-2 ring-primary/30 shadow-md"
-                  : "bg-card/50 hover:bg-card"
-              }`}
-              data-testid="tab-google-reviews"
-            >
-              <svg className="h-5 w-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-              <div className="flex flex-col items-start">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-sm">{rating.toFixed(1)}</span>
-                  <div className="flex items-center gap-0.5">
-                    {[1, 2, 3, 4, 5].map((i) => {
-                      const fillPercent = Math.min(1, Math.max(0, rating - (i - 1)));
-                      return (
-                        <div key={i} className="relative h-3.5 w-3.5">
-                          <Star className="h-3.5 w-3.5 fill-gray-300 text-gray-300 absolute" />
-                          <div className="overflow-hidden absolute" style={{ width: `${fillPercent * 100}%` }}>
-                            <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                <span className="text-muted-foreground text-xs">{totalReviews} recensioni Google</span>
-              </div>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("satisfaction")}
-              className={`inline-flex items-center gap-3 px-5 py-3 rounded-lg border transition-all ${
-                activeTab === "satisfaction"
-                  ? "bg-card ring-2 ring-primary/30 shadow-md"
-                  : "bg-card/50 hover:bg-card"
-              }`}
-              data-testid="tab-satisfaction-reviews"
-            >
-              <ShieldCheck className="h-5 w-5 text-emerald-500" />
-              <div className="flex flex-col items-start">
-                <span className="font-bold text-sm">Feedback Verificati</span>
-                <span className="text-muted-foreground text-xs">
-                  {totalSatisfaction > 0 ? `${totalSatisfaction.toLocaleString("it-IT")} questionari` : "Questionari di soddisfazione"}
-                </span>
-              </div>
-            </button>
-          </div>
         </motion.div>
 
-        <div className="relative min-h-[280px]">
-          {isLoading ? (
+        <div className="mb-6 flex items-center justify-between">
+          <a
+            href={GOOGLE_REVIEWS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 px-4 py-2.5 rounded-lg bg-card border hover-elevate"
+          >
+            <svg className="h-5 w-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            <div className="flex flex-col items-start">
+              <div className="flex items-center gap-1.5">
+                <span className="font-bold text-sm">{rating.toFixed(1)}</span>
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((i) => {
+                    const fillPercent = Math.min(1, Math.max(0, rating - (i - 1)));
+                    return (
+                      <div key={i} className="relative h-3.5 w-3.5">
+                        <Star className="h-3.5 w-3.5 fill-gray-300 text-gray-300 absolute" />
+                        <div className="overflow-hidden absolute" style={{ width: `${fillPercent * 100}%` }}>
+                          <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <span className="text-muted-foreground text-xs">{totalReviews} recensioni</span>
+            </div>
+          </a>
+          <a href={GOOGLE_WRITE_REVIEW_URL} target="_blank" rel="noopener noreferrer">
+            <Button size="sm" variant="outline" data-testid="button-write-review">
+              Lascia una Recensione
+              <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400 ml-1.5" />
+            </Button>
+          </a>
+        </div>
+
+        <div className="relative min-h-[200px] mb-16">
+          {googleLoading ? (
             <div className="flex justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-          ) : activeItems.length === 0 ? (
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <AnimatePresence mode="popLayout">
+                {visibleGoogle.map((review) => (
+                  <motion.div
+                    key={`g-${review.id}`}
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -50 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    layout
+                  >
+                    <Card className="h-full hover-elevate relative" data-testid={`testimonial-google-${review.id}`}>
+                      <CardContent className="pt-6">
+                        <Quote className="h-8 w-8 text-primary/20 absolute top-4 right-4" />
+                        <div className="flex items-center gap-1 mb-4">
+                          {Array.from({ length: review.rating }).map((_, i) => (
+                            <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          ))}
+                        </div>
+                        <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-4">
+                          "{review.content}"
+                        </p>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-12 w-12 border-2 border-primary/20">
+                            {review.avatar && (
+                              <AvatarImage src={review.avatar} alt={review.name} className="object-cover" />
+                            )}
+                            <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-white">
+                              {review.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-semibold text-sm">{review.name}</p>
+                            <p className="text-xs text-muted-foreground">{review.relativeTime || review.role}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
+
+        <div className="mb-6 flex items-center justify-between">
+          <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-lg bg-card border">
+            <ShieldCheck className="h-5 w-5 text-emerald-500" />
+            <div className="flex flex-col items-start">
+              <span className="font-bold text-sm">Feedback Verificati</span>
+              <span className="text-muted-foreground text-xs">
+                {totalSatisfaction > 0 ? `${totalSatisfaction.toLocaleString("it-IT")} questionari compilati` : "Questionari di soddisfazione"}
+              </span>
+            </div>
+          </div>
+          <a href={QUALITY_URL} target="_blank" rel="noopener noreferrer">
+            <Button size="sm" variant="outline" data-testid="button-quality-portal">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-500 mr-1.5" />
+              Portale Qualità
+            </Button>
+          </a>
+        </div>
+
+        <div className="relative min-h-[200px]">
+          {satLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : satisfactionComments.length === 0 ? (
             <div className="flex justify-center py-12">
               <p className="text-muted-foreground">Nessun feedback disponibile al momento.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <AnimatePresence mode="popLayout">
-                {visibleItems.map((item) => {
-                  const isGoogle = activeTab === "google";
-                  const review = item as GoogleReview;
-                  const satisfaction = item as SatisfactionComment;
-
-                  const displayName = isGoogle
-                    ? review.name
-                    : satisfaction.author;
-                  const displayContent = isGoogle
-                    ? review.content
-                    : satisfaction.comment;
-                  const courseName = !isGoogle ? formatCourseName(satisfaction.course) : "";
-                  const itemId = isGoogle ? review.id : satisfaction.id;
-
+                {visibleSat.map((item) => {
+                  const courseName = formatCourseName(item.course);
                   return (
                     <motion.div
-                      key={`${activeTab}-${itemId}`}
+                      key={`s-${item.id}`}
                       initial={{ opacity: 0, x: 50 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -50 }}
                       transition={{ duration: 0.5, ease: "easeInOut" }}
                       layout
                     >
-                      <Card
-                        className="h-full hover-elevate relative"
-                        data-testid={`testimonial-${itemId}`}
-                      >
+                      <Card className="h-full hover-elevate relative" data-testid={`testimonial-sat-${item.id}`}>
                         <CardContent className="pt-6">
-                          <Quote className="h-8 w-8 text-primary/20 absolute top-4 right-4" />
-
-                          {isGoogle && (
-                            <div className="flex items-center gap-1 mb-4">
-                              {Array.from({ length: review.rating }).map((_, i) => (
-                                <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                              ))}
-                            </div>
-                          )}
-
-                          {!isGoogle && (
-                            <div className="flex items-center gap-1.5 mb-4">
-                              <MessageSquareHeart className="h-4 w-4 text-emerald-500" />
-                              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Feedback Verificato</span>
-                            </div>
-                          )}
-
+                          <Quote className="h-8 w-8 text-emerald-500/20 absolute top-4 right-4" />
+                          <div className="flex items-center gap-1.5 mb-4">
+                            <MessageSquareHeart className="h-4 w-4 text-emerald-500" />
+                            <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Feedback Verificato</span>
+                          </div>
                           <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-4">
-                            "{displayContent}"
+                            "{item.comment}"
                           </p>
-
                           <div className="flex items-center gap-3">
-                            <Avatar className="h-12 w-12 border-2 border-primary/20">
-                              {isGoogle && review.avatar && (
-                                <AvatarImage
-                                  src={review.avatar}
-                                  alt={displayName}
-                                  className="object-cover"
-                                />
-                              )}
-                              <AvatarFallback className={`text-white ${isGoogle ? "bg-gradient-to-br from-primary to-accent" : "bg-gradient-to-br from-emerald-500 to-teal-500"}`}>
-                                {getInitials(displayName)}
+                            <Avatar className="h-12 w-12 border-2 border-emerald-500/20">
+                              <AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-500 text-white">
+                                {getInitials(item.author)}
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <p className="font-semibold text-sm" data-testid={`text-reviewer-name-${itemId}`}>{displayName}</p>
+                              <p className="font-semibold text-sm" data-testid={`text-sat-author-${item.id}`}>{item.author}</p>
                               <p className="text-xs text-muted-foreground">
-                                {isGoogle
-                                  ? (review.relativeTime || review.role)
-                                  : (courseName || "Questionario di Soddisfazione")}
+                                {courseName || "Questionario di Soddisfazione"}
                               </p>
                             </div>
                           </div>
@@ -336,47 +352,6 @@ export function TestimonialsSection() {
             </div>
           )}
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8"
-        >
-          {activeTab === "google" ? (
-            <>
-              <a href={GOOGLE_WRITE_REVIEW_URL} target="_blank" rel="noopener noreferrer">
-                <Button size="lg" data-testid="button-write-review">
-                  Lascia una Recensione
-                  <div className="flex ml-2 gap-0.5">
-                    {[1,2,3,4,5].map(i => (
-                      <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    ))}
-                  </div>
-                </Button>
-              </a>
-              <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" size="lg" data-testid="button-google-reviews">
-                  <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                  </svg>
-                  Vedi Tutte le Recensioni
-                </Button>
-              </a>
-            </>
-          ) : (
-            <a href={QUALITY_URL} target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="lg" data-testid="button-quality-portal">
-                <ShieldCheck className="h-5 w-5 mr-2 text-emerald-500" />
-                Portale Soddisfazione Cliente
-              </Button>
-            </a>
-          )}
-        </motion.div>
       </div>
     </section>
   );
