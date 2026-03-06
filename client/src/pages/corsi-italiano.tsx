@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import { Navigation } from "@/components/navigation";
 import { Footer } from "@/components/footer";
@@ -57,7 +57,7 @@ import { CorsiItalianoSchema } from "@/components/seo-schemas";
 import { CourseFAQ } from "@/components/course-faq";
 import { SHOP_PRODUCTS } from "@shared/products";
 import { useCart } from "@/lib/cart-context";
-import { useQuery } from "@tanstack/react-query";
+import { TestimonialsSection } from "@/components/testimonials-section";
 
 const corsiItalianoFAQs = [
   {
@@ -453,45 +453,11 @@ const content = {
   },
 };
 
-const ITALIAN_KEYWORDS = /italian|italiano|stranieri/i;
-
-function formatCourseName(raw: string): string {
-  return raw
-    .replace(/^corso\s+/i, "")
-    .replace(/[-_]/g, " ")
-    .replace(/\b\w/g, c => c.toUpperCase())
-    .trim();
-}
 
 export default function CorsiItalianoPage() {
   const [lang, setLang] = useState<Lang>("it");
   const t = content[lang];
   const { addItem } = useCart();
-
-  const { data: googleReviews } = useQuery<{ reviews: Array<{ id: string; name: string; content: string; rating: number }> }>({
-    queryKey: ["/api/reviews"],
-  });
-
-  const { data: satisfactionData } = useQuery<{ comments: Array<{ id: string; comment: string; author: string; course: string; date: string }> }>({
-    queryKey: ["/api/satisfaction-comments"],
-  });
-
-  const italianTestimonials = useMemo(() => {
-    const items: Array<{ text: string; author: string; source: string; rating?: number }> = [];
-
-    if (googleReviews?.reviews) {
-      googleReviews.reviews
-        .filter(r => r.rating >= 4)
-        .forEach(r => items.push({ text: r.content, author: r.name, source: "Google", rating: r.rating }));
-    }
-
-    if (satisfactionData?.comments) {
-      satisfactionData.comments
-        .forEach(c => items.push({ text: c.comment, author: c.author, source: formatCourseName(c.course) }));
-    }
-
-    return items.slice(0, 6);
-  }, [googleReviews, satisfactionData]);
   useSEO({
     title: lang === "it"
       ? "Corsi di Italiano per Stranieri Vicenza | Italian Courses Vicenza | SkillCraft-Interlingua"
@@ -925,45 +891,7 @@ export default function CorsiItalianoPage() {
           </div>
         </section>
 
-        {italianTestimonials.length > 0 && (
-          <section className="py-20">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-              <AnimatedSection className="text-center mb-14">
-                <Badge variant="secondary" className="mb-4">
-                  <Star className="w-3 h-3 mr-1" />
-                  {lang === "it" ? "Recensioni Verificate" : "Verified Reviews"}
-                </Badge>
-                <h2 className="text-3xl md:text-4xl font-bold" data-testid="text-testimonials-title">{t.testimonialsTitle}</h2>
-              </AnimatedSection>
-              <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                {italianTestimonials.map((item, i) => (
-                  <AnimatedSection key={i} delay={i * 0.1}>
-                    <Card className="h-full hover-elevate">
-                      <CardContent className="p-6">
-                        <div className="flex gap-1 mb-3">
-                          {[...Array(item.rating || 5)].map((_, j) => (
-                            <Star key={j} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          ))}
-                        </div>
-                        <p className="text-muted-foreground italic leading-relaxed mb-4">
-                          "{item.text}"
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2 text-sm font-medium">
-                            <span>{item.author}</span>
-                          </div>
-                          <Badge variant="outline" className="text-xs">
-                            {item.source === "Google" ? "Google Review" : item.source}
-                          </Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </AnimatedSection>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+        <TestimonialsSection />
 
         <section id="italian-contact" className="py-20 bg-muted/30">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
