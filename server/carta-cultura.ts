@@ -1,9 +1,6 @@
 import https from "https";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const PRODUCTION_ENDPOINT = "https://ws-cartegiovani.cultura.gov.it/WSUtilizzoVoucherGMWEB/VerificaVoucher";
 const TEST_ENDPOINT = "https://wstestcartegiovani.cultura.gov.it/WSUtilizzoVoucherGMWEB/VerificaVoucher";

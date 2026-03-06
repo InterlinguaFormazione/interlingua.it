@@ -1,9 +1,6 @@
 // PayPal integration - based on Replit PayPal blueprint
 import { Request, Response } from "express";
-import { createRequire } from "module";
-
-const require = createRequire(import.meta.url);
-const paypalSdk = require("@paypal/paypal-server-sdk");
+import paypalSdk from "@paypal/paypal-server-sdk";
 
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
 

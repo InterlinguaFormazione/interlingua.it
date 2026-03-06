@@ -1,0 +1,98 @@
+root@srv1133915:/var/www/interlingua# npm run build
+
+> rest-express@1.0.0 build
+> tsx script/build.ts
+
+building client...
+vite v7.3.0 building client environment for production...
+transforming (5) ../node_modules/@tanstack/react-query/build/modern/index.js
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 2303 modules transformed.
+../dist/public/assets/carte-cultura-1200x675_1772388120185-MpLUQ9E2.avif                              7.13 kB
+../dist/public/assets/hero-fallback-B-LBMgyt.jpg                                                     12.29 kB
+../dist/public/assets/about-teaching-DBvQQtPu.jpg                                                    12.55 kB
+../dist/public/index.html                                                                            15.43 kB │ gzip:   3.16 kB
+../dist/public/assets/corso-lingua-online_1772143586662-Dg-SKdWk.jpg                                 22.47 kB
+../dist/public/assets/Full-Immersion-Workshop-di-Lingua-Inglese_1772143747179-Pnzfhr2e.jpg           23.78 kB
+../dist/public/assets/lingue-straniere_1772143318023-BPtlRbUV.webp                                   26.72 kB
+../dist/public/assets/course-excel-BaCgR8XK.jpg                                                      28.50 kB
+../dist/public/assets/Language_Coaching_1772143397641-BsEmVJ-q.webp                                  31.54 kB
+../dist/public/assets/marketing-vendite-clienti_1771623200419-CAywqx9X.webp                          46.64 kB
+../dist/public/assets/course-ai-C8EXM2YL.jpg                                                         49.24 kB
+../dist/public/assets/category-online-DhteMXA8.jpg                                                   54.69 kB
+../dist/public/assets/management-leadership_1772143822898-DEJxnPlG.webp                              58.45 kB
+../dist/public/assets/SKILLCRAFT-INTERLINGUA_1769354785857-Z2hGo91J.png                              78.40 kB
+../dist/public/assets/course-individual-DTH3oiv6.jpg                                                 85.92 kB
+../dist/public/assets/Speakers-Corner-Conversazione-in-lingua-Inglese_1772143640698-DlKAF760.jpg     94.11 kB
+../dist/public/assets/about-team-C4DeBQ7D.jpg                                                       201.63 kB
+../dist/public/assets/about-vicenza-DtYqkaeh.jpg                                                    657.06 kB
+../dist/public/assets/coaching-online-CsOUYhom.png                                                1,252.86 kB
+../dist/public/assets/individuale-blended-KR_PCCGv.png                                            1,254.26 kB
+../dist/public/assets/coaching-blended-B8NysrQ8.png                                               1,258.00 kB
+../dist/public/assets/coaching-fluency-ByURwikU.png                                               1,280.31 kB
+../dist/public/assets/certification-BDk4R71a.png                                                  1,318.90 kB
+../dist/public/assets/coaching-blended-B3pPUVDR.png                                               1,322.36 kB
+../dist/public/assets/camclass-minigruppi-CxXQwpfO.png                                            1,327.04 kB
+../dist/public/assets/coaching-individuale-sede-DyyovmJD.png                                      1,338.43 kB
+../dist/public/assets/course-competenze-trasversali-NrOwa5CW.png                                  1,345.30 kB
+../dist/public/assets/camclass-gruppo-CheCQ34R.png                                                1,345.98 kB
+../dist/public/assets/course-language-coaching-CeGz3xHY.png                                       1,357.24 kB
+../dist/public/assets/corso-booster-DBIeYDD5.png                                                  1,360.52 kB
+../dist/public/assets/course-management-CAFi_Crg.png                                              1,360.85 kB
+../dist/public/assets/fluency-coaching-Cm77aQ3e.png                                               1,369.26 kB
+../dist/public/assets/ai-course-C7J0Ol_4.png                                                      1,390.45 kB
+../dist/public/assets/coaching-online-DcBenBd6.png                                                1,398.40 kB
+../dist/public/assets/e-learning-online-C7--kbug.png                                              1,398.51 kB
+../dist/public/assets/course-full-immersion-D7ERMsm3.png                                          1,402.45 kB
+../dist/public/assets/course-lingue-straniere-BI4bK1br.png                                        1,416.23 kB
+../dist/public/assets/italiano-individuale-online-CWHvHJzt.png                                    1,442.03 kB
+../dist/public/assets/individual-lesson-BE4LTtQv.png                                              1,448.38 kB
+../dist/public/assets/camclass-individuale-D41b6h6Z.png                                           1,452.03 kB
+../dist/public/assets/course-business-vae8noOT.png                                                1,470.13 kB
+../dist/public/assets/course-digitale-qyvbQ1xp.png                                                1,489.64 kB
+../dist/public/assets/full-immersion-xUwIRrHg.png                                                 1,497.85 kB
+../dist/public/assets/course-formazione-presenza-hero-CBgvHR8e.png                                1,518.56 kB
+../dist/public/assets/office-digital-skills-CUZ_hX6o.png                                          1,542.50 kB
+../dist/public/assets/coaching-in-sede-Du7-opbT.png                                               1,554.62 kB
+../dist/public/assets/italiano-individuale-presenza-D-oN8c3D.png                                  1,570.11 kB
+../dist/public/assets/conversazione-individuale-2EbYlQi3.png                                      1,588.74 kB
+../dist/public/assets/italiano-intensivo-20-v5VCMZgt.png                                          1,614.44 kB
+../dist/public/assets/course-italiano-per-stranieri-IA3Z_PaB.png                                  1,629.73 kB
+../dist/public/assets/group-classroom-CQ-aV1aI.png                                                1,674.51 kB
+../dist/public/assets/italian-course-CN6XCtF0.png                                                 1,751.68 kB
+../dist/public/assets/thiene-town-D4gszjlG.png                                                    1,871.56 kB
+../dist/public/assets/course-formazione-esperienziale-CeVbCR_i.png                                2,070.76 kB
+../dist/public/assets/Learn_Italin_in_Vicenza_1772214851188-LhHw-add.png                          2,585.21 kB
+../dist/public/assets/hero-video-CSn88cQ-.mp4                                                     8,456.36 kB
+../dist/public/assets/Metodologia_Innovativa_1772393171969-Cyw2DPQ1.png                           8,952.04 kB
+../dist/public/assets/index-YOqV3IfA.css                                                            178.19 kB │ gzip:  25.20 kB
+../dist/public/assets/index-CnVVj1Hl.js                                                           1,810.03 kB │ gzip: 471.05 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 7.81s
+building server...
+▲ [WARNING] "import.meta" is not available with the "cjs" output format and will be empty [empty-import-meta]
+
+    server/paypal.ts:5:30:
+      5 │ const require = createRequire(import.meta.url);
+        ╵                               ~~~~~~~~~~~
+
+  You need to set the output format to "esm" for "import.meta" to work correctly.
+
+▲ [WARNING] "import.meta" is not available with the "cjs" output format and will be empty [empty-import-meta]
+
+    server/carta-cultura.ts:6:45:
+      6 │ const __dirname = path.dirname(fileURLToPath(import.meta.url));
+        ╵                                              ~~~~~~~~~~~
+
+  You need to set the output format to "esm" for "import.meta" to work correctly.
+
+2 warnings
+
+  dist/index.cjs  1.8mb ⚠️
+
+⚡ Done in 165ms
+root@srv1133915:/var/www/interlingua#
