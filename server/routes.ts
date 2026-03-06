@@ -266,6 +266,79 @@ export async function registerRoutes(
   };
   seedDefaultAdmin();
 
+  app.get("/sitemap.xml", async (_req, res) => {
+    try {
+      const blogPosts = await storage.getBlogPosts();
+      const base = "https://skillcraft-interlingua.it";
+
+      const staticPages = [
+        { loc: "/", changefreq: "weekly", priority: "1.0" },
+        { loc: "/formazione-in-presenza", changefreq: "weekly", priority: "0.9" },
+        { loc: "/corsi-e-learning", changefreq: "weekly", priority: "0.9" },
+        { loc: "/corsi-italiano", changefreq: "weekly", priority: "0.9" },
+        { loc: "/full-immersion", changefreq: "weekly", priority: "0.9" },
+        { loc: "/language-coaching", changefreq: "weekly", priority: "0.9" },
+        { loc: "/speakers-corner", changefreq: "weekly", priority: "0.9" },
+        { loc: "/bandi-e-corsi-finanziati", changefreq: "weekly", priority: "0.9" },
+        ...[
+          "lingue-straniere", "comunicazione-interculturale-e-cross-culturale", "language-coaching",
+          "learning-week-weekend-tematici", "comunicazione", "problem-solving", "creativit-innovazione",
+          "leadership-teamwork", "project-management", "metodologie-agile-scrum", "lean-office-operations",
+          "gestione-risorse-umane", "sales-marketing", "pianificazione-controllo", "digital-skills",
+          "digital-marketing", "innovazione-digitale-ai", "workshop-indoor-outdoor", "full-immersion-english",
+          "the-spirit-of-leadership",
+        ].map(id => ({ loc: `/corsi/${id}`, changefreq: "monthly", priority: "0.8" })),
+        { loc: "/shop", changefreq: "weekly", priority: "0.8" },
+        ...[
+          "corsi-gruppo", "individuali-presenza", "individuale-blended", "corso-booster",
+          "office-senza-segreti", "ai-senza-segreti", "full-immersion", "camclass-selflearning",
+          "camclass-gruppo", "camclass-individuale", "preparazione-certificazione", "conversazione-individuale",
+          "camclass-minigruppi", "coaching-in-sede", "coaching-blended", "coaching-online", "fluency-coaching",
+          "italiano-intensivo-15", "italiano-intensivo-20", "italiano-individuale-presenza", "italiano-individuale-online",
+        ].map(slug => ({ loc: `/shop/product/${slug}`, changefreq: "monthly", priority: "0.7" })),
+        { loc: "/speakers-corner/acquista", changefreq: "monthly", priority: "0.8" },
+        { loc: "/convenzioni", changefreq: "monthly", priority: "0.8" },
+        { loc: "/test-di-livello", changefreq: "monthly", priority: "0.8" },
+        { loc: "/english-test", changefreq: "monthly", priority: "0.7" },
+        { loc: "/italian-test", changefreq: "monthly", priority: "0.7" },
+        { loc: "/german-test", changefreq: "monthly", priority: "0.7" },
+        { loc: "/french-test", changefreq: "monthly", priority: "0.7" },
+        { loc: "/spanish-test", changefreq: "monthly", priority: "0.7" },
+        { loc: "/blog", changefreq: "weekly", priority: "0.7" },
+        { loc: "/chi-siamo", changefreq: "monthly", priority: "0.7" },
+        { loc: "/sedi", changefreq: "monthly", priority: "0.7" },
+        { loc: "/cookie-policy", changefreq: "yearly", priority: "0.3" },
+        { loc: "/privacy-policy", changefreq: "yearly", priority: "0.3" },
+        { loc: "/termini-e-condizioni", changefreq: "yearly", priority: "0.3" },
+        { loc: "/codice-etico", changefreq: "yearly", priority: "0.3" },
+      ];
+
+      const blogEntries = blogPosts.map(post => ({
+        loc: `/blog/${post.slug}`,
+        changefreq: "monthly",
+        priority: "0.6",
+        lastmod: post.createdAt ? new Date(post.createdAt).toISOString().split("T")[0] : undefined,
+      }));
+
+      const allPages = [...staticPages, ...blogEntries];
+
+      const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${allPages.map(p => `  <url>
+    <loc>${base}${p.loc}</loc>${(p as any).lastmod ? `\n    <lastmod>${(p as any).lastmod}</lastmod>` : ""}
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`).join("\n")}
+</urlset>`;
+
+      res.set("Content-Type", "application/xml");
+      res.send(xml);
+    } catch (error) {
+      console.error("Error generating sitemap:", error);
+      res.status(500).send("Error generating sitemap");
+    }
+  });
+
   app.post("/api/admin/login", async (req, res) => {
     try {
       const { username, password } = req.body;
