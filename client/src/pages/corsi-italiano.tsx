@@ -481,13 +481,12 @@ export default function CorsiItalianoPage() {
 
     if (googleReviews?.reviews) {
       googleReviews.reviews
-        .filter(r => r.rating >= 4 && ITALIAN_KEYWORDS.test(r.content))
+        .filter(r => r.rating >= 4)
         .forEach(r => items.push({ text: r.content, author: r.name, source: "Google", rating: r.rating }));
     }
 
     if (satisfactionData?.comments) {
       satisfactionData.comments
-        .filter(c => ITALIAN_KEYWORDS.test(c.course) || ITALIAN_KEYWORDS.test(c.comment))
         .forEach(c => items.push({ text: c.comment, author: c.author, source: formatCourseName(c.course) }));
     }
 
