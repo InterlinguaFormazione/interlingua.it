@@ -361,7 +361,7 @@ export default function ShopProductPage() {
             loading="eager"
           />
         )}
-        <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} ${heroImage ? "opacity-75" : "opacity-90"}`} />
+        <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} ${heroImage ? "opacity-50" : "opacity-90"}`} />
         <div className="absolute inset-0 opacity-10"
           style={{
             backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
