@@ -174,7 +174,7 @@ function BandoCardComponent({ bando, index, expired = false }: { bando: typeof b
             }
             data-testid={`badge-status-${bando.id}`}
           >
-            {bando.status === "active" ? "Attivo" : "Scaduto"}
+            {bando.status === "active" ? "Attivo" : "Chiuso"}
           </Badge>
         </div>
       </div>

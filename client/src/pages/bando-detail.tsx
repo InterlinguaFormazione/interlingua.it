@@ -67,7 +67,7 @@ export default function BandoDetailPage() {
                 }`}
                 data-testid="badge-status"
               >
-                {card.status === "active" ? "Bando Attivo" : "Bando Scaduto"}
+                {card.status === "active" ? "Bando Attivo" : "Bando Chiuso"}
               </Badge>
             )}
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight" data-testid="heading-project-title">
