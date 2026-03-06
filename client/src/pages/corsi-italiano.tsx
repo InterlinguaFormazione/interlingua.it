@@ -55,6 +55,8 @@ import {
 import { COUNTRIES } from "@shared/countries";
 import { CorsiItalianoSchema } from "@/components/seo-schemas";
 import { CourseFAQ } from "@/components/course-faq";
+import { SHOP_PRODUCTS } from "@shared/products";
+import { useCart } from "@/lib/cart-context";
 
 const corsiItalianoFAQs = [
   {
@@ -460,6 +462,7 @@ const testimonials = [
 export default function CorsiItalianoPage() {
   const [lang, setLang] = useState<Lang>("it");
   const t = content[lang];
+  const { addItem } = useCart();
   useSEO({
     title: lang === "it"
       ? "Corsi di Italiano per Stranieri Vicenza | Italian Courses Vicenza | SkillCraft-Interlingua"
@@ -837,21 +840,25 @@ export default function CorsiItalianoPage() {
                           </li>
                         ))}
                       </ul>
-                      <div className="flex gap-2">
+                      <div className="flex flex-col gap-2">
                         {course.reviewSlug && (
-                          <Link href={`/shop/product/${course.reviewSlug}`} className="flex-1">
-                            <Button
-                              className="w-full bg-green-700 hover:bg-green-800 text-white"
-                              data-testid={`button-course-buy-${i}`}
-                            >
-                              <ShoppingCart className="mr-2 h-4 w-4" />
-                              {lang === "it" ? "Acquista Ora" : "Buy Now"}
-                            </Button>
-                          </Link>
+                          <Button
+                            className="w-full bg-green-700 hover:bg-green-800 text-white"
+                            data-testid={`button-course-cart-${i}`}
+                            onClick={() => {
+                              const product = SHOP_PRODUCTS.find(p => p.slug === course.reviewSlug);
+                              if (product) {
+                                addItem(product);
+                              }
+                            }}
+                          >
+                            <ShoppingCart className="mr-2 h-4 w-4" />
+                            {lang === "it" ? "Aggiungi al Carrello" : "Add to Cart"}
+                          </Button>
                         )}
                         <Button
                           variant="outline"
-                          className={course.reviewSlug ? "flex-1" : "w-full"}
+                          className="w-full"
                           onClick={() => document.querySelector("#italian-contact")?.scrollIntoView({ behavior: "smooth" })}
                           data-testid={`button-course-info-${i}`}
                         >
