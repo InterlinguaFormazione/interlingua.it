@@ -19,6 +19,7 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
 - **Database**: PostgreSQL (Drizzle ORM)
 - **Email**: AWS SES (gracefully disabled if credentials not set)
 - **CRM Integration**: Webhook to `crm-privati.skillcraft.it` (via `server/crm.ts`, env: CRM_API_KEY + CRM_WEBHOOK_URL)
+- **Quality/Satisfaction API**: Fetches verified student satisfaction comments from `quality-skillcraft.interlingua.it` (env: QUALITY_API_KEY, QUALITY_API_URL). Server-side proxy at `/api/satisfaction-comments` with 1-hour cache. Filters for positive feedback (type="sorpreso", length>25).
 - **State Management**: TanStack React Query
 - **Animations**: Framer Motion
 - **Routing**: Wouter

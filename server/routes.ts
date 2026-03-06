@@ -818,6 +818,55 @@ ${allPages.map(p => `  <url>
     }
   });
 
+  let satisfactionCache: { data: any; timestamp: number } | null = null;
+  const SATISFACTION_CACHE_DURATION = 60 * 60 * 1000;
+
+  app.get("/api/satisfaction-comments", async (_req, res) => {
+    try {
+      if (satisfactionCache && Date.now() - satisfactionCache.timestamp < SATISFACTION_CACHE_DURATION) {
+        return res.json(satisfactionCache.data);
+      }
+
+      const apiKey = process.env.QUALITY_API_KEY;
+      const apiUrl = process.env.QUALITY_API_URL || "https://quality-skillcraft.interlingua.it/api/public/satisfaction-comments";
+      if (!apiKey) {
+        return res.status(500).json({ success: false, message: "Quality API key not configured" });
+      }
+
+      const response = await fetch(`${apiUrl}?limit=100`, {
+        headers: { "X-API-Key": apiKey },
+      });
+
+      if (!response.ok) {
+        console.error("Quality API error:", response.status);
+        return res.status(502).json({ success: false, message: "Failed to fetch satisfaction comments" });
+      }
+
+      const data = await response.json();
+
+      const positiveComments = (data.comments || [])
+        .filter((c: any) => c.type === "sorpreso" && c.comment && c.comment.length > 25)
+        .map((c: any, i: number) => ({
+          id: `sat-${i}`,
+          comment: c.comment,
+          author: c.author || "Studente Verificato",
+          course: c.course || "",
+          date: c.date || "",
+        }));
+
+      const result = {
+        total: data.total || 0,
+        comments: positiveComments,
+      };
+
+      satisfactionCache = { data: result, timestamp: Date.now() };
+      res.json(result);
+    } catch (error) {
+      console.error("Error fetching satisfaction comments:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
   app.post("/api/cookie-consent", async (req, res) => {
     try {
       const consentData = {
