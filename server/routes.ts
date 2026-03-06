@@ -1516,7 +1516,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
     }
   });
 
-  app.delete("/api/admin/speakers-corner/subscribers/:id", requireAuth, async (req, res) => {
+  app.delete("/api/admin/speakers-corner/subscribers/:id", async (req, res) => {
     try {
       const deleted = await storage.deleteScSubscriber(req.params.id);
       if (!deleted) {
