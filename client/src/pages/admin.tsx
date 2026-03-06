@@ -16,6 +16,7 @@ import { queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { SHOP_PRODUCTS } from "@shared/products";
 import { SpeakersCornerTabContent } from "@/pages/speakers-corner-admin";
+import { AnalyticsTabContent } from "@/pages/admin-analytics";
 import {
   Shield,
   Mail,
@@ -63,6 +64,7 @@ import {
   Percent,
   UserCheck,
   Copy,
+  BarChart3,
 } from "lucide-react";
 
 interface DashboardStats {
@@ -3621,6 +3623,7 @@ function ConventionsTab({ token }: { token: string }) {
 }
 
 const adminTabs = [
+  { value: "analytics", label: "Statistiche", icon: BarChart3 },
   { value: "contacts", label: "Contatti", icon: MessageSquare },
   { value: "newsletter", label: "Newsletter", icon: Mail },
   { value: "blog", label: "Blog", icon: Newspaper },
@@ -3641,7 +3644,7 @@ export default function AdminPage() {
   const [token, setToken] = useState<string | null>(localStorage.getItem("admin_token"));
   const [user, setUser] = useState<any>(JSON.parse(localStorage.getItem("admin_user") || "null"));
   const [showPassword, setShowPassword] = useState(false);
-  const [activeTab, setActiveTab] = useState("contacts");
+  const [activeTab, setActiveTab] = useState("analytics");
   const { toast } = useToast();
   const [, setLocation] = useLocation();
 
@@ -3834,6 +3837,19 @@ export default function AdminPage() {
             </Select>
           </div>
 
+          <TabsContent value="analytics">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5" /> Statistiche e Analisi
+                </CardTitle>
+                <CardDescription>Panoramica completa delle metriche del sito</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AnalyticsTabContent token={token!} />
+              </CardContent>
+            </Card>
+          </TabsContent>
           <TabsContent value="contacts">
             <ContactsTab token={token} />
           </TabsContent>

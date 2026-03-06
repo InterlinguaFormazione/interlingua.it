@@ -456,6 +456,180 @@ ${allPages.map(p => `  <url>
     }
   });
 
+  app.get("/api/admin/analytics", requireAuth, async (req, res) => {
+    try {
+      const [
+        allOrders, allSubscribers, allSessions, allBookings, allPayments,
+        testResults, contacts, newsletter, reviews, blogPostsList,
+        blogCommentsList, vouchers, allConventions, allConvRegistrations
+      ] = await Promise.all([
+        storage.getShopOrders(),
+        storage.getAllScSubscribers(),
+        storage.getAllScSessions(),
+        storage.getAllScBookings(),
+        storage.getScPayments(),
+        storage.getBeTestSessions(),
+        storage.getContactSubmissions(),
+        storage.getNewsletterSubscriptions(),
+        storage.getAllProductReviews(),
+        storage.getBlogPosts(),
+        storage.getAllBlogComments(),
+        storage.getDiscountVouchers(),
+        storage.getConventions(),
+        storage.getConventionRegistrations(),
+      ]);
+
+      const completedOrders = allOrders.filter((o: any) => o.status === "completed");
+      const totalRevenue = completedOrders.reduce((sum: number, o: any) => sum + parseFloat(o.amount || "0"), 0);
+      const avgOrderValue = completedOrders.length > 0 ? totalRevenue / completedOrders.length : 0;
+
+      const now = new Date();
+      const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+      const monthlyRevenue: Record<string, number> = {};
+      const monthlyOrders: Record<string, number> = {};
+      completedOrders.forEach((o: any) => {
+        const d = o.createdAt ? new Date(o.createdAt) : new Date();
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        monthlyRevenue[key] = (monthlyRevenue[key] || 0) + parseFloat(o.amount || "0");
+        monthlyOrders[key] = (monthlyOrders[key] || 0) + 1;
+      });
+      const months = Object.keys(monthlyRevenue).sort().slice(-12);
+      const revenueByMonth = months.map(m => ({ month: m, revenue: monthlyRevenue[m], orders: monthlyOrders[m] || 0 }));
+
+      const thisMonthRevenue = monthlyRevenue[thisMonth] || 0;
+      const thisMonthOrders = monthlyOrders[thisMonth] || 0;
+
+      const ordersByStatus: Record<string, number> = {};
+      allOrders.forEach((o: any) => {
+        ordersByStatus[o.status] = (ordersByStatus[o.status] || 0) + 1;
+      });
+
+      const productSales: Record<string, { count: number; revenue: number; name: string }> = {};
+      completedOrders.forEach((o: any) => {
+        const slug = o.productSlug;
+        if (!productSales[slug]) productSales[slug] = { count: 0, revenue: 0, name: o.productName || slug };
+        productSales[slug].count++;
+        productSales[slug].revenue += parseFloat(o.amount || "0");
+      });
+      const topProducts = Object.entries(productSales)
+        .map(([slug, d]) => ({ slug, name: d.name, count: d.count, revenue: d.revenue }))
+        .sort((a, b) => b.revenue - a.revenue)
+        .slice(0, 10);
+
+      const voucherUsage = allOrders.filter((o: any) => o.discountCode).length;
+      const voucherStats = vouchers.map((v: any) => ({
+        code: v.code,
+        description: v.description,
+        usedCount: v.usedCount || 0,
+        maxUses: v.maxUses,
+        active: v.active,
+      })).sort((a: any, b: any) => b.usedCount - a.usedCount).slice(0, 10);
+
+      const activeSubscribers = allSubscribers.filter((s: any) => s.active);
+      const scTotalPayments = allPayments.filter((p: any) => p.status === "completed");
+      const scRevenue = scTotalPayments.reduce((sum: number, p: any) => sum + parseFloat(p.amount || "0"), 0);
+      const bookingsBySession: Record<string, number> = {};
+      allBookings.forEach((b: any) => {
+        bookingsBySession[b.sessionId] = (bookingsBySession[b.sessionId] || 0) + 1;
+      });
+      const sessionsWithBookings = allSessions.map((s: any) => ({
+        ...s,
+        bookingCount: bookingsBySession[s.id] || 0,
+      }));
+      const upcomingSessions = sessionsWithBookings.filter((s: any) => new Date(s.sessionDate) >= now);
+      const avgBookingRate = upcomingSessions.length > 0
+        ? upcomingSessions.reduce((sum: number, s: any) => sum + (s.bookingCount / (s.maxParticipants || 6)), 0) / upcomingSessions.length
+        : 0;
+
+      const completedTests = testResults.filter((t: any) => t.status === "completed");
+      const testsByLanguage: Record<string, { total: number; completed: number }> = {};
+      testResults.forEach((t: any) => {
+        const lang = t.language || "english";
+        if (!testsByLanguage[lang]) testsByLanguage[lang] = { total: 0, completed: 0 };
+        testsByLanguage[lang].total++;
+        if (t.status === "completed") testsByLanguage[lang].completed++;
+      });
+      const levelDistribution: Record<string, number> = {};
+      completedTests.forEach((t: any) => {
+        const level = t.finalLevel || t.currentLevel || "Unknown";
+        levelDistribution[level] = (levelDistribution[level] || 0) + 1;
+      });
+      const testCompletionRate = testResults.length > 0 ? completedTests.length / testResults.length : 0;
+
+      const approvedReviews = reviews.filter((r: any) => r.approved);
+      const pendingReviewsList = reviews.filter((r: any) => !r.approved);
+      const avgRating = approvedReviews.length > 0
+        ? approvedReviews.reduce((sum: number, r: any) => sum + (r.rating || 0), 0) / approvedReviews.length
+        : 0;
+
+      const activeNewsletter = newsletter.filter((n: any) => n.subscribed !== false);
+      const userComments = blogCommentsList.filter((c: any) => !c.isAiReply);
+
+      const activeConventions = allConventions.filter((c: any) => c.active);
+
+      const recentContacts = contacts
+        .sort((a: any, b: any) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+        .slice(0, 5)
+        .map((c: any) => ({ name: c.name, email: c.email, courseInterest: c.courseInterest, date: c.createdAt }));
+
+      res.json({
+        revenue: {
+          total: totalRevenue,
+          thisMonth: thisMonthRevenue,
+          avgOrderValue,
+          byMonth: revenueByMonth,
+        },
+        orders: {
+          total: allOrders.length,
+          thisMonth: thisMonthOrders,
+          byStatus: ordersByStatus,
+          topProducts,
+          voucherUsage,
+        },
+        speakersCorner: {
+          totalSubscribers: allSubscribers.length,
+          activeSubscribers: activeSubscribers.length,
+          totalSessions: allSessions.length,
+          avgBookingRate: Math.round(avgBookingRate * 100),
+          totalPayments: scTotalPayments.length,
+          totalRevenue: scRevenue,
+        },
+        tests: {
+          total: testResults.length,
+          completed: completedTests.length,
+          completionRate: Math.round(testCompletionRate * 100),
+          byLanguage: testsByLanguage,
+          levelDistribution,
+        },
+        engagement: {
+          contacts: contacts.length,
+          recentContacts,
+          newsletterTotal: newsletter.length,
+          newsletterActive: activeNewsletter.length,
+          reviews: reviews.length,
+          reviewsApproved: approvedReviews.length,
+          reviewsPending: pendingReviewsList.length,
+          avgRating: Math.round(avgRating * 10) / 10,
+          blogPosts: blogPostsList.length,
+          blogComments: userComments.length,
+        },
+        vouchers: {
+          total: vouchers.length,
+          activeCount: vouchers.filter((v: any) => v.active).length,
+          topVouchers: voucherStats,
+        },
+        conventions: {
+          total: allConventions.length,
+          active: activeConventions.length,
+          totalRegistrations: allConvRegistrations.length,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching analytics:", error);
+      res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  });
+
   app.get("/api/admin/dashboard", requireAuth, async (_req, res) => {
     try {
       const [contacts, newsletter, posts, orders, reviews, testResults, comments] = await Promise.all([

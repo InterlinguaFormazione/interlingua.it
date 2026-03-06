@@ -115,6 +115,7 @@ export interface IStorage {
   getAllScSessions(): Promise<ScSession[]>;
   updateScSession(id: string, data: Partial<InsertScSession>): Promise<ScSession | undefined>;
 
+  getAllScBookings(): Promise<ScBooking[]>;
   createScBooking(booking: InsertScBooking): Promise<ScBooking>;
   getScBookingsBySession(sessionId: string): Promise<ScBooking[]>;
   getScBookingsBySubscriber(subscriberId: string): Promise<ScBooking[]>;
@@ -401,6 +402,10 @@ export class DatabaseStorage implements IStorage {
   async updateScSession(id: string, data: Partial<InsertScSession>): Promise<ScSession | undefined> {
     const [result] = await db.update(scSessions).set(data).where(eq(scSessions.id, id)).returning();
     return result;
+  }
+
+  async getAllScBookings(): Promise<ScBooking[]> {
+    return db.select().from(scBookings);
   }
 
   async createScBooking(booking: InsertScBooking): Promise<ScBooking> {
