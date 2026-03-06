@@ -580,3 +580,28 @@ export const insertConventionRegistrationSchema = createInsertSchema(conventionR
 });
 export type InsertConventionRegistration = z.infer<typeof insertConventionRegistrationSchema>;
 export type ConventionRegistration = typeof conventionRegistrations.$inferSelect;
+
+export const pageViews = pgTable("page_views", {
+  id: serial("id").primaryKey(),
+  path: text("path").notNull(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  referrer: text("referrer"),
+  sessionId: text("session_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertPageViewSchema = createInsertSchema(pageViews).omit({ id: true, createdAt: true });
+export type InsertPageView = z.infer<typeof insertPageViewSchema>;
+export type PageView = typeof pageViews.$inferSelect;
+
+export const excludedIps = pgTable("excluded_ips", {
+  id: serial("id").primaryKey(),
+  ipAddress: text("ip_address").notNull(),
+  label: text("label"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertExcludedIpSchema = createInsertSchema(excludedIps).omit({ id: true, createdAt: true });
+export type InsertExcludedIp = z.infer<typeof insertExcludedIpSchema>;
+export type ExcludedIp = typeof excludedIps.$inferSelect;

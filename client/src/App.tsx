@@ -46,12 +46,18 @@ import ConvenzioniPage from "@/pages/convenzioni";
 import NotFound from "@/pages/not-found";
 import { CartProvider } from "@/lib/cart-context";
 import { CartDrawer } from "@/components/cart-drawer";
+import { usePageTracker } from "@/hooks/use-page-tracker";
 
 function ScrollToTop() {
   const [location] = useLocation();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location]);
+  return null;
+}
+
+function PageTracker() {
+  usePageTracker();
   return null;
 }
 
@@ -104,6 +110,7 @@ function App() {
         <CartProvider>
           <TooltipProvider>
             <ScrollToTop />
+            <PageTracker />
             <Router />
             <CartDrawer />
             <CookieBanner />

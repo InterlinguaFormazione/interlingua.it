@@ -387,3 +387,22 @@ CREATE TABLE "users" (
 	"created_at" timestamp DEFAULT now(),
 	CONSTRAINT "users_username_unique" UNIQUE("username")
 );
+
+-- Page Views tracking
+CREATE TABLE IF NOT EXISTS "page_views" (
+  "id" serial PRIMARY KEY NOT NULL,
+  "path" text NOT NULL,
+  "ip_address" text,
+  "user_agent" text,
+  "referrer" text,
+  "session_id" text,
+  "created_at" timestamp DEFAULT now()
+);
+
+-- Excluded IPs
+CREATE TABLE IF NOT EXISTS "excluded_ips" (
+  "id" serial PRIMARY KEY NOT NULL,
+  "ip_address" text NOT NULL,
+  "label" text,
+  "created_at" timestamp DEFAULT now()
+);

@@ -1,6 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import {
   DollarSign,
   ShoppingCart,
@@ -16,6 +21,11 @@ import {
   BarChart3,
   FileText,
   Percent,
+  Eye,
+  Globe,
+  Shield,
+  Plus,
+  Trash2,
 } from "lucide-react";
 
 interface AnalyticsData {
@@ -68,6 +78,12 @@ interface AnalyticsData {
     total: number;
     active: number;
     totalRegistrations: number;
+  };
+  pageViewStats: {
+    totalViews: number;
+    uniqueVisitors: number;
+    topPages: Array<{ path: string; count: number }>;
+    viewsByDay: Array<{ day: string; count: number }>;
   };
 }
 
@@ -557,6 +573,209 @@ export function AnalyticsTabContent({ token }: { token: string }) {
           </CardContent>
         </Card>
       )}
+
+      <div className="grid lg:grid-cols-2 gap-6">
+        <Card data-testid="card-page-views">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Eye className="w-5 h-5 text-blue-600" />
+              Visite al Sito
+            </CardTitle>
+            <CardDescription>
+              Ultimi 30 giorni — {data.pageViewStats.totalViews} visite, {data.pageViewStats.uniqueVisitors} visitatori unici
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {data.pageViewStats.viewsByDay.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nessuna visita registrata ancora</p>
+            ) : (
+              <BarChartSimple
+                data={data.pageViewStats.viewsByDay.map(d => ({
+                  label: d.day.slice(5),
+                  value: d.count,
+                }))}
+                maxVal={Math.max(...data.pageViewStats.viewsByDay.map(d => d.count), 1)}
+              />
+            )}
+          </CardContent>
+        </Card>
+
+        <Card data-testid="card-top-pages">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Globe className="w-5 h-5 text-blue-600" />
+              Pagine Più Visitate
+            </CardTitle>
+            <CardDescription>Top 20 — ultimi 30 giorni</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {data.pageViewStats.topPages.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nessuna visita registrata ancora</p>
+            ) : (
+              <div className="space-y-2 max-h-80 overflow-y-auto">
+                {data.pageViewStats.topPages.map((p, i) => (
+                  <div key={i} className="flex items-center justify-between gap-2 py-1">
+                    <span className="text-sm truncate flex-1 font-mono text-muted-foreground">{p.path}</span>
+                    <Badge variant="secondary" className="shrink-0">{p.count}</Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <ExcludedIpsSection token={token} />
     </div>
+  );
+}
+
+function ExcludedIpsSection({ token }: { token: string }) {
+  const { toast } = useToast();
+  const [newIp, setNewIp] = useState("");
+  const [newLabel, setNewLabel] = useState("");
+
+  const { data: excludedIps = [] } = useQuery<Array<{ id: number; ipAddress: string; label: string | null; createdAt: string }>>({
+    queryKey: ["/api/admin/excluded-ips"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/excluded-ips", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Errore");
+      return res.json();
+    },
+  });
+
+  const { data: myIpData } = useQuery<{ ip: string }>({
+    queryKey: ["/api/admin/my-ip"],
+    queryFn: async () => {
+      const res = await fetch("/api/admin/my-ip", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Errore");
+      return res.json();
+    },
+  });
+
+  const addIpMutation = useMutation({
+    mutationFn: async ({ ipAddress, label }: { ipAddress: string; label: string }) => {
+      const res = await fetch("/api/admin/excluded-ips", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ ipAddress, label }),
+      });
+      if (!res.ok) throw new Error("Errore");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/excluded-ips"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/analytics"] });
+      setNewIp("");
+      setNewLabel("");
+      toast({ title: "IP aggiunto", description: "L'indirizzo IP è stato escluso dalle statistiche." });
+    },
+  });
+
+  const removeIpMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/admin/excluded-ips/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Errore");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/excluded-ips"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/analytics"] });
+      toast({ title: "IP rimosso", description: "L'indirizzo IP non è più escluso." });
+    },
+  });
+
+  return (
+    <Card data-testid="card-excluded-ips">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Shield className="w-5 h-5 text-red-600" />
+          IP Esclusi dalle Statistiche
+        </CardTitle>
+        <CardDescription>
+          Le visite e attività da questi indirizzi IP non vengono conteggiate nelle statistiche.
+          {myIpData?.ip && (
+            <span className="block mt-1">
+              Il tuo IP attuale: <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono">{myIpData.ip}</code>
+            </span>
+          )}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+          <Input
+            placeholder="Indirizzo IP (es. 192.168.1.1)"
+            value={newIp}
+            onChange={(e) => setNewIp(e.target.value)}
+            className="flex-1"
+            data-testid="input-new-excluded-ip"
+          />
+          <Input
+            placeholder="Etichetta (es. Ufficio)"
+            value={newLabel}
+            onChange={(e) => setNewLabel(e.target.value)}
+            className="flex-1"
+            data-testid="input-new-excluded-label"
+          />
+          <Button
+            onClick={() => {
+              if (!newIp.trim()) return;
+              addIpMutation.mutate({ ipAddress: newIp.trim(), label: newLabel.trim() });
+            }}
+            disabled={!newIp.trim() || addIpMutation.isPending}
+            data-testid="button-add-excluded-ip"
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            Aggiungi
+          </Button>
+        </div>
+
+        {myIpData?.ip && !excludedIps.some(e => e.ipAddress === myIpData.ip) && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="mb-4"
+            onClick={() => addIpMutation.mutate({ ipAddress: myIpData.ip, label: "Il mio IP" })}
+            disabled={addIpMutation.isPending}
+            data-testid="button-add-my-ip"
+          >
+            <Shield className="w-3 h-3 mr-1" />
+            Escludi il mio IP attuale ({myIpData.ip})
+          </Button>
+        )}
+
+        {excludedIps.length === 0 ? (
+          <p className="text-sm text-muted-foreground">Nessun IP escluso. Aggiungi il tuo IP aziendale per filtrare le tue visite.</p>
+        ) : (
+          <div className="space-y-2">
+            {excludedIps.map((ip) => (
+              <div key={ip.id} className="flex items-center justify-between gap-2 py-2 border-b last:border-0" data-testid={`row-excluded-ip-${ip.id}`}>
+                <div className="flex items-center gap-3">
+                  <code className="text-sm font-mono bg-muted px-2 py-0.5 rounded">{ip.ipAddress}</code>
+                  {ip.label && <span className="text-sm text-muted-foreground">{ip.label}</span>}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => removeIpMutation.mutate(ip.id)}
+                  disabled={removeIpMutation.isPending}
+                  data-testid={`button-remove-ip-${ip.id}`}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

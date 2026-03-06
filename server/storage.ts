@@ -46,6 +46,10 @@ import {
   type InsertConvention,
   type ConventionRegistration,
   type InsertConventionRegistration,
+  type PageView,
+  type InsertPageView,
+  type ExcludedIp,
+  type InsertExcludedIp,
   users,
   contactSubmissions,
   newsletterSubscriptions,
@@ -70,6 +74,8 @@ import {
   blogComments,
   conventions,
   conventionRegistrations,
+  pageViews,
+  excludedIps,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
@@ -216,6 +222,14 @@ export interface IStorage {
   getRegistrationByEmail(conventionId: string, email: string): Promise<ConventionRegistration | undefined>;
   getRegistrationsByCustomerEmail(email: string): Promise<Array<{ registration: ConventionRegistration; convention: Convention }>>;
   getRegistrationCountByConvention(conventionId: string): Promise<number>;
+
+  createPageView(view: InsertPageView): Promise<PageView>;
+  getPageViews(since?: Date): Promise<PageView[]>;
+  getPageViewStats(since?: Date, excludedIpList?: string[]): Promise<{ totalViews: number; uniqueVisitors: number; topPages: Array<{ path: string; count: number }>; viewsByDay: Array<{ day: string; count: number }> }>;
+
+  getExcludedIps(): Promise<ExcludedIp[]>;
+  addExcludedIp(data: InsertExcludedIp): Promise<ExcludedIp>;
+  removeExcludedIp(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -859,6 +873,56 @@ export class DatabaseStorage implements IStorage {
     const result = await db.select({ count: sql<number>`count(*)` }).from(conventionRegistrations)
       .where(eq(conventionRegistrations.conventionId, conventionId));
     return Number(result[0]?.count || 0);
+  }
+
+  async createPageView(view: InsertPageView): Promise<PageView> {
+    const [result] = await db.insert(pageViews).values(view).returning();
+    return result;
+  }
+
+  async getPageViews(since?: Date): Promise<PageView[]> {
+    if (since) {
+      return db.select().from(pageViews).where(gte(pageViews.createdAt, since)).orderBy(desc(pageViews.createdAt));
+    }
+    return db.select().from(pageViews).orderBy(desc(pageViews.createdAt));
+  }
+
+  async getPageViewStats(since?: Date, excludedIpList?: string[]): Promise<{ totalViews: number; uniqueVisitors: number; topPages: Array<{ path: string; count: number }>; viewsByDay: Array<{ day: string; count: number }> }> {
+    let allViews = await this.getPageViews(since);
+    if (excludedIpList && excludedIpList.length > 0) {
+      allViews = allViews.filter(v => !excludedIpList.includes(v.ipAddress || ""));
+    }
+    const uniqueIps = new Set(allViews.map(v => v.ipAddress).filter(Boolean));
+    const pageCounts: Record<string, number> = {};
+    const dayCounts: Record<string, number> = {};
+    allViews.forEach(v => {
+      pageCounts[v.path] = (pageCounts[v.path] || 0) + 1;
+      const day = v.createdAt ? new Date(v.createdAt).toISOString().slice(0, 10) : "unknown";
+      dayCounts[day] = (dayCounts[day] || 0) + 1;
+    });
+    const topPages = Object.entries(pageCounts)
+      .map(([path, count]) => ({ path, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 20);
+    const viewsByDay = Object.entries(dayCounts)
+      .map(([day, count]) => ({ day, count }))
+      .sort((a, b) => a.day.localeCompare(b.day))
+      .slice(-30);
+    return { totalViews: allViews.length, uniqueVisitors: uniqueIps.size, topPages, viewsByDay };
+  }
+
+  async getExcludedIps(): Promise<ExcludedIp[]> {
+    return db.select().from(excludedIps).orderBy(desc(excludedIps.createdAt));
+  }
+
+  async addExcludedIp(data: InsertExcludedIp): Promise<ExcludedIp> {
+    const [result] = await db.insert(excludedIps).values(data).returning();
+    return result;
+  }
+
+  async removeExcludedIp(id: number): Promise<boolean> {
+    const result = await db.delete(excludedIps).where(eq(excludedIps.id, id)).returning();
+    return result.length > 0;
   }
 }
 

@@ -461,7 +461,8 @@ ${allPages.map(p => `  <url>
       const [
         allOrders, allSubscribers, allSessions, allBookings, allPayments,
         testResults, contacts, newsletter, reviews, blogPostsList,
-        blogCommentsList, vouchers, allConventions, allConvRegistrations
+        blogCommentsList, vouchers, allConventions, allConvRegistrations,
+        excludedIpsList
       ] = await Promise.all([
         storage.getShopOrders(),
         storage.getAllScSubscribers(),
@@ -477,7 +478,12 @@ ${allPages.map(p => `  <url>
         storage.getDiscountVouchers(),
         storage.getConventions(),
         storage.getConventionRegistrations(),
+        storage.getExcludedIps(),
       ]);
+
+      const excludedIpAddresses = excludedIpsList.map((ip: any) => ip.ipAddress);
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      const pageViewStats = await storage.getPageViewStats(thirtyDaysAgo, excludedIpAddresses);
 
       const completedOrders = allOrders.filter((o: any) => o.status === "completed");
       const totalRevenue = completedOrders.reduce((sum: number, o: any) => sum + parseFloat(o.amount || "0"), 0);
@@ -623,11 +629,66 @@ ${allPages.map(p => `  <url>
           active: activeConventions.length,
           totalRegistrations: allConvRegistrations.length,
         },
+        pageViewStats,
       });
     } catch (error) {
       console.error("Error fetching analytics:", error);
       res.status(500).json({ success: false, message: "Internal server error" });
     }
+  });
+
+  app.post("/api/track-pageview", async (req, res) => {
+    try {
+      const ip = getClientIp(req);
+      const { path: pagePath } = req.body;
+      if (!pagePath || typeof pagePath !== "string") {
+        return res.status(400).json({ success: false });
+      }
+      await storage.createPageView({
+        path: pagePath,
+        ipAddress: ip,
+        userAgent: (req.headers["user-agent"] || "").substring(0, 500),
+        referrer: (req.headers["referer"] || "").substring(0, 500),
+        sessionId: req.body.sessionId || null,
+      });
+      res.json({ success: true });
+    } catch (error) {
+      res.json({ success: false });
+    }
+  });
+
+  app.get("/api/admin/excluded-ips", requireAuth, async (_req, res) => {
+    try {
+      const ips = await storage.getExcludedIps();
+      res.json(ips);
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.post("/api/admin/excluded-ips", requireAuth, async (req, res) => {
+    try {
+      const { ipAddress, label } = req.body;
+      if (!ipAddress) return res.status(400).json({ success: false, message: "IP obbligatorio" });
+      const result = await storage.addExcludedIp({ ipAddress, label: label || null });
+      res.json({ success: true, ip: result });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.delete("/api/admin/excluded-ips/:id", requireAuth, async (req, res) => {
+    try {
+      const deleted = await storage.removeExcludedIp(parseInt(req.params.id));
+      if (!deleted) return res.status(404).json({ success: false });
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
+  app.get("/api/admin/my-ip", requireAuth, async (req, res) => {
+    res.json({ ip: getClientIp(req) });
   });
 
   app.get("/api/admin/dashboard", requireAuth, async (_req, res) => {
