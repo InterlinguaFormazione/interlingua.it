@@ -477,7 +477,7 @@ export default function CourseDetailPage() {
           src={courseImage} 
           alt={course.title}
           className="w-full h-full object-cover"
-          loading="lazy"
+          loading="eager"
           decoding="async"
         />
         <div className={`absolute inset-0 bg-gradient-to-br ${heroGradient}`} />
