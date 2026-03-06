@@ -36,6 +36,41 @@ import {
   ThumbsUp,
 } from "lucide-react";
 
+import groupClassroomImg from "@assets/shop/group-classroom.png";
+import individualLessonImg from "@assets/shop/individual-lesson.png";
+import eLearningImg from "@assets/shop/e-learning-online.png";
+import officeSkillsImg from "@assets/shop/office-digital-skills.png";
+import aiCourseImg from "@assets/shop/ai-course.png";
+import fullImmersionImg from "@assets/shop/full-immersion.png";
+import coachingOnlineImg from "@assets/shop/coaching-online.png";
+import coachingInSedeImg from "@assets/shop/coaching-in-sede.png";
+import italianCourseImg from "@assets/shop/italian-course.png";
+import certificationImg from "@assets/shop/certification.png";
+
+const PRODUCT_IMAGES: Record<string, string> = {
+  "corsi-gruppo": groupClassroomImg,
+  "individuali-presenza": individualLessonImg,
+  "individuale-blended": individualLessonImg,
+  "corso-booster": groupClassroomImg,
+  "office-senza-segreti": officeSkillsImg,
+  "ai-senza-segreti": aiCourseImg,
+  "full-immersion": fullImmersionImg,
+  "camclass-selflearning": eLearningImg,
+  "camclass-gruppo": eLearningImg,
+  "camclass-individuale": coachingOnlineImg,
+  "preparazione-certificazione": certificationImg,
+  "conversazione-individuale": coachingOnlineImg,
+  "camclass-minigruppi": eLearningImg,
+  "coaching-in-sede": coachingInSedeImg,
+  "coaching-blended": coachingInSedeImg,
+  "coaching-online": coachingOnlineImg,
+  "fluency-coaching": coachingOnlineImg,
+  "italiano-intensivo-15": italianCourseImg,
+  "italiano-intensivo-20": italianCourseImg,
+  "italiano-individuale-presenza": italianCourseImg,
+  "italiano-individuale-online": italianCourseImg,
+};
+
 const CATEGORY_CONFIG: Record<string, { icon: any; color: string }> = {
   "Formazione in Presenza": { icon: GraduationCap, color: "from-blue-600 to-indigo-500" },
   "Corsi E-Learning": { icon: Monitor, color: "from-emerald-600 to-teal-500" },
@@ -261,6 +296,7 @@ export default function ShopProductPage() {
   const categoryConfig = product ? CATEGORY_CONFIG[product.category] : null;
   const gradientClass = categoryConfig?.color || "from-primary to-blue-400";
   const CategoryIcon = categoryConfig?.icon || Sparkles;
+  const heroImage = product ? PRODUCT_IMAGES[product.slug] : undefined;
 
   const { data: reviews = [], isLoading: reviewsLoading } = useQuery<ProductReview[]>({
     queryKey: [`/api/shop/reviews/${slug}`],
@@ -317,7 +353,15 @@ export default function ShopProductPage() {
       <Navigation />
 
       <section className={`relative pt-28 pb-16 overflow-hidden`}>
-        <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} opacity-90`} />
+        {heroImage && (
+          <img
+            src={heroImage}
+            alt={product.name}
+            className="absolute inset-0 w-full h-full object-cover"
+            loading="eager"
+          />
+        )}
+        <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} ${heroImage ? "opacity-75" : "opacity-90"}`} />
         <div className="absolute inset-0 opacity-10"
           style={{
             backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
