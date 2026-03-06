@@ -40,39 +40,50 @@ import {
 import { SiPaypal, SiVisa, SiMastercard } from "react-icons/si";
 import cartaCulturaLogo from "@assets/carte-cultura-1200x675_1772388120185.avif";
 
-import groupClassroomImg from "@assets/shop/group-classroom.png";
-import individualLessonImg from "@assets/shop/individual-lesson.png";
-import eLearningImg from "@assets/shop/e-learning-online.png";
-import officeSkillsImg from "@assets/shop/office-digital-skills.png";
-import aiCourseImg from "@assets/shop/ai-course.png";
-import fullImmersionImg from "@assets/shop/full-immersion.png";
-import coachingOnlineImg from "@assets/shop/coaching-online.png";
-import coachingInSedeImg from "@assets/shop/coaching-in-sede.png";
-import italianCourseImg from "@assets/shop/italian-course.png";
-import certificationImg from "@assets/shop/certification.png";
+import imgCorsiGruppo from "@assets/shop/group-classroom.png";
+import imgIndividualiPresenza from "@assets/shop/individual-lesson.png";
+import imgIndividualeBlended from "@assets/shop/individuale-blended.png";
+import imgCorsoBooster from "@assets/shop/corso-booster.png";
+import imgOffice from "@assets/shop/office-digital-skills.png";
+import imgAI from "@assets/shop/ai-course.png";
+import imgFullImmersion from "@assets/shop/full-immersion.png";
+import imgCamclassSelf from "@assets/shop/e-learning-online.png";
+import imgCamclassGruppo from "@assets/shop/camclass-gruppo.png";
+import imgCamclassIndividuale from "@assets/shop/camclass-individuale.png";
+import imgCertificazione from "@assets/shop/certification.png";
+import imgConversazione from "@assets/shop/conversazione-individuale.png";
+import imgCamclassMini from "@assets/shop/camclass-minigruppi.png";
+import imgCoachingInSede from "@assets/shop/coaching-in-sede.png";
+import imgCoachingBlended from "@assets/shop/coaching-blended.png";
+import imgCoachingOnline from "@assets/shop/coaching-online.png";
+import imgFluencyCoaching from "@assets/shop/fluency-coaching.png";
+import imgItalianoIntensivo15 from "@assets/shop/italian-course.png";
+import imgItalianoIntensivo20 from "@assets/shop/italiano-intensivo-20.png";
+import imgItalianoPresenza from "@assets/shop/italiano-individuale-presenza.png";
+import imgItalianoOnline from "@assets/shop/italiano-individuale-online.png";
 
 const PRODUCT_IMAGES: Record<string, string> = {
-  "corsi-gruppo": groupClassroomImg,
-  "individuali-presenza": individualLessonImg,
-  "individuale-blended": individualLessonImg,
-  "corso-booster": groupClassroomImg,
-  "office-senza-segreti": officeSkillsImg,
-  "ai-senza-segreti": aiCourseImg,
-  "full-immersion": fullImmersionImg,
-  "camclass-selflearning": eLearningImg,
-  "camclass-gruppo": eLearningImg,
-  "camclass-individuale": coachingOnlineImg,
-  "preparazione-certificazione": certificationImg,
-  "conversazione-individuale": coachingOnlineImg,
-  "camclass-minigruppi": eLearningImg,
-  "coaching-in-sede": coachingInSedeImg,
-  "coaching-blended": coachingInSedeImg,
-  "coaching-online": coachingOnlineImg,
-  "fluency-coaching": coachingOnlineImg,
-  "italiano-intensivo-15": italianCourseImg,
-  "italiano-intensivo-20": italianCourseImg,
-  "italiano-individuale-presenza": italianCourseImg,
-  "italiano-individuale-online": italianCourseImg,
+  "corsi-gruppo": imgCorsiGruppo,
+  "individuali-presenza": imgIndividualiPresenza,
+  "individuale-blended": imgIndividualeBlended,
+  "corso-booster": imgCorsoBooster,
+  "office-senza-segreti": imgOffice,
+  "ai-senza-segreti": imgAI,
+  "full-immersion": imgFullImmersion,
+  "camclass-selflearning": imgCamclassSelf,
+  "camclass-gruppo": imgCamclassGruppo,
+  "camclass-individuale": imgCamclassIndividuale,
+  "preparazione-certificazione": imgCertificazione,
+  "conversazione-individuale": imgConversazione,
+  "camclass-minigruppi": imgCamclassMini,
+  "coaching-in-sede": imgCoachingInSede,
+  "coaching-blended": imgCoachingBlended,
+  "coaching-online": imgCoachingOnline,
+  "fluency-coaching": imgFluencyCoaching,
+  "italiano-intensivo-15": imgItalianoIntensivo15,
+  "italiano-intensivo-20": imgItalianoIntensivo20,
+  "italiano-individuale-presenza": imgItalianoPresenza,
+  "italiano-individuale-online": imgItalianoOnline,
 };
 
 const CATEGORY_CONFIG = [
