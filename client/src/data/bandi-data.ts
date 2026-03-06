@@ -141,8 +141,8 @@ export const bandiCards: BandoCard[] = [
     description: "Beneficiario: Interlingua Formazione\nCod. 4400-0003-231-2024\nApprovato con DPR n. 949 del 22/07/2024",
     image: "/images/bandi/dgr-231.gif",
     link: "/bandi/4400-0003-231-2024",
-    status: "active",
-    section: "BANDI ATTIVI",
+    status: "expired",
+    section: "BANDI SCADUTI",
   },
   {
     id: "fondimpresa-ca",
