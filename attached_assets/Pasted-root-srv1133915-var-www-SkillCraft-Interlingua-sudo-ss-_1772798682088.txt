@@ -1,0 +1,18 @@
+root@srv1133915:/var/www/SkillCraft-Interlingua# sudo ss -tlnp | grep LISTEN
+LISTEN 0      511          0.0.0.0:5005      0.0.0.0:*    users:(("node /var/www/S",pid=1369493,fd=20))                            
+LISTEN 0      511          0.0.0.0:5000      0.0.0.0:*    users:(("node /var/www/s",pid=1367932,fd=19))                            
+LISTEN 0      511          0.0.0.0:5001      0.0.0.0:*    users:(("node /var/www/q",pid=1367002,fd=20))                            
+LISTEN 0      511          0.0.0.0:5002      0.0.0.0:*    users:(("node /var/www/e",pid=1319710,fd=20))                            
+LISTEN 0      511          0.0.0.0:5003      0.0.0.0:*    users:(("node",pid=1321260,fd=19))                                       
+LISTEN 0      4096      127.0.0.54:53        0.0.0.0:*    users:(("systemd-resolve",pid=849829,fd=17))                             
+LISTEN 0      200        127.0.0.1:5432      0.0.0.0:*    users:(("postgres",pid=1345912,fd=7))                                    
+LISTEN 0      4096   127.0.0.53%lo:53        0.0.0.0:*    users:(("systemd-resolve",pid=849829,fd=15))                             
+LISTEN 0      511          0.0.0.0:80        0.0.0.0:*    users:(("nginx",pid=1204460,fd=7),("nginx",pid=1204459,fd=7),("nginx",pid=1204458,fd=7),("nginx",pid=1204457,fd=7),("nginx",pid=1004844,fd=7))
+LISTEN 0      4096         0.0.0.0:22        0.0.0.0:*    users:(("sshd",pid=849798,fd=3),("systemd",pid=1,fd=89))                 
+LISTEN 0      511          0.0.0.0:443       0.0.0.0:*    users:(("nginx",pid=1204460,fd=9),("nginx",pid=1204459,fd=9),("nginx",pid=1204458,fd=9),("nginx",pid=1204457,fd=9),("nginx",pid=1004844,fd=9))
+LISTEN 0      511                *:5006            *:*    users:(("node /var/www/c",pid=1113371,fd=19))                            
+LISTEN 0      200            [::1]:5432         [::]:*    users:(("postgres",pid=1345912,fd=6))                                    
+LISTEN 0      511             [::]:80           [::]:*    users:(("nginx",pid=1204460,fd=8),("nginx",pid=1204459,fd=8),("nginx",pid=1204458,fd=8),("nginx",pid=1204457,fd=8),("nginx",pid=1004844,fd=8))
+LISTEN 0      4096            [::]:22           [::]:*    users:(("sshd",pid=849798,fd=4),("systemd",pid=1,fd=91))                 
+LISTEN 0      511             [::]:443          [::]:*    users:(("nginx",pid=1204460,fd=10),("nginx",pid=1204459,fd=10),("nginx",pid=1204458,fd=10),("nginx",pid=1204457,fd=10),("nginx",pid=1004844,fd=10))
+root@srv1133915:/var/www/SkillCraft-Interlingua#
