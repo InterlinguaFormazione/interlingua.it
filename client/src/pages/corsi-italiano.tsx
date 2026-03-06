@@ -50,6 +50,7 @@ import {
   TrendingUp,
   Zap,
   Shield,
+  ShoppingCart,
 } from "lucide-react";
 import { COUNTRIES } from "@shared/countries";
 import { CorsiItalianoSchema } from "@/components/seo-schemas";
@@ -836,14 +837,27 @@ export default function CorsiItalianoPage() {
                           </li>
                         ))}
                       </ul>
-                      <Button
-                        className="w-full bg-green-700 hover:bg-green-800 text-white"
-                        onClick={() => document.querySelector("#italian-contact")?.scrollIntoView({ behavior: "smooth" })}
-                        data-testid={`button-course-info-${i}`}
-                      >
-                        {t.heroCtaSecondary}
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
+                      <div className="flex gap-2">
+                        {course.reviewSlug && (
+                          <Link href={`/shop/product/${course.reviewSlug}`} className="flex-1">
+                            <Button
+                              className="w-full bg-green-700 hover:bg-green-800 text-white"
+                              data-testid={`button-course-buy-${i}`}
+                            >
+                              <ShoppingCart className="mr-2 h-4 w-4" />
+                              {lang === "it" ? "Acquista Ora" : "Buy Now"}
+                            </Button>
+                          </Link>
+                        )}
+                        <Button
+                          variant="outline"
+                          className={course.reviewSlug ? "flex-1" : "w-full"}
+                          onClick={() => document.querySelector("#italian-contact")?.scrollIntoView({ behavior: "smooth" })}
+                          data-testid={`button-course-info-${i}`}
+                        >
+                          {t.heroCtaSecondary}
+                        </Button>
+                      </div>
                       {course.reviewSlug && (
                         <div className="mt-4">
                           <CourseReviewsInline productSlug={course.reviewSlug} />
