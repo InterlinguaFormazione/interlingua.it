@@ -27,6 +27,7 @@ import {
   RefreshCw,
   Pencil,
   CreditCard,
+  Trash2,
 } from "lucide-react";
 
 interface AdminSubscriber {
@@ -187,6 +188,20 @@ export function SpeakersCornerTabContent() {
     },
     onError: () => {
       toast({ title: "Errore", description: "Errore nell'aggiornamento.", variant: "destructive" });
+    },
+  });
+
+  const deleteSubscriberMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiRequest("DELETE", `/api/admin/speakers-corner/subscribers/${id}`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/speakers-corner/subscribers"] });
+      toast({ title: "Eliminato", description: "Iscritto eliminato definitivamente." });
+    },
+    onError: () => {
+      toast({ title: "Errore", description: "Errore nell'eliminazione.", variant: "destructive" });
     },
   });
 
@@ -525,6 +540,19 @@ export function SpeakersCornerTabContent() {
                                 data-testid={`button-edit-subscriber-${sub.id}`}
                               >
                                 <Pencil className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                onClick={() => {
+                                  if (window.confirm(`Eliminare definitivamente ${sub.nome} ${sub.cognome}? Questa azione non può essere annullata.`)) {
+                                    deleteSubscriberMutation.mutate(sub.id);
+                                  }
+                                }}
+                                data-testid={`button-delete-subscriber-${sub.id}`}
+                              >
+                                <Trash2 className="w-4 h-4" />
                               </Button>
                             </div>
                           </div>

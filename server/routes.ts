@@ -1516,6 +1516,19 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
     }
   });
 
+  app.delete("/api/admin/speakers-corner/subscribers/:id", requireAuth, async (req, res) => {
+    try {
+      const deleted = await storage.deleteScSubscriber(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ success: false, message: "Iscritto non trovato" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting SC subscriber:", error);
+      res.status(500).json({ success: false, message: "Errore del server" });
+    }
+  });
+
   app.get("/api/admin/speakers-corner/sessions", async (_req, res) => {
     try {
       const sessions = await storage.getAllScSessions();
