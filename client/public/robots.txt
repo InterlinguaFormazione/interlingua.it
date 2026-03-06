@@ -5,6 +5,5 @@ Disallow: /admin
 Disallow: /speakers-corner/admin
 Disallow: /speakers-corner/dashboard
 Disallow: /shop/dashboard
-Disallow: /shop/checkout
 
 Sitemap: https://skillcraft-interlingua.it/sitemap.xml

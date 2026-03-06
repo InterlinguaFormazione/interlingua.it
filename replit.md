@@ -66,6 +66,8 @@ A modern, visually stunning website for SkillCraft-Interlingua, a comprehensive 
   - `footer.tsx` - Site footer
   - `theme-provider.tsx` - Dark/light mode support
   - `theme-toggle.tsx` - Theme switcher button
+  - `seo-schemas.tsx` - Per-page JSON-LD structured data components (Course, LanguageSchool, BlogPosting, Product, LearningResource, AboutPage schemas)
+- `src/hooks/use-seo.ts` - Reusable SEO hook that dynamically sets page title, meta description, canonical URL, and Open Graph tags per page
 
 ### Backend (`server/`)
 - `db.ts` - PostgreSQL database connection (drizzle-orm/node-postgres)
