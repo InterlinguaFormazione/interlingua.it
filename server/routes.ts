@@ -13,6 +13,7 @@ import { createPaypalOrder, capturePaypalOrder, loadPaypalDefault, verifyPaypalO
 import { checkVoucher, confirmVoucher, isCartaCulturaAvailable, ALLOWED_AMBITO, ALLOWED_BENE } from "./carta-cultura";
 import { SHOP_PRODUCTS, getProductBySlug, getEffectivePrice } from "@shared/products";
 import geoip from "geoip-lite";
+import { UAParser } from "ua-parser-js";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import { validateCodiceFiscale } from "@shared/cf-validator";
@@ -690,6 +691,21 @@ ${allPages.map(p => `  <url>
           country = geo.country || null;
         }
       } catch {}
+
+      let deviceType: string | null = null;
+      let browser: string | null = null;
+      let os: string | null = null;
+      try {
+        const uaString = req.headers["user-agent"] || "";
+        const parser = new UAParser(uaString);
+        const device = parser.getDevice();
+        const browserInfo = parser.getBrowser();
+        const osInfo = parser.getOS();
+        deviceType = device.type === "mobile" ? "Mobile" : device.type === "tablet" ? "Tablet" : "Desktop";
+        browser = browserInfo.name || null;
+        os = osInfo.name || null;
+      } catch {}
+
       await storage.createPageView({
         path: pagePath,
         ipAddress: ip,
@@ -699,6 +715,9 @@ ${allPages.map(p => `  <url>
         city,
         region,
         country,
+        deviceType,
+        browser,
+        os,
       });
       res.json({ success: true });
     } catch (error) {

@@ -413,6 +413,11 @@ ALTER TABLE "page_views" ADD COLUMN IF NOT EXISTS "city" text;
 ALTER TABLE "page_views" ADD COLUMN IF NOT EXISTS "region" text;
 ALTER TABLE "page_views" ADD COLUMN IF NOT EXISTS "country" text;
 
+-- Device/browser/OS columns for page_views
+ALTER TABLE "page_views" ADD COLUMN IF NOT EXISTS "device_type" text;
+ALTER TABLE "page_views" ADD COLUMN IF NOT EXISTS "browser" text;
+ALTER TABLE "page_views" ADD COLUMN IF NOT EXISTS "os" text;
+
 CREATE TABLE IF NOT EXISTS "cart_events" (
   "id" serial PRIMARY KEY NOT NULL,
   "session_id" text NOT NULL,

@@ -591,6 +591,9 @@ export const pageViews = pgTable("page_views", {
   city: text("city"),
   region: text("region"),
   country: text("country"),
+  deviceType: text("device_type"),
+  browser: text("browser"),
+  os: text("os"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

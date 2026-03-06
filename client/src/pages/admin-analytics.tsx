@@ -29,6 +29,13 @@ import {
   ShoppingBag,
   AlertTriangle,
   MapPin,
+  Monitor,
+  Smartphone,
+  Tablet,
+  Clock,
+  UserCheck,
+  UserPlus,
+  ArrowUpDown,
 } from "lucide-react";
 
 interface AnalyticsData {
@@ -90,6 +97,13 @@ interface AnalyticsData {
     topReferrers: Array<{ source: string; count: number }>;
     topLocations: Array<{ city: string; region: string; country: string; count: number }>;
     topCountries: Array<{ country: string; count: number }>;
+    deviceStats: Array<{ type: string; count: number }>;
+    browserStats: Array<{ name: string; count: number }>;
+    osStats: Array<{ name: string; count: number }>;
+    newVsReturning: { newVisitors: number; returningVisitors: number };
+    avgSessionDuration: number;
+    bounceRate: number;
+    avgPagesPerSession: number;
   };
   cartStats: {
     totalAddToCarts: number;
@@ -114,6 +128,14 @@ const COUNTRY_NAMES: Record<string, string> = {
 };
 function countryName(code: string): string {
   return COUNTRY_NAMES[code] || code;
+}
+
+function formatDuration(seconds: number): string {
+  if (seconds === 0) return "0s";
+  if (seconds < 60) return `${seconds}s`;
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
 }
 
 function FunnelBar({ label, value, max, color }: { label: string; value: number; max: number; color: string }) {
@@ -645,6 +667,152 @@ export function AnalyticsTabContent({ token }: { token: string }) {
           )}
         </CardContent>
       </Card>
+
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4" data-testid="session-stats-row">
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <UserPlus className="w-4 h-4 text-green-600" />
+              <span className="text-xs text-muted-foreground">Nuovi</span>
+            </div>
+            <div className="text-2xl font-bold text-green-600" data-testid="text-new-visitors">{data.pageViewStats.newVsReturning.newVisitors}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <UserCheck className="w-4 h-4 text-blue-600" />
+              <span className="text-xs text-muted-foreground">Di ritorno</span>
+            </div>
+            <div className="text-2xl font-bold text-blue-600" data-testid="text-returning-visitors">{data.pageViewStats.newVsReturning.returningVisitors}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Clock className="w-4 h-4 text-purple-600" />
+              <span className="text-xs text-muted-foreground">Durata media</span>
+            </div>
+            <div className="text-2xl font-bold text-purple-600" data-testid="text-avg-duration">{formatDuration(data.pageViewStats.avgSessionDuration)}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <ArrowUpDown className="w-4 h-4 text-orange-600" />
+              <span className="text-xs text-muted-foreground">Rimbalzo</span>
+            </div>
+            <div className="text-2xl font-bold text-orange-600" data-testid="text-bounce-rate">{data.pageViewStats.bounceRate}%</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Eye className="w-4 h-4 text-cyan-600" />
+              <span className="text-xs text-muted-foreground">Pagine/sessione</span>
+            </div>
+            <div className="text-2xl font-bold text-cyan-600" data-testid="text-pages-per-session">{data.pageViewStats.avgPagesPerSession}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-6" data-testid="device-browser-os-row">
+        <Card data-testid="card-device-stats">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Monitor className="w-4 h-4" />
+              Dispositivi
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {data.pageViewStats.deviceStats.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nessun dato ancora</p>
+            ) : (
+              <div className="space-y-3">
+                {data.pageViewStats.deviceStats.map((d, i) => {
+                  const total = data.pageViewStats.deviceStats.reduce((s, x) => s + x.count, 0);
+                  const pct = total > 0 ? Math.round((d.count / total) * 100) : 0;
+                  const DeviceIcon = d.type === "Mobile" ? Smartphone : d.type === "Tablet" ? Tablet : Monitor;
+                  return (
+                    <div key={i} data-testid={`row-device-${i}`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <DeviceIcon className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-sm">{d.type}</span>
+                        </div>
+                        <span className="text-sm font-medium">{d.count} ({pct}%)</span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div className="bg-primary rounded-full h-2 transition-all" style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card data-testid="card-browser-stats">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Globe className="w-4 h-4" />
+              Browser
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {data.pageViewStats.browserStats.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nessun dato ancora</p>
+            ) : (
+              <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                {data.pageViewStats.browserStats.map((b, i) => {
+                  const total = data.pageViewStats.browserStats.reduce((s, x) => s + x.count, 0);
+                  const pct = total > 0 ? Math.round((b.count / total) * 100) : 0;
+                  return (
+                    <div key={i} className="flex items-center justify-between gap-2 py-1" data-testid={`row-browser-${i}`}>
+                      <span className="text-sm truncate flex-1">{b.name}</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-xs text-muted-foreground">{pct}%</span>
+                        <Badge variant="secondary">{b.count}</Badge>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card data-testid="card-os-stats">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Monitor className="w-4 h-4" />
+              Sistema Operativo
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {data.pageViewStats.osStats.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nessun dato ancora</p>
+            ) : (
+              <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                {data.pageViewStats.osStats.map((o, i) => {
+                  const total = data.pageViewStats.osStats.reduce((s, x) => s + x.count, 0);
+                  const pct = total > 0 ? Math.round((o.count / total) * 100) : 0;
+                  return (
+                    <div key={i} className="flex items-center justify-between gap-2 py-1" data-testid={`row-os-${i}`}>
+                      <span className="text-sm truncate flex-1">{o.name}</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-xs text-muted-foreground">{pct}%</span>
+                        <Badge variant="secondary">{o.count}</Badge>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
         <Card data-testid="card-top-referrers">

@@ -83,6 +83,23 @@ import {
 import { db } from "./db";
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
 
+export interface PageViewStatsResult {
+  totalViews: number;
+  uniqueVisitors: number;
+  topPages: Array<{ path: string; count: number }>;
+  viewsByDay: Array<{ day: string; count: number }>;
+  topReferrers: Array<{ source: string; count: number }>;
+  topLocations: Array<{ city: string; region: string; country: string; count: number }>;
+  topCountries: Array<{ country: string; count: number }>;
+  deviceStats: Array<{ type: string; count: number }>;
+  browserStats: Array<{ name: string; count: number }>;
+  osStats: Array<{ name: string; count: number }>;
+  newVsReturning: { newVisitors: number; returningVisitors: number };
+  avgSessionDuration: number;
+  bounceRate: number;
+  avgPagesPerSession: number;
+}
+
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -228,7 +245,7 @@ export interface IStorage {
 
   createPageView(view: InsertPageView): Promise<PageView>;
   getPageViews(since?: Date): Promise<PageView[]>;
-  getPageViewStats(since?: Date, excludedIpList?: string[]): Promise<{ totalViews: number; uniqueVisitors: number; topPages: Array<{ path: string; count: number }>; viewsByDay: Array<{ day: string; count: number }>; topReferrers: Array<{ source: string; count: number }>; topLocations: Array<{ city: string; region: string; country: string; count: number }>; topCountries: Array<{ country: string; count: number }> }>;
+  getPageViewStats(since?: Date, excludedIpList?: string[]): Promise<PageViewStatsResult>;
 
   getExcludedIps(): Promise<ExcludedIp[]>;
   addExcludedIp(data: InsertExcludedIp): Promise<ExcludedIp>;
@@ -893,7 +910,7 @@ export class DatabaseStorage implements IStorage {
     return db.select().from(pageViews).orderBy(desc(pageViews.createdAt));
   }
 
-  async getPageViewStats(since?: Date, excludedIpList?: string[]): Promise<{ totalViews: number; uniqueVisitors: number; topPages: Array<{ path: string; count: number }>; viewsByDay: Array<{ day: string; count: number }>; topReferrers: Array<{ source: string; count: number }>; topLocations: Array<{ city: string; region: string; country: string; count: number }>; topCountries: Array<{ country: string; count: number }> }> {
+  async getPageViewStats(since?: Date, excludedIpList?: string[]): Promise<PageViewStatsResult> {
     let allViews = await this.getPageViews(since);
     if (excludedIpList && excludedIpList.length > 0) {
       allViews = allViews.filter(v => !excludedIpList.includes(v.ipAddress || ""));
@@ -904,6 +921,11 @@ export class DatabaseStorage implements IStorage {
     const referrerCounts: Record<string, number> = {};
     const locationCounts: Record<string, { city: string; region: string; country: string; count: number }> = {};
     const countryCounts: Record<string, number> = {};
+    const deviceCounts: Record<string, number> = {};
+    const browserCounts: Record<string, number> = {};
+    const osCounts: Record<string, number> = {};
+    const sessionViews: Record<string, { pages: string[]; timestamps: number[]; ip: string }> = {};
+
     allViews.forEach(v => {
       pageCounts[v.path] = (pageCounts[v.path] || 0) + 1;
       const day = v.createdAt ? new Date(v.createdAt).toISOString().slice(0, 10) : "unknown";
@@ -931,7 +953,20 @@ export class DatabaseStorage implements IStorage {
       if (v.country) {
         countryCounts[v.country] = (countryCounts[v.country] || 0) + 1;
       }
+      const dt = v.deviceType || (v.userAgent ? "Desktop" : "Sconosciuto");
+      deviceCounts[dt] = (deviceCounts[dt] || 0) + 1;
+      if (v.browser) browserCounts[v.browser] = (browserCounts[v.browser] || 0) + 1;
+      if (v.os) osCounts[v.os] = (osCounts[v.os] || 0) + 1;
+
+      if (v.sessionId) {
+        if (!sessionViews[v.sessionId]) {
+          sessionViews[v.sessionId] = { pages: [], timestamps: [], ip: v.ipAddress || "" };
+        }
+        sessionViews[v.sessionId].pages.push(v.path);
+        if (v.createdAt) sessionViews[v.sessionId].timestamps.push(new Date(v.createdAt).getTime());
+      }
     });
+
     const directCount = allViews.filter(v => !v.referrer).length;
     if (directCount > 0) {
       referrerCounts["Diretto / Bookmark"] = directCount;
@@ -955,7 +990,54 @@ export class DatabaseStorage implements IStorage {
       .map(([country, count]) => ({ country, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 20);
-    return { totalViews: allViews.length, uniqueVisitors: uniqueIps.size, topPages, viewsByDay, topReferrers, topLocations, topCountries };
+    const deviceStats = Object.entries(deviceCounts)
+      .map(([type, count]) => ({ type, count }))
+      .sort((a, b) => b.count - a.count);
+    const browserStats = Object.entries(browserCounts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+    const osStats = Object.entries(osCounts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10);
+
+    const sessions = Object.values(sessionViews);
+    let newVisitors = 0;
+    let returningVisitors = 0;
+    const ipSessionCounts: Record<string, number> = {};
+    sessions.forEach(s => {
+      if (s.ip) ipSessionCounts[s.ip] = (ipSessionCounts[s.ip] || 0) + 1;
+    });
+    Object.entries(ipSessionCounts).forEach(([, count]) => {
+      if (count <= 1) newVisitors++;
+      else returningVisitors++;
+    });
+
+    let totalDuration = 0;
+    let durationCount = 0;
+    let bounceCount = 0;
+    let totalPagesInSessions = 0;
+    sessions.forEach(s => {
+      if (s.pages.length === 1) bounceCount++;
+      totalPagesInSessions += s.pages.length;
+      if (s.timestamps.length >= 2) {
+        const duration = Math.max(...s.timestamps) - Math.min(...s.timestamps);
+        if (duration > 0 && duration < 3600000) {
+          totalDuration += duration;
+          durationCount++;
+        }
+      }
+    });
+    const avgSessionDuration = durationCount > 0 ? Math.round(totalDuration / durationCount / 1000) : 0;
+    const bounceRate = sessions.length > 0 ? Math.round((bounceCount / sessions.length) * 100) : 0;
+    const avgPagesPerSession = sessions.length > 0 ? Math.round((totalPagesInSessions / sessions.length) * 10) / 10 : 0;
+
+    return {
+      totalViews: allViews.length, uniqueVisitors: uniqueIps.size, topPages, viewsByDay, topReferrers,
+      topLocations, topCountries, deviceStats, browserStats, osStats,
+      newVsReturning: { newVisitors, returningVisitors }, avgSessionDuration, bounceRate, avgPagesPerSession,
+    };
   }
 
   async getExcludedIps(): Promise<ExcludedIp[]> {
