@@ -35,7 +35,7 @@ import courseItalianImage from "@assets/Learn_Italin_in_Vicenza_1772214851188.pn
 const categories = [
   {
     id: "lingua",
-    title: "Corsi di Lingua",
+    title: "Corsi di Lingua in Presenza",
     description: "Inglese, francese, tedesco, spagnolo e russo. Corsi di gruppo, individuali e preparazione certificazioni in presenza a Vicenza e Thiene.",
     icon: Globe,
     image: lingueStraniereImage,
@@ -153,9 +153,6 @@ function CategoryCard({ category, index }: { category: typeof categories[0]; ind
             <h3 className="text-lg font-bold group-hover:text-primary transition-colors duration-300">
               {category.title}
             </h3>
-            <Badge variant="secondary" className="text-xs shrink-0">
-              {category.courseCount} {category.courseCount === 1 ? "corso" : "corsi"}
-            </Badge>
           </div>
           <p className="text-sm text-muted-foreground mb-4 line-clamp-2 leading-relaxed">
             {category.description}
