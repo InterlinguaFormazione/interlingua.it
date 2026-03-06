@@ -819,7 +819,51 @@ ${allPages.map(p => `  <url>
   });
 
   let satisfactionCache: { data: any; timestamp: number } | null = null;
-  const SATISFACTION_CACHE_DURATION = 60 * 60 * 1000;
+  const SATISFACTION_CACHE_DURATION = 6 * 60 * 60 * 1000;
+
+  async function curateCommentsWithAI(comments: any[]): Promise<number[]> {
+    try {
+      const OpenAI = (await import("openai")).default;
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+      const numbered = comments.map((c, i) => `${i}: "${c.comment}" — ${c.author || "Anonimo"} (${c.course || "N/A"})`).join("\n");
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        temperature: 0.2,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content: `Sei un esperto di marketing per un centro di formazione linguistica e professionale. Devi selezionare i migliori feedback degli studenti da mostrare sul sito web.
+
+Criteri di selezione (in ordine di importanza):
+1. Il commento deve essere POSITIVO e genuino (esprime soddisfazione, gratitudine, sorpresa positiva)
+2. Il commento deve essere abbastanza lungo e dettagliato da essere convincente (minimo ~30 caratteri utili)
+3. Preferisci commenti che menzionano specificamente: qualità del docente, metodologia, risultati ottenuti, atmosfera del corso
+4. Escludi commenti vaghi come "non saprei", "tutto ok", "nulla da segnalare"
+5. Escludi commenti che contengono critiche o suggerimenti negativi mascherati da positivi
+6. Escludi commenti troppo corti o generici
+7. Preferisci diversità: corsi diversi, autori diversi, aspetti diversi apprezzati
+
+Rispondi SOLO con un oggetto JSON: {"selected": [lista degli indici numerici dei 15 migliori commenti, ordinati dal migliore al peggiore]}`
+          },
+          {
+            role: "user",
+            content: `Seleziona i 15 migliori feedback tra questi ${comments.length} commenti:\n\n${numbered}`
+          }
+        ],
+      });
+
+      const content = response.choices[0]?.message?.content;
+      if (!content) return [];
+      const parsed = JSON.parse(content);
+      return (parsed.selected || []).filter((i: number) => typeof i === "number" && i >= 0 && i < comments.length);
+    } catch (error) {
+      console.error("AI curation failed, using fallback:", error);
+      return [];
+    }
+  }
 
   app.get("/api/satisfaction-comments", async (_req, res) => {
     try {
@@ -844,19 +888,39 @@ ${allPages.map(p => `  <url>
 
       const data = await response.json();
 
-      const positiveComments = (data.comments || [])
-        .filter((c: any) => c.type === "sorpreso" && c.comment && c.comment.length > 25)
-        .map((c: any, i: number) => ({
-          id: `sat-${i}`,
-          comment: c.comment,
-          author: c.author || "Studente Verificato",
-          course: c.course || "",
-          date: c.date || "",
-        }));
+      const candidateComments = (data.comments || [])
+        .filter((c: any) => c.type === "sorpreso" && c.comment && c.comment.length > 20);
+
+      let bestComments;
+      const selectedIndices = await curateCommentsWithAI(candidateComments);
+
+      if (selectedIndices.length > 0) {
+        bestComments = selectedIndices.map((idx, i) => {
+          const c = candidateComments[idx];
+          return {
+            id: `sat-${i}`,
+            comment: c.comment,
+            author: c.author || "Studente Verificato",
+            course: c.course || "",
+            date: c.date || "",
+          };
+        });
+      } else {
+        bestComments = candidateComments
+          .filter((c: any) => c.comment.length > 40)
+          .slice(0, 15)
+          .map((c: any, i: number) => ({
+            id: `sat-${i}`,
+            comment: c.comment,
+            author: c.author || "Studente Verificato",
+            course: c.course || "",
+            date: c.date || "",
+          }));
+      }
 
       const result = {
         total: data.total || 0,
-        comments: positiveComments,
+        comments: bestComments,
       };
 
       satisfactionCache = { data: result, timestamp: Date.now() };
