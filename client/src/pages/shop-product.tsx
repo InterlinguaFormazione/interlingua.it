@@ -442,9 +442,15 @@ export default function ShopProductPage() {
                     return (
                       <div key={opt.name}>
                         <Label className="text-sm font-semibold mb-2 block">{opt.label}</Label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                        <select
+                          value={selectedOptions[opt.name] || ""}
+                          onChange={(e) => setSelectedOptions((prev) => ({ ...prev, [opt.name]: e.target.value }))}
+                          className="w-full h-11 px-3 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary appearance-none cursor-pointer"
+                          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
+                          data-testid={`select-${opt.name}`}
+                        >
+                          <option value="" disabled>Seleziona {opt.label.toLowerCase()}</option>
                           {opt.values.map((v) => {
-                            const isSelected = selectedOptions[opt.name] === v;
                             let priceForValue: string | null = null;
                             if (isPriceDriving && product.variations) {
                               const match = product.variations.find((var_) =>
@@ -456,27 +462,12 @@ export default function ShopProductPage() {
                               if (match) priceForValue = match.price;
                             }
                             return (
-                              <button
-                                key={v}
-                                type="button"
-                                onClick={() => setSelectedOptions((prev) => ({ ...prev, [opt.name]: v }))}
-                                className={`text-left px-3 py-2.5 rounded-lg text-sm transition-all flex items-center justify-between ${
-                                  isSelected
-                                    ? "bg-primary/10 border-2 border-primary/40 text-primary font-medium"
-                                    : "bg-muted/50 hover:bg-muted border-2 border-transparent"
-                                }`}
-                                data-testid={`option-${opt.name}-${v}`}
-                              >
-                                <span className="line-clamp-1 mr-2">{v}</span>
-                                {priceForValue && (
-                                  <span className={`text-xs font-bold shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground"}`}>
-                                    &euro;{parseFloat(priceForValue).toFixed(0)}
-                                  </span>
-                                )}
-                              </button>
+                              <option key={v} value={v}>
+                                {v}{priceForValue ? ` — €${parseFloat(priceForValue).toFixed(0)}` : ""}
+                              </option>
                             );
                           })}
-                        </div>
+                        </select>
                       </div>
                     );
                   })}
