@@ -113,7 +113,7 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (product.options && product.options.length > 0) {
-      setLocation(`/shop/checkout/${product.slug}`);
+      setLocation(`/shop/product/${product.slug}`);
       return;
     }
     cart.addItem(product);

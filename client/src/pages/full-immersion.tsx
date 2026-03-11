@@ -319,7 +319,7 @@ export default function FullImmersionPage() {
                   transition={{ duration: 0.6, delay: 0.65 }}
                   className="flex flex-wrap gap-4"
                 >
-                  <Link href="/shop/checkout/full-immersion">
+                  <Link href="/shop/product/full-immersion">
                     <Button
                       size="lg"
                       className="h-14 px-10 text-base rounded-2xl bg-white text-primary hover:bg-white/90 shadow-2xl shadow-black/20 font-bold"
@@ -899,7 +899,7 @@ export default function FullImmersionPage() {
                   Contattaci per scoprire le prossime date e riservare il tuo posto. Una chiacchierata al telefono o un'email: è tutto quello che serve per iniziare.
                 </p>
                 <div className="flex flex-wrap justify-center gap-5">
-                  <Link href="/shop/checkout/full-immersion">
+                  <Link href="/shop/product/full-immersion">
                     <Button
                       size="lg"
                       className="h-16 px-10 text-lg rounded-2xl bg-white text-primary hover:bg-white/90 shadow-2xl shadow-black/20 font-bold"

@@ -20,7 +20,6 @@ import {
   Users,
   Award,
   BookOpen,
-  ExternalLink,
   ShoppingCart,
   Target,
   Sparkles,
@@ -72,6 +71,7 @@ interface CourseData {
   targetAudience: string;
   methodology: string;
   purchaseUrl?: string;
+  shopSlug?: string;
 }
 
 const allCourses: CourseData[] = [
@@ -90,7 +90,8 @@ const allCourses: CourseData[] = [
     requirements: ["Nessun requisito particolare", "Test di livello per inserimento corretto"],
     targetAudience: "Adulti e giovani adulti che desiderano imparare o migliorare una lingua straniera in un ambiente stimolante e interattivo.",
     methodology: "Metodologia C.L.I.L. con approccio comunicativo e task-based learning.",
-    purchaseUrl: "https://interlingua.it/prodotto/collettivi-intensivi-presenza/"
+    purchaseUrl: "https://interlingua.it/prodotto/collettivi-intensivi-presenza/",
+    shopSlug: "corsi-gruppo"
   },
   {
     id: "comunicazione-interculturale-e-cross-culturale",
@@ -315,7 +316,8 @@ const allCourses: CourseData[] = [
     requirements: ["Conoscenza base del PC", "Accesso a Microsoft Office"],
     targetAudience: "Professionisti, studenti e chiunque voglia migliorare le proprie competenze digitali.",
     methodology: "Apprendimento pratico con esercitazioni su casi reali.",
-    purchaseUrl: "https://interlingua.it/prodotto/office-senza-segreti-excel-word-powerpoint-e-copilot/"
+    purchaseUrl: "https://interlingua.it/prodotto/office-senza-segreti-excel-word-powerpoint-e-copilot/",
+    shopSlug: "office-senza-segreti"
   },
   {
     id: "digital-marketing",
@@ -673,22 +675,16 @@ export default function CourseDetailPage() {
                   </div>
 
                   <div className="space-y-3">
-                    {course.purchaseUrl && (
-                      <a 
-                        href={course.purchaseUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="block"
-                      >
+                    {course.shopSlug && (
+                      <Link href={`/shop/product/${course.shopSlug}`}>
                         <Button className="w-full bg-accent text-accent-foreground border-accent" size="lg" data-testid="button-purchase-course">
                           <ShoppingCart className="w-4 h-4 mr-2" />
                           Acquista Online
-                          <ExternalLink className="w-3 h-3 ml-2" />
                         </Button>
-                      </a>
+                      </Link>
                     )}
                     <Link href="/#contact">
-                      <Button className="w-full" variant={course.purchaseUrl ? "outline" : "default"} size="lg" data-testid="button-request-info">
+                      <Button className="w-full" variant={course.shopSlug ? "outline" : "default"} size="lg" data-testid="button-request-info">
                         <Mail className="w-4 h-4 mr-2" />
                         Richiedi Informazioni
                       </Button>

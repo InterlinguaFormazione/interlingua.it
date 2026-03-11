@@ -762,7 +762,7 @@ function CourseCard({ course, index }: { course: typeof courses[0]; index: numbe
               </div>
               <div className="mt-7 pt-6 border-t border-border/50 flex flex-wrap gap-3">
                 {course.shopSlug && (
-                  <Link href={`/shop/checkout/${course.shopSlug}`}>
+                  <Link href={`/shop/product/${course.shopSlug}`}>
                     <Button
                       size="lg"
                       className={`rounded-xl bg-gradient-to-r ${course.gradient} hover:opacity-90 text-white shadow-lg`}
