@@ -113,7 +113,7 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (product.options && product.options.length > 0) {
-      setLocation(`/shop/product/${product.slug}`);
+      setLocation(`/shop/checkout/${product.slug}`);
       return;
     }
     cart.addItem(product);
@@ -240,7 +240,7 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
                 >
                   <ShoppingCart className="h-4 w-4" />
                 </Button>
-                <Link href={product.options && product.options.length > 0 ? `/shop/product/${product.slug}` : `/shop/checkout/${product.slug}`} onClick={(e: any) => e.stopPropagation()}>
+                <Link href={`/shop/checkout/${product.slug}`} onClick={(e: any) => e.stopPropagation()}>
                   <Button
                     size="sm"
                     className={`bg-gradient-to-r ${gradientClass} hover:opacity-90 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 group/btn h-9`}
