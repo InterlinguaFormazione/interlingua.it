@@ -369,6 +369,11 @@ export default function ShopProductPage() {
     toast({ title: "Aggiunto al carrello", description: product.name });
   };
 
+  const priceDrivingKeys = new Set(
+    (product.variations || []).flatMap((v) => Object.keys(v.options))
+  );
+  const optionsReady = !product.options || product.options.length === 0 || (hasAllOptions && (!product.variations || hasValidVariation));
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <ShopProductSchema
@@ -381,329 +386,251 @@ export default function ShopProductPage() {
       <Breadcrumb items={[{ label: "Shop", href: "/shop" }, { label: product.name }]} schemaOnly />
       <Navigation />
 
-      <section className={`relative pt-28 pb-16 overflow-hidden`}>
-        {heroImage && (
-          <img
-            src={heroImage}
-            alt={product.name}
-            className="absolute inset-0 w-full h-full object-cover"
-            loading="eager"
-          />
-        )}
-        <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} ${heroImage ? "opacity-50" : "opacity-90"}`} />
-        <div className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-            backgroundSize: "32px 32px",
-          }}
-        />
-        <div className="absolute -right-20 -top-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute -left-10 -bottom-10 w-60 h-60 bg-white/5 rounded-full blur-2xl" />
-
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <main className="flex-grow pt-28 pb-20">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
           <Link href="/shop">
-            <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-white/10 mb-6" data-testid="button-back-shop">
+            <Button variant="ghost" size="sm" className="mb-6 text-muted-foreground hover:text-foreground" data-testid="button-back-shop">
               <ArrowLeft className="w-4 h-4 mr-1.5" />
               Torna allo Shop
             </Button>
           </Link>
 
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <CategoryIcon className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-sm font-medium text-white/80">{product.category}</span>
-          </div>
-
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4 max-w-3xl" data-testid="text-product-title">
-            {product.name}
-          </h1>
-
-          <p className="text-lg text-white/60 max-w-2xl mb-6">
-            {product.description}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-4">
-            {reviews.length > 0 && (
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5">
-                <StarRating rating={Math.round(avgRating)} />
-                <span className="text-sm font-medium text-white">
-                  {avgRating.toFixed(1)}
-                </span>
-                <span className="text-xs text-white/50">
-                  ({reviews.length} {reviews.length === 1 ? "recensione" : "recensioni"})
-                </span>
-              </div>
-            )}
-            <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5">
-              <Clock className="w-3.5 h-3.5 text-white/80" />
-              <span className="text-sm text-white/80">{product.duration}</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <main className="flex-grow -mt-6 relative z-10 pb-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-8">
-              <Card className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-bold text-xl">Cosa include</h2>
-                  <Link href={`${product.pageLink}${product.pageAnchor ? `#${product.pageAnchor}` : ""}`}>
-                    <Button variant="outline" size="sm" data-testid="button-course-details">
-                      <GraduationCap className="w-4 h-4 mr-1.5" />
-                      Dettagli corso
-                    </Button>
-                  </Link>
+          <Card className="shadow-lg border-border/50 overflow-hidden">
+            <div className={`relative h-32 bg-gradient-to-br ${gradientClass} overflow-hidden`}>
+              {heroImage && (
+                <img src={heroImage} alt={product.name} className="absolute inset-0 w-full h-full object-cover" loading="eager" />
+              )}
+              <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass} ${heroImage ? "opacity-60" : "opacity-100"}`} />
+              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`, backgroundSize: "24px 24px" }} />
+              <div className="absolute bottom-4 left-6 right-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-7 h-7 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    <CategoryIcon className="w-3.5 h-3.5 text-white" />
+                  </div>
+                  <span className="text-xs font-medium text-white/80">{product.category}</span>
+                  <div className="flex items-center gap-1 ml-auto bg-white/15 backdrop-blur-sm rounded-full px-2 py-0.5">
+                    <Clock className="w-3 h-3 text-white/80" />
+                    <span className="text-[10px] text-white/80">{product.duration}</span>
+                  </div>
                 </div>
-                <ul className="space-y-3">
-                  {product.features.map((f, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
-                      <span className="text-sm">{f}</span>
-                    </li>
-                  ))}
-                </ul>
+                <h1 className="text-xl md:text-2xl font-extrabold text-white leading-tight" data-testid="text-product-title">
+                  {product.name}
+                </h1>
+              </div>
+            </div>
+
+            <div className="p-6">
+              <p className="text-sm text-muted-foreground mb-5 leading-relaxed">{product.description}</p>
+
+              <div className="flex flex-wrap gap-2 mb-6">
+                {product.features.map((f, i) => (
+                  <div key={i} className="flex items-center gap-1.5 bg-muted/50 rounded-full px-3 py-1.5">
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span className="text-xs">{f}</span>
+                  </div>
+                ))}
+              </div>
+
+              {product.options && product.options.length > 0 && (
+                <div className="space-y-4 mb-6 pb-6 border-b border-border/40">
+                  <h2 className="text-sm font-bold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    Configura il tuo corso
+                  </h2>
+                  {product.options.map((opt) => {
+                    const isPriceDriving = priceDrivingKeys.has(opt.name);
+                    return (
+                      <div key={opt.name}>
+                        <Label className="text-sm font-semibold mb-2 block">{opt.label}</Label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                          {opt.values.map((v) => {
+                            const isSelected = selectedOptions[opt.name] === v;
+                            let priceForValue: string | null = null;
+                            if (isPriceDriving && product.variations) {
+                              const match = product.variations.find((var_) =>
+                                Object.entries(var_.options).every(([k, val]) => {
+                                  if (k === opt.name) return val === v;
+                                  return !selectedOptions[k] || selectedOptions[k] === val;
+                                })
+                              );
+                              if (match) priceForValue = match.price;
+                            }
+                            return (
+                              <button
+                                key={v}
+                                type="button"
+                                onClick={() => setSelectedOptions((prev) => ({ ...prev, [opt.name]: v }))}
+                                className={`text-left px-3 py-2.5 rounded-lg text-sm transition-all flex items-center justify-between ${
+                                  isSelected
+                                    ? "bg-primary/10 border-2 border-primary/40 text-primary font-medium"
+                                    : "bg-muted/50 hover:bg-muted border-2 border-transparent"
+                                }`}
+                                data-testid={`option-${opt.name}-${v}`}
+                              >
+                                <span className="line-clamp-1 mr-2">{v}</span>
+                                {priceForValue && (
+                                  <span className={`text-xs font-bold shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground"}`}>
+                                    &euro;{parseFloat(priceForValue).toFixed(0)}
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <span className="text-xs text-muted-foreground uppercase tracking-wide block mb-0.5">
+                    {product.variations && hasAllOptions && hasValidVariation ? "Prezzo" : product.priceRange ? "A partire da" : "Prezzo"}
+                  </span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-3xl font-extrabold">
+                      &euro;{product.variations && hasAllOptions && hasValidVariation
+                        ? parseFloat(effectivePrice).toFixed(2)
+                        : product.priceRange
+                          ? parseFloat(product.priceRange.min).toFixed(0)
+                          : parseFloat(product.price).toFixed(0)
+                      }
+                    </span>
+                    {!product.variations && !product.priceRange && product.priceLabel && (
+                      <span className="text-sm text-muted-foreground">/{product.priceLabel}</span>
+                    )}
+                    {product.priceRange && !(hasAllOptions && hasValidVariation) && (
+                      <span className="text-sm text-muted-foreground">
+                        - &euro;{parseFloat(product.priceRange.max).toFixed(0)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <ShieldCheck className="w-4 h-4 text-primary" />
+                  <span>Pagamento sicuro</span>
+                </div>
+              </div>
+
+              <div className="space-y-2.5">
+                <Button
+                  className={`w-full bg-gradient-to-r ${gradientClass} text-white border-0 shadow-md hover:shadow-lg h-12 text-base`}
+                  data-testid="button-buy-now"
+                  disabled={!optionsReady}
+                  onClick={() => {
+                    const params = Object.keys(selectedOptions).length > 0
+                      ? `?options=${encodeURIComponent(JSON.stringify(selectedOptions))}`
+                      : "";
+                    setLocation(`/shop/checkout/${product.slug}${params}`);
+                  }}
+                >
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Acquista Ora
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full h-11"
+                  disabled={!optionsReady}
+                  onClick={() => {
+                    cart.addItem(product, selectedOptions);
+                    toast({ title: "Aggiunto al carrello", description: product.name });
+                    setLocation("/shop");
+                  }}
+                  data-testid="button-add-cart"
+                >
+                  <ShoppingCart className="w-4 h-4 mr-2" />
+                  Aggiungi al Carrello e Continua
+                </Button>
+              </div>
+
+              {!optionsReady && product.options && product.options.length > 0 && (
+                <p className="text-xs text-muted-foreground text-center mt-3">
+                  Seleziona tutte le opzioni per procedere
+                </p>
+              )}
+            </div>
+          </Card>
+
+          {reviews.length > 0 && (
+            <div className="mt-10">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-bold text-xl flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-primary" />
+                  Recensioni
+                  <Badge variant="secondary" className="ml-1">{reviews.length}</Badge>
+                </h2>
+                {!showReviewForm && (
+                  <Button variant="outline" size="sm" onClick={() => setShowReviewForm(true)} data-testid="button-write-review">
+                    <MessageSquare className="w-4 h-4 mr-1.5" />
+                    Scrivi una recensione
+                  </Button>
+                )}
+              </div>
+
+              <Card className="p-5 mb-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                  <div className="text-center">
+                    <div className="text-4xl font-extrabold mb-1">{avgRating.toFixed(1)}</div>
+                    <StarRating rating={Math.round(avgRating)} size="md" />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {reviews.length} {reviews.length === 1 ? "recensione" : "recensioni"}
+                    </p>
+                  </div>
+                  <div className="flex-grow space-y-1.5 w-full">
+                    {ratingDistribution.map((d) => (
+                      <div key={d.stars} className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground w-8 text-right">{d.stars} ★</span>
+                        <div className="flex-grow h-2 bg-muted rounded-full overflow-hidden">
+                          <div className="h-full bg-amber-400 rounded-full transition-all" style={{ width: `${d.percentage}%` }} />
+                        </div>
+                        <span className="text-xs text-muted-foreground w-6">{d.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </Card>
 
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="font-bold text-xl flex items-center gap-2">
-                    <MessageSquare className="w-5 h-5 text-primary" />
-                    Recensioni
-                    {reviews.length > 0 && (
-                      <Badge variant="secondary" className="ml-1">{reviews.length}</Badge>
-                    )}
-                  </h2>
-                  {!showReviewForm && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowReviewForm(true)}
-                      data-testid="button-write-review"
-                    >
-                      <MessageSquare className="w-4 h-4 mr-1.5" />
-                      Scrivi una recensione
-                    </Button>
-                  )}
-                </div>
-
-                {reviews.length > 0 && (
-                  <Card className="p-5 mb-6">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                      <div className="text-center">
-                        <div className="text-4xl font-extrabold mb-1">{avgRating.toFixed(1)}</div>
-                        <StarRating rating={Math.round(avgRating)} size="md" />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {reviews.length} {reviews.length === 1 ? "recensione" : "recensioni"}
-                        </p>
-                      </div>
-                      <div className="flex-grow space-y-1.5 w-full">
-                        {ratingDistribution.map((d) => (
-                          <div key={d.stars} className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground w-8 text-right">{d.stars} ★</span>
-                            <div className="flex-grow h-2 bg-muted rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-amber-400 rounded-full transition-all"
-                                style={{ width: `${d.percentage}%` }}
-                              />
-                            </div>
-                            <span className="text-xs text-muted-foreground w-6">{d.count}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </Card>
+              <AnimatePresence>
+                {showReviewForm && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="mb-6 overflow-hidden">
+                    <ReviewForm productSlug={product.slug} onSuccess={() => setShowReviewForm(false)} />
+                  </motion.div>
                 )}
+              </AnimatePresence>
 
+              <div className="space-y-4">
+                {reviews.map((review) => (
+                  <ReviewCard key={review.id} review={review} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {reviews.length === 0 && (
+            <div className="mt-10">
+              <Card className="p-8 text-center">
+                <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
+                  <ThumbsUp className="w-6 h-6 text-muted-foreground" />
+                </div>
+                <p className="font-semibold mb-1">Nessuna recensione ancora</p>
+                <p className="text-sm text-muted-foreground mb-4">Sii il primo a recensire questo corso!</p>
+                {!showReviewForm && (
+                  <Button variant="outline" size="sm" onClick={() => setShowReviewForm(true)} data-testid="button-first-review">
+                    <MessageSquare className="w-4 h-4 mr-1.5" />
+                    Scrivi la prima recensione
+                  </Button>
+                )}
                 <AnimatePresence>
                   {showReviewForm && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="mb-6 overflow-hidden"
-                    >
-                      <ReviewForm
-                        productSlug={product.slug}
-                        onSuccess={() => setShowReviewForm(false)}
-                      />
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="mt-6 overflow-hidden">
+                      <ReviewForm productSlug={product.slug} onSuccess={() => setShowReviewForm(false)} />
                     </motion.div>
                   )}
                 </AnimatePresence>
-
-                {reviewsLoading ? (
-                  <div className="space-y-4">
-                    {[1, 2, 3].map((i) => (
-                      <Card key={i} className="p-5 animate-pulse">
-                        <div className="h-4 bg-muted rounded w-1/3 mb-3" />
-                        <div className="h-3 bg-muted rounded w-full mb-2" />
-                        <div className="h-3 bg-muted rounded w-2/3" />
-                      </Card>
-                    ))}
-                  </div>
-                ) : reviews.length === 0 ? (
-                  <Card className="p-8 text-center">
-                    <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
-                      <ThumbsUp className="w-6 h-6 text-muted-foreground" />
-                    </div>
-                    <p className="font-semibold mb-1">Nessuna recensione ancora</p>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      Sii il primo a recensire questo corso!
-                    </p>
-                    {!showReviewForm && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowReviewForm(true)}
-                        data-testid="button-first-review"
-                      >
-                        <MessageSquare className="w-4 h-4 mr-1.5" />
-                        Scrivi la prima recensione
-                      </Button>
-                    )}
-                  </Card>
-                ) : (
-                  <div className="space-y-4">
-                    {reviews.map((review) => (
-                      <ReviewCard key={review.id} review={review} />
-                    ))}
-                  </div>
-                )}
-              </div>
+              </Card>
             </div>
-
-            <div className="lg:col-span-1">
-              <div className="sticky top-24">
-                <Card className="p-6 shadow-lg border-primary/20">
-                  {product.options && product.options.length > 0 && (() => {
-                    const priceDrivingKeys = new Set(
-                      (product.variations || []).flatMap((v) => Object.keys(v.options))
-                    );
-                    return (
-                    <div className="space-y-3 mb-5 pb-5 border-b border-border/40">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Configura il corso</p>
-                      {product.options.map((opt) => {
-                        const isPriceDriving = priceDrivingKeys.has(opt.name);
-                        return (
-                        <div key={opt.name}>
-                          <Label className="text-sm font-medium mb-1.5 block">{opt.label}</Label>
-                          <div className="space-y-1">
-                            {opt.values.map((v) => {
-                              const isSelected = selectedOptions[opt.name] === v;
-                              let priceForValue: string | null = null;
-                              if (isPriceDriving && product.variations) {
-                                const match = product.variations.find((var_) =>
-                                  Object.entries(var_.options).every(([k, val]) => {
-                                    if (k === opt.name) return val === v;
-                                    return !selectedOptions[k] || selectedOptions[k] === val;
-                                  })
-                                );
-                                if (match) priceForValue = match.price;
-                              }
-                              return (
-                                <button
-                                  key={v}
-                                  type="button"
-                                  onClick={() => setSelectedOptions((prev) => ({ ...prev, [opt.name]: v }))}
-                                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all flex items-center justify-between ${
-                                    isSelected
-                                      ? "bg-primary/10 border border-primary/30 text-primary font-medium"
-                                      : "bg-muted/50 hover:bg-muted border border-transparent"
-                                  }`}
-                                  data-testid={`option-${opt.name}-${v}`}
-                                >
-                                  <span className="line-clamp-1 mr-2">{v}</span>
-                                  {priceForValue && (
-                                    <span className={`text-xs font-semibold shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground"}`}>
-                                      &euro;{parseFloat(priceForValue).toFixed(0)}
-                                    </span>
-                                  )}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                        );
-                      })}
-                    </div>
-                    );
-                  })()}
-
-                  <div className="mb-4">
-                    <span className="text-xs text-muted-foreground uppercase tracking-wide block mb-1">
-                      {product.variations && hasAllOptions && hasValidVariation ? "Prezzo" : product.priceRange ? "A partire da" : "Prezzo"}
-                    </span>
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-3xl font-extrabold">
-                        &euro;{product.variations && hasAllOptions && hasValidVariation
-                          ? parseFloat(effectivePrice).toFixed(2)
-                          : product.priceRange
-                            ? parseFloat(product.priceRange.min).toFixed(0)
-                            : parseFloat(product.price).toFixed(0)
-                        }
-                      </span>
-                      {!product.variations && !product.priceRange && product.priceLabel && (
-                        <span className="text-sm text-muted-foreground">/{product.priceLabel}</span>
-                      )}
-                      {product.priceRange && !(hasAllOptions && hasValidVariation) && (
-                        <span className="text-sm text-muted-foreground">
-                          - &euro;{parseFloat(product.priceRange.max).toFixed(0)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 mb-5">
-                    <Button
-                      className={`w-full bg-gradient-to-r ${gradientClass} text-white border-0 shadow-md hover:shadow-lg h-12 text-base`}
-                      data-testid="button-buy-now"
-                      disabled={product.options && product.options.length > 0 && (!hasAllOptions || (product.variations && !hasValidVariation))}
-                      onClick={() => {
-                        const params = Object.keys(selectedOptions).length > 0
-                          ? `?options=${encodeURIComponent(JSON.stringify(selectedOptions))}`
-                          : "";
-                        setLocation(`/shop/checkout/${product.slug}${params}`);
-                      }}
-                    >
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      Acquista Ora
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="w-full h-11"
-                      disabled={product.options && product.options.length > 0 && (!hasAllOptions || (product.variations && !hasValidVariation))}
-                      onClick={() => {
-                        cart.addItem(product, selectedOptions);
-                        toast({ title: "Aggiunto al carrello", description: product.name });
-                        setLocation("/shop");
-                      }}
-                      data-testid="button-add-cart"
-                    >
-                      <ShoppingCart className="w-4 h-4 mr-2" />
-                      Aggiungi al Carrello e Continua
-                    </Button>
-                  </div>
-
-                  <div className="border-t border-border/40 pt-4 space-y-2.5">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                      <span>Conferma immediata via email</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                      <span>Pagamento sicuro con PayPal</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span>{product.duration}</span>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </main>
 
