@@ -210,7 +210,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     description: "Workshop intensivo di inglese in presenza, disponibile in formato collettivo, semi-individuale o individuale.",
     price: "450.00",
     priceLabel: "da",
-    duration: "1 settimana",
+    duration: "1-2 settimane",
     features: [
       "Immersione totale nella lingua",
       "Docenti madrelingua qualificati",
@@ -219,6 +219,11 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     ],
     pageLink: "/full-immersion",
     options: [
+      {
+        name: "durata",
+        label: "Durata",
+        values: ["1 settimana", "2 settimane"],
+      },
       {
         name: "tipo",
         label: "Tipo di classe",
@@ -235,11 +240,14 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       },
     ],
     variations: [
-      { options: { tipo: "Collettivo (da 5 a 8 partecipanti)" }, price: "450.00" },
-      { options: { tipo: "Semi-Individuale (da 2 a 4 partecipanti)" }, price: "840.00" },
-      { options: { tipo: "Individuale (1 to 1)" }, price: "1620.00" },
+      { options: { durata: "1 settimana", tipo: "Collettivo (da 5 a 8 partecipanti)" }, price: "450.00" },
+      { options: { durata: "1 settimana", tipo: "Semi-Individuale (da 2 a 4 partecipanti)" }, price: "840.00" },
+      { options: { durata: "1 settimana", tipo: "Individuale (1 to 1)" }, price: "1620.00" },
+      { options: { durata: "2 settimane", tipo: "Collettivo (da 5 a 8 partecipanti)" }, price: "900.00" },
+      { options: { durata: "2 settimane", tipo: "Semi-Individuale (da 2 a 4 partecipanti)" }, price: "1680.00" },
+      { options: { durata: "2 settimane", tipo: "Individuale (1 to 1)" }, price: "3240.00" },
     ],
-    priceRange: { min: "450.00", max: "1620.00" },
+    priceRange: { min: "450.00", max: "3240.00" },
   },
   {
     slug: "camclass-selflearning",
