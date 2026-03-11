@@ -34,6 +34,7 @@ import {
   ShieldCheck,
   Send,
   ThumbsUp,
+  CreditCard,
 } from "lucide-react";
 
 import imgCorsiGruppo from "@assets/shop/group-classroom.png";
@@ -656,34 +657,32 @@ export default function ShopProductPage() {
 
                   <div className="space-y-2 mb-5">
                     <Button
-                      className={`w-full bg-gradient-to-r ${gradientClass} text-white border-0 shadow-md hover:shadow-lg h-11`}
+                      className={`w-full bg-gradient-to-r ${gradientClass} text-white border-0 shadow-md hover:shadow-lg h-12 text-base`}
                       data-testid="button-buy-now"
+                      disabled={product.options && product.options.length > 0 && (!hasAllOptions || (product.variations && !hasValidVariation))}
                       onClick={() => {
-                        if (product.options && product.options.length > 0 && !hasAllOptions) {
-                          toast({ title: "Seleziona le opzioni", description: "Configura tutte le opzioni prima di procedere.", variant: "destructive" });
-                          return;
-                        }
-                        if (product.variations && !hasValidVariation) {
-                          toast({ title: "Combinazione non disponibile", description: "La combinazione selezionata non è disponibile.", variant: "destructive" });
-                          return;
-                        }
                         const params = Object.keys(selectedOptions).length > 0
                           ? `?options=${encodeURIComponent(JSON.stringify(selectedOptions))}`
                           : "";
                         setLocation(`/shop/checkout/${product.slug}${params}`);
                       }}
                     >
-                      <ArrowRight className="w-4 h-4 mr-2" />
+                      <CreditCard className="w-4 h-4 mr-2" />
                       Acquista Ora
                     </Button>
                     <Button
                       variant="outline"
                       className="w-full h-11"
-                      onClick={handleAddToCart}
+                      disabled={product.options && product.options.length > 0 && (!hasAllOptions || (product.variations && !hasValidVariation))}
+                      onClick={() => {
+                        cart.addItem(product, selectedOptions);
+                        toast({ title: "Aggiunto al carrello", description: product.name });
+                        setLocation("/shop");
+                      }}
                       data-testid="button-add-cart"
                     >
                       <ShoppingCart className="w-4 h-4 mr-2" />
-                      Aggiungi al Carrello
+                      Aggiungi al Carrello e Continua
                     </Button>
                   </div>
 

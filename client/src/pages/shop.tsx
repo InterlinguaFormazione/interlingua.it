@@ -231,16 +231,7 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
               </div>
               <div className="flex items-center gap-1.5">
                 <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-5 w-auto rounded-lg opacity-60 hover:opacity-100 transition-opacity" title="Pagabile con Carta della Cultura" />
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className="h-9 w-9 border-border/50 hover:bg-primary/5 hover:border-primary/30 transition-all"
-                  onClick={handleAddToCart}
-                  data-testid={`button-cart-${product.slug}`}
-                >
-                  <ShoppingCart className="h-4 w-4" />
-                </Button>
-                <Link href={`/shop/checkout/${product.slug}`} onClick={(e: any) => e.stopPropagation()}>
+                <Link href={`/shop/product/${product.slug}`} onClick={(e: any) => e.stopPropagation()}>
                   <Button
                     size="sm"
                     className={`bg-gradient-to-r ${gradientClass} hover:opacity-90 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 group/btn h-9`}
