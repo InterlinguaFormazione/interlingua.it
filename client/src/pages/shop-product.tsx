@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Link, useParams } from "wouter";
+import { Link, useParams, useLocation } from "wouter";
 import { SHOP_PRODUCTS, getEffectivePrice } from "@shared/products";
 import { ShopProductSchema } from "@/components/seo-schemas";
 import { useCart } from "@/lib/cart-context";
@@ -304,6 +304,7 @@ export default function ShopProductPage() {
   const product = SHOP_PRODUCTS.find((p) => p.slug === slug);
   const cart = useCart();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   const categoryConfig = product ? CATEGORY_CONFIG[product.category] : null;
   const gradientClass = categoryConfig?.color || "from-primary to-blue-400";
@@ -654,15 +655,27 @@ export default function ShopProductPage() {
                   </div>
 
                   <div className="space-y-2 mb-5">
-                    <Link href={`/shop/checkout/${product.slug}`}>
-                      <Button
-                        className={`w-full bg-gradient-to-r ${gradientClass} text-white border-0 shadow-md hover:shadow-lg h-11`}
-                        data-testid="button-buy-now"
-                      >
-                        <ArrowRight className="w-4 h-4 mr-2" />
-                        Acquista Ora
-                      </Button>
-                    </Link>
+                    <Button
+                      className={`w-full bg-gradient-to-r ${gradientClass} text-white border-0 shadow-md hover:shadow-lg h-11`}
+                      data-testid="button-buy-now"
+                      onClick={() => {
+                        if (product.options && product.options.length > 0 && !hasAllOptions) {
+                          toast({ title: "Seleziona le opzioni", description: "Configura tutte le opzioni prima di procedere.", variant: "destructive" });
+                          return;
+                        }
+                        if (product.variations && !hasValidVariation) {
+                          toast({ title: "Combinazione non disponibile", description: "La combinazione selezionata non è disponibile.", variant: "destructive" });
+                          return;
+                        }
+                        const params = Object.keys(selectedOptions).length > 0
+                          ? `?options=${encodeURIComponent(JSON.stringify(selectedOptions))}`
+                          : "";
+                        setLocation(`/shop/checkout/${product.slug}${params}`);
+                      }}
+                    >
+                      <ArrowRight className="w-4 h-4 mr-2" />
+                      Acquista Ora
+                    </Button>
                     <Button
                       variant="outline"
                       className="w-full h-11"

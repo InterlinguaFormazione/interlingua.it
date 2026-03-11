@@ -93,7 +93,14 @@ export default function ShopCheckout() {
   const [codiceSdi, setCodiceSdi] = useState("");
   const [pec, setPec] = useState("");
 
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const opts = params.get("options");
+      if (opts) return JSON.parse(decodeURIComponent(opts));
+    } catch {}
+    return {};
+  });
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [acceptGdpr, setAcceptGdpr] = useState(false);
   const [step, setStep] = useState<"details" | "billing" | "payment" | "success">("details");
