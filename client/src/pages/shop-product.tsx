@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Link, useParams } from "wouter";
-import { SHOP_PRODUCTS } from "@shared/products";
+import { SHOP_PRODUCTS, getEffectivePrice } from "@shared/products";
 import { ShopProductSchema } from "@/components/seo-schemas";
 import { useCart } from "@/lib/cart-context";
 import { useToast } from "@/hooks/use-toast";
@@ -300,6 +300,7 @@ function ReviewForm({ productSlug, onSuccess }: { productSlug: string; onSuccess
 export default function ShopProductPage() {
   const { slug } = useParams<{ slug: string }>();
   const [showReviewForm, setShowReviewForm] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const product = SHOP_PRODUCTS.find((p) => p.slug === slug);
   const cart = useCart();
   const { toast } = useToast();
@@ -308,6 +309,9 @@ export default function ShopProductPage() {
   const gradientClass = categoryConfig?.color || "from-primary to-blue-400";
   const CategoryIcon = categoryConfig?.icon || Sparkles;
   const heroImage = product ? PRODUCT_IMAGES[product.slug] : undefined;
+
+  const effectivePrice = product ? getEffectivePrice(product, selectedOptions) : "0";
+  const hasAllOptions = product?.options ? product.options.every((opt) => selectedOptions[opt.name]) : true;
 
   const { data: reviews = [], isLoading: reviewsLoading } = useQuery<ProductReview[]>({
     queryKey: [`/api/shop/reviews/${slug}`],
@@ -346,8 +350,20 @@ export default function ShopProductPage() {
       : 0,
   }));
 
+  const hasValidVariation = !product?.variations || product.variations.some((v) =>
+    Object.entries(v.options).every(([k, val]) => selectedOptions[k] === val)
+  );
+
   const handleAddToCart = () => {
-    cart.addItem(product);
+    if (product.options && product.options.length > 0 && !hasAllOptions) {
+      toast({ title: "Seleziona le opzioni", description: "Configura tutte le opzioni prima di aggiungere al carrello.", variant: "destructive" });
+      return;
+    }
+    if (product.variations && !hasValidVariation) {
+      toast({ title: "Combinazione non disponibile", description: "La combinazione selezionata non è disponibile. Prova un'altra configurazione.", variant: "destructive" });
+      return;
+    }
+    cart.addItem(product, selectedOptions);
     toast({ title: "Aggiunto al carrello", description: product.name });
   };
 
@@ -551,18 +567,77 @@ export default function ShopProductPage() {
             <div className="lg:col-span-1">
               <div className="sticky top-24">
                 <Card className="p-6 shadow-lg border-primary/20">
+                  {product.options && product.options.length > 0 && (() => {
+                    const priceDrivingKeys = new Set(
+                      (product.variations || []).flatMap((v) => Object.keys(v.options))
+                    );
+                    return (
+                    <div className="space-y-3 mb-5 pb-5 border-b border-border/40">
+                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Configura il corso</p>
+                      {product.options.map((opt) => {
+                        const isPriceDriving = priceDrivingKeys.has(opt.name);
+                        return (
+                        <div key={opt.name}>
+                          <Label className="text-sm font-medium mb-1.5 block">{opt.label}</Label>
+                          <div className="space-y-1">
+                            {opt.values.map((v) => {
+                              const isSelected = selectedOptions[opt.name] === v;
+                              let priceForValue: string | null = null;
+                              if (isPriceDriving && product.variations) {
+                                const match = product.variations.find((var_) =>
+                                  Object.entries(var_.options).every(([k, val]) => {
+                                    if (k === opt.name) return val === v;
+                                    return !selectedOptions[k] || selectedOptions[k] === val;
+                                  })
+                                );
+                                if (match) priceForValue = match.price;
+                              }
+                              return (
+                                <button
+                                  key={v}
+                                  type="button"
+                                  onClick={() => setSelectedOptions((prev) => ({ ...prev, [opt.name]: v }))}
+                                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all flex items-center justify-between ${
+                                    isSelected
+                                      ? "bg-primary/10 border border-primary/30 text-primary font-medium"
+                                      : "bg-muted/50 hover:bg-muted border border-transparent"
+                                  }`}
+                                  data-testid={`option-${opt.name}-${v}`}
+                                >
+                                  <span className="line-clamp-1 mr-2">{v}</span>
+                                  {priceForValue && (
+                                    <span className={`text-xs font-semibold shrink-0 ${isSelected ? "text-primary" : "text-muted-foreground"}`}>
+                                      &euro;{parseFloat(priceForValue).toFixed(0)}
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        );
+                      })}
+                    </div>
+                    );
+                  })()}
+
                   <div className="mb-4">
                     <span className="text-xs text-muted-foreground uppercase tracking-wide block mb-1">
-                      {product.priceRange ? "A partire da" : "Prezzo"}
+                      {product.variations && hasAllOptions && hasValidVariation ? "Prezzo" : product.priceRange ? "A partire da" : "Prezzo"}
                     </span>
                     <div className="flex items-baseline gap-1.5">
                       <span className="text-3xl font-extrabold">
-                        &euro;{product.priceRange ? parseFloat(product.priceRange.min).toFixed(0) : parseFloat(product.price).toFixed(0)}
+                        &euro;{product.variations && hasAllOptions && hasValidVariation
+                          ? parseFloat(effectivePrice).toFixed(2)
+                          : product.priceRange
+                            ? parseFloat(product.priceRange.min).toFixed(0)
+                            : parseFloat(product.price).toFixed(0)
+                        }
                       </span>
-                      {!product.priceRange && product.priceLabel && (
+                      {!product.variations && !product.priceRange && product.priceLabel && (
                         <span className="text-sm text-muted-foreground">/{product.priceLabel}</span>
                       )}
-                      {product.priceRange && (
+                      {product.priceRange && !(hasAllOptions && hasValidVariation) && (
                         <span className="text-sm text-muted-foreground">
                           - &euro;{parseFloat(product.priceRange.max).toFixed(0)}
                         </span>
