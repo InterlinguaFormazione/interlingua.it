@@ -135,7 +135,7 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
       <Card
         className="h-full group relative overflow-hidden border border-border/50 bg-card hover:shadow-xl hover:border-primary/30 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
         data-testid={`card-product-${product.slug}`}
-        onClick={() => setLocation(`${product.pageLink}${product.pageAnchor ? `#${product.pageAnchor}` : ""}`)}
+        onClick={() => setLocation(`/shop/product/${product.slug}`)}
       >
         <div className={`relative h-28 bg-gradient-to-br ${gradientClass} overflow-hidden`}>
           {cardImage && (
@@ -240,7 +240,7 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
                 >
                   <ShoppingCart className="h-4 w-4" />
                 </Button>
-                <Link href={`/shop/checkout/${product.slug}`} onClick={(e: any) => e.stopPropagation()}>
+                <Link href={product.options && product.options.length > 0 ? `/shop/product/${product.slug}` : `/shop/checkout/${product.slug}`} onClick={(e: any) => e.stopPropagation()}>
                   <Button
                     size="sm"
                     className={`bg-gradient-to-r ${gradientClass} hover:opacity-90 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 group/btn h-9`}

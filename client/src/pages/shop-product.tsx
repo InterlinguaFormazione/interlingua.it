@@ -446,7 +446,15 @@ export default function ShopProductPage() {
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
               <Card className="p-6">
-                <h2 className="font-bold text-xl mb-4">Cosa include</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="font-bold text-xl">Cosa include</h2>
+                  <Link href={`${product.pageLink}${product.pageAnchor ? `#${product.pageAnchor}` : ""}`}>
+                    <Button variant="outline" size="sm" data-testid="button-course-details">
+                      <GraduationCap className="w-4 h-4 mr-1.5" />
+                      Dettagli corso
+                    </Button>
+                  </Link>
+                </div>
                 <ul className="space-y-3">
                   {product.features.map((f, i) => (
                     <li key={i} className="flex items-start gap-3">
