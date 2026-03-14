@@ -1551,24 +1551,32 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       const today = new Date();
       const thirtyDaysFromNow = new Date(today);
       thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+      const sevenDaysFromNow = new Date(today);
+      sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
 
-      const expiringSoon = allSubscribers.filter(sub => {
-        if (!sub.active || sub.renewalReminderSent) return false;
+      const needsReminder = allSubscribers.filter(sub => {
+        if (!sub.active) return false;
+        const reminderCount = sub.renewalReminderCount || 0;
+        if (reminderCount >= 2) return false;
         const endDate = new Date(sub.subscriptionEnd);
-        return endDate >= today && endDate <= thirtyDaysFromNow;
+        if (endDate < today) return false;
+        if (reminderCount === 0 && endDate <= thirtyDaysFromNow) return true;
+        if (reminderCount === 1 && endDate <= sevenDaysFromNow) return true;
+        return false;
       });
 
-      console.log(`Found ${expiringSoon.length} SC subscribers expiring within 30 days`);
+      console.log(`Found ${needsReminder.length} SC subscribers needing renewal reminder`);
 
-      for (const sub of expiringSoon) {
+      for (const sub of needsReminder) {
         try {
+          const reminderNum = (sub.renewalReminderCount || 0) + 1;
           const code = `SCRINNOVO-${sub.id.slice(0, 6).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
           const validUntil = new Date(sub.subscriptionEnd);
           validUntil.setDate(validUntil.getDate() + 14);
 
           await storage.createDiscountVoucher({
             code,
-            description: `Sconto rinnovo Speaker's Corner per ${sub.nome} ${sub.cognome} (${sub.email})`,
+            description: `Sconto rinnovo Speaker's Corner (promemoria ${reminderNum}/2) per ${sub.nome} ${sub.cognome} (${sub.email})`,
             discountType: "percentage",
             discountValue: "50",
             maxUses: 1,
@@ -1592,10 +1600,10 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
           });
 
           await storage.updateScSubscriber(sub.id, {
-            renewalReminderSent: true,
+            renewalReminderCount: reminderNum,
           });
 
-          console.log(`Sent renewal reminder to ${sub.email} with code ${code}`);
+          console.log(`Sent renewal reminder ${reminderNum}/2 to ${sub.email} with code ${code}`);
         } catch (subErr) {
           console.error(`Failed to send renewal reminder to ${sub.email}:`, subErr);
         }
@@ -2324,7 +2332,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
             await storage.updateScSubscriber(existingSC.id, {
               subscriptionEnd,
               active: true,
-              renewalReminderSent: false,
+              renewalReminderCount: 0,
             });
             subscriberId = existingSC.id;
           } else {
@@ -2663,7 +2671,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
             await storage.updateScSubscriber(existingSC.id, {
               subscriptionEnd,
               active: true,
-              renewalReminderSent: false,
+              renewalReminderCount: 0,
             });
             subscriberId = existingSC.id;
           } else {

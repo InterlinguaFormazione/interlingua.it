@@ -141,7 +141,7 @@ export const scSubscribers = pgTable("sc_subscribers", {
   subscriptionStart: date("subscription_start").notNull(),
   subscriptionEnd: date("subscription_end").notNull(),
   active: boolean("active").default(true),
-  renewalReminderSent: boolean("renewal_reminder_sent").default(false),
+  renewalReminderCount: integer("renewal_reminder_count").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
