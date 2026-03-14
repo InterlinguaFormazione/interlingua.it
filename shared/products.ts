@@ -437,7 +437,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "livello",
         label: "Livello",
-        values: ["A1 - Principiante", "A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
+        values: ["Base", "Intermedio", "Avanzato"],
       },
       {
         name: "moduli",
@@ -481,7 +481,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "livello",
         label: "Livello",
-        values: ["A1 - Principiante", "A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
+        values: ["Base", "Intermedio", "Avanzato"],
       },
       {
         name: "ore",
@@ -522,7 +522,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "livello",
         label: "Livello",
-        values: ["A1 - Principiante", "A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
+        values: ["Base", "Intermedio", "Avanzato"],
       },
     ],
   },
@@ -551,7 +551,12 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "livello",
         label: "Livello",
-        values: ["A1 - Principiante", "A2 - Elementare", "B1 - Intermedio", "B2 - Post-Intermedio", "C1 - Avanzato"],
+        values: ["Base", "Intermedio", "Avanzato"],
+      },
+      {
+        name: "sede",
+        label: "Sede",
+        values: ["Vicenza", "Thiene (VI)"],
       },
     ],
   },
@@ -588,6 +593,13 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     ],
     pageLink: "/formazione-in-presenza",
     pageAnchor: "ai",
+    options: [
+      {
+        name: "sede",
+        label: "Sede",
+        values: ["Vicenza", "Thiene"],
+      },
+    ],
   },
   {
     slug: "full-immersion",
