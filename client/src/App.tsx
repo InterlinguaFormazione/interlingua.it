@@ -17,7 +17,6 @@ import BandoDetailPage from "@/pages/bando-detail";
 import SpeakersCornerPage from "@/pages/speakers-corner";
 import SpeakersCornerDashboard from "@/pages/speakers-corner-dashboard";
 import SpeakersCornerAdmin from "@/pages/speakers-corner-admin";
-import SpeakersCornerPurchase from "@/pages/speakers-corner-purchase";
 import AdminPage from "@/pages/admin";
 import BlogPage from "@/pages/blog";
 import BlogPostPage from "@/pages/blog-post";
@@ -71,7 +70,6 @@ function Router() {
       <Route path="/bandi/:id" component={BandoDetailPage} />
       <Route path="/speakers-corner" component={SpeakersCornerPage} />
       <Route path="/speakers-corner/dashboard" component={SpeakersCornerDashboard} />
-      <Route path="/speakers-corner/acquista" component={SpeakersCornerPurchase} />
       <Route path="/speakers-corner/admin" component={SpeakersCornerAdmin} />
       <Route path="/full-immersion" component={FullImmersionPage} />
       <Route path="/formazione-in-presenza" component={FormazioneInPresenzaPage} />

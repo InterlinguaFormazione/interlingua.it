@@ -218,7 +218,7 @@ Servizio di conversazione in inglese su abbonamento annuale.
 - Il martedì gli iscritti ricevono email con il tema della settimana e materiali preparatori
 - Area riservata per prenotare il proprio posto
 Pagina: /speakers-corner
-Acquisto: /speakers-corner/acquista
+Acquisto: /shop/product/speakers-corner
 
 ═══════════════════════════════════════════
 TEST DI LIVELLO LINGUISTICO GRATUITI
@@ -240,7 +240,7 @@ Pagina panoramica: /test-di-livello
 ═══════════════════════════════════════════
 NEGOZIO ONLINE (SHOP)
 ═══════════════════════════════════════════
-Il sito ha un negozio online completo dove è possibile acquistare direttamente 21 corsi formativi. Speaker's Corner si acquista separatamente.
+Il sito ha un negozio online completo dove è possibile acquistare direttamente tutti i corsi formativi, incluso Speaker's Corner.
 - Pagina shop: /shop
 - Ogni prodotto ha la sua pagina dettaglio: /shop/product/[slug-prodotto]
 - Si possono aggiungere prodotti al carrello e acquistare più corsi insieme
@@ -256,7 +256,7 @@ Categorie nello shop:
 - Language Coaching (4 prodotti)
 - Full Immersion (1 prodotto con 3 varianti)
 - Corsi di Italiano (4 prodotti)
-- Speaker's Corner (acquisto separato a /speakers-corner/acquista)
+- Speaker's Corner (acquistabile nello shop a /shop/product/speakers-corner)
 
 ═══════════════════════════════════════════
 CONVENZIONI AZIENDALI
