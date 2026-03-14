@@ -210,38 +210,58 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
           </div>
 
           <div className="px-5 pb-5 mt-auto">
-            <div className="border-t border-border/40 pt-4 flex items-end justify-between">
-              <div>
-                <span className="text-[10px] text-muted-foreground block mb-0.5 uppercase tracking-wide">
-                  {product.priceRange ? "A partire da" : "Prezzo"}
-                </span>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-extrabold text-foreground">
-                    &euro;{product.priceRange ? parseFloat(product.priceRange.min).toFixed(0) : parseFloat(product.price).toFixed(0)}
+            <div className="border-t border-border/40 pt-4">
+              <div className="flex items-end justify-between mb-3">
+                <div>
+                  <span className="text-[10px] text-muted-foreground block mb-0.5 uppercase tracking-wide">
+                    {product.priceRange ? "A partire da" : "Prezzo"}
                   </span>
-                  {!product.priceRange && product.priceLabel && (
-                    <span className="text-[11px] text-muted-foreground">/{product.priceLabel}</span>
-                  )}
-                  {product.priceRange && (
-                    <span className="text-[11px] text-muted-foreground">
-                      - &euro;{parseFloat(product.priceRange.max).toFixed(0)}
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-extrabold text-foreground">
+                      &euro;{product.priceRange ? parseFloat(product.priceRange.min).toFixed(0) : parseFloat(product.price).toFixed(0)}
                     </span>
-                  )}
+                    {!product.priceRange && product.priceLabel && (
+                      <span className="text-[11px] text-muted-foreground">/{product.priceLabel}</span>
+                    )}
+                    {product.priceRange && (
+                      <span className="text-[11px] text-muted-foreground">
+                        - &euro;{parseFloat(product.priceRange.max).toFixed(0)}
+                      </span>
+                    )}
+                  </div>
+                  <span className="inline-flex items-center gap-1 mt-1 text-[9px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 rounded px-1.5 py-0.5 font-medium">
+                    Carta della Cultura
+                  </span>
                 </div>
-                <span className="inline-flex items-center gap-1 mt-1 text-[9px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 rounded px-1.5 py-0.5 font-medium">
-                  Carta della Cultura
-                </span>
               </div>
-              <Link href={`/shop/product/${product.slug}`} onClick={(e: any) => e.stopPropagation()}>
+              <div className="flex gap-2">
                 <Button
                   size="sm"
-                  className={`bg-gradient-to-r ${gradientClass} hover:opacity-90 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 group/btn h-9`}
+                  className={`flex-1 bg-gradient-to-r ${gradientClass} hover:opacity-90 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 h-9 text-xs`}
                   data-testid={`button-buy-${product.slug}`}
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    if (product.options && product.options.length > 0) {
+                      setLocation(`/shop/product/${product.slug}`);
+                    } else {
+                      setLocation(`/shop/checkout/${product.slug}`);
+                    }
+                  }}
                 >
-                  Acquista
-                  <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform duration-300 group-hover/btn:translate-x-0.5" />
+                  Acquista Ora
+                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
                 </Button>
-              </Link>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-9 px-3"
+                  data-testid={`button-cart-${product.slug}`}
+                  onClick={handleAddToCart}
+                  title="Aggiungi al Carrello"
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
