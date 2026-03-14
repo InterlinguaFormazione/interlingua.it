@@ -2165,6 +2165,15 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
           if (!opt.values.includes(val)) {
             return res.status(400).json({ success: false, message: `Valore non valido per ${opt.label}: ${val}` });
           }
+          if (opt.dependsOn) {
+            const parentVal = selectedOptions[opt.dependsOn.option];
+            if (parentVal) {
+              const allowed = opt.dependsOn.valuesFor[parentVal];
+              if (allowed && !allowed.includes(val)) {
+                return res.status(400).json({ success: false, message: `${val} non è disponibile per ${opt.dependsOn.option}: ${parentVal}` });
+              }
+            }
+          }
         }
       }
 
@@ -2484,10 +2493,31 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         if (!product) {
           return res.status(400).json({ success: false, message: `Prodotto non trovato: ${item.productSlug}` });
         }
+        const opts = item.selectedOptions || {};
+        if (product.options && product.options.length > 0) {
+          for (const opt of product.options) {
+            const val = opts[opt.name];
+            if (!val) {
+              return res.status(400).json({ success: false, message: `Opzione mancante per ${product.name}: ${opt.label}` });
+            }
+            if (!opt.values.includes(val)) {
+              return res.status(400).json({ success: false, message: `Valore non valido per ${opt.label}: ${val}` });
+            }
+            if (opt.dependsOn) {
+              const parentVal = opts[opt.dependsOn.option];
+              if (parentVal) {
+                const allowed = opt.dependsOn.valuesFor[parentVal];
+                if (allowed && !allowed.includes(val)) {
+                  return res.status(400).json({ success: false, message: `${val} non è disponibile per ${opt.dependsOn.option}: ${parentVal}` });
+                }
+              }
+            }
+          }
+        }
         const qty = Math.max(1, Math.min(50, Math.floor(item.quantity || 1)));
-        const price = getEffectivePrice(product, item.selectedOptions || {});
+        const price = getEffectivePrice(product, opts);
         expectedTotal += parseFloat(price) * qty;
-        validatedItems.push({ product, selectedOptions: item.selectedOptions || {}, quantity: qty, unitPrice: price });
+        validatedItems.push({ product, selectedOptions: opts, quantity: qty, unitPrice: price });
       }
 
       let finalTotal = expectedTotal;

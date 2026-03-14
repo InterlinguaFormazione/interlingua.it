@@ -168,7 +168,7 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
     slug: "preparazione-certificazione",
     name: "Percorso di Certificazione Linguistica",
     category: "Corsi E-Learning",
-    description: "Preparazione esami MIUR: LanguageCert, IELTS, Cambridge, Trinity, DELF, DELE, Goethe. Con opzione esame incluso.",
+    description: "Preparazione esami MIUR: LanguageCert, IELTS, Cambridge, Trinity, DELF, DELE, Goethe. Con opzione esame incluso (solo LanguageCert).",
     price: "140.00",
     priceLabel: "da",
     duration: "12 lezioni + 60h e-learning",
@@ -189,14 +189,14 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "certificazione",
         label: "Certificazione",
-        values: ["LanguageCert", "IELTS", "Cambridge", "Trinity", "TOEFL", "DELF", "DELE", "Goethe-Zertifikat"],
+        values: ["LanguageCert", "IELTS", "Cambridge", "Trinity", "DELF", "DELE", "Goethe-Zertifikat", "Altra Certificazione"],
         dependsOn: {
           option: "lingua",
           valuesFor: {
-            "Inglese": ["LanguageCert", "IELTS", "Cambridge", "Trinity", "TOEFL"],
-            "Francese": ["DELF"],
-            "Spagnolo": ["DELE"],
-            "Tedesco": ["Goethe-Zertifikat"],
+            "Inglese": ["LanguageCert", "IELTS", "Cambridge", "Trinity", "Altra Certificazione"],
+            "Francese": ["DELF", "Altra Certificazione"],
+            "Spagnolo": ["DELE", "Altra Certificazione"],
+            "Tedesco": ["Goethe-Zertifikat", "Altra Certificazione"],
           },
         },
       },
@@ -209,14 +209,39 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
         name: "corso",
         label: "Tipo di percorso",
         values: ["Standard", "Ipermediale", "Standard + Esame", "Ipermediale + Esame", "Solo Esame"],
+        dependsOn: {
+          option: "certificazione",
+          valuesFor: {
+            "LanguageCert": ["Standard", "Ipermediale", "Standard + Esame", "Ipermediale + Esame", "Solo Esame"],
+            "IELTS": ["Standard", "Ipermediale"],
+            "Cambridge": ["Standard", "Ipermediale"],
+            "Trinity": ["Standard", "Ipermediale"],
+            "DELF": ["Standard", "Ipermediale"],
+            "DELE": ["Standard", "Ipermediale"],
+            "Goethe-Zertifikat": ["Standard", "Ipermediale"],
+            "Altra Certificazione": ["Standard", "Ipermediale"],
+          },
+        },
       },
     ],
     variations: [
-      { options: { corso: "Solo Esame" }, price: "140.00" },
-      { options: { corso: "Standard" }, price: "230.00" },
-      { options: { corso: "Ipermediale" }, price: "295.00" },
-      { options: { corso: "Standard + Esame" }, price: "370.00" },
-      { options: { corso: "Ipermediale + Esame" }, price: "585.00" },
+      { options: { corso: "Standard" }, price: "250.00" },
+      { options: { corso: "Ipermediale" }, price: "315.00" },
+      { options: { corso: "Solo Esame", livello: "A2 - Elementare" }, price: "140.00" },
+      { options: { corso: "Solo Esame", livello: "B1 - Intermedio" }, price: "155.00" },
+      { options: { corso: "Solo Esame", livello: "B2 - Post-Intermedio" }, price: "240.00" },
+      { options: { corso: "Solo Esame", livello: "C1 - Avanzato" }, price: "250.00" },
+      { options: { corso: "Solo Esame", livello: "C2 - Bilinguismo" }, price: "260.00" },
+      { options: { corso: "Standard + Esame", livello: "A2 - Elementare" }, price: "390.00" },
+      { options: { corso: "Standard + Esame", livello: "B1 - Intermedio" }, price: "405.00" },
+      { options: { corso: "Standard + Esame", livello: "B2 - Post-Intermedio" }, price: "490.00" },
+      { options: { corso: "Standard + Esame", livello: "C1 - Avanzato" }, price: "500.00" },
+      { options: { corso: "Standard + Esame", livello: "C2 - Bilinguismo" }, price: "510.00" },
+      { options: { corso: "Ipermediale + Esame", livello: "A2 - Elementare" }, price: "465.00" },
+      { options: { corso: "Ipermediale + Esame", livello: "B1 - Intermedio" }, price: "480.00" },
+      { options: { corso: "Ipermediale + Esame", livello: "B2 - Post-Intermedio" }, price: "565.00" },
+      { options: { corso: "Ipermediale + Esame", livello: "C1 - Avanzato" }, price: "575.00" },
+      { options: { corso: "Ipermediale + Esame", livello: "C2 - Bilinguismo" }, price: "585.00" },
     ],
     priceRange: { min: "140.00", max: "585.00" },
   },
@@ -732,13 +757,19 @@ export function getEffectivePrice(product: ShopProduct, selectedOptions?: Record
     return product.price;
   }
 
-  const match = product.variations.find((v) => {
-    return Object.entries(v.options).every(
+  const matches = product.variations.filter((v) =>
+    Object.entries(v.options).every(
       ([key, value]) => selectedOptions[key] === value,
-    );
-  });
+    )
+  );
 
-  return match ? match.price : product.price;
+  if (matches.length === 0) return product.price;
+
+  const bestMatch = matches.reduce((best, current) =>
+    Object.keys(current.options).length > Object.keys(best.options).length ? current : best
+  );
+
+  return bestMatch.price;
 }
 
 export function formatPriceDisplay(product: ShopProduct): string {

@@ -458,14 +458,19 @@ export default function ShopProductPage() {
                           onChange={(e) => setSelectedOptions((prev) => {
                             const updated = { ...prev, [opt.name]: e.target.value };
                             if (product.options) {
-                              for (const depOpt of product.options) {
-                                if (depOpt.dependsOn?.option === opt.name && updated[depOpt.name]) {
-                                  const newAllowed = depOpt.dependsOn.valuesFor[e.target.value];
-                                  if (!newAllowed || !newAllowed.includes(updated[depOpt.name])) {
-                                    delete updated[depOpt.name];
+                              const clearDependents = (changedKey: string) => {
+                                for (const depOpt of product.options!) {
+                                  if (depOpt.dependsOn?.option === changedKey && updated[depOpt.name]) {
+                                    const parentVal = updated[changedKey];
+                                    const newAllowed = parentVal ? depOpt.dependsOn.valuesFor[parentVal] : undefined;
+                                    if (!newAllowed || !newAllowed.includes(updated[depOpt.name])) {
+                                      delete updated[depOpt.name];
+                                      clearDependents(depOpt.name);
+                                    }
                                   }
                                 }
-                              }
+                              };
+                              clearDependents(opt.name);
                             }
                             return updated;
                           })}
@@ -475,19 +480,26 @@ export default function ShopProductPage() {
                         >
                           <option value="" disabled>Seleziona {opt.label.toLowerCase()}</option>
                           {availableValues.map((v) => {
-                            let priceForValue: string | null = null;
+                            let priceLabel = "";
                             if (isPriceDriving && product.variations) {
-                              const match = product.variations.find((var_) =>
+                              const matches = product.variations.filter((var_) =>
                                 Object.entries(var_.options).every(([k, val]) => {
                                   if (k === opt.name) return val === v;
                                   return !selectedOptions[k] || selectedOptions[k] === val;
                                 })
                               );
-                              if (match) priceForValue = match.price;
+                              if (matches.length === 1) {
+                                priceLabel = ` — €${parseFloat(matches[0].price).toFixed(0)}`;
+                              } else if (matches.length > 1) {
+                                const prices = matches.map(m => parseFloat(m.price));
+                                const min = Math.min(...prices);
+                                const max = Math.max(...prices);
+                                priceLabel = min === max ? ` — €${min.toFixed(0)}` : ` — da €${min.toFixed(0)}`;
+                              }
                             }
                             return (
                               <option key={v} value={v}>
-                                {v}{priceForValue ? ` — €${parseFloat(priceForValue).toFixed(0)}` : ""}
+                                {v}{priceLabel}
                               </option>
                             );
                           })}
