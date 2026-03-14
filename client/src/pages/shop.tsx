@@ -61,6 +61,7 @@ import imgItalianoIntensivo15 from "@assets/shop/italian-course.png";
 import imgItalianoIntensivo20 from "@assets/shop/italiano-intensivo-20.png";
 import imgItalianoPresenza from "@assets/shop/italiano-individuale-presenza.png";
 import imgItalianoOnline from "@assets/shop/italiano-individuale-online.png";
+import imgSpeakersCorner from "@assets/course-speakers-corner.png";
 
 const PRODUCT_IMAGES: Record<string, string> = {
   "corsi-gruppo": imgCorsiGruppo,
@@ -84,6 +85,7 @@ const PRODUCT_IMAGES: Record<string, string> = {
   "italiano-intensivo-20": imgItalianoIntensivo20,
   "italiano-individuale-presenza": imgItalianoPresenza,
   "italiano-individuale-online": imgItalianoOnline,
+  "speakers-corner": imgSpeakersCorner,
 };
 
 const CATEGORY_CONFIG = [
