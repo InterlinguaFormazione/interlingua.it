@@ -832,9 +832,6 @@ export default function ShopCheckout() {
                       <div>
                         <p className="font-medium text-sm">{product.name}</p>
                         <p className="text-xs text-muted-foreground">{product.category}</p>
-                        <span className="inline-flex items-center gap-1 mt-1 text-[9px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 rounded px-1.5 py-0.5 font-medium">
-                          Carta della Cultura
-                        </span>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <Clock className="w-3.5 h-3.5" />
@@ -941,6 +938,7 @@ export default function ShopCheckout() {
                         <SiPaypal className="w-8 h-5 text-[#003087]" />
                         <SiVisa className="w-8 h-5 text-[#1A1F71]" />
                         <SiMastercard className="w-8 h-5 text-[#EB001B]" />
+                        <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-5 w-auto" />
                       </div>
                       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                         <Shield className="w-3.5 h-3.5" />

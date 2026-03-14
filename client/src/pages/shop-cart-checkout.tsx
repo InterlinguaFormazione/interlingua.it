@@ -1272,6 +1272,7 @@ export default function CartCheckout() {
                               <SiPaypal className="w-8 h-8 text-[#003087]" />
                               <SiVisa className="w-8 h-6 text-[#1a1f71]" />
                               <SiMastercard className="w-8 h-6 text-[#eb001b]" />
+                              <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-6 w-auto" />
                             </div>
                             <button
                               id="cart-paypal-button"
@@ -1471,9 +1472,6 @@ export default function CartCheckout() {
                         </div>
                       ))}
                     </div>
-                    <span className="inline-flex items-center gap-1 mt-1 text-[9px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 rounded px-1.5 py-0.5 font-medium">
-                      Carta della Cultura
-                    </span>
                     <div className="border-t pt-3 space-y-3">
                       <button
                         type="button"
@@ -1554,6 +1552,12 @@ export default function CartCheckout() {
                           </span>
                         </div>
                       )}
+                    </div>
+                    <div className="flex items-center gap-3 pt-2">
+                      <SiPaypal className="w-8 h-5 text-[#003087]" />
+                      <SiVisa className="w-8 h-5 text-[#1a1f71]" />
+                      <SiMastercard className="w-8 h-5 text-[#eb001b]" />
+                      <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-5 w-auto" />
                     </div>
                     <div className="space-y-2 pt-2">
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
