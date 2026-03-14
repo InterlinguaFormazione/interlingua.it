@@ -228,20 +228,20 @@ function ProductCard({ product, index }: { product: ShopProduct; index: number }
                     </span>
                   )}
                 </div>
+                <span className="inline-flex items-center gap-1 mt-1 text-[9px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 rounded px-1.5 py-0.5 font-medium">
+                  Carta della Cultura
+                </span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <img src={cartaCulturaLogo} alt="Carta della Cultura" className="h-5 w-auto rounded-lg opacity-60 hover:opacity-100 transition-opacity" title="Pagabile con Carta della Cultura" />
-                <Link href={`/shop/product/${product.slug}`} onClick={(e: any) => e.stopPropagation()}>
-                  <Button
-                    size="sm"
-                    className={`bg-gradient-to-r ${gradientClass} hover:opacity-90 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 group/btn h-9`}
-                    data-testid={`button-buy-${product.slug}`}
-                  >
-                    Acquista
-                    <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform duration-300 group-hover/btn:translate-x-0.5" />
-                  </Button>
-                </Link>
-              </div>
+              <Link href={`/shop/product/${product.slug}`} onClick={(e: any) => e.stopPropagation()}>
+                <Button
+                  size="sm"
+                  className={`bg-gradient-to-r ${gradientClass} hover:opacity-90 text-white border-0 shadow-md hover:shadow-lg transition-all duration-300 group/btn h-9`}
+                  data-testid={`button-buy-${product.slug}`}
+                >
+                  Acquista
+                  <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform duration-300 group-hover/btn:translate-x-0.5" />
+                </Button>
+              </Link>
             </div>
           </div>
         </CardContent>
