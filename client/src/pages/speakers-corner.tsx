@@ -222,7 +222,7 @@ export default function SpeakersCornerPage() {
                 </div>
 
                 <div className="flex flex-wrap gap-4">
-                  <Button size="lg" className="h-14 px-8 text-base rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all" onClick={() => setLocation("/speakers-corner/acquista")} data-testid="button-sc-purchase">
+                  <Button size="lg" className="h-14 px-8 text-base rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all" onClick={() => setLocation("/shop/product/speakers-corner")} data-testid="button-sc-purchase">
                     <CreditCard className="w-5 h-5 mr-2" />
                     Acquista Abbonamento
                   </Button>
@@ -441,7 +441,7 @@ export default function SpeakersCornerPage() {
                     <p className="text-sm text-muted-foreground">
                       Non sei ancora abbonato?{" "}
                       <button 
-                        onClick={() => setLocation("/speakers-corner/acquista")}
+                        onClick={() => setLocation("/shop/product/speakers-corner")}
                         className="text-primary font-semibold hover:underline"
                         data-testid="link-sc-info"
                       >
@@ -478,7 +478,7 @@ export default function SpeakersCornerPage() {
                 Unisciti alla nostra community di conversazione in inglese. Migliora la tua fluenza settimana dopo settimana.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
-                <Button size="lg" className="h-14 px-8 text-base rounded-xl bg-white text-primary hover:bg-white/90 shadow-xl" onClick={() => setLocation("/speakers-corner/acquista")} data-testid="button-sc-cta-purchase">
+                <Button size="lg" className="h-14 px-8 text-base rounded-xl bg-white text-primary hover:bg-white/90 shadow-xl" onClick={() => setLocation("/shop/product/speakers-corner")} data-testid="button-sc-cta-purchase">
                   <CreditCard className="w-5 h-5 mr-2" />
                   Acquista Abbonamento
                 </Button>

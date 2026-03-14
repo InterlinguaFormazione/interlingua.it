@@ -418,6 +418,10 @@ export default function ShopCheckout() {
       toast({ title: "Email non valida", description: "Inserisci un indirizzo email valido.", variant: "destructive" });
       return;
     }
+    if (product?.requiresPassword && !customerPassword) {
+      toast({ title: "Password obbligatoria", description: "Questo prodotto richiede la creazione di un account con password per accedere al servizio.", variant: "destructive" });
+      return;
+    }
     if (customerPassword) {
       const hasUppercase = /[A-Z]/.test(customerPassword);
       const hasLowercase = /[a-z]/.test(customerPassword);
@@ -1097,10 +1101,16 @@ export default function ShopCheckout() {
                       <div className="border-t pt-4 mt-2">
                         <div className="flex items-center gap-2 mb-2">
                           <Lock className="w-4 h-4 text-primary" />
-                          <Label htmlFor="customerPassword" className="font-medium">Crea il tuo account</Label>
+                          <Label htmlFor="customerPassword" className="font-medium">
+                            {product?.requiresPassword ? "Crea il tuo account (obbligatorio)" : "Crea il tuo account"}
+                          </Label>
+                          {product?.requiresPassword && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Richiesto</Badge>}
                         </div>
                         <p className="text-xs text-muted-foreground mb-2">
-                          Inserisci una password per accedere alla tua area clienti dopo l'acquisto, dove troverai i materiali del corso.
+                          {product?.requiresPassword
+                            ? "La password è necessaria per accedere alla dashboard Speaker's Corner dove potrai prenotare le sessioni settimanali."
+                            : "Inserisci una password per accedere alla tua area clienti dopo l'acquisto, dove troverai i materiali del corso."
+                          }
                         </p>
                         <div className="relative mt-1">
                           <Input

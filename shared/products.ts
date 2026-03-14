@@ -23,6 +23,7 @@ export interface ShopProduct {
   options?: ProductOption[];
   variations?: ProductVariation[];
   priceRange?: { min: string; max: string };
+  requiresPassword?: boolean;
 }
 
 export const SHOP_PRODUCTS: ShopProduct[] = [
@@ -688,6 +689,24 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       { options: { ore: "24 ore" }, price: "1060.00" },
     ],
     priceRange: { min: "300.00", max: "1060.00" },
+  },
+  {
+    slug: "speakers-corner",
+    name: "Speaker's Corner — Abbonamento Annuale",
+    category: "Formazione in Presenza",
+    description: "Sessioni settimanali di conversazione in inglese con insegnanti qualificati. Ogni venerdì dalle 18:30 alle 19:30 nella nostra sede di Vicenza.",
+    price: "200.00",
+    priceLabel: "anno",
+    duration: "12 mesi",
+    features: [
+      "Sessioni settimanali ogni venerdì",
+      "Insegnanti qualificati",
+      "Gruppi piccoli (max 12 partecipanti)",
+      "Accesso alla dashboard prenotazioni",
+      "3 mesi di accesso piattaforma e-learning",
+    ],
+    pageLink: "/speakers-corner",
+    requiresPassword: true,
   },
 ];
 

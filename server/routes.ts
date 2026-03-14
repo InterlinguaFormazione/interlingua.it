@@ -2406,6 +2406,71 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         shopCustomerSessions.set(customerToken, { createdAt: Date.now(), customerId });
       }
 
+      if (product.slug === "speakers-corner" && customerPassword) {
+        try {
+          const existingSC = await storage.getScSubscriberByEmail(customerEmail);
+          if (!existingSC) {
+            const today = new Date();
+            const endDate = new Date(today);
+            endDate.setFullYear(endDate.getFullYear() + 1);
+            const hashedPw = await bcrypt.hash(customerPassword, 10);
+            const subscriber = await storage.createScSubscriber({
+              nome: customerFirstName,
+              cognome: customerLastName,
+              email: customerEmail,
+              password: hashedPw,
+              tipoFatturazione: billingPartitaIva ? "azienda" : "privato",
+              codiceFiscale: billingCodiceFiscale || null,
+              indirizzo: billingIndirizzo || null,
+              cap: billingCap || null,
+              citta: billingCitta || null,
+              provincia: billingProvincia || null,
+              paese: billingPaese || "IT",
+              ragioneSociale: null,
+              partitaIva: billingPartitaIva || null,
+              codiceSdi: billingCodiceSdi || null,
+              pec: billingPec || null,
+              subscriptionStart: today.toISOString().split('T')[0],
+              subscriptionEnd: endDate.toISOString().split('T')[0],
+              active: true,
+            });
+            await storage.createScPayment({
+              subscriberId: subscriber.id,
+              paypalOrderId,
+              amount: finalPrice,
+              currency: "EUR",
+              status: "completed",
+              payerEmail: customerEmail,
+              billingNome: customerFirstName,
+              billingCognome: customerLastName,
+              billingCodiceFiscale: billingCodiceFiscale || null,
+              billingIndirizzo: billingIndirizzo || null,
+              billingCap: billingCap || null,
+              billingCitta: billingCitta || null,
+              billingProvincia: billingProvincia || null,
+              billingPartitaIva: billingPartitaIva || null,
+              billingCodiceSdi: billingCodiceSdi || null,
+              billingPec: billingPec || null,
+            });
+            try {
+              await sendSubscriptionConfirmation({
+                nome: customerFirstName,
+                cognome: customerLastName,
+                email: customerEmail,
+                subscriptionStart: today.toISOString().split('T')[0],
+                subscriptionEnd: endDate.toISOString().split('T')[0],
+                amount: finalPrice,
+                paypalOrderId,
+              });
+            } catch (scEmailErr) {
+              console.error("Failed to send SC subscription confirmation:", scEmailErr);
+            }
+          }
+        } catch (scErr) {
+          console.error("Failed to create SC subscriber from shop purchase:", scErr);
+        }
+      }
+
       try {
         await sendContactNotification({
           name: `${customerFirstName} ${customerLastName}`,
@@ -2429,7 +2494,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
           productName: productNameWithOptions,
           amount: finalPrice,
           paymentMethod: "PayPal",
-          source: "shop-acquisto",
+          source: product.slug === "speakers-corner" ? "speakers-corner" : "shop-acquisto",
         });
       } catch (crmError) {
         console.error("Failed to forward shop purchase to CRM:", crmError);
@@ -2656,6 +2721,73 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       if (customerId) {
         customerToken = generateAdminToken();
         shopCustomerSessions.set(customerToken, { createdAt: Date.now(), customerId });
+      }
+
+      const hasSCItem = validatedItems.some(i => i.product.slug === "speakers-corner");
+      if (hasSCItem && customerPassword) {
+        try {
+          const existingSC = await storage.getScSubscriberByEmail(customerEmail);
+          if (!existingSC) {
+            const today = new Date();
+            const endDate = new Date(today);
+            endDate.setFullYear(endDate.getFullYear() + 1);
+            const hashedPw = await bcrypt.hash(customerPassword, 10);
+            const scItem = validatedItems.find(i => i.product.slug === "speakers-corner")!;
+            const subscriber = await storage.createScSubscriber({
+              nome: customerFirstName,
+              cognome: customerLastName,
+              email: customerEmail,
+              password: hashedPw,
+              tipoFatturazione: billingPartitaIva ? "azienda" : "privato",
+              codiceFiscale: billingCodiceFiscale || null,
+              indirizzo: billingIndirizzo || null,
+              cap: billingCap || null,
+              citta: billingCitta || null,
+              provincia: billingProvincia || null,
+              paese: billingPaese || "IT",
+              ragioneSociale: null,
+              partitaIva: billingPartitaIva || null,
+              codiceSdi: billingCodiceSdi || null,
+              pec: billingPec || null,
+              subscriptionStart: today.toISOString().split('T')[0],
+              subscriptionEnd: endDate.toISOString().split('T')[0],
+              active: true,
+            });
+            await storage.createScPayment({
+              subscriberId: subscriber.id,
+              paypalOrderId,
+              amount: scItem.unitPrice,
+              currency: "EUR",
+              status: "completed",
+              payerEmail: customerEmail,
+              billingNome: customerFirstName,
+              billingCognome: customerLastName,
+              billingCodiceFiscale: billingCodiceFiscale || null,
+              billingIndirizzo: billingIndirizzo || null,
+              billingCap: billingCap || null,
+              billingCitta: billingCitta || null,
+              billingProvincia: billingProvincia || null,
+              billingPartitaIva: billingPartitaIva || null,
+              billingCodiceSdi: billingCodiceSdi || null,
+              billingPec: billingPec || null,
+            });
+            try {
+              await sendSubscriptionConfirmation({
+                nome: customerFirstName,
+                cognome: customerLastName,
+                email: customerEmail,
+                subscriptionStart: today.toISOString().split('T')[0],
+                subscriptionEnd: endDate.toISOString().split('T')[0],
+                amount: scItem.unitPrice,
+                paypalOrderId,
+              });
+            } catch (scEmailErr) {
+              console.error("Failed to send SC subscription confirmation from cart:", scEmailErr);
+            }
+          }
+        } catch (scErr) {
+          console.error("Failed to create SC subscriber from cart purchase:", scErr);
+        }
       }
 
       const itemsSummary = validatedItems.map(i => `${i.product.name} x${i.quantity}`).join(", ");

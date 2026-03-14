@@ -394,6 +394,11 @@ export default function CartCheckout() {
       toast({ title: "Email non valida", description: "Inserisci un indirizzo email valido.", variant: "destructive" });
       return;
     }
+    const cartRequiresPassword = items.some(i => i.product.requiresPassword);
+    if (cartRequiresPassword && !customerPassword) {
+      toast({ title: "Password obbligatoria", description: "Il carrello contiene un prodotto che richiede la creazione di un account con password.", variant: "destructive" });
+      return;
+    }
     if (customerPassword) {
       const hasUppercase = /[A-Z]/.test(customerPassword);
       const hasLowercase = /[a-z]/.test(customerPassword);
@@ -910,14 +915,21 @@ export default function CartCheckout() {
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="password">Password (per Area Clienti)</Label>
+                        <Label htmlFor="password">
+                          {items.some(i => i.product.requiresPassword) ? "Password (obbligatoria)" : "Password (per Area Clienti)"}
+                        </Label>
                         <div className="relative">
                           <Input id="password" type={showPassword ? "text" : "password"} value={customerPassword} onChange={(e) => setCustomerPassword(e.target.value)} placeholder="Minimo 8 caratteri" className="pr-10" data-testid="input-password" />
                           <button type="button" tabIndex={-1} onClick={() => setShowPassword(!showPassword)} className="absolute right-0 top-0 h-full px-3 text-muted-foreground" data-testid="button-toggle-password">
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
                         </div>
-                        <p className="text-xs text-muted-foreground">Crea una password per accedere ai tuoi acquisti</p>
+                        <p className="text-xs text-muted-foreground">
+                          {items.some(i => i.product.requiresPassword)
+                            ? "La password è necessaria per accedere alla dashboard Speaker's Corner."
+                            : "Crea una password per accedere ai tuoi acquisti"
+                          }
+                        </p>
                         {customerPassword && (
                           <>
                             <div className="mt-2 space-y-1">
