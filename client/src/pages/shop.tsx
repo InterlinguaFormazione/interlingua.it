@@ -88,9 +88,10 @@ const PRODUCT_IMAGES: Record<string, string> = {
 
 const CATEGORY_CONFIG = [
   { key: "Tutti", label: "Tutti", icon: Sparkles, color: "from-primary to-blue-400" },
-  { key: "Formazione in Presenza", label: "In Presenza", icon: GraduationCap, color: "from-blue-600 to-indigo-500" },
   { key: "Corsi E-Learning", label: "E-Learning", icon: Monitor, color: "from-emerald-600 to-teal-500" },
   { key: "Language Coaching", label: "Coaching", icon: Headphones, color: "from-violet-600 to-purple-500" },
+  { key: "Formazione Online", label: "Online", icon: Monitor, color: "from-cyan-600 to-sky-500" },
+  { key: "Formazione in Presenza", label: "In Presenza", icon: GraduationCap, color: "from-blue-600 to-indigo-500" },
   { key: "Corsi di Italiano per Stranieri", label: "Italiano", icon: Globe, color: "from-orange-500 to-amber-500" },
 ];
 
