@@ -142,6 +142,7 @@ export const scSubscribers = pgTable("sc_subscribers", {
   subscriptionEnd: date("subscription_end").notNull(),
   active: boolean("active").default(true),
   renewalReminderCount: integer("renewal_reminder_count").default(0),
+  renewalVoucherCode: text("renewal_voucher_code"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

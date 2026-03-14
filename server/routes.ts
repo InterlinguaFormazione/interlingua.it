@@ -1570,22 +1570,26 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       for (const sub of needsReminder) {
         try {
           const reminderNum = (sub.renewalReminderCount || 0) + 1;
-          const code = `SCRINNOVO-${sub.id.slice(0, 6).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
-          const validUntil = new Date(sub.subscriptionEnd);
-          validUntil.setDate(validUntil.getDate() + 14);
+          let code = sub.renewalVoucherCode;
 
-          await storage.createDiscountVoucher({
-            code,
-            description: `Sconto rinnovo Speaker's Corner (promemoria ${reminderNum}/2) per ${sub.nome} ${sub.cognome} (${sub.email})`,
-            discountType: "percentage",
-            discountValue: "50",
-            maxUses: 1,
-            usedCount: 0,
-            validFrom: new Date(),
-            validUntil,
-            productSlugs: "speakers-corner",
-            active: true,
-          });
+          if (!code) {
+            code = `SCRINNOVO-${sub.id.slice(0, 6).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
+            const validUntil = new Date(sub.subscriptionEnd);
+            validUntil.setDate(validUntil.getDate() + 14);
+
+            await storage.createDiscountVoucher({
+              code,
+              description: `Sconto rinnovo Speaker's Corner per ${sub.nome} ${sub.cognome} (${sub.email})`,
+              discountType: "percentage",
+              discountValue: "50",
+              maxUses: 1,
+              usedCount: 0,
+              validFrom: new Date(),
+              validUntil,
+              productSlugs: "speakers-corner",
+              active: true,
+            });
+          }
 
           const renewalUrl = `https://skillcraft.interlingua.it/shop/product/speakers-corner`;
 
@@ -1601,6 +1605,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
 
           await storage.updateScSubscriber(sub.id, {
             renewalReminderCount: reminderNum,
+            renewalVoucherCode: code,
           });
 
           console.log(`Sent renewal reminder ${reminderNum}/2 to ${sub.email} with code ${code}`);
@@ -2333,6 +2338,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
               subscriptionEnd,
               active: true,
               renewalReminderCount: 0,
+              renewalVoucherCode: null,
             });
             subscriberId = existingSC.id;
           } else {
@@ -2672,6 +2678,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
               subscriptionEnd,
               active: true,
               renewalReminderCount: 0,
+              renewalVoucherCode: null,
             });
             subscriberId = existingSC.id;
           } else {
