@@ -2,6 +2,10 @@ export interface ProductOption {
   name: string;
   label: string;
   values: string[];
+  dependsOn?: {
+    option: string;
+    valuesFor: Record<string, string[]>;
+  };
 }
 
 export interface ProductVariation {
@@ -185,7 +189,16 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
       {
         name: "certificazione",
         label: "Certificazione",
-        values: ["LanguageCert", "IELTS", "Cambridge", "Trinity", "DELF", "DELE", "Goethe-Zertifikat", "Altra Certificazione"],
+        values: ["LanguageCert", "IELTS", "Cambridge", "Trinity", "TOEFL", "DELF", "DELE", "Goethe-Zertifikat"],
+        dependsOn: {
+          option: "lingua",
+          valuesFor: {
+            "Inglese": ["LanguageCert", "IELTS", "Cambridge", "Trinity", "TOEFL"],
+            "Francese": ["DELF"],
+            "Spagnolo": ["DELE"],
+            "Tedesco": ["Goethe-Zertifikat"],
+          },
+        },
       },
       {
         name: "livello",

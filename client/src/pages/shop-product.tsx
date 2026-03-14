@@ -443,18 +443,38 @@ export default function ShopProductPage() {
                   </h2>
                   {product.options.map((opt) => {
                     const isPriceDriving = priceDrivingKeys.has(opt.name);
+                    let availableValues = opt.values;
+                    if (opt.dependsOn) {
+                      const parentValue = selectedOptions[opt.dependsOn.option];
+                      if (parentValue && opt.dependsOn.valuesFor[parentValue]) {
+                        availableValues = opt.dependsOn.valuesFor[parentValue];
+                      }
+                    }
                     return (
                       <div key={opt.name}>
                         <Label className="text-sm font-semibold mb-2 block">{opt.label}</Label>
                         <select
-                          value={selectedOptions[opt.name] || ""}
-                          onChange={(e) => setSelectedOptions((prev) => ({ ...prev, [opt.name]: e.target.value }))}
+                          value={availableValues.includes(selectedOptions[opt.name] || "") ? selectedOptions[opt.name] : ""}
+                          onChange={(e) => setSelectedOptions((prev) => {
+                            const updated = { ...prev, [opt.name]: e.target.value };
+                            if (product.options) {
+                              for (const depOpt of product.options) {
+                                if (depOpt.dependsOn?.option === opt.name && updated[depOpt.name]) {
+                                  const newAllowed = depOpt.dependsOn.valuesFor[e.target.value];
+                                  if (!newAllowed || !newAllowed.includes(updated[depOpt.name])) {
+                                    delete updated[depOpt.name];
+                                  }
+                                }
+                              }
+                            }
+                            return updated;
+                          })}
                           className="w-full h-11 px-3 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary appearance-none cursor-pointer"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 12px center" }}
                           data-testid={`select-${opt.name}`}
                         >
                           <option value="" disabled>Seleziona {opt.label.toLowerCase()}</option>
-                          {opt.values.map((v) => {
+                          {availableValues.map((v) => {
                             let priceForValue: string | null = null;
                             if (isPriceDriving && product.variations) {
                               const match = product.variations.find((var_) =>
