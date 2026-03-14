@@ -2011,11 +2011,6 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         return res.status(400).json({ success: false, message: "La password deve avere almeno 8 caratteri, una maiuscola, una minuscola, un numero e un carattere speciale." });
       }
 
-      const existing = await storage.getScSubscriberByEmail(email);
-      if (existing) {
-        return res.status(400).json({ success: false, message: "Esiste già un account con questa email. Accedi dalla pagina Speaker's Corner." });
-      }
-
       const existingPayment = await storage.getScPaymentByOrderId(paypalOrderId);
       if (existingPayment) {
         return res.status(400).json({ success: false, message: "Questo pagamento è già stato elaborato." });
@@ -2031,33 +2026,54 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       }
 
       const today = new Date();
-      const endDate = new Date(today);
-      endDate.setFullYear(endDate.getFullYear() + 1);
+      const existing = await storage.getScSubscriberByEmail(email);
+      let subscriberId: string;
+      let subscriptionStart: string;
+      let subscriptionEnd: string;
 
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const subscriber = await storage.createScSubscriber({
-        nome,
-        cognome,
-        email,
-        password: hashedPassword,
-        tipoFatturazione: tipoFatturazione || null,
-        codiceFiscale: codiceFiscale || null,
-        indirizzo: indirizzo || null,
-        cap: cap || null,
-        citta: citta || null,
-        provincia: provincia || null,
-        paese: paese || null,
-        ragioneSociale: ragioneSociale || null,
-        partitaIva: partitaIva || null,
-        codiceSdi: codiceSdi || null,
-        pec: pec || null,
-        subscriptionStart: today.toISOString().split('T')[0],
-        subscriptionEnd: endDate.toISOString().split('T')[0],
-        active: true,
-      });
+      if (existing) {
+        const currentEnd = new Date(existing.subscriptionEnd || today);
+        const extensionBase = currentEnd > today ? currentEnd : today;
+        const newEnd = new Date(extensionBase);
+        newEnd.setFullYear(newEnd.getFullYear() + 1);
+        subscriptionStart = existing.subscriptionStart || today.toISOString().split('T')[0];
+        subscriptionEnd = newEnd.toISOString().split('T')[0];
+        await storage.updateScSubscriber(existing.id, {
+          subscriptionEnd,
+          active: true,
+        });
+        subscriberId = existing.id;
+      } else {
+        const endDate = new Date(today);
+        endDate.setFullYear(endDate.getFullYear() + 1);
+        subscriptionStart = today.toISOString().split('T')[0];
+        subscriptionEnd = endDate.toISOString().split('T')[0];
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const subscriber = await storage.createScSubscriber({
+          nome,
+          cognome,
+          email,
+          password: hashedPassword,
+          tipoFatturazione: tipoFatturazione || null,
+          codiceFiscale: codiceFiscale || null,
+          indirizzo: indirizzo || null,
+          cap: cap || null,
+          citta: citta || null,
+          provincia: provincia || null,
+          paese: paese || null,
+          ragioneSociale: ragioneSociale || null,
+          partitaIva: partitaIva || null,
+          codiceSdi: codiceSdi || null,
+          pec: pec || null,
+          subscriptionStart,
+          subscriptionEnd,
+          active: true,
+        });
+        subscriberId = subscriber.id;
+      }
 
       await storage.createScPayment({
-        subscriberId: subscriber.id,
+        subscriberId,
         paypalOrderId,
         amount: verification.amount || "200.00",
         currency: verification.currency || "EUR",
@@ -2081,9 +2097,11 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         if (existingCustomer) {
           customerId = existingCustomer.id;
         } else {
+          const custPassword = existing ? password : password;
+          const hashedCustPw = await bcrypt.hash(custPassword, 10);
           const newCustomer = await storage.createShopCustomer({
             email,
-            password: hashedPassword,
+            password: hashedCustPw,
             firstName: nome,
             lastName: cognome,
             phone: null,
@@ -2127,8 +2145,8 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
           nome,
           cognome,
           email,
-          subscriptionStart: today.toISOString().split('T')[0],
-          subscriptionEnd: endDate.toISOString().split('T')[0],
+          subscriptionStart,
+          subscriptionEnd,
           amount: verification.amount || "200.00",
           paypalOrderId,
         });
@@ -2153,8 +2171,11 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
         console.error("Failed to forward SC purchase to CRM:", crmError);
       }
 
-      const { password: _, ...safeSubscriber } = subscriber;
-      res.json({ success: true, subscriber: safeSubscriber });
+      const updatedSubscriber = existing
+        ? await storage.getScSubscriberByEmail(email)
+        : await storage.getScSubscriberByEmail(email);
+      const safeData = updatedSubscriber ? (({ password: _, ...rest }) => rest)(updatedSubscriber) : { id: subscriberId, email };
+      res.json({ success: true, subscriber: safeData });
     } catch (error) {
       console.error("Error processing SC purchase:", error);
       res.status(500).json({ success: false, message: "Errore durante l'elaborazione dell'acquisto" });
@@ -2409,10 +2430,28 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       if (product.slug === "speakers-corner" && customerPassword) {
         try {
           const existingSC = await storage.getScSubscriberByEmail(customerEmail);
-          if (!existingSC) {
-            const today = new Date();
+          const today = new Date();
+          let subscriberId: string;
+          let subscriptionStart: string;
+          let subscriptionEnd: string;
+
+          if (existingSC) {
+            const currentEnd = new Date(existingSC.subscriptionEnd || today);
+            const extensionBase = currentEnd > today ? currentEnd : today;
+            const newEnd = new Date(extensionBase);
+            newEnd.setFullYear(newEnd.getFullYear() + 1);
+            subscriptionStart = existingSC.subscriptionStart || today.toISOString().split('T')[0];
+            subscriptionEnd = newEnd.toISOString().split('T')[0];
+            await storage.updateScSubscriber(existingSC.id, {
+              subscriptionEnd,
+              active: true,
+            });
+            subscriberId = existingSC.id;
+          } else {
             const endDate = new Date(today);
             endDate.setFullYear(endDate.getFullYear() + 1);
+            subscriptionStart = today.toISOString().split('T')[0];
+            subscriptionEnd = endDate.toISOString().split('T')[0];
             const hashedPw = await bcrypt.hash(customerPassword, 10);
             const subscriber = await storage.createScSubscriber({
               nome: customerFirstName,
@@ -2430,41 +2469,42 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
               partitaIva: billingPartitaIva || null,
               codiceSdi: billingCodiceSdi || null,
               pec: billingPec || null,
-              subscriptionStart: today.toISOString().split('T')[0],
-              subscriptionEnd: endDate.toISOString().split('T')[0],
+              subscriptionStart,
+              subscriptionEnd,
               active: true,
             });
-            await storage.createScPayment({
-              subscriberId: subscriber.id,
-              paypalOrderId,
+            subscriberId = subscriber.id;
+          }
+          await storage.createScPayment({
+            subscriberId,
+            paypalOrderId,
+            amount: finalPrice,
+            currency: "EUR",
+            status: "completed",
+            payerEmail: customerEmail,
+            billingNome: customerFirstName,
+            billingCognome: customerLastName,
+            billingCodiceFiscale: billingCodiceFiscale || null,
+            billingIndirizzo: billingIndirizzo || null,
+            billingCap: billingCap || null,
+            billingCitta: billingCitta || null,
+            billingProvincia: billingProvincia || null,
+            billingPartitaIva: billingPartitaIva || null,
+            billingCodiceSdi: billingCodiceSdi || null,
+            billingPec: billingPec || null,
+          });
+          try {
+            await sendSubscriptionConfirmation({
+              nome: customerFirstName,
+              cognome: customerLastName,
+              email: customerEmail,
+              subscriptionStart,
+              subscriptionEnd,
               amount: finalPrice,
-              currency: "EUR",
-              status: "completed",
-              payerEmail: customerEmail,
-              billingNome: customerFirstName,
-              billingCognome: customerLastName,
-              billingCodiceFiscale: billingCodiceFiscale || null,
-              billingIndirizzo: billingIndirizzo || null,
-              billingCap: billingCap || null,
-              billingCitta: billingCitta || null,
-              billingProvincia: billingProvincia || null,
-              billingPartitaIva: billingPartitaIva || null,
-              billingCodiceSdi: billingCodiceSdi || null,
-              billingPec: billingPec || null,
+              paypalOrderId,
             });
-            try {
-              await sendSubscriptionConfirmation({
-                nome: customerFirstName,
-                cognome: customerLastName,
-                email: customerEmail,
-                subscriptionStart: today.toISOString().split('T')[0],
-                subscriptionEnd: endDate.toISOString().split('T')[0],
-                amount: finalPrice,
-                paypalOrderId,
-              });
-            } catch (scEmailErr) {
-              console.error("Failed to send SC subscription confirmation:", scEmailErr);
-            }
+          } catch (scEmailErr) {
+            console.error("Failed to send SC subscription confirmation:", scEmailErr);
           }
         } catch (scErr) {
           console.error("Failed to create SC subscriber from shop purchase:", scErr);
@@ -2727,12 +2767,30 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
       if (hasSCItem && customerPassword) {
         try {
           const existingSC = await storage.getScSubscriberByEmail(customerEmail);
-          if (!existingSC) {
-            const today = new Date();
+          const today = new Date();
+          const scItem = validatedItems.find(i => i.product.slug === "speakers-corner")!;
+          let subscriberId: string;
+          let subscriptionStart: string;
+          let subscriptionEnd: string;
+
+          if (existingSC) {
+            const currentEnd = new Date(existingSC.subscriptionEnd || today);
+            const extensionBase = currentEnd > today ? currentEnd : today;
+            const newEnd = new Date(extensionBase);
+            newEnd.setFullYear(newEnd.getFullYear() + 1);
+            subscriptionStart = existingSC.subscriptionStart || today.toISOString().split('T')[0];
+            subscriptionEnd = newEnd.toISOString().split('T')[0];
+            await storage.updateScSubscriber(existingSC.id, {
+              subscriptionEnd,
+              active: true,
+            });
+            subscriberId = existingSC.id;
+          } else {
             const endDate = new Date(today);
             endDate.setFullYear(endDate.getFullYear() + 1);
+            subscriptionStart = today.toISOString().split('T')[0];
+            subscriptionEnd = endDate.toISOString().split('T')[0];
             const hashedPw = await bcrypt.hash(customerPassword, 10);
-            const scItem = validatedItems.find(i => i.product.slug === "speakers-corner")!;
             const subscriber = await storage.createScSubscriber({
               nome: customerFirstName,
               cognome: customerLastName,
@@ -2749,41 +2807,42 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
               partitaIva: billingPartitaIva || null,
               codiceSdi: billingCodiceSdi || null,
               pec: billingPec || null,
-              subscriptionStart: today.toISOString().split('T')[0],
-              subscriptionEnd: endDate.toISOString().split('T')[0],
+              subscriptionStart,
+              subscriptionEnd,
               active: true,
             });
-            await storage.createScPayment({
-              subscriberId: subscriber.id,
-              paypalOrderId,
+            subscriberId = subscriber.id;
+          }
+          await storage.createScPayment({
+            subscriberId,
+            paypalOrderId,
+            amount: scItem.unitPrice,
+            currency: "EUR",
+            status: "completed",
+            payerEmail: customerEmail,
+            billingNome: customerFirstName,
+            billingCognome: customerLastName,
+            billingCodiceFiscale: billingCodiceFiscale || null,
+            billingIndirizzo: billingIndirizzo || null,
+            billingCap: billingCap || null,
+            billingCitta: billingCitta || null,
+            billingProvincia: billingProvincia || null,
+            billingPartitaIva: billingPartitaIva || null,
+            billingCodiceSdi: billingCodiceSdi || null,
+            billingPec: billingPec || null,
+          });
+          try {
+            await sendSubscriptionConfirmation({
+              nome: customerFirstName,
+              cognome: customerLastName,
+              email: customerEmail,
+              subscriptionStart,
+              subscriptionEnd,
               amount: scItem.unitPrice,
-              currency: "EUR",
-              status: "completed",
-              payerEmail: customerEmail,
-              billingNome: customerFirstName,
-              billingCognome: customerLastName,
-              billingCodiceFiscale: billingCodiceFiscale || null,
-              billingIndirizzo: billingIndirizzo || null,
-              billingCap: billingCap || null,
-              billingCitta: billingCitta || null,
-              billingProvincia: billingProvincia || null,
-              billingPartitaIva: billingPartitaIva || null,
-              billingCodiceSdi: billingCodiceSdi || null,
-              billingPec: billingPec || null,
+              paypalOrderId,
             });
-            try {
-              await sendSubscriptionConfirmation({
-                nome: customerFirstName,
-                cognome: customerLastName,
-                email: customerEmail,
-                subscriptionStart: today.toISOString().split('T')[0],
-                subscriptionEnd: endDate.toISOString().split('T')[0],
-                amount: scItem.unitPrice,
-                paypalOrderId,
-              });
-            } catch (scEmailErr) {
-              console.error("Failed to send SC subscription confirmation from cart:", scEmailErr);
-            }
+          } catch (scEmailErr) {
+            console.error("Failed to send SC subscription confirmation from cart:", scEmailErr);
           }
         } catch (scErr) {
           console.error("Failed to create SC subscriber from cart purchase:", scErr);
