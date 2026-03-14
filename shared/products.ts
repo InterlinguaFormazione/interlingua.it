@@ -693,8 +693,8 @@ export const SHOP_PRODUCTS: ShopProduct[] = [
   {
     slug: "speakers-corner",
     name: "Speaker's Corner — Abbonamento Annuale",
-    category: "Formazione in Presenza",
-    description: "Sessioni settimanali di conversazione in inglese con insegnanti qualificati. Ogni venerdì dalle 18:30 alle 19:30 nella nostra sede di Vicenza.",
+    category: "Formazione Online",
+    description: "Sessioni settimanali di conversazione in inglese con insegnanti qualificati. Ogni venerdì dalle 18:30 alle 19:30 online via Zoom.",
     price: "200.00",
     priceLabel: "anno",
     duration: "12 mesi",
