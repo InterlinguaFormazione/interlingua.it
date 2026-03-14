@@ -356,6 +356,10 @@ export default function ShopProductPage() {
     Object.entries(v.options).every(([k, val]) => selectedOptions[k] === val)
   );
 
+  const hasPriceDrivingSelection = product?.variations ? product.variations.some((v) =>
+    Object.entries(v.options).every(([k, val]) => selectedOptions[k] === val)
+  ) : false;
+
   const handleAddToCart = () => {
     if (product.options && product.options.length > 0 && !hasAllOptions) {
       toast({ title: "Seleziona le opzioni", description: "Configura tutte le opzioni prima di aggiungere al carrello.", variant: "destructive" });
@@ -477,11 +481,11 @@ export default function ShopProductPage() {
               <div className="flex items-center justify-between mb-5">
                 <div>
                   <span className="text-xs text-muted-foreground uppercase tracking-wide block mb-0.5">
-                    {product.variations && hasAllOptions && hasValidVariation ? "Prezzo" : product.priceRange ? "A partire da" : "Prezzo"}
+                    {hasPriceDrivingSelection ? "Prezzo" : product.priceRange ? "A partire da" : "Prezzo"}
                   </span>
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-3xl font-extrabold">
-                      &euro;{product.variations && hasAllOptions && hasValidVariation
+                      &euro;{hasPriceDrivingSelection
                         ? parseFloat(effectivePrice).toFixed(2)
                         : product.priceRange
                           ? parseFloat(product.priceRange.min).toFixed(0)
@@ -491,7 +495,7 @@ export default function ShopProductPage() {
                     {!product.variations && !product.priceRange && product.priceLabel && (
                       <span className="text-sm text-muted-foreground">/{product.priceLabel}</span>
                     )}
-                    {product.priceRange && !(hasAllOptions && hasValidVariation) && (
+                    {product.priceRange && !hasPriceDrivingSelection && (
                       <span className="text-sm text-muted-foreground">
                         - &euro;{parseFloat(product.priceRange.max).toFixed(0)}
                       </span>
