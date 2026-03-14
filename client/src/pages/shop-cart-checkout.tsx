@@ -1471,6 +1471,9 @@ export default function CartCheckout() {
                         </div>
                       ))}
                     </div>
+                    <span className="inline-flex items-center gap-1 mt-1 text-[9px] text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 rounded px-1.5 py-0.5 font-medium">
+                      Carta della Cultura
+                    </span>
                     <div className="border-t pt-3 space-y-3">
                       <button
                         type="button"
