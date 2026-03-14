@@ -307,6 +307,91 @@ Per qualsiasi domanda contattaci a: infocorsi@skillcraft.interlingua.it
   await ses.send(command);
 }
 
+export async function sendRenewalReminder(data: {
+  nome: string;
+  cognome: string;
+  email: string;
+  subscriptionEnd: string;
+  discountCode: string;
+  discountPercent: number;
+  renewalUrl: string;
+}) {
+  const htmlBody = `
+    <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8f9fa; padding: 20px;">
+      <div style="background: linear-gradient(135deg, #7c3aed, #14b8a6); padding: 24px; border-radius: 12px 12px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 22px;">Il tuo abbonamento Speaker's Corner sta per scadere</h1>
+        <p style="color: rgba(255,255,255,0.85); margin: 8px 0 0; font-size: 14px;">SkillCraft-Interlingua</p>
+      </div>
+      <div style="background: white; padding: 24px; border-radius: 0 0 12px 12px; border: 1px solid #e5e7eb; border-top: none;">
+        <p style="color: #4b5563; line-height: 1.6;">Gentile <strong>${data.nome} ${data.cognome}</strong>,</p>
+        <p style="color: #4b5563; line-height: 1.6;">Il tuo abbonamento a Speaker's Corner scade il <strong>${data.subscriptionEnd}</strong>.</p>
+        <p style="color: #4b5563; line-height: 1.6;">Non perdere l'accesso alle nostre sessioni settimanali di conversazione in inglese! Abbiamo preparato un'offerta esclusiva per il tuo rinnovo:</p>
+        <div style="background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
+          <p style="color: #92400e; font-size: 13px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Sconto esclusivo per il rinnovo</p>
+          <p style="color: #78350f; font-size: 36px; font-weight: 800; margin: 0;">${data.discountPercent}% DI SCONTO</p>
+          <p style="color: #92400e; font-size: 14px; margin: 8px 0 0;">Usa il codice:</p>
+          <p style="background: white; display: inline-block; padding: 8px 20px; border-radius: 8px; font-size: 20px; font-weight: 700; color: #7c3aed; letter-spacing: 2px; margin: 8px 0 0; border: 2px dashed #7c3aed;">${data.discountCode}</p>
+        </div>
+        <div style="text-align: center; margin: 24px 0;">
+          <a href="${data.renewalUrl}" style="display: inline-block; background: linear-gradient(135deg, #7c3aed, #14b8a6); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 700; font-size: 16px;">Rinnova Ora con il ${data.discountPercent}% di Sconto</a>
+        </div>
+        <p style="color: #6b7280; font-size: 13px; line-height: 1.6;">Cosa include il tuo abbonamento:</p>
+        <ul style="color: #6b7280; font-size: 13px; line-height: 1.8; padding-left: 20px;">
+          <li>Sessioni settimanali di conversazione in inglese ogni venerd&igrave;</li>
+          <li>Moderatore qualificato che guida la discussione</li>
+          <li>Temi sempre nuovi e stimolanti</li>
+          <li>Prenotazione online dalla tua dashboard</li>
+        </ul>
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+          <p style="color: #6b7280; font-size: 14px; margin: 0;">Per qualsiasi domanda contattaci a:</p>
+          <p style="margin: 4px 0 0;"><a href="mailto:infocorsi@skillcraft.interlingua.it" style="color: #7c3aed; font-size: 14px;">infocorsi@skillcraft.interlingua.it</a></p>
+        </div>
+        <p style="color: #9ca3af; font-size: 11px; margin-top: 24px;">Questa &egrave; un'email automatica. Il codice sconto &egrave; valido solo per il rinnovo dell'abbonamento Speaker's Corner ed &egrave; utilizzabile una sola volta.</p>
+      </div>
+    </div>
+  `;
+
+  const textBody = `Gentile ${data.nome} ${data.cognome},
+
+Il tuo abbonamento a Speaker's Corner scade il ${data.subscriptionEnd}.
+
+Non perdere l'accesso alle nostre sessioni settimanali di conversazione in inglese!
+
+OFFERTA ESCLUSIVA: ${data.discountPercent}% DI SCONTO sul rinnovo
+Usa il codice: ${data.discountCode}
+
+Rinnova ora: ${data.renewalUrl}
+
+Per qualsiasi domanda contattaci a: infocorsi@skillcraft.interlingua.it
+
+— SkillCraft-Interlingua`;
+
+  if (!ses) {
+    console.log("Email sending disabled — skipping renewal reminder");
+    return;
+  }
+
+  const command = new SendEmailCommand({
+    Source: SC_FROM_EMAIL,
+    Destination: {
+      ToAddresses: [data.email],
+    },
+    Message: {
+      Subject: {
+        Data: `Speaker's Corner — Rinnova con il ${data.discountPercent}% di sconto!`,
+        Charset: "UTF-8",
+      },
+      Body: {
+        Html: { Data: htmlBody, Charset: "UTF-8" },
+        Text: { Data: textBody, Charset: "UTF-8" },
+      },
+    },
+    ReplyToAddresses: [NOTIFICATION_EMAIL],
+  });
+
+  await ses.send(command);
+}
+
 export async function sendBookingConfirmation(data: {
   nome: string;
   cognome: string;

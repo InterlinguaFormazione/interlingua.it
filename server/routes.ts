@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { insertContactSchema, insertNewsletterSchema, insertCookieConsentSchema, insertShopOrderSchema, insertCourseMaterialSchema, insertBlogCommentSchema } from "@shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendSubscriptionConfirmation, sendBookingConfirmation, sendInvoiceEmail } from "./email";
+import { sendContactNotification, sendContactConfirmation, sendNewsletterConfirmation, sendSubscriptionConfirmation, sendBookingConfirmation, sendInvoiceEmail, sendRenewalReminder } from "./email";
 import { generateInvoicePDF, generateInvoiceNumber, generateFatturaPA, generateFatturaFilename, generateProgressivoInvio } from "./invoice";
 import { forwardToCRM, forwardPurchaseToCRM, forwardTestToCRM, forwardNewsletterToCRM } from "./crm";
 import { generateBlogPost } from "./blog-generator";
@@ -1544,6 +1544,67 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
     await generateBlogPost();
   });
 
+  cron.schedule("0 9 * * *", async () => {
+    console.log("Running SC renewal reminder check...");
+    try {
+      const allSubscribers = await storage.getAllScSubscribers();
+      const today = new Date();
+      const thirtyDaysFromNow = new Date(today);
+      thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+
+      const expiringSoon = allSubscribers.filter(sub => {
+        if (!sub.active || sub.renewalReminderSent) return false;
+        const endDate = new Date(sub.subscriptionEnd);
+        return endDate >= today && endDate <= thirtyDaysFromNow;
+      });
+
+      console.log(`Found ${expiringSoon.length} SC subscribers expiring within 30 days`);
+
+      for (const sub of expiringSoon) {
+        try {
+          const code = `SCRINNOVO-${sub.id.slice(0, 6).toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
+          const validUntil = new Date(sub.subscriptionEnd);
+          validUntil.setDate(validUntil.getDate() + 14);
+
+          await storage.createDiscountVoucher({
+            code,
+            description: `Sconto rinnovo Speaker's Corner per ${sub.nome} ${sub.cognome} (${sub.email})`,
+            discountType: "percentage",
+            discountValue: "50",
+            maxUses: 1,
+            usedCount: 0,
+            validFrom: new Date(),
+            validUntil,
+            productSlugs: "speakers-corner",
+            active: true,
+          });
+
+          const renewalUrl = `https://skillcraft.interlingua.it/shop/product/speakers-corner`;
+
+          await sendRenewalReminder({
+            nome: sub.nome,
+            cognome: sub.cognome,
+            email: sub.email,
+            subscriptionEnd: sub.subscriptionEnd,
+            discountCode: code,
+            discountPercent: 50,
+            renewalUrl,
+          });
+
+          await storage.updateScSubscriber(sub.id, {
+            renewalReminderSent: true,
+          });
+
+          console.log(`Sent renewal reminder to ${sub.email} with code ${code}`);
+        } catch (subErr) {
+          console.error(`Failed to send renewal reminder to ${sub.email}:`, subErr);
+        }
+      }
+    } catch (err) {
+      console.error("SC renewal reminder cron error:", err);
+    }
+  });
+
   const chatRateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
   app.post("/api/chat", async (req, res) => {
@@ -2263,6 +2324,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
             await storage.updateScSubscriber(existingSC.id, {
               subscriptionEnd,
               active: true,
+              renewalReminderSent: false,
             });
             subscriberId = existingSC.id;
           } else {
@@ -2601,6 +2663,7 @@ Rispondi in JSON: {"comments": [{"authorName": "...", "content": "..."}]}`
             await storage.updateScSubscriber(existingSC.id, {
               subscriptionEnd,
               active: true,
+              renewalReminderSent: false,
             });
             subscriberId = existingSC.id;
           } else {
